@@ -149,7 +149,7 @@ export function Newsletter({ onSuccess, className = "" }: NewsletterFormProps) {
       }
 
       // Parse successful response
-      const responseData = await response.json()
+      // const responseData = await response.json()
 
       setEmail("")
       setIsSuccess(true)
