@@ -11,7 +11,9 @@ interface NavbarProps {
 export default function Navbar({ onMenuClick }: NavbarProps) {
   const navRef = useRef<HTMLElement>(null)
   const punchingBagRef = useRef<HTMLButtonElement>(null)
-  const bagSvgRef = useRef<SVGSVGElement>(null)
+  const bagImageRef = useRef<HTMLImageElement>(null)
+  const glowRef = useRef<HTMLDivElement>(null)
+  const rippleRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     // Navbar entrance animation
@@ -23,14 +25,33 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
         y: 0,
         duration: 1.5,
         ease: "power2.out",
-        delay: 1, // Delay to let video start first
+        delay: 1,
       },
     )
+
+    // Continuous floating animation for the punching bag
+    gsap.to(bagImageRef.current, {
+      y: -3,
+      duration: 2,
+      repeat: -1,
+      yoyo: true,
+      ease: "sine.inOut",
+    })
+
+    // Subtle glow pulse animation
+    gsap.to(glowRef.current, {
+      opacity: 0.8,
+      scale: 1.1,
+      duration: 3,
+      repeat: -1,
+      yoyo: true,
+      ease: "sine.inOut",
+    })
   }, [])
 
-  // Enhanced punching bag hover animation with chain reaction
+  // Enhanced punching bag hover animation with realistic physics
   const handleBagHover = () => {
-    if (bagSvgRef.current && punchingBagRef.current) {
+    if (bagImageRef.current && punchingBagRef.current && rippleRef.current) {
       // Create punch impact animation with enhanced physics
       const tl = gsap.timeline()
 
@@ -41,65 +62,120 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
         ease: "power2.out",
       })
 
-      // Bag physics simulation
-      tl.to(bagSvgRef.current, {
-        rotation: 12,
-        x: 4,
-        scale: 0.92,
+      // Ripple effect
+      gsap.set(rippleRef.current, { scale: 0, opacity: 1 })
+      gsap.to(rippleRef.current, {
+        scale: 2,
+        opacity: 0,
+        duration: 0.6,
+        ease: "power2.out",
+      })
+
+      // Enhanced bag physics simulation
+      tl.to(bagImageRef.current, {
+        rotation: 15,
+        x: 6,
+        scale: 0.9,
         duration: 0.08,
         ease: "power3.out",
       })
         // Enhanced swing back with more realistic physics
-        .to(bagSvgRef.current, {
-          rotation: -6,
-          x: -2,
-          scale: 1.02,
-          duration: 0.25,
+        .to(bagImageRef.current, {
+          rotation: -8,
+          x: -3,
+          scale: 1.05,
+          duration: 0.3,
           ease: "power2.out",
         })
         // Secondary bounce
-        .to(bagSvgRef.current, {
-          rotation: 2,
+        .to(bagImageRef.current, {
+          rotation: 3,
           x: 1,
           scale: 0.98,
-          duration: 0.35,
+          duration: 0.4,
           ease: "power2.out",
         })
-        // Final settle with slight overshoot
-        .to(bagSvgRef.current, {
+        // Final settle with elastic overshoot
+        .to(bagImageRef.current, {
           rotation: 0,
           x: 0,
           scale: 1,
-          duration: 0.4,
+          duration: 0.5,
           ease: "elastic.out(1, 0.3)",
         })
+
+      // Enhanced glow effect on hover
+      gsap.to(glowRef.current, {
+        opacity: 1,
+        scale: 1.3,
+        duration: 0.3,
+        ease: "power2.out",
+      })
     }
   }
 
   const handleBagLeave = () => {
-    if (bagSvgRef.current && punchingBagRef.current) {
+    if (bagImageRef.current && punchingBagRef.current && glowRef.current) {
       // Gentle return to rest position
-      gsap.to([bagSvgRef.current, punchingBagRef.current], {
+      gsap.to([bagImageRef.current, punchingBagRef.current], {
         rotation: 0,
         x: 0,
         scale: 1,
         duration: 0.6,
         ease: "power2.out",
       })
+
+      // Return glow to normal
+      gsap.to(glowRef.current, {
+        opacity: 0.6,
+        scale: 1.1,
+        duration: 0.4,
+        ease: "power2.out",
+      })
     }
   }
 
-  // Enhanced click animation
+  // Enhanced click animation with satisfying feedback
   const handleBagClick = () => {
-    if (punchingBagRef.current) {
+    if (punchingBagRef.current && bagImageRef.current && rippleRef.current) {
       // Quick punch feedback before opening modal
-      gsap.to(punchingBagRef.current, {
-        scale: 0.95,
+      const tl = gsap.timeline()
+
+      // Impact effect
+      tl.to(punchingBagRef.current, {
+        scale: 0.9,
         duration: 0.1,
+        ease: "power2.out",
+      })
+        .to(punchingBagRef.current, {
+          scale: 1.1,
+          duration: 0.15,
+          ease: "back.out(1.7)",
+        })
+        .to(punchingBagRef.current, {
+          scale: 1,
+          duration: 0.1,
+          ease: "power2.out",
+          onComplete: onMenuClick,
+        })
+
+      // Dramatic bag swing on click
+      gsap.to(bagImageRef.current, {
+        rotation: 20,
+        x: 8,
+        duration: 0.2,
+        ease: "power3.out",
         yoyo: true,
         repeat: 1,
+      })
+
+      // Multiple ripple effects for impact
+      gsap.set(rippleRef.current, { scale: 0, opacity: 1 })
+      gsap.to(rippleRef.current, {
+        scale: 3,
+        opacity: 0,
+        duration: 0.8,
         ease: "power2.out",
-        onComplete: onMenuClick,
       })
     } else {
       onMenuClick()
@@ -113,8 +189,8 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
           {/* Hidden Logo for SEO */}
           <div className="sr-only">
             <Image
-              src="/txmx-logo.svg"
-              alt="TXMX Logo - Premium Boxing and Fitness Brand"
+              src="https://ampd-asset.s3.us-east-2.amazonaws.com/TXMXBack.svg"
+              alt="TXMX Logo"
               width={120}
               height={40}
               className="h-8 w-auto object-contain"
@@ -125,88 +201,107 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
           {/* Spacer */}
           <div className="flex-1" />
 
-          {/* Enhanced Punching Bag Menu */}
+          {/* Enhanced Punching Bag Menu Button */}
           <button
             ref={punchingBagRef}
             onClick={handleBagClick}
             onMouseEnter={handleBagHover}
             onMouseLeave={handleBagLeave}
-            className="group relative p-3 rounded-full bg-black/20 backdrop-blur-sm transition-all duration-500 overflow-hidden hover:shadow-2xl"
-            aria-label="Open menu"
+            className="group relative p-1 md:p-2 rounded-full transition-all duration-500 overflow-hidden"
+            aria-label="Open menu - Click the punching bag"
             style={{
               background: `
-                radial-gradient(circle at center, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 100%),
-                linear-gradient(45deg, transparent 30%, rgba(0,104,71,0.3) 50%, transparent 70%),
-                linear-gradient(-45deg, transparent 30%, rgba(206,17,38,0.3) 50%, transparent 70%)
+                radial-gradient(circle at center, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.1) 100%),
+                linear-gradient(45deg, transparent 30%, rgba(0,104,71,0.2) 50%, transparent 70%),
+                linear-gradient(-45deg, transparent 30%, rgba(206,17,38,0.2) 50%, transparent 70%)
               `,
               border: "1px solid rgba(255,255,255,0.1)",
               boxShadow: `
-                0 0 20px rgba(0,104,71,0.2),
-                0 0 40px rgba(206,17,38,0.1),
+                0 0 20px rgba(0,104,71,0.3),
+                0 0 40px rgba(206,17,38,0.2),
                 inset 0 1px 0 rgba(255,255,255,0.1)
               `,
-              animation: "glowPulse 3s ease-in-out infinite",
             }}
           >
+            {/* Animated glow background */}
+            <div
+              ref={glowRef}
+              className="absolute inset-0 rounded-full opacity-60"
+              style={{
+                background: `
+                  radial-gradient(circle at center, 
+                    rgba(0,104,71,0.4) 0%, 
+                    rgba(206,17,38,0.3) 50%, 
+                    transparent 70%
+                  )
+                `,
+                filter: "blur(8px)",
+              }}
+            />
+
+            {/* Ripple effect */}
+            <div
+              ref={rippleRef}
+              className="absolute inset-0 rounded-full border-2 border-white/30 opacity-0"
+              style={{ transformOrigin: "center" }}
+            />
+
             {/* Enhanced traveling light effect */}
             <div
               className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"
               style={{
                 background: `conic-gradient(from 0deg, transparent, rgba(0,104,71,0.8), rgba(255,255,255,0.3), rgba(206,17,38,0.8), transparent)`,
                 animation: "rotateBorder 2s linear infinite",
-                mask: "radial-gradient(circle at center, transparent 65%, black 70%, black 100%)",
-                WebkitMask: "radial-gradient(circle at center, transparent 65%, black 70%, black 100%)",
+                mask: "radial-gradient(circle at center, transparent 70%, black 75%, black 100%)",
+                WebkitMask: "radial-gradient(circle at center, transparent 70%, black 75%, black 100%)",
               }}
             />
 
-            {/* Enhanced Punching Bag SVG with more detail */}
-            <svg
-              ref={bagSvgRef}
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              className="relative z-10 text-white/90 group-hover:text-white transition-colors duration-300"
-              style={{ transformOrigin: "center top" }}
-            >
-              {/* Chain/Rope with links */}
-              <line x1="12" y1="1" x2="12" y2="6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-              <circle cx="12" cy="2" r="0.8" fill="currentColor" opacity="0.8" />
-              <circle cx="12" cy="3.5" r="0.6" fill="currentColor" opacity="0.6" />
-              <circle cx="12" cy="5" r="0.4" fill="currentColor" opacity="0.4" />
-
-              {/* Main Bag Body with enhanced shape */}
-              <path
-                d="M8 6h8c1.1 0 2 0.9 2 2v8c0 2.2-1.8 4-4 4h-4c-2.2 0-4-1.8-4-4V8c0-1.1 0.9-2 2-2z"
-                fill="currentColor"
-                opacity="0.9"
+            {/* Punching Bag Image */}
+            <div className="relative z-10 w-12 h-12 flex items-center justify-center">
+              <Image
+                ref={bagImageRef}
+                src="https://ampd-asset.s3.us-east-2.amazonaws.com/flyers-38-bag.png"
+                alt="Punching Bag Menu"
+                width={40}
+                height={40}
+                className="w-10 h-10 object-contain filter drop-shadow-lg"
+                style={{
+                  transformOrigin: "center top",
+                  filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.3)) brightness(1.1) contrast(1.1)",
+                }}
+                priority
               />
+            </div>
 
-              {/* Bag Top Ring with metallic effect */}
-              <rect x="7.5" y="6" width="9" height="1.5" rx="0.75" fill="currentColor" opacity="0.8" />
-              <rect x="8" y="6.2" width="8" height="0.6" rx="0.3" fill="rgba(255,255,255,0.3)" />
-
-              {/* Bag Bottom with weight */}
-              <ellipse cx="12" cy="20" rx="4" ry="1.2" fill="currentColor" opacity="0.6" />
-
-              {/* Enhanced highlight with multiple layers */}
-              <path
-                d="M10 8c0-0.5 0.5-1 1-1h2c0.5 0 1 0.5 1 1v6c0 1-0.5 2-1 2h-2c-0.5 0-1-1-1-2V8z"
-                fill="rgba(255,255,255,0.25)"
-              />
-              <path
-                d="M10.5 8.5c0-0.3 0.3-0.5 0.5-0.5h1c0.3 0 0.5 0.2 0.5 0.5v4c0 0.5-0.2 1-0.5 1h-1c-0.3 0-0.5-0.5-0.5-1V8.5z"
-                fill="rgba(255,255,255,0.15)"
-              />
-
-              {/* Bag texture lines */}
-              <line x1="9" y1="10" x2="15" y2="10" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
-              <line x1="9" y1="13" x2="15" y2="13" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
-              <line x1="9" y1="16" x2="15" y2="16" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
-            </svg>
+            {/* Hover instruction tooltip */}
+            <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+              <div className="bg-black/80 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                Click to open menu
+              </div>
+            </div>
           </button>
         </div>
       </div>
+
+      {/* Enhanced CSS for additional animations */}
+      <style jsx>{`
+        @keyframes rotateBorder {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        
+        /* Enhanced button hover effects */
+        button:hover {
+          transform: translateY(-1px);
+        }
+        
+        /* Smooth transitions for all elements */
+        * {
+          transition-property: transform, opacity, filter;
+          transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+      `}</style>
     </nav>
   )
 }
