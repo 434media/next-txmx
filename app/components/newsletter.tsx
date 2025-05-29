@@ -140,7 +140,7 @@ export function Newsletter({ onSuccess, className = "" }: NewsletterFormProps) {
         throw new Error(errorMessage)
       }
 
-      const responseData = await response.json()
+      await response.json()
 
       setEmail("")
       setIsSuccess(true)
