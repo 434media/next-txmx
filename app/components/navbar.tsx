@@ -14,6 +14,7 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
   const bagImageRef = useRef<HTMLImageElement>(null)
   const glowRef = useRef<HTMLDivElement>(null)
   const rippleRef = useRef<HTMLDivElement>(null)
+  const orbitRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     // Navbar entrance animation
@@ -31,25 +32,33 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
 
     // Continuous floating animation for the punching bag
     gsap.to(bagImageRef.current, {
-      y: -3,
-      duration: 2,
+      y: -4,
+      duration: 2.5,
       repeat: -1,
       yoyo: true,
       ease: "sine.inOut",
     })
 
-    // Subtle glow pulse animation
+    // Enhanced glow pulse animation
     gsap.to(glowRef.current, {
-      opacity: 0.8,
-      scale: 1.1,
-      duration: 3,
+      opacity: 0.9,
+      scale: 1.15,
+      duration: 4,
       repeat: -1,
       yoyo: true,
       ease: "sine.inOut",
+    })
+
+    // Orbital ring animation
+    gsap.to(orbitRef.current, {
+      rotation: 360,
+      duration: 12,
+      repeat: -1,
+      ease: "none",
     })
   }, [])
 
-  // Enhanced punching bag hover animation with realistic physics
+  // Enhanced punching bag hover animation with premium effects
   const handleBagHover = () => {
     if (bagImageRef.current && punchingBagRef.current && rippleRef.current) {
       // Create punch impact animation with enhanced physics
@@ -57,42 +66,42 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
 
       // Button scale for impact feedback
       gsap.to(punchingBagRef.current, {
-        scale: 1.05,
-        duration: 0.1,
+        scale: 1.08,
+        duration: 0.15,
         ease: "power2.out",
       })
 
-      // Ripple effect
+      // Enhanced ripple effect
       gsap.set(rippleRef.current, { scale: 0, opacity: 1 })
       gsap.to(rippleRef.current, {
-        scale: 2,
+        scale: 2.5,
         opacity: 0,
-        duration: 0.6,
+        duration: 0.8,
         ease: "power2.out",
       })
 
       // Enhanced bag physics simulation
       tl.to(bagImageRef.current, {
-        rotation: 15,
-        x: 6,
-        scale: 0.9,
-        duration: 0.08,
+        rotation: 18,
+        x: 8,
+        scale: 0.85,
+        duration: 0.1,
         ease: "power3.out",
       })
         // Enhanced swing back with more realistic physics
         .to(bagImageRef.current, {
-          rotation: -8,
-          x: -3,
-          scale: 1.05,
-          duration: 0.3,
+          rotation: -10,
+          x: -4,
+          scale: 1.08,
+          duration: 0.35,
           ease: "power2.out",
         })
         // Secondary bounce
         .to(bagImageRef.current, {
-          rotation: 3,
-          x: 1,
-          scale: 0.98,
-          duration: 0.4,
+          rotation: 4,
+          x: 2,
+          scale: 0.96,
+          duration: 0.45,
           ease: "power2.out",
         })
         // Final settle with elastic overshoot
@@ -100,15 +109,22 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
           rotation: 0,
           x: 0,
           scale: 1,
-          duration: 0.5,
+          duration: 0.6,
           ease: "elastic.out(1, 0.3)",
         })
 
       // Enhanced glow effect on hover
       gsap.to(glowRef.current, {
         opacity: 1,
-        scale: 1.3,
-        duration: 0.3,
+        scale: 1.4,
+        duration: 0.4,
+        ease: "power2.out",
+      })
+
+      // Orbital ring speed up on hover
+      gsap.to(orbitRef.current, {
+        rotation: "+=60",
+        duration: 0.8,
         ease: "power2.out",
       })
     }
@@ -121,15 +137,15 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
         rotation: 0,
         x: 0,
         scale: 1,
-        duration: 0.6,
+        duration: 0.8,
         ease: "power2.out",
       })
 
       // Return glow to normal
       gsap.to(glowRef.current, {
-        opacity: 0.6,
-        scale: 1.1,
-        duration: 0.4,
+        opacity: 0.9,
+        scale: 1.15,
+        duration: 0.6,
         ease: "power2.out",
       })
     }
@@ -143,27 +159,27 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
 
       // Impact effect
       tl.to(punchingBagRef.current, {
-        scale: 0.9,
-        duration: 0.1,
+        scale: 0.85,
+        duration: 0.12,
         ease: "power2.out",
       })
         .to(punchingBagRef.current, {
-          scale: 1.1,
-          duration: 0.15,
+          scale: 1.15,
+          duration: 0.18,
           ease: "back.out(1.7)",
         })
         .to(punchingBagRef.current, {
           scale: 1,
-          duration: 0.1,
+          duration: 0.15,
           ease: "power2.out",
           onComplete: onMenuClick,
         })
 
       // Dramatic bag swing on click
       gsap.to(bagImageRef.current, {
-        rotation: 20,
-        x: 8,
-        duration: 0.2,
+        rotation: 25,
+        x: 12,
+        duration: 0.25,
         ease: "power3.out",
         yoyo: true,
         repeat: 1,
@@ -172,9 +188,9 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
       // Multiple ripple effects for impact
       gsap.set(rippleRef.current, { scale: 0, opacity: 1 })
       gsap.to(rippleRef.current, {
-        scale: 3,
+        scale: 4,
         opacity: 0,
-        duration: 0.8,
+        duration: 1,
         ease: "power2.out",
       })
     } else {
@@ -201,48 +217,69 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
           {/* Spacer */}
           <div className="flex-1" />
 
-          {/* Enhanced Punching Bag Menu Button */}
+          {/* Enhanced Punching Bag Menu Button - Pure Monochrome */}
           <button
             ref={punchingBagRef}
             onClick={handleBagClick}
             onMouseEnter={handleBagHover}
             onMouseLeave={handleBagLeave}
-            className="group relative p-1 md:p-2 rounded-full transition-all duration-500 overflow-hidden"
+            className="group relative p-3 rounded-full transition-all duration-500 overflow-hidden"
             aria-label="Open menu - Click the punching bag"
             style={{
               background: `
-                radial-gradient(circle at center, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.1) 100%),
-                linear-gradient(45deg, transparent 30%, rgba(0,104,71,0.2) 50%, transparent 70%),
-                linear-gradient(-45deg, transparent 30%, rgba(206,17,38,0.2) 50%, transparent 70%)
+                radial-gradient(circle at center, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%),
+                linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.05) 50%, transparent 70%),
+                linear-gradient(-45deg, transparent 30%, rgba(255,255,255,0.03) 50%, transparent 70%)
               `,
-              border: "1px solid rgba(255,255,255,0.1)",
+              border: "1px solid rgba(255,255,255,0.15)",
               boxShadow: `
-                0 0 20px rgba(0,104,71,0.3),
-                0 0 40px rgba(206,17,38,0.2),
-                inset 0 1px 0 rgba(255,255,255,0.1)
+                0 0 25px rgba(255,255,255,0.1),
+                0 0 50px rgba(255,255,255,0.05),
+                inset 0 1px 0 rgba(255,255,255,0.2),
+                inset 0 -1px 0 rgba(0,0,0,0.2)
               `,
             }}
           >
-            {/* Animated glow background */}
+            {/* Animated glow background - Pure white */}
             <div
               ref={glowRef}
-              className="absolute inset-0 rounded-full opacity-60"
+              className="absolute inset-0 rounded-full opacity-90"
               style={{
                 background: `
                   radial-gradient(circle at center, 
-                    rgba(0,104,71,0.4) 0%, 
-                    rgba(206,17,38,0.3) 50%, 
-                    transparent 70%
+                    rgba(255,255,255,0.15) 0%, 
+                    rgba(255,255,255,0.08) 40%, 
+                    rgba(255,255,255,0.03) 70%,
+                    transparent 100%
                   )
                 `,
-                filter: "blur(8px)",
+                filter: "blur(12px)",
+              }}
+            />
+
+            {/* Orbital ring effect */}
+            <div
+              ref={orbitRef}
+              className="absolute inset-0 rounded-full opacity-30"
+              style={{
+                background: `
+                  conic-gradient(from 0deg, 
+                    transparent, 
+                    rgba(255,255,255,0.4), 
+                    rgba(255,255,255,0.8), 
+                    rgba(255,255,255,0.4), 
+                    transparent
+                  )
+                `,
+                mask: "radial-gradient(circle at center, transparent 75%, black 80%, black 85%, transparent 90%)",
+                WebkitMask: "radial-gradient(circle at center, transparent 75%, black 80%, black 85%, transparent 90%)",
               }}
             />
 
             {/* Ripple effect */}
             <div
               ref={rippleRef}
-              className="absolute inset-0 rounded-full border-2 border-white/30 opacity-0"
+              className="absolute inset-0 rounded-full border-2 border-white/40 opacity-0"
               style={{ transformOrigin: "center" }}
             />
 
@@ -250,34 +287,46 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
             <div
               className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"
               style={{
-                background: `conic-gradient(from 0deg, transparent, rgba(0,104,71,0.8), rgba(255,255,255,0.3), rgba(206,17,38,0.8), transparent)`,
-                animation: "rotateBorder 2s linear infinite",
+                background: `conic-gradient(from 0deg, transparent, rgba(255,255,255,0.6), rgba(255,255,255,0.9), rgba(255,255,255,0.6), transparent)`,
+                animation: "rotateBorder 3s linear infinite",
                 mask: "radial-gradient(circle at center, transparent 70%, black 75%, black 100%)",
                 WebkitMask: "radial-gradient(circle at center, transparent 70%, black 75%, black 100%)",
               }}
             />
 
             {/* Punching Bag Image */}
-            <div className="relative z-10 w-12 h-12 flex items-center justify-center">
+            <div className="relative z-10 w-14 h-14 flex items-center justify-center">
               <Image
                 ref={bagImageRef}
                 src="https://ampd-asset.s3.us-east-2.amazonaws.com/flyers-38-bag.png"
                 alt="Punching Bag Menu"
-                width={40}
-                height={40}
-                className="w-10 h-10 object-contain filter drop-shadow-lg"
+                width={44}
+                height={44}
+                className="w-11 h-11 object-contain"
                 style={{
                   transformOrigin: "center top",
-                  filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.3)) brightness(1.1) contrast(1.1)",
+                  filter: `
+                    drop-shadow(0 4px 12px rgba(0,0,0,0.4)) 
+                    drop-shadow(0 0 20px rgba(255,255,255,0.2))
+                    brightness(1.1) 
+                    contrast(1.2)
+                  `,
                 }}
                 priority
               />
             </div>
 
-            {/* Hover instruction tooltip */}
-            <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-              <div className="bg-black/80 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+            {/* Enhanced hover instruction tooltip */}
+            <div className="absolute -bottom-14 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
+              <div
+                className="text-white text-xs px-3 py-2 rounded-lg whitespace-nowrap backdrop-blur-sm border border-white/20"
+                style={{
+                  background: "rgba(0,0,0,0.8)",
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
+                }}
+              >
                 Click to open menu
+                <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-black/80 border-l border-t border-white/20 rotate-45"></div>
               </div>
             </div>
           </button>
@@ -293,12 +342,12 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
         
         /* Enhanced button hover effects */
         button:hover {
-          transform: translateY(-1px);
+          transform: translateY(-2px);
         }
         
         /* Smooth transitions for all elements */
         * {
-          transition-property: transform, opacity, filter;
+          transition-property: transform, opacity, filter, box-shadow;
           transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
         }
       `}</style>
