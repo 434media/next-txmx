@@ -255,7 +255,7 @@ export default function SlideOutModal({ isOpen, onClose }: SlideOutModalProps) {
                 <span className="text-white drop-shadow-lg">Levantamos Los Puños</span>
               </h1>
               <p className="text-white/70 text-sm leading-relaxed px-4 font-light">
-                TXMX Boxing is a dynamic media platform designed to connect brands with a passionate fight fan audience.
+                Somos Boxeo
               </p>
             </div>
 
@@ -455,9 +455,7 @@ export default function SlideOutModal({ isOpen, onClose }: SlideOutModalProps) {
                 <span className="text-white drop-shadow-lg">Levantamos Los Puños</span>
               </h1>
               <p className="text-white/70 text-sm leading-relaxed px-4 font-light">
-                TXMX Boxing is a dynamic media platform designed to connect brands with a passionate fight fan audience.
-                By celebrating the rich cultural heritage of Texas and Mexico, TXMX Boxing offers unique opportunities
-                for brands to authentically engage with a community that is deeply rooted in both sport and culture.
+                Somos Boxeo
               </p>
             </div>
 
