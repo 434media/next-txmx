@@ -209,24 +209,46 @@ export default function ShopifyTeaserPage() {
     <main className="relative min-h-screen bg-black overflow-hidden font-sans">
       {/* Hero Section with Teaser Video */}
       <section ref={heroRef} className="relative h-screen flex items-center justify-center overflow-hidden">
-        {/* Background Video */}
-        <video
-          ref={videoRef}
-          autoPlay
-          muted
-          loop
-          playsInline
-          onLoadedData={handleVideoLoaded}
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{
-            filter: "brightness(0.85) contrast(1.15) saturate(1.1)",
-            minWidth: "100%",
-            minHeight: "100%",
-            objectPosition: "center center",
-          }}
-        >
-          <source src="https://ampd-asset.s3.us-east-2.amazonaws.com/TXMX+DROP+TEASER.mp4" type="video/mp4" />
-        </video>
+        {/* Desktop Video Container */}
+        <div className="absolute inset-0 hidden md:block">
+          <video
+            ref={videoRef}
+            autoPlay
+            muted
+            loop
+            playsInline
+            onLoadedData={handleVideoLoaded}
+            className="w-full h-full object-cover"
+            style={{
+              filter: "brightness(0.85) contrast(1.15) saturate(1.1)",
+              objectPosition: "center center",
+            }}
+          >
+            <source src="https://ampd-asset.s3.us-east-2.amazonaws.com/TXMX+DROP+TEASER.mp4" type="video/mp4" />
+          </video>
+        </div>
+
+        {/* Mobile Video Container - 1080x1350 Aspect Ratio */}
+        <div className="absolute inset-0 md:hidden flex items-center justify-center">
+          <div
+            className="relative w-full bg-black">
+            <video
+              ref={videoRef}
+              autoPlay
+              muted
+              loop
+              playsInline
+              onLoadedData={handleVideoLoaded}
+              className="w-full h-full object-cover md:hidden aspect-square"
+              style={{
+                filter: "brightness(0.85) contrast(1.15) saturate(1.1)",
+                objectPosition: "center center",
+              }}
+            >
+              <source src="https://ampd-asset.s3.us-east-2.amazonaws.com/TXMX+DROP+TEASER.mp4" type="video/mp4" />
+            </video>
+          </div>
+        </div>
 
         {/* Enhanced gradient overlays */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/40" />
@@ -263,7 +285,7 @@ export default function ShopifyTeaserPage() {
         {/* Content Overlay */}
         <div
           ref={ctaRef}
-          className="relative z-10 flex flex-col items-center justify-end h-full w-full pb-20 px-4 opacity-0"
+          className="relative z-10 flex flex-col items-center justify-end h-full w-full pb-20 px-4 opacity-0 mt-32 md:mt-24"
           style={{ transform: "translateY(20px)" }}
         >
           {/* Newsletter Signup Form */}
@@ -318,28 +340,44 @@ export default function ShopifyTeaserPage() {
           will-change: transform, opacity;
         }
         
-        /* Mobile optimizations */
+        /* Mobile-specific video styling */
         @media (max-width: 768px) {
+          /* Ensure mobile video container is properly centered */
+          .mobile-video-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+          }
+          
+          /* Override any conflicting styles for mobile video */
           video {
             object-position: center center !important;
-          }
-        }
-        
-        @media (max-width: 480px) {
-          video {
-            object-position: center center !important;
-          }
-        }
-        
-        @media (max-width: 768px) and (min-aspect-ratio: 9/16) {
-          video {
             object-fit: cover !important;
-            width: 100vw !important;
-            height: 100vh !important;
           }
         }
         
+        /* Portrait orientation optimization */
+        @media (max-width: 768px) and (orientation: portrait) {
+          /* Ensure the aspect ratio container works well in portrait */
+          .mobile-video-container > div {
+            width: 100vw;
+            max-width: 100vw;
+          }
+        }
+        
+        /* Landscape orientation for mobile */
         @media (max-width: 768px) and (orientation: landscape) {
+          /* In landscape, we might want to adjust the aspect ratio container */
+          .mobile-video-container > div {
+            height: 100vh;
+            width: auto;
+            aspect-ratio: 1080 / 1350;
+          }
+        }
+        
+        /* Very small screens */
+        @media (max-width: 480px) {
           video {
             object-position: center center !important;
           }
