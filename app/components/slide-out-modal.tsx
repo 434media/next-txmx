@@ -254,9 +254,7 @@ export default function SlideOutModal({ isOpen, onClose }: SlideOutModalProps) {
               <h1 className="text-white text-2xl font-bold tracking-wide">
                 <span className="text-white drop-shadow-lg">Levantamos Los Puños</span>
               </h1>
-              <p className="text-white/70 text-sm leading-relaxed px-4 font-light">
-                Somos Boxeo
-              </p>
+              <p className="text-white/70 text-sm leading-relaxed px-4 font-light">Somos Boxeo</p>
             </div>
 
             {/* Enhanced Link Tree Style Links */}
@@ -306,11 +304,9 @@ export default function SlideOutModal({ isOpen, onClose }: SlideOutModalProps) {
                 </div>
               </a>
 
-              {/* Shopify Link */}
+              {/* Shopify Link - Updated to go to /shopify */}
               <a
-                href="https://434media.com/shop"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/shopify"
                 className="modal-element group relative block"
                 onMouseEnter={handleItemHover}
                 onMouseLeave={handleItemLeave}
@@ -344,9 +340,11 @@ export default function SlideOutModal({ isOpen, onClose }: SlideOutModalProps) {
                       <div className="text-white font-semibold group-hover:text-white transition-colors duration-300">
                         Shop
                       </div>
-                      <div className="text-white/60 text-sm">Official Store</div>
+                      <div className="text-white/60 text-sm">Coming Soon</div>
                     </div>
-                    <ExternalLinkIcon className="w-4 h-4 text-white/40 group-hover:text-white/70 transition-colors duration-300" />
+                    <div className="w-4 h-4 text-white/40 group-hover:text-white/70 transition-colors duration-300 flex items-center justify-center">
+                      <div className="w-2 h-2 bg-current rounded-full"></div>
+                    </div>
                   </div>
                 </div>
               </a>
@@ -454,9 +452,7 @@ export default function SlideOutModal({ isOpen, onClose }: SlideOutModalProps) {
               <h1 className="text-white text-2xl font-bold tracking-wide">
                 <span className="text-white drop-shadow-lg">Levantamos Los Puños</span>
               </h1>
-              <p className="text-white/70 text-sm leading-relaxed px-4 font-light">
-                Somos Boxeo
-              </p>
+              <p className="text-white/70 text-sm leading-relaxed px-4 font-light">Somos Boxeo</p>
             </div>
 
             {/* Newsletter Form */}
