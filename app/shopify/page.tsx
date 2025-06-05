@@ -285,7 +285,7 @@ export default function ShopifyTeaserPage() {
         {/* Content Overlay */}
         <div
           ref={ctaRef}
-          className="relative z-10 flex flex-col items-center justify-end h-full w-full pb-20 px-4 opacity-0 mt-32 md:mt-24"
+          className="relative z-10 flex flex-col items-center justify-end h-full w-full pb-20 px-4 opacity-0 mt-32 md:mt-0"
           style={{ transform: "translateY(20px)" }}
         >
           {/* Newsletter Signup Form */}
