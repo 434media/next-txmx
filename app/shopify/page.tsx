@@ -2,9 +2,7 @@
 
 import { useRef, useEffect, useState } from "react"
 import { gsap } from "gsap"
-import Navbar from "../components/navbar"
 import { Newsletter } from "../components/newsletter"
-import GlobalStyles from "../components/global-styles"
 
 export default function ShopifyTeaserPage() {
   const heroRef = useRef<HTMLDivElement>(null)
@@ -208,152 +206,146 @@ export default function ShopifyTeaserPage() {
   }
 
   return (
-    <>
-      <GlobalStyles />
-      <main className="relative min-h-screen bg-black overflow-hidden font-sans">
-        {/* Minimal Navbar */}
-        <Navbar onMenuClick={() => {}} />
+    <main className="relative min-h-screen bg-black overflow-hidden font-sans">
+      {/* Hero Section with Teaser Video */}
+      <section ref={heroRef} className="relative h-screen flex items-center justify-center overflow-hidden">
+        {/* Background Video */}
+        <video
+          ref={videoRef}
+          autoPlay
+          muted
+          loop
+          playsInline
+          onLoadedData={handleVideoLoaded}
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{
+            filter: "brightness(0.85) contrast(1.15) saturate(1.1)",
+            minWidth: "100%",
+            minHeight: "100%",
+            objectPosition: "center center",
+          }}
+        >
+          <source src="https://ampd-asset.s3.us-east-2.amazonaws.com/TXMX+DROP+TEASER.mp4" type="video/mp4" />
+        </video>
 
-        {/* Hero Section with Teaser Video */}
-        <section ref={heroRef} className="relative h-screen flex items-center justify-center overflow-hidden">
-          {/* Background Video */}
-          <video
-            ref={videoRef}
-            autoPlay
-            muted
-            loop
-            playsInline
-            onLoadedData={handleVideoLoaded}
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{
-              filter: "brightness(0.85) contrast(1.15) saturate(1.1)",
-              minWidth: "100%",
-              minHeight: "100%",
-              objectPosition: "center center",
-            }}
-          >
-            <source src="https://ampd-asset.s3.us-east-2.amazonaws.com/TXMX+DROP+TEASER.mp4" type="video/mp4" />
-          </video>
+        {/* Enhanced gradient overlays */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/40" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/30" />
 
-          {/* Enhanced gradient overlays */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/40" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/30" />
+        {/* Vignette effect */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: `radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.4) 100%)`,
+          }}
+        />
 
-          {/* Vignette effect */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: `radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.4) 100%)`,
-            }}
-          />
+        {/* Audio Control Button */}
+        <button
+          ref={audioButtonRef}
+          onClick={toggleMute}
+          className="absolute top-20 right-6 z-20 p-3 rounded-full transition-all duration-300 hover:opacity-100 focus:opacity-100"
+          style={{
+            background: "rgba(0,0,0,0.3)",
+            backdropFilter: "blur(8px)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+          }}
+          aria-label={isMuted ? "Unmute video" : "Mute video"}
+        >
+          {isMuted ? (
+            <VolumeOffIcon className="w-5 h-5 text-white/90" />
+          ) : (
+            <VolumeOnIcon className="w-5 h-5 text-white/90" />
+          )}
+        </button>
 
-          {/* Audio Control Button */}
-          <button
-            ref={audioButtonRef}
-            onClick={toggleMute}
-            className="absolute top-20 right-6 z-20 p-3 rounded-full transition-all duration-300 hover:opacity-100 focus:opacity-100"
-            style={{
-              background: "rgba(0,0,0,0.3)",
-              backdropFilter: "blur(8px)",
-              border: "1px solid rgba(255,255,255,0.1)",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
-            }}
-            aria-label={isMuted ? "Unmute video" : "Mute video"}
-          >
-            {isMuted ? (
-              <VolumeOffIcon className="w-5 h-5 text-white/90" />
-            ) : (
-              <VolumeOnIcon className="w-5 h-5 text-white/90" />
-            )}
-          </button>
-
-          {/* Content Overlay */}
-          <div
-            ref={ctaRef}
-            className="relative z-10 flex flex-col items-center justify-end h-full w-full pb-20 px-4 opacity-0"
-            style={{ transform: "translateY(20px)" }}
-          >
-            {/* Newsletter Signup Form */}
-            <div className="w-full max-w-md">
-              <div
-                className="relative p-6 rounded-2xl border border-white/10 backdrop-blur-md"
-                style={{
-                  background: `
-                    linear-gradient(135deg, 
-                      rgba(0,0,0,0.6) 0%, 
-                      rgba(0,0,0,0.4) 100%
-                    )
-                  `,
-                  boxShadow: `
-                    0 8px 32px rgba(0,0,0,0.4),
-                    inset 0 1px 0 rgba(255,255,255,0.1)
-                  `,
-                }}
-              >
-                <div className="text-center mb-5">
-                  <h2 className="text-white text-xl font-semibold mb-2">Coming July 19th</h2>
-                  <p className="text-white/80 text-sm">Sign up for early access and exclusive drops</p>
-                </div>
-
-                <Newsletter onSuccess={handleNewsletterSuccess} className="w-full" />
+        {/* Content Overlay */}
+        <div
+          ref={ctaRef}
+          className="relative z-10 flex flex-col items-center justify-end h-full w-full pb-20 px-4 opacity-0"
+          style={{ transform: "translateY(20px)" }}
+        >
+          {/* Newsletter Signup Form */}
+          <div className="w-full max-w-md">
+            <div
+              className="relative p-6 rounded-2xl border border-white/10 backdrop-blur-md"
+              style={{
+                background: `
+                  linear-gradient(135deg, 
+                    rgba(0,0,0,0.6) 0%, 
+                    rgba(0,0,0,0.4) 100%
+                  )
+                `,
+                boxShadow: `
+                  0 8px 32px rgba(0,0,0,0.4),
+                  inset 0 1px 0 rgba(255,255,255,0.1)
+                `,
+              }}
+            >
+              <div className="text-center mb-5">
+                <h2 className="text-white text-xl font-semibold mb-2">Coming July 19th</h2>
+                <p className="text-white/80 text-sm">Sign up for early access and exclusive drops</p>
               </div>
-            </div>
 
-            {/* Back to Home Link */}
-            <div ref={backLinkRef} className="mt-6 opacity-0" style={{ transform: "translateY(20px)" }}>
-              <a
-                href="/"
-                className="inline-flex items-center space-x-2 text-white/60 hover:text-white transition-colors duration-300 text-sm backdrop-blur-sm px-3 py-2 rounded-full"
-                style={{
-                  background: "rgba(0,0,0,0.2)",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                }}
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                <span>Back to Home</span>
-              </a>
+              <Newsletter onSuccess={handleNewsletterSuccess} className="w-full" />
             </div>
           </div>
-        </section>
 
-        {/* Enhanced CSS animations */}
-        <style jsx>{`
-          /* Video optimizations */
+          {/* Back to Home Link */}
+          <div ref={backLinkRef} className="mt-6 opacity-0" style={{ transform: "translateY(20px)" }}>
+            <a
+              href="/"
+              className="inline-flex items-center space-x-2 text-white/60 hover:text-white transition-colors duration-300 text-sm backdrop-blur-sm px-3 py-2 rounded-full"
+              style={{
+                background: "rgba(0,0,0,0.2)",
+                border: "1px solid rgba(255,255,255,0.1)",
+              }}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              <span>Back to Home</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Enhanced CSS animations */}
+      <style jsx>{`
+        /* Video optimizations */
+        video {
+          will-change: transform, opacity;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
           video {
-            will-change: transform, opacity;
+            object-position: center center !important;
           }
-          
-          /* Mobile optimizations */
-          @media (max-width: 768px) {
-            video {
-              object-position: center center !important;
-            }
+        }
+        
+        @media (max-width: 480px) {
+          video {
+            object-position: center center !important;
           }
-          
-          @media (max-width: 480px) {
-            video {
-              object-position: center center !important;
-            }
+        }
+        
+        @media (max-width: 768px) and (min-aspect-ratio: 9/16) {
+          video {
+            object-fit: cover !important;
+            width: 100vw !important;
+            height: 100vh !important;
           }
-          
-          @media (max-width: 768px) and (min-aspect-ratio: 9/16) {
-            video {
-              object-fit: cover !important;
-              width: 100vw !important;
-              height: 100vh !important;
-            }
+        }
+        
+        @media (max-width: 768px) and (orientation: landscape) {
+          video {
+            object-position: center center !important;
           }
-          
-          @media (max-width: 768px) and (orientation: landscape) {
-            video {
-              object-position: center center !important;
-            }
-          }
-        `}</style>
-      </main>
-    </>
+        }
+      `}</style>
+    </main>
   )
 }
 
