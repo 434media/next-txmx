@@ -1,12 +1,15 @@
 "use client"
 
+import type React from "react"
+
 import { useRef, useEffect, useState } from "react"
 import { gsap } from "gsap"
 import { Newsletter } from "../components/newsletter"
 
 export default function ShopifyTeaserPage() {
   const heroRef = useRef<HTMLDivElement>(null)
-  const videoRef = useRef<HTMLVideoElement>(null)
+  const desktopVideoRef = useRef<HTMLVideoElement>(null)
+  const mobileVideoRef = useRef<HTMLVideoElement>(null)
   const ctaRef = useRef<HTMLDivElement>(null)
   const backLinkRef = useRef<HTMLDivElement>(null)
   const audioButtonRef = useRef<HTMLButtonElement>(null)
@@ -15,14 +18,32 @@ export default function ShopifyTeaserPage() {
   const [videoTime, setVideoTime] = useState(0)
   const [hasScrolled, setHasScrolled] = useState(false)
   const [showCTA, setShowCTA] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
 
   // Track if CTA has been shown
   const ctaShownRef = useRef(false)
 
+  // Detect mobile screen size
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+
+    checkMobile()
+    window.addEventListener("resize", checkMobile)
+
+    return () => window.removeEventListener("resize", checkMobile)
+  }, [])
+
+  // Get the active video ref based on screen size
+  const getActiveVideoRef = () => {
+    return isMobile ? mobileVideoRef : desktopVideoRef
+  }
+
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Immediate presentation of video
-      gsap.set(videoRef.current, {
+      // Immediate presentation of videos
+      gsap.set([desktopVideoRef.current, mobileVideoRef.current], {
         opacity: 0,
         scale: 1.05,
       })
@@ -38,8 +59,8 @@ export default function ShopifyTeaserPage() {
         opacity: 0,
       })
 
-      // Video entrance animation
-      gsap.to(videoRef.current, {
+      // Video entrance animation for both videos
+      gsap.to([desktopVideoRef.current, mobileVideoRef.current], {
         opacity: 1,
         scale: 1,
         duration: 1.8,
@@ -74,13 +95,16 @@ export default function ShopifyTeaserPage() {
         const xPercent = (clientX / innerWidth - 0.5) * 2
         const yPercent = (clientY / innerHeight - 0.5) * 2
 
-        // Subtle video parallax
-        gsap.to(videoRef.current, {
-          x: xPercent * 15,
-          y: yPercent * 15,
-          duration: 2.5,
-          ease: "power2.out",
-        })
+        // Subtle video parallax for active video
+        const activeVideo = getActiveVideoRef().current
+        if (activeVideo) {
+          gsap.to(activeVideo, {
+            x: xPercent * 15,
+            y: yPercent * 15,
+            duration: 2.5,
+            ease: "power2.out",
+          })
+        }
 
         // Counter-parallax for CTA when visible
         if (showCTA) {
@@ -104,12 +128,15 @@ export default function ShopifyTeaserPage() {
 
         // Parallax effects on scroll
         const scrollPercent = Math.min(scrollY / window.innerHeight, 1)
-        gsap.to(videoRef.current, {
-          scale: 1 + scrollPercent * 0.1,
-          filter: `brightness(${0.85 - scrollPercent * 0.3}) contrast(${1.15 + scrollPercent * 0.2}) blur(${scrollPercent * 2}px)`,
-          duration: 0.3,
-          ease: "none",
-        })
+        const activeVideo = getActiveVideoRef().current
+        if (activeVideo) {
+          gsap.to(activeVideo, {
+            scale: 1 + scrollPercent * 0.1,
+            filter: `brightness(${0.85 - scrollPercent * 0.3}) contrast(${1.15 + scrollPercent * 0.2}) blur(${scrollPercent * 2}px)`,
+            duration: 0.3,
+            ease: "none",
+          })
+        }
 
         if (showCTA) {
           gsap.to(ctaRef.current, {
@@ -131,7 +158,7 @@ export default function ShopifyTeaserPage() {
     }, heroRef)
 
     return () => ctx.revert()
-  }, [videoLoaded, hasScrolled, showCTA])
+  }, [videoLoaded, hasScrolled, showCTA, isMobile])
 
   // Effect to show CTA based on video time or scroll
   useEffect(() => {
@@ -158,18 +185,29 @@ export default function ShopifyTeaserPage() {
     }
   }, [videoTime, hasScrolled])
 
-  // Track video time
+  // Track video time for both videos
   useEffect(() => {
-    const video = videoRef.current
-    if (!video) return
+    const setupTimeTracking = (videoRef: React.RefObject<HTMLVideoElement | null>) => {
+      const video = videoRef.current
+      if (!video) return
 
-    const updateTime = () => {
-      setVideoTime(Math.floor(video.currentTime))
+      const updateTime = () => {
+        setVideoTime(Math.floor(video.currentTime))
+      }
+
+      video.addEventListener("timeupdate", updateTime)
+      return () => {
+        video.removeEventListener("timeupdate", updateTime)
+      }
     }
 
-    video.addEventListener("timeupdate", updateTime)
+    // Set up time tracking for both videos
+    const cleanupDesktop = setupTimeTracking(desktopVideoRef)
+    const cleanupMobile = setupTimeTracking(mobileVideoRef)
+
     return () => {
-      video.removeEventListener("timeupdate", updateTime)
+      cleanupDesktop?.()
+      cleanupMobile?.()
     }
   }, [])
 
@@ -178,9 +216,14 @@ export default function ShopifyTeaserPage() {
   }
 
   const toggleMute = () => {
-    if (videoRef.current) {
+    // Toggle mute for both videos to keep them in sync
+    const desktopVideo = desktopVideoRef.current
+    const mobileVideo = mobileVideoRef.current
+
+    if (desktopVideo && mobileVideo) {
       const newMutedState = !isMuted
-      videoRef.current.muted = newMutedState
+      desktopVideo.muted = newMutedState
+      mobileVideo.muted = newMutedState
       setIsMuted(newMutedState)
 
       // Animate the button
@@ -212,7 +255,7 @@ export default function ShopifyTeaserPage() {
         {/* Desktop Video Container */}
         <div className="absolute inset-0 hidden md:block">
           <video
-            ref={videoRef}
+            ref={desktopVideoRef}
             autoPlay
             muted
             loop
@@ -230,19 +273,20 @@ export default function ShopifyTeaserPage() {
 
         {/* Mobile Video Container - 1080x1350 Aspect Ratio */}
         <div className="absolute inset-0 md:hidden flex items-center justify-center">
-          <div
-            className="relative w-full bg-black">
+          <div className="relative w-full" style={{ maxHeight: "100vh" }}>
             <video
-              ref={videoRef}
+              ref={mobileVideoRef}
               autoPlay
               muted
               loop
               playsInline
               onLoadedData={handleVideoLoaded}
-              className="w-full h-full object-cover md:hidden aspect-square"
+              className="w-full h-full object-cover"
               style={{
                 filter: "brightness(0.85) contrast(1.15) saturate(1.1)",
                 objectPosition: "center center",
+                aspectRatio: "1080 / 1350",
+                maxHeight: "100vh",
               }}
             >
               <source src="https://ampd-asset.s3.us-east-2.amazonaws.com/TXMX+DROP+TEASER.mp4" type="video/mp4" />
@@ -285,7 +329,7 @@ export default function ShopifyTeaserPage() {
         {/* Content Overlay */}
         <div
           ref={ctaRef}
-          className="relative z-10 flex flex-col items-center justify-end h-full w-full pb-20 px-4 opacity-0 mt-32 md:mt-0"
+          className="relative z-10 flex flex-col items-center justify-end h-full w-full pb-20 px-4 opacity-0"
           style={{ transform: "translateY(20px)" }}
         >
           {/* Newsletter Signup Form */}
@@ -331,6 +375,14 @@ export default function ShopifyTeaserPage() {
             </a>
           </div>
         </div>
+
+        {/* Debug Info - Remove in production */}
+        <div className="absolute top-4 left-4 z-50 text-white text-xs bg-black/50 p-2 rounded">
+          <div>Video Time: {videoTime}s</div>
+          <div>Has Scrolled: {hasScrolled ? "Yes" : "No"}</div>
+          <div>Show CTA: {showCTA ? "Yes" : "No"}</div>
+          <div>Is Mobile: {isMobile ? "Yes" : "No"}</div>
+        </div>
       </section>
 
       {/* Enhanced CSS animations */}
@@ -342,15 +394,6 @@ export default function ShopifyTeaserPage() {
         
         /* Mobile-specific video styling */
         @media (max-width: 768px) {
-          /* Ensure mobile video container is properly centered */
-          .mobile-video-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-          }
-          
-          /* Override any conflicting styles for mobile video */
           video {
             object-position: center center !important;
             object-fit: cover !important;
@@ -359,7 +402,6 @@ export default function ShopifyTeaserPage() {
         
         /* Portrait orientation optimization */
         @media (max-width: 768px) and (orientation: portrait) {
-          /* Ensure the aspect ratio container works well in portrait */
           .mobile-video-container > div {
             width: 100vw;
             max-width: 100vw;
@@ -368,7 +410,6 @@ export default function ShopifyTeaserPage() {
         
         /* Landscape orientation for mobile */
         @media (max-width: 768px) and (orientation: landscape) {
-          /* In landscape, we might want to adjust the aspect ratio container */
           .mobile-video-container > div {
             height: 100vh;
             width: auto;
