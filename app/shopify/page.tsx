@@ -329,7 +329,7 @@ export default function ShopifyTeaserPage() {
         {/* Content Overlay */}
         <div
           ref={ctaRef}
-          className="relative z-10 flex flex-col items-center justify-end h-full w-full pb-20 px-4 opacity-0"
+          className="relative z-10 flex flex-col items-center justify-end h-full w-full pb-20 px-4 opacity-0 mt-32 md:mt-24"
           style={{ transform: "translateY(20px)" }}
         >
           {/* Newsletter Signup Form */}
@@ -374,14 +374,6 @@ export default function ShopifyTeaserPage() {
               <span>Back to Home</span>
             </a>
           </div>
-        </div>
-
-        {/* Debug Info - Remove in production */}
-        <div className="absolute top-4 left-4 z-50 text-white text-xs bg-black/50 p-2 rounded">
-          <div>Video Time: {videoTime}s</div>
-          <div>Has Scrolled: {hasScrolled ? "Yes" : "No"}</div>
-          <div>Show CTA: {showCTA ? "Yes" : "No"}</div>
-          <div>Is Mobile: {isMobile ? "Yes" : "No"}</div>
         </div>
       </section>
 
