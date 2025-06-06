@@ -378,7 +378,7 @@ export function Newsletter({ onSuccess, className = "" }: NewsletterFormProps) {
         <div className="text-center mb-6">
           <h3 className="text-sm font-bold text-black mb-2 tracking-wide">JOIN THE FIGHT</h3>
           <p className="text-sm text-gray-700 leading-relaxed font-medium">
-            Get exclusive drops, insider access, and be first in the ring for limited releases. SOMOS BOXEO.
+            Get exclusive drops, insider access, and be first in the ring for limited releases.
           </p>
         </div>
 

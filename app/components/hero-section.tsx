@@ -1,17 +1,20 @@
 "use client"
 
-import { useRef, useEffect } from "react"
+import { useRef, useEffect, useState } from "react"
 import { gsap } from "gsap"
 import Image from "next/image"
+import { Newsletter } from "./newsletter"
 
 export default function HeroSection() {
   const heroRef = useRef<HTMLDivElement>(null)
   const logoRef = useRef<HTMLDivElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
+  const newsletterRef = useRef<HTMLDivElement>(null)
+  const [showNewsletter, setShowNewsletter] = useState(false)
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Immediate video presentation - no complex filters
+      // Immediate video presentation
       gsap.set(videoRef.current, {
         opacity: 1,
         scale: 1,
@@ -33,6 +36,56 @@ export default function HeroSection() {
         ease: "sine.inOut",
       })
 
+      // Newsletter entrance sequence after delay
+      const newsletterTimer = setTimeout(() => {
+        setShowNewsletter(true)
+
+        // Wait for React to render the newsletter, then animate
+        requestAnimationFrame(() => {
+          if (newsletterRef.current) {
+            // Set initial state
+            gsap.set(newsletterRef.current, {
+              opacity: 0,
+              scale: 0.8,
+              y: 50,
+              rotationX: -15,
+            })
+
+            // Dramatic entrance animation
+            const tl = gsap.timeline()
+
+            tl.to(newsletterRef.current, {
+              opacity: 1,
+              scale: 1,
+              y: 0,
+              rotationX: 0,
+              duration: 1.2,
+              ease: "back.out(1.4)",
+            })
+              .to(
+                newsletterRef.current,
+                {
+                  scale: 1.02,
+                  duration: 0.3,
+                  ease: "power2.out",
+                  yoyo: true,
+                  repeat: 1,
+                },
+                "-=0.3",
+              )
+              .to(
+                newsletterRef.current,
+                {
+                  boxShadow: "0 25px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1)",
+                  duration: 0.5,
+                  ease: "power2.out",
+                },
+                "-=0.6",
+              )
+          }
+        })
+      }, 4000) // Show newsletter after 4 seconds
+
       // Simple logo hover enhancement
       const handleLogoHover = () => {
         gsap.to(logoRef.current, {
@@ -50,7 +103,7 @@ export default function HeroSection() {
         })
       }
 
-      // Simple scroll fade for logo
+      // Simple scroll fade for logo and newsletter
       const handleScroll = () => {
         const scrollY = window.scrollY
         const scrollPercent = Math.min(scrollY / (window.innerHeight * 0.8), 1)
@@ -61,6 +114,16 @@ export default function HeroSection() {
           duration: 0.1,
           ease: "none",
         })
+
+        if (newsletterRef.current) {
+          gsap.to(newsletterRef.current, {
+            opacity: 1 - scrollPercent * 1.2,
+            y: scrollPercent * -30,
+            scale: 1 - scrollPercent * 0.1,
+            duration: 0.1,
+            ease: "none",
+          })
+        }
       }
 
       // Add event listeners
@@ -72,6 +135,7 @@ export default function HeroSection() {
       }
 
       return () => {
+        clearTimeout(newsletterTimer)
         window.removeEventListener("scroll", handleScroll)
         if (logoRef.current) {
           logoRef.current.removeEventListener("mouseenter", handleLogoHover)
@@ -82,6 +146,33 @@ export default function HeroSection() {
 
     return () => ctx.revert()
   }, [])
+
+  const handleNewsletterSuccess = () => {
+    // Celebration animation on success
+    if (newsletterRef.current) {
+      gsap.to(newsletterRef.current, {
+        scale: 1.05,
+        duration: 0.3,
+        ease: "back.out(1.7)",
+        yoyo: true,
+        repeat: 1,
+      })
+    }
+  }
+
+  const handleNewsletterClose = () => {
+    // Smooth exit animation
+    if (newsletterRef.current) {
+      gsap.to(newsletterRef.current, {
+        opacity: 0,
+        scale: 0.9,
+        y: 30,
+        duration: 0.6,
+        ease: "power2.in",
+        onComplete: () => setShowNewsletter(false),
+      })
+    }
+  }
 
   return (
     <section ref={heroRef} className="relative h-screen flex items-center justify-center overflow-hidden">
@@ -170,7 +261,61 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* Performance-Optimized CSS */}
+      {/* Newsletter Pop-in */}
+      {showNewsletter && (
+        <div
+          ref={newsletterRef}
+          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 w-full max-w-sm px-4"
+          style={{
+            perspective: "1000px",
+          }}
+        >
+          {/* Close Button */}
+          <button
+            onClick={handleNewsletterClose}
+            className="absolute -top-3 -right-3 z-30 w-8 h-8 bg-black text-white border-2 border-white hover:bg-white hover:text-black transition-colors duration-300 flex items-center justify-center text-sm font-bold"
+            aria-label="Close newsletter"
+          >
+            ×
+          </button>
+
+          {/* Newsletter Form with Enhanced Styling */}
+          <div
+            style={{
+              background: "rgba(255, 255, 255, 0.95)",
+              backdropFilter: "blur(20px)",
+              WebkitBackdropFilter: "blur(20px)",
+              border: "4px solid white",
+              boxShadow: `
+                0 20px 60px rgba(0,0,0,0.4),
+                0 0 0 1px rgba(255,255,255,0.2),
+                inset 0 1px 0 rgba(255,255,255,0.3)
+              `,
+            }}
+          >
+            <Newsletter onSuccess={handleNewsletterSuccess} />
+          </div>
+
+          {/* Animated Attention Indicators */}
+          <div className="absolute -inset-4 pointer-events-none">
+            {/* Pulsing Ring */}
+            <div
+              className="absolute inset-0 border-2 border-white/30 animate-pulse"
+              style={{
+                animation: "pulseRing 3s ease-in-out infinite",
+              }}
+            />
+
+            {/* Corner Accents */}
+            <div className="absolute -top-2 -left-2 w-4 h-4 border-l-2 border-t-2 border-white/60"></div>
+            <div className="absolute -top-2 -right-2 w-4 h-4 border-r-2 border-t-2 border-white/60"></div>
+            <div className="absolute -bottom-2 -left-2 w-4 h-4 border-l-2 border-b-2 border-white/60"></div>
+            <div className="absolute -bottom-2 -right-2 w-4 h-4 border-r-2 border-b-2 border-white/60"></div>
+          </div>
+        </div>
+      )}
+
+      {/* Enhanced CSS for Newsletter Animations */}
       <style jsx>{`
         /* Hardware acceleration for smooth performance */
         video {
@@ -184,12 +329,34 @@ export default function HeroSection() {
           transform: translateZ(0);
         }
 
-        /* Mobile video optimizations */
+        /* Newsletter animations */
+        @keyframes pulseRing {
+          0% {
+            transform: scale(1);
+            opacity: 0.6;
+          }
+          50% {
+            transform: scale(1.05);
+            opacity: 0.3;
+          }
+          100% {
+            transform: scale(1);
+            opacity: 0.6;
+          }
+        }
+
+        /* Mobile optimizations */
         @media (max-width: 768px) {
           video {
             object-position: center center;
             height: 100vh;
-            height: 100dvh; /* Dynamic viewport height for mobile */
+            height: 100dvh;
+          }
+          
+          /* Newsletter mobile positioning */
+          .newsletter-container {
+            bottom: 1rem;
+            max-width: calc(100vw - 2rem);
           }
         }
 
@@ -199,6 +366,12 @@ export default function HeroSection() {
             object-fit: cover;
             width: 100vw;
             height: 100vh;
+          }
+          
+          /* Adjust newsletter position for landscape */
+          .newsletter-container {
+            bottom: 0.5rem;
+            transform: scale(0.9);
           }
         }
 
@@ -223,19 +396,10 @@ export default function HeroSection() {
           img {
             filter: brightness(1.2) contrast(1.3) !important;
           }
-        }
-
-        /* Dark mode optimization */
-        @media (prefers-color-scheme: dark) {
-          video {
-            filter: brightness(0.95);
-          }
-        }
-
-        /* Print styles */
-        @media print {
-          video {
-            display: none;
+          
+          .newsletter-container {
+            border: 4px solid white !important;
+            background: white !important;
           }
         }
 
@@ -243,6 +407,11 @@ export default function HeroSection() {
         [tabindex]:focus-visible {
           outline: 2px solid rgba(255, 255, 255, 0.8);
           outline-offset: 4px;
+        }
+
+        /* Newsletter close button hover effect */
+        button:hover {
+          transform: scale(1.1);
         }
       `}</style>
     </section>
