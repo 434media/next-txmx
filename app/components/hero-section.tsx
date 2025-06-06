@@ -11,6 +11,19 @@ export default function HeroSection() {
   const videoRef = useRef<HTMLVideoElement>(null)
   const newsletterRef = useRef<HTMLDivElement>(null)
   const [showNewsletter, setShowNewsletter] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    // Detect mobile device
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768)
+    }
+
+    checkMobile()
+    window.addEventListener("resize", checkMobile)
+
+    return () => window.removeEventListener("resize", checkMobile)
+  }, [])
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -103,11 +116,12 @@ export default function HeroSection() {
         })
       }
 
-      // Simple scroll fade for logo and newsletter
+      // Simple scroll fade for logo and newsletter (disabled on mobile for newsletter)
       const handleScroll = () => {
         const scrollY = window.scrollY
         const scrollPercent = Math.min(scrollY / (window.innerHeight * 0.8), 1)
 
+        // Always fade logo on scroll
         gsap.to(logoRef.current, {
           opacity: 1 - scrollPercent,
           y: scrollPercent * -50,
@@ -115,7 +129,8 @@ export default function HeroSection() {
           ease: "none",
         })
 
-        if (newsletterRef.current) {
+        // Only fade newsletter on desktop, keep it visible on mobile
+        if (newsletterRef.current && !isMobile) {
           gsap.to(newsletterRef.current, {
             opacity: 1 - scrollPercent * 1.2,
             y: scrollPercent * -30,
@@ -145,7 +160,7 @@ export default function HeroSection() {
     }, heroRef)
 
     return () => ctx.revert()
-  }, [])
+  }, [isMobile])
 
   const handleNewsletterSuccess = () => {
     // Celebration animation on success
@@ -261,11 +276,11 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* Newsletter Pop-in - Clean & Simple */}
+      {/* Newsletter Pop-in - Mobile Keyboard Optimized */}
       {showNewsletter && (
         <div
           ref={newsletterRef}
-          className="absolute bottom-20 sm:bottom-24 md:bottom-32 left-1/2 transform -translate-x-1/2 z-20 w-full max-w-xs sm:max-w-sm px-3 sm:px-4"
+          className={`absolute bottom-20 sm:bottom-24 md:bottom-32 left-1/2 transform -translate-x-1/2 z-20 w-full max-w-xs sm:max-w-sm px-3 sm:px-4 ${isMobile ? "mobile-newsletter-container" : ""}`}
           style={{
             perspective: "1000px",
           }}
@@ -297,7 +312,7 @@ export default function HeroSection() {
               `,
             }}
           >
-            <Newsletter onSuccess={handleNewsletterSuccess} compact={true} mobile={true} />
+            <Newsletter onSuccess={handleNewsletterSuccess} compact={true} mobile={isMobile} />
           </div>
         </div>
       )}
@@ -314,6 +329,13 @@ export default function HeroSection() {
         img {
           will-change: transform;
           transform: translateZ(0);
+        }
+
+        /* Mobile newsletter container - prevent scroll fade */
+        .mobile-newsletter-container {
+          /* Ensure newsletter stays visible on mobile regardless of scroll */
+          opacity: 1 !important;
+          transform: translateX(-50%) !important;
         }
 
         /* Mobile-first optimizations */
@@ -337,6 +359,34 @@ export default function HeroSection() {
             z-index: 9999;
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
           }
+
+          /* Prevent newsletter from fading on mobile scroll */
+          .mobile-newsletter-container {
+            opacity: 1 !important;
+            transform: translateX(-50%) translateY(0) !important;
+            transition: none !important;
+          }
+
+          /* Handle mobile keyboard appearance */
+          @supports (-webkit-touch-callout: none) {
+            /* iOS specific handling */
+            .mobile-newsletter-container {
+              position: fixed !important;
+              bottom: 1rem !important;
+              opacity: 1 !important;
+              transform: translateX(-50%) !important;
+            }
+          }
+
+          /* Android keyboard handling */
+          @media screen and (max-height: 500px) {
+            .mobile-newsletter-container {
+              position: fixed !important;
+              bottom: 0.5rem !important;
+              opacity: 1 !important;
+              transform: translateX(-50%) scale(0.9) !important;
+            }
+          }
         }
 
         /* Extra small mobile devices */
@@ -349,6 +399,12 @@ export default function HeroSection() {
           /* Smaller shadows for performance */
           .mobile-newsletter {
             box-shadow: 0 10px 30px rgba(0,0,0,0.3) !important;
+          }
+
+          /* Ensure visibility on small screens */
+          .mobile-newsletter-container {
+            opacity: 1 !important;
+            transform: translateX(-50%) !important;
           }
         }
 
@@ -365,22 +421,34 @@ export default function HeroSection() {
             max-height: 70vh;
           }
           
-          /* Position higher in landscape */
-          [ref="newsletterRef"] {
-            bottom: 10vh !important;
+          /* Keep newsletter visible in landscape */
+          .mobile-newsletter-container {
+            bottom: 0.5rem !important;
+            opacity: 1 !important;
+            transform: translateX(-50%) scale(0.85) !important;
           }
         }
 
         /* iOS Safari specific optimizations */
         @supports (-webkit-touch-callout: none) {
           /* iOS safe area handling */
-          [ref="newsletterRef"] {
-            bottom: calc(5rem + env(safe-area-inset-bottom)) !important;
+          .mobile-newsletter-container {
+            bottom: calc(1rem + env(safe-area-inset-bottom)) !important;
+            opacity: 1 !important;
           }
           
           /* Prevent zoom on input focus */
           input[type="email"] {
             font-size: 16px !important;
+          }
+
+          /* Handle iOS keyboard */
+          @media screen and (max-height: 500px) {
+            .mobile-newsletter-container {
+              bottom: 0.25rem !important;
+              transform: translateX(-50%) scale(0.8) !important;
+              opacity: 1 !important;
+            }
           }
         }
 
@@ -435,6 +503,36 @@ export default function HeroSection() {
             min-width: 44px;
             min-height: 44px;
             padding: 8px;
+          }
+
+          /* Ensure newsletter stays visible on touch devices */
+          .mobile-newsletter-container {
+            opacity: 1 !important;
+            transform: translateX(-50%) !important;
+          }
+        }
+
+        /* Viewport height changes (keyboard appearance) */
+        @media (max-width: 768px) {
+          /* When viewport height is reduced (keyboard visible) */
+          @media (max-height: 600px) {
+            .mobile-newsletter-container {
+              position: fixed !important;
+              bottom: 0.5rem !important;
+              opacity: 1 !important;
+              transform: translateX(-50%) scale(0.9) !important;
+              z-index: 9999 !important;
+            }
+          }
+
+          @media (max-height: 450px) {
+            .mobile-newsletter-container {
+              position: fixed !important;
+              bottom: 0.25rem !important;
+              opacity: 1 !important;
+              transform: translateX(-50%) scale(0.8) !important;
+              z-index: 9999 !important;
+            }
           }
         }
       `}</style>
