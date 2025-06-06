@@ -7,6 +7,7 @@ import Navbar from "./components/navbar"
 import SlideOutModal from "./components/slide-out-modal"
 import GlobalStyles from "./components/global-styles"
 import "./globals.css"
+import Footer from "./components/footer"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -118,7 +119,9 @@ export default function ClientLayout({
 
         {/* Page Content */}
         {children}
-
+        
+        <Footer />
+        
         {/* Universal Slide Out Modal */}
         <SlideOutModal isOpen={isModalOpen} onClose={closeModal} />
       </body>

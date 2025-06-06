@@ -2,7 +2,8 @@
 
 import type React from "react"
 import { useState, useRef, useEffect } from "react"
-import { MailIcon } from "./icons/mail-icon"
+import { gsap } from "gsap"
+import Image from "next/image"
 
 // Extend the Window interface to include the turnstile property
 declare global {
@@ -38,9 +39,69 @@ export function Newsletter({ onSuccess, className = "" }: NewsletterFormProps) {
   const [turnstileWidget, setTurnstileWidget] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const successRef = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const logoRef = useRef<HTMLImageElement>(null)
+  const titleRef = useRef<HTMLParagraphElement>(null)
 
   // Email validation regex pattern
   const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+
+  // Enhanced entrance animation
+  useEffect(() => {
+    if (containerRef.current && logoRef.current && titleRef.current) {
+      const tl = gsap.timeline()
+
+      // Set initial states
+      gsap.set([containerRef.current, logoRef.current, titleRef.current], {
+        opacity: 0,
+        y: 30,
+        scale: 0.95,
+      })
+
+      // Animate entrance with stagger
+      tl.to(containerRef.current, {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.8,
+        ease: "back.out(1.4)",
+      })
+        .to(
+          logoRef.current,
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.6,
+            ease: "back.out(1.7)",
+          },
+          "-=0.4",
+        )
+        .to(
+          titleRef.current,
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.5,
+            ease: "back.out(1.5)",
+          },
+          "-=0.3",
+        )
+
+      // Add floating animation to logo
+      gsap.to(logoRef.current, {
+        y: -3,
+        duration: 2.5,
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut",
+        delay: 1,
+      })
+    }
+  }, [])
 
   // Load Turnstile script only when needed
   useEffect(() => {
@@ -93,18 +154,47 @@ export function Newsletter({ onSuccess, className = "" }: NewsletterFormProps) {
     setError(null)
 
     if (!email.trim()) {
-      setError("Please enter your email address")
+      setError("Enter your email to join the fight")
       inputRef.current?.focus()
+
+      // Error shake animation
+      if (inputRef.current) {
+        gsap.to(inputRef.current, {
+          keyframes: { x: [-10, 10, -8, 8, -6, 6, -4, 4, 0] },
+          duration: 0.6,
+          ease: "power2.out",
+        })
+      }
       return
     }
 
     if (!validateEmail(email)) {
-      setError("Please enter a valid email address")
+      setError("Enter a valid email address")
       inputRef.current?.focus()
+
+      // Error shake animation
+      if (inputRef.current) {
+        gsap.to(inputRef.current, {
+          keyframes: { x: [-10, 10, -8, 8, -6, 6, -4, 4, 0] },
+          duration: 0.6,
+          ease: "power2.out",
+        })
+      }
       return
     }
 
     setIsSubmitting(true)
+
+    // Enhanced button animation during submission
+    if (buttonRef.current) {
+      gsap.to(buttonRef.current, {
+        scale: 0.98,
+        duration: 0.1,
+        yoyo: true,
+        repeat: 1,
+        ease: "power2.out",
+      })
+    }
 
     try {
       let turnstileResponse = undefined
@@ -130,7 +220,7 @@ export function Newsletter({ onSuccess, className = "" }: NewsletterFormProps) {
       })
 
       if (!response.ok) {
-        let errorMessage = "Newsletter subscription failed"
+        let errorMessage = "Failed to join the fight"
         try {
           const errorData = await response.json()
           errorMessage = errorData.error || errorMessage
@@ -147,7 +237,16 @@ export function Newsletter({ onSuccess, className = "" }: NewsletterFormProps) {
       formRef.current?.reset()
       onSuccess?.()
 
-      setTimeout(() => setIsSuccess(false), 5000)
+      // Enhanced success animation
+      if (successRef.current) {
+        gsap.fromTo(
+          successRef.current,
+          { scale: 0.8, opacity: 0, rotationY: -90 },
+          { scale: 1, opacity: 1, rotationY: 0, duration: 0.8, ease: "back.out(1.7)" },
+        )
+      }
+
+      setTimeout(() => setIsSuccess(false), 6000)
 
       if (!isDevelopment && turnstileWidget && window.turnstile) {
         window.turnstile.reset(turnstileWidget)
@@ -156,53 +255,97 @@ export function Newsletter({ onSuccess, className = "" }: NewsletterFormProps) {
       console.error("Error subscribing to newsletter:", error)
 
       if (error instanceof TypeError && error.message.includes("fetch")) {
-        setError("Network error. Please check your connection and try again.")
+        setError("Network error. Check your connection and try again.")
       } else if (error instanceof SyntaxError) {
         setError("Server error. Please try again later.")
       } else {
-        setError(`${error instanceof Error ? error.message : "An unexpected error occurred"}. Please try again.`)
+        setError(`${error instanceof Error ? error.message : "An unexpected error occurred"}. Try again.`)
       }
     } finally {
       setIsSubmitting(false)
     }
   }
 
+  // Enhanced input focus animations
+  const handleInputFocus = () => {
+    if (inputRef.current) {
+      gsap.to(inputRef.current, {
+        scale: 1.02,
+        duration: 0.3,
+        ease: "power2.out",
+      })
+    }
+  }
+
+  const handleInputBlur = () => {
+    if (inputRef.current) {
+      gsap.to(inputRef.current, {
+        scale: 1,
+        duration: 0.3,
+        ease: "power2.out",
+      })
+    }
+  }
+
+  // Enhanced button hover animations
+  const handleButtonHover = () => {
+    if (buttonRef.current && !isSubmitting) {
+      gsap.to(buttonRef.current, {
+        scale: 1.05,
+        y: -2,
+        duration: 0.3,
+        ease: "back.out(1.7)",
+      })
+    }
+  }
+
+  const handleButtonLeave = () => {
+    if (buttonRef.current && !isSubmitting) {
+      gsap.to(buttonRef.current, {
+        scale: 1,
+        y: 0,
+        duration: 0.3,
+        ease: "back.out(1.7)",
+      })
+    }
+  }
+
   if (isSuccess) {
     return (
       <div className={`${className}`}>
-        <div
-          className="relative p-5 rounded-xl border border-white/20 backdrop-blur-sm"
-          style={{
-            background: `
-              linear-gradient(135deg, 
-                rgba(255,255,255,0.08) 0%, 
-                rgba(255,255,255,0.04) 100%
-              )
-            `,
-            boxShadow: `
-              0 8px 32px rgba(0,0,0,0.3),
-              inset 0 1px 0 rgba(255,255,255,0.15),
-              0 0 0 1px rgba(255,255,255,0.1)
-            `,
-          }}
-        >
-          <div className="flex items-center space-x-4 mb-4">
-            <div
-              className="p-3 rounded-lg backdrop-blur-sm"
-              style={{
-                background: "linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.08) 100%)",
-                boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
-              }}
-            >
-              <MailIcon className="w-5 h-5 text-white" />
+        <div ref={successRef} className="relative p-8 border-4 border-white bg-white text-black">
+          {/* Header with Logo */}
+          <div className="text-center mb-6">
+            <div className="flex justify-center mb-4">
+              <Image
+                src="https://ampd-asset.s3.us-east-2.amazonaws.com/TXMXBack.svg"
+                alt="TXMX Boxing Logo"
+                width={120}
+                height={60}
+                className="filter invert"
+                priority
+              />
             </div>
-            <div className="flex-1">
-              <div className="text-white font-semibold">¡Gracias!</div>
-              <div className="text-white/60 text-sm">Successfully subscribed</div>
+            <div className="h-1 w-16 bg-black mx-auto mb-4"></div>
+            <p className="text-lg font-bold text-black italic">Levantamos Los Puños</p>
+          </div>
+
+          {/* Success Message */}
+          <div className="text-center">
+            <div className="mb-4">
+              <div className="w-16 h-16 bg-black flex items-center justify-center mx-auto mb-4">
+                <CheckIcon className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-black mb-2 tracking-wide">WELCOME TO THE FIGHT!</h3>
+              <p className="text-gray-700 text-sm font-medium">
+                You're now part of the TXMX family. Get ready for exclusive drops and insider access to the ring.
+              </p>
             </div>
           </div>
-          <div className="text-white/80 text-sm text-center" role="status" aria-live="polite">
-            Thanks for subscribing! We&apos;ll be in touch soon.
+
+          {/* Success Footer */}
+          <div className="text-center mt-6 pt-4 border-t-2 border-black">
+            <p className="text-xs text-gray-600 font-bold tracking-widest">SOMOS BOXEO</p>
           </div>
         </div>
       </div>
@@ -211,38 +354,41 @@ export function Newsletter({ onSuccess, className = "" }: NewsletterFormProps) {
 
   return (
     <div className={`${className}`}>
-      <div
-        className="relative p-5 rounded-xl border border-white/10 backdrop-blur-sm"
-        style={{
-          background: `
-            linear-gradient(135deg, 
-              rgba(255,255,255,0.05) 0%, 
-              rgba(255,255,255,0.02) 100%
-            )
-          `,
-          boxShadow: `
-            0 4px 20px rgba(0,0,0,0.2),
-            inset 0 1px 0 rgba(255,255,255,0.1)
-          `,
-        }}
-      >
-        <div className="flex items-center space-x-4 mb-5">
-          <div
-            className="p-3 rounded-lg backdrop-blur-sm"
-            style={{
-              background: "linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)",
-              boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
-            }}
-          >
-            <MailIcon className="w-5 h-5 text-white/90" />
+      <div ref={containerRef} className="relative p-8 border-4 border-white bg-white text-black">
+        {/* Header with Logo */}
+        <div className="text-center mb-6">
+          <div className="flex justify-center mb-4">
+            <Image
+              ref={logoRef}
+              src="https://ampd-asset.s3.us-east-2.amazonaws.com/TXMXBack.svg"
+              alt="TXMX Boxing Logo"
+              width={120}
+              height={60}
+              className="filter invert"
+              priority
+            />
           </div>
-          <div className="flex-1">
-            <div className="text-white font-semibold">Stay Connected</div>
-            <div className="text-white/60 text-sm">Join our community</div>
-          </div>
+          <div className="h-1 w-16 bg-black mx-auto mb-4"></div>
+          <p ref={titleRef} className="text-lg font-bold text-black italic">
+            Levantamos Los Puños
+          </p>
         </div>
 
-        <form ref={formRef} onSubmit={handleSubmit} className="space-y-4" aria-label="Newsletter subscription form">
+        {/* Enhanced Value Proposition */}
+        <div className="text-center mb-6">
+          <h3 className="text-sm font-bold text-black mb-2 tracking-wide">JOIN THE FIGHT</h3>
+          <p className="text-sm text-gray-700 leading-relaxed font-medium">
+            Get exclusive drops, insider access, and be first in the ring for limited releases. SOMOS BOXEO.
+          </p>
+        </div>
+
+        {/* Enhanced Form */}
+        <form
+          ref={formRef}
+          onSubmit={handleSubmit}
+          className="space-y-4"
+          aria-label="TXMX Newsletter subscription form"
+        >
           <div className="relative">
             <label htmlFor="newsletter-email" className="sr-only">
               Email address
@@ -255,68 +401,70 @@ export function Newsletter({ onSuccess, className = "" }: NewsletterFormProps) {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email address"
-              className="w-full pr-16 pl-4 py-3 text-white placeholder:text-white/50 focus:outline-none rounded-lg transition-all duration-300 text-sm backdrop-blur-sm"
-              style={{
-                background: "rgba(255,255,255,0.08)",
-                border: "1px solid rgba(255,255,255,0.15)",
-                boxShadow: "inset 0 2px 10px rgba(0,0,0,0.2)",
-              }}
-              onFocus={(e) => {
-                e.target.style.background = "rgba(255,255,255,0.12)"
-                e.target.style.borderColor = "rgba(255,255,255,0.25)"
-              }}
-              onBlur={(e) => {
-                e.target.style.background = "rgba(255,255,255,0.08)"
-                e.target.style.borderColor = "rgba(255,255,255,0.15)"
-              }}
+              onFocus={handleInputFocus}
+              onBlur={handleInputBlur}
+              placeholder="Enter your email to join the fight"
+              className="w-full px-4 py-3 border-2 border-black bg-white text-black placeholder-gray-500 focus:outline-none focus:border-gray-600 transition-all duration-300 font-medium"
               aria-describedby={error ? "newsletter-error" : undefined}
               disabled={isSubmitting}
               autoComplete="email"
             />
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 disabled:opacity-50 hover:scale-105 active:scale-95 backdrop-blur-sm"
-              style={{
-                background: "linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%)",
-                border: "1px solid rgba(255,255,255,0.2)",
-                boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
-              }}
-              aria-label="Subscribe to newsletter"
-            >
-              {isSubmitting ? (
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-              ) : (
-                <ArrowIcon className="w-4 h-4" />
-              )}
-            </button>
           </div>
 
+          <button
+            ref={buttonRef}
+            type="submit"
+            disabled={isSubmitting}
+            onMouseEnter={handleButtonHover}
+            onMouseLeave={handleButtonLeave}
+            className="w-full bg-black text-white py-3 px-6 font-bold text-sm tracking-widest hover:bg-gray-800 transition-colors disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+            aria-label="Join TXMX newsletter"
+          >
+            <div className="flex items-center justify-center">
+              {isSubmitting ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
+                  JOINING THE FIGHT...
+                </>
+              ) : (
+                "STEP INTO THE RING"
+              )}
+            </div>
+          </button>
+
           {!isDevelopment && (
-            <div ref={turnstileRef} data-size="flexible" className="w-full" aria-label="Security verification" />
+            <div
+              ref={turnstileRef}
+              data-theme="light"
+              data-size="compact"
+              className="w-full flex justify-center"
+              aria-label="Security verification"
+            />
           )}
 
           {error && (
-            <div id="newsletter-error" className="text-red-400 text-sm px-2" role="alert">
+            <div
+              id="newsletter-error"
+              className="text-red-600 text-sm text-center font-bold tracking-wide"
+              role="alert"
+            >
               {error}
             </div>
           )}
         </form>
+
+        {/* Enhanced Footer */}
+        <div className="text-center mt-6 pt-4 border-t-2 border-black">
+          <p className="text-xs text-gray-600 font-bold tracking-widest">TXMX • BOXING</p>
+        </div>
       </div>
     </div>
   )
 }
 
-// Custom arrow icon
-const ArrowIcon = ({ className }: { className?: string }) => (
-  <svg className={className} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path
-      d="M5 12H19M19 12L12 5M19 12L12 19"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
+// Enhanced check icon with animation potential
+const CheckIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M5 13L9 17L19 7" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 )
