@@ -45,18 +45,17 @@ export function Newsletter({ onSuccess, className = "", compact = false, mobile 
   const buttonRef = useRef<HTMLButtonElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const logoRef = useRef<HTMLImageElement>(null)
-  const titleRef = useRef<HTMLParagraphElement>(null)
 
   // Email validation regex pattern
   const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
   // Enhanced entrance animation
   useEffect(() => {
-    if (containerRef.current && logoRef.current && titleRef.current) {
+    if (containerRef.current && logoRef.current) {
       const tl = gsap.timeline()
 
       // Set initial states
-      gsap.set([containerRef.current, logoRef.current, titleRef.current], {
+      gsap.set([containerRef.current, logoRef.current], {
         opacity: 0,
         y: 30,
         scale: 0.95,
@@ -69,29 +68,17 @@ export function Newsletter({ onSuccess, className = "", compact = false, mobile 
         scale: 1,
         duration: 0.8,
         ease: "back.out(1.4)",
-      })
-        .to(
-          logoRef.current,
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            duration: 0.6,
-            ease: "back.out(1.7)",
-          },
-          "-=0.4",
-        )
-        .to(
-          titleRef.current,
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            duration: 0.5,
-            ease: "back.out(1.5)",
-          },
-          "-=0.3",
-        )
+      }).to(
+        logoRef.current,
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.6,
+          ease: "back.out(1.7)",
+        },
+        "-=0.4",
+      )
 
       // Add floating animation to logo (reduced on mobile)
       gsap.to(logoRef.current, {
@@ -336,9 +323,9 @@ export function Newsletter({ onSuccess, className = "", compact = false, mobile 
     return (
       <div className={`${className}`}>
         <div ref={successRef} className={`relative ${padding} border-4 border-white bg-white text-black`}>
-          {/* Header with Logo */}
+          {/* Header with Logo - No Spacer */}
           <div className={`text-center ${mobile ? "mb-3" : "mb-4"}`}>
-            <div className={`flex justify-center ${mobile ? "mb-2" : "mb-3"}`}>
+            <div className={`flex justify-center ${mobile ? "mb-3" : "mb-4"}`}>
               <Image
                 src="https://ampd-asset.s3.us-east-2.amazonaws.com/TXMXBack.svg"
                 alt="TXMX Boxing Logo"
@@ -348,8 +335,6 @@ export function Newsletter({ onSuccess, className = "", compact = false, mobile 
                 priority
               />
             </div>
-            <div className={`h-1 ${mobile ? "w-8" : "w-12"} bg-black mx-auto ${mobile ? "mb-2" : "mb-3"}`}></div>
-            <p className={`${mobile ? "text-sm" : "text-base"} font-bold text-black italic`}>Levantamos Los Puños</p>
           </div>
 
           {/* Success Message */}
@@ -381,9 +366,9 @@ export function Newsletter({ onSuccess, className = "", compact = false, mobile 
   return (
     <div className={`${className}`}>
       <div ref={containerRef} className={`relative ${padding} border-4 border-white bg-white text-black`}>
-        {/* Header with Logo */}
+        {/* Header with Logo - No Spacer or Tagline */}
         <div className={`text-center ${mobile ? "mb-3" : "mb-4"}`}>
-          <div className={`flex justify-center ${mobile ? "mb-2" : "mb-3"}`}>
+          <div className={`flex justify-center ${mobile ? "mb-3" : "mb-4"}`}>
             <Image
               ref={logoRef}
               src="https://ampd-asset.s3.us-east-2.amazonaws.com/TXMXBack.svg"
@@ -394,10 +379,6 @@ export function Newsletter({ onSuccess, className = "", compact = false, mobile 
               priority
             />
           </div>
-          <div className={`h-1 ${mobile ? "w-8" : "w-12"} bg-black mx-auto ${mobile ? "mb-2" : "mb-3"}`}></div>
-          <p ref={titleRef} className={`${mobile ? "text-sm" : "text-base"} font-bold text-black italic`}>
-            Levantamos Los Puños
-          </p>
         </div>
 
         {/* Enhanced Value Proposition */}
@@ -471,7 +452,7 @@ export function Newsletter({ onSuccess, className = "", compact = false, mobile 
             <div
               ref={turnstileRef}
               data-theme="light"
-              data-size="compact"
+              data-size="flexible"
               className="w-full flex justify-center"
               aria-label="Security verification"
             />
@@ -491,7 +472,7 @@ export function Newsletter({ onSuccess, className = "", compact = false, mobile 
         {/* Enhanced Footer */}
         <div className={`text-center ${mobile ? "mt-3 pt-2" : "mt-4 pt-3"} border-t-2 border-black`}>
           <p className={`${mobile ? "text-xs" : "text-xs"} text-gray-600 font-bold tracking-widest`}>
-            TXMX• BOXING
+            TXMX • BOXING
           </p>
         </div>
       </div>

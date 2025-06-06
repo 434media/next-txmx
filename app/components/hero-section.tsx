@@ -261,7 +261,7 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* Newsletter Pop-in - Mobile Optimized */}
+      {/* Newsletter Pop-in - Clean & Simple */}
       {showNewsletter && (
         <div
           ref={newsletterRef}
@@ -283,9 +283,8 @@ export default function HeroSection() {
             ×
           </button>
 
-          {/* Newsletter Form with Enhanced Mobile Styling */}
+          {/* Newsletter Form - Clean Design */}
           <div
-            className="mobile-newsletter"
             style={{
               background: "rgba(255, 255, 255, 0.95)",
               backdropFilter: "blur(20px)",
@@ -299,23 +298,6 @@ export default function HeroSection() {
             }}
           >
             <Newsletter onSuccess={handleNewsletterSuccess} compact={true} mobile={true} />
-          </div>
-
-          {/* Simplified Attention Indicators for Mobile */}
-          <div className="absolute -inset-2 sm:-inset-4 pointer-events-none">
-            {/* Pulsing Ring */}
-            <div
-              className="absolute inset-0 border border-white/30 sm:border-2 animate-pulse"
-              style={{
-                animation: "pulseRing 3s ease-in-out infinite",
-              }}
-            />
-
-            {/* Corner Accents - Smaller on Mobile */}
-            <div className="absolute -top-1 -left-1 sm:-top-2 sm:-left-2 w-3 h-3 sm:w-4 sm:h-4 border-l border-t sm:border-l-2 sm:border-t-2 border-white/60"></div>
-            <div className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-3 h-3 sm:w-4 sm:h-4 border-r border-t sm:border-r-2 sm:border-t-2 border-white/60"></div>
-            <div className="absolute -bottom-1 -left-1 sm:-bottom-2 sm:-left-2 w-3 h-3 sm:w-4 sm:h-4 border-l border-b sm:border-l-2 sm:border-b-2 border-white/60"></div>
-            <div className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 w-3 h-3 sm:w-4 sm:h-4 border-r border-b sm:border-r-2 sm:border-b-2 border-white/60"></div>
           </div>
         </div>
       )}
@@ -332,22 +314,6 @@ export default function HeroSection() {
         img {
           will-change: transform;
           transform: translateZ(0);
-        }
-
-        /* Newsletter animations */
-        @keyframes pulseRing {
-          0% {
-            transform: scale(1);
-            opacity: 0.6;
-          }
-          50% {
-            transform: scale(1.05);
-            opacity: 0.3;
-          }
-          100% {
-            transform: scale(1);
-            opacity: 0.6;
-          }
         }
 
         /* Mobile-first optimizations */
