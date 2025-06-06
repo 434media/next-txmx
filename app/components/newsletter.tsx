@@ -28,9 +28,10 @@ const isDevelopment = process.env.NODE_ENV === "development"
 interface NewsletterFormProps {
   onSuccess?: () => void
   className?: string
+  compact?: boolean
 }
 
-export function Newsletter({ onSuccess, className = "" }: NewsletterFormProps) {
+export function Newsletter({ onSuccess, className = "", compact = false }: NewsletterFormProps) {
   const [email, setEmail] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
@@ -159,11 +160,16 @@ export function Newsletter({ onSuccess, className = "" }: NewsletterFormProps) {
 
       // Error shake animation
       if (inputRef.current) {
-        gsap.to(inputRef.current, {
-          keyframes: { x: [-10, 10, -8, 8, -6, 6, -4, 4, 0] },
-          duration: 0.6,
-          ease: "power2.out",
-        })
+        const tl = gsap.timeline()
+        tl.to(inputRef.current, { x: -10, duration: 0.08, ease: "power2.out" })
+          .to(inputRef.current, { x: 10, duration: 0.08, ease: "power2.out" })
+          .to(inputRef.current, { x: -8, duration: 0.08, ease: "power2.out" })
+          .to(inputRef.current, { x: 8, duration: 0.08, ease: "power2.out" })
+          .to(inputRef.current, { x: -6, duration: 0.08, ease: "power2.out" })
+          .to(inputRef.current, { x: 6, duration: 0.08, ease: "power2.out" })
+          .to(inputRef.current, { x: -4, duration: 0.08, ease: "power2.out" })
+          .to(inputRef.current, { x: 4, duration: 0.08, ease: "power2.out" })
+          .to(inputRef.current, { x: 0, duration: 0.08, ease: "power2.out" })
       }
       return
     }
@@ -174,11 +180,16 @@ export function Newsletter({ onSuccess, className = "" }: NewsletterFormProps) {
 
       // Error shake animation
       if (inputRef.current) {
-        gsap.to(inputRef.current, {
-          keyframes: { x: [-10, 10, -8, 8, -6, 6, -4, 4, 0] },
-          duration: 0.6,
-          ease: "power2.out",
-        })
+        const tl = gsap.timeline()
+        tl.to(inputRef.current, { x: -10, duration: 0.08, ease: "power2.out" })
+          .to(inputRef.current, { x: 10, duration: 0.08, ease: "power2.out" })
+          .to(inputRef.current, { x: -8, duration: 0.08, ease: "power2.out" })
+          .to(inputRef.current, { x: 8, duration: 0.08, ease: "power2.out" })
+          .to(inputRef.current, { x: -6, duration: 0.08, ease: "power2.out" })
+          .to(inputRef.current, { x: 6, duration: 0.08, ease: "power2.out" })
+          .to(inputRef.current, { x: -4, duration: 0.08, ease: "power2.out" })
+          .to(inputRef.current, { x: 4, duration: 0.08, ease: "power2.out" })
+          .to(inputRef.current, { x: 0, duration: 0.08, ease: "power2.out" })
       }
       return
     }
@@ -313,38 +324,41 @@ export function Newsletter({ onSuccess, className = "" }: NewsletterFormProps) {
   if (isSuccess) {
     return (
       <div className={`${className}`}>
-        <div ref={successRef} className="relative p-8 border-4 border-white bg-white text-black">
+        <div
+          ref={successRef}
+          className={`relative p-6 ${compact ? "py-4" : "p-8"} border-4 border-white bg-white text-black`}
+        >
           {/* Header with Logo */}
-          <div className="text-center mb-6">
-            <div className="flex justify-center mb-4">
+          <div className="text-center mb-4">
+            <div className="flex justify-center mb-3">
               <Image
                 src="https://ampd-asset.s3.us-east-2.amazonaws.com/TXMXBack.svg"
                 alt="TXMX Boxing Logo"
-                width={120}
-                height={60}
+                width={compact ? 100 : 120}
+                height={compact ? 50 : 60}
                 className="filter invert"
                 priority
               />
             </div>
-            <div className="h-1 w-16 bg-black mx-auto mb-4"></div>
-            <p className="text-lg font-bold text-black italic">Levantamos Los Puños</p>
+            <div className="h-1 w-12 bg-black mx-auto mb-3"></div>
+            <p className="text-base font-bold text-black italic">Levantamos Los Puños</p>
           </div>
 
           {/* Success Message */}
           <div className="text-center">
-            <div className="mb-4">
-              <div className="w-16 h-16 bg-black flex items-center justify-center mx-auto mb-4">
-                <CheckIcon className="h-8 w-8 text-white" />
+            <div className="mb-3">
+              <div className="w-12 h-12 bg-black flex items-center justify-center mx-auto mb-3">
+                <CheckIcon className="h-6 w-6 text-white" />
               </div>
-              <h3 className="text-xl font-bold text-black mb-2 tracking-wide">WELCOME TO THE FIGHT!</h3>
-              <p className="text-gray-700 text-sm font-medium">
+              <h3 className="text-lg font-bold text-black mb-2 tracking-wide">WELCOME TO THE FIGHT!</h3>
+              <p className="text-gray-700 text-xs font-medium">
                 You're now part of the TXMX family. Get ready for exclusive drops and insider access to the ring.
               </p>
             </div>
           </div>
 
           {/* Success Footer */}
-          <div className="text-center mt-6 pt-4 border-t-2 border-black">
+          <div className="text-center mt-4 pt-3 border-t-2 border-black">
             <p className="text-xs text-gray-600 font-bold tracking-widest">SOMOS BOXEO</p>
           </div>
         </div>
@@ -354,30 +368,33 @@ export function Newsletter({ onSuccess, className = "" }: NewsletterFormProps) {
 
   return (
     <div className={`${className}`}>
-      <div ref={containerRef} className="relative p-8 border-4 border-white bg-white text-black">
+      <div
+        ref={containerRef}
+        className={`relative ${compact ? "p-6 py-4" : "p-8"} border-4 border-white bg-white text-black`}
+      >
         {/* Header with Logo */}
-        <div className="text-center mb-6">
-          <div className="flex justify-center mb-4">
+        <div className="text-center mb-4">
+          <div className="flex justify-center mb-3">
             <Image
               ref={logoRef}
               src="https://ampd-asset.s3.us-east-2.amazonaws.com/TXMXBack.svg"
               alt="TXMX Boxing Logo"
-              width={120}
-              height={60}
+              width={compact ? 100 : 120}
+              height={compact ? 50 : 60}
               className="filter invert"
               priority
             />
           </div>
-          <div className="h-1 w-16 bg-black mx-auto mb-4"></div>
-          <p ref={titleRef} className="text-lg font-bold text-black italic">
+          <div className="h-1 w-12 bg-black mx-auto mb-3"></div>
+          <p ref={titleRef} className="text-base font-bold text-black italic">
             Levantamos Los Puños
           </p>
         </div>
 
         {/* Enhanced Value Proposition */}
-        <div className="text-center mb-6">
+        <div className="text-center mb-4">
           <h3 className="text-sm font-bold text-black mb-2 tracking-wide">JOIN THE FIGHT</h3>
-          <p className="text-sm text-gray-700 leading-relaxed font-medium">
+          <p className="text-xs text-gray-700 leading-relaxed font-medium">
             Get exclusive drops, insider access, and be first in the ring for limited releases.
           </p>
         </div>
@@ -386,7 +403,7 @@ export function Newsletter({ onSuccess, className = "" }: NewsletterFormProps) {
         <form
           ref={formRef}
           onSubmit={handleSubmit}
-          className="space-y-4"
+          className="space-y-3"
           aria-label="TXMX Newsletter subscription form"
         >
           <div className="relative">
@@ -404,7 +421,7 @@ export function Newsletter({ onSuccess, className = "" }: NewsletterFormProps) {
               onFocus={handleInputFocus}
               onBlur={handleInputBlur}
               placeholder="Enter your email to join the fight"
-              className="w-full px-4 py-3 border-2 border-black bg-white text-black placeholder-gray-500 focus:outline-none focus:border-gray-600 transition-all duration-300 font-medium"
+              className="w-full px-3 py-2 border-2 border-black bg-white text-black placeholder-gray-500 focus:outline-none focus:border-gray-600 transition-all duration-300 font-medium text-sm"
               aria-describedby={error ? "newsletter-error" : undefined}
               disabled={isSubmitting}
               autoComplete="email"
@@ -417,17 +434,20 @@ export function Newsletter({ onSuccess, className = "" }: NewsletterFormProps) {
             disabled={isSubmitting}
             onMouseEnter={handleButtonHover}
             onMouseLeave={handleButtonLeave}
-            className="w-full bg-black text-white py-3 px-6 font-bold text-sm tracking-widest hover:bg-gray-800 transition-colors disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+            className="w-full bg-black text-white py-2 px-4 font-bold text-sm tracking-widest hover:bg-gray-800 transition-colors disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center justify-center"
             aria-label="Join TXMX newsletter"
           >
             <div className="flex items-center justify-center">
               {isSubmitting ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
-                  JOINING THE FIGHT...
+                  SUBMITTING...
                 </>
               ) : (
-                "STEP INTO THE RING"
+                <>
+                  <span className="mr-1">SUBMIT</span>
+                  <ArrowRightIcon className="h-4 w-4" />
+                </>
               )}
             </div>
           </button>
@@ -436,7 +456,7 @@ export function Newsletter({ onSuccess, className = "" }: NewsletterFormProps) {
             <div
               ref={turnstileRef}
               data-theme="light"
-              data-size="flexible"
+              data-size="compact"
               className="w-full flex justify-center"
               aria-label="Security verification"
             />
@@ -445,7 +465,7 @@ export function Newsletter({ onSuccess, className = "" }: NewsletterFormProps) {
           {error && (
             <div
               id="newsletter-error"
-              className="text-red-600 text-sm text-center font-bold tracking-wide"
+              className="text-red-600 text-xs text-center font-bold tracking-wide"
               role="alert"
             >
               {error}
@@ -454,7 +474,7 @@ export function Newsletter({ onSuccess, className = "" }: NewsletterFormProps) {
         </form>
 
         {/* Enhanced Footer */}
-        <div className="text-center mt-6 pt-4 border-t-2 border-black">
+        <div className="text-center mt-4 pt-3 border-t-2 border-black">
           <p className="text-xs text-gray-600 font-bold tracking-widest">TXMX • BOXING</p>
         </div>
       </div>
@@ -466,5 +486,21 @@ export function Newsletter({ onSuccess, className = "" }: NewsletterFormProps) {
 const CheckIcon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M5 13L9 17L19 7" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+)
+
+// Arrow right icon for submit button
+const ArrowRightIcon = ({ className }: { className?: string }) => (
+  <svg
+    className={className}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M5 12h14" />
+    <path d="m12 5 7 7-7 7" />
   </svg>
 )

@@ -261,11 +261,11 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* Newsletter Pop-in */}
+      {/* Newsletter Pop-in - Adjusted Height */}
       {showNewsletter && (
         <div
           ref={newsletterRef}
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 w-full max-w-sm px-4"
+          className="absolute bottom-24 sm:bottom-32 left-1/2 transform -translate-x-1/2 z-20 w-full max-w-sm px-4"
           style={{
             perspective: "1000px",
           }}
@@ -281,6 +281,7 @@ export default function HeroSection() {
 
           {/* Newsletter Form with Enhanced Styling */}
           <div
+            className="compact-newsletter"
             style={{
               background: "rgba(255, 255, 255, 0.95)",
               backdropFilter: "blur(20px)",
@@ -293,7 +294,7 @@ export default function HeroSection() {
               `,
             }}
           >
-            <Newsletter onSuccess={handleNewsletterSuccess} />
+            <Newsletter onSuccess={handleNewsletterSuccess} compact={true} />
           </div>
 
           {/* Animated Attention Indicators */}
@@ -352,12 +353,6 @@ export default function HeroSection() {
             height: 100vh;
             height: 100dvh;
           }
-          
-          /* Newsletter mobile positioning */
-          .newsletter-container {
-            bottom: 1rem;
-            max-width: calc(100vw - 2rem);
-          }
         }
 
         /* Landscape mobile optimization */
@@ -366,12 +361,6 @@ export default function HeroSection() {
             object-fit: cover;
             width: 100vw;
             height: 100vh;
-          }
-          
-          /* Adjust newsletter position for landscape */
-          .newsletter-container {
-            bottom: 0.5rem;
-            transform: scale(0.9);
           }
         }
 
@@ -395,11 +384,6 @@ export default function HeroSection() {
         @media (prefers-contrast: high) {
           img {
             filter: brightness(1.2) contrast(1.3) !important;
-          }
-          
-          .newsletter-container {
-            border: 4px solid white !important;
-            background: white !important;
           }
         }
 
