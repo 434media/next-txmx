@@ -261,62 +261,66 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* Newsletter Pop-in - Adjusted Height */}
+      {/* Newsletter Pop-in - Mobile Optimized */}
       {showNewsletter && (
         <div
           ref={newsletterRef}
-          className="absolute bottom-24 sm:bottom-32 left-1/2 transform -translate-x-1/2 z-20 w-full max-w-sm px-4"
+          className="absolute bottom-20 sm:bottom-24 md:bottom-32 left-1/2 transform -translate-x-1/2 z-20 w-full max-w-xs sm:max-w-sm px-3 sm:px-4"
           style={{
             perspective: "1000px",
           }}
         >
-          {/* Close Button */}
+          {/* Close Button - Mobile Safe Positioning */}
           <button
             onClick={handleNewsletterClose}
-            className="absolute -top-3 -right-3 z-30 w-8 h-8 bg-black text-white border-2 border-white hover:bg-white hover:text-black transition-colors duration-300 flex items-center justify-center text-sm font-bold"
+            className="absolute -top-2 -right-2 sm:-top-3 sm:-right-3 z-30 w-7 h-7 sm:w-8 sm:h-8 bg-black text-white border-2 border-white hover:bg-white hover:text-black transition-colors duration-300 flex items-center justify-center text-xs sm:text-sm font-bold"
             aria-label="Close newsletter"
+            style={{
+              minHeight: "44px", // iOS touch target minimum
+              minWidth: "44px",
+            }}
           >
             ×
           </button>
 
-          {/* Newsletter Form with Enhanced Styling */}
+          {/* Newsletter Form with Enhanced Mobile Styling */}
           <div
-            className="compact-newsletter"
+            className="mobile-newsletter"
             style={{
               background: "rgba(255, 255, 255, 0.95)",
               backdropFilter: "blur(20px)",
               WebkitBackdropFilter: "blur(20px)",
-              border: "4px solid white",
+              border: "3px solid white",
               boxShadow: `
-                0 20px 60px rgba(0,0,0,0.4),
+                0 15px 40px rgba(0,0,0,0.4),
                 0 0 0 1px rgba(255,255,255,0.2),
                 inset 0 1px 0 rgba(255,255,255,0.3)
               `,
             }}
           >
-            <Newsletter onSuccess={handleNewsletterSuccess} compact={true} />
+            <Newsletter onSuccess={handleNewsletterSuccess} compact={true} mobile={true} />
           </div>
 
-          {/* Animated Attention Indicators */}
-          <div className="absolute -inset-4 pointer-events-none">
+          {/* Simplified Attention Indicators for Mobile */}
+          <div className="absolute -inset-2 sm:-inset-4 pointer-events-none">
             {/* Pulsing Ring */}
             <div
-              className="absolute inset-0 border-2 border-white/30 animate-pulse"
+              className="absolute inset-0 border border-white/30 sm:border-2 animate-pulse"
               style={{
                 animation: "pulseRing 3s ease-in-out infinite",
               }}
             />
 
-            {/* Corner Accents */}
-            <div className="absolute -top-2 -left-2 w-4 h-4 border-l-2 border-t-2 border-white/60"></div>
-            <div className="absolute -top-2 -right-2 w-4 h-4 border-r-2 border-t-2 border-white/60"></div>
-            <div className="absolute -bottom-2 -left-2 w-4 h-4 border-l-2 border-b-2 border-white/60"></div>
-            <div className="absolute -bottom-2 -right-2 w-4 h-4 border-r-2 border-b-2 border-white/60"></div>
+            {/* Corner Accents - Smaller on Mobile */}
+            <div className="absolute -top-1 -left-1 sm:-top-2 sm:-left-2 w-3 h-3 sm:w-4 sm:h-4 border-l border-t sm:border-l-2 sm:border-t-2 border-white/60"></div>
+            <div className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-3 h-3 sm:w-4 sm:h-4 border-r border-t sm:border-r-2 sm:border-t-2 border-white/60"></div>
+            <div className="absolute -bottom-1 -left-1 sm:-bottom-2 sm:-left-2 w-3 h-3 sm:w-4 sm:h-4 border-l border-b sm:border-l-2 sm:border-b-2 border-white/60"></div>
+            <div className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 w-3 h-3 sm:w-4 sm:h-4 border-r border-b sm:border-r-2 sm:border-b-2 border-white/60"></div>
           </div>
         </div>
       )}
 
-      {/* Enhanced CSS for Newsletter Animations */}
+      {/* Enhanced CSS for Mobile Newsletter */}
       <style jsx>{`
         /* Hardware acceleration for smooth performance */
         video {
@@ -346,12 +350,39 @@ export default function HeroSection() {
           }
         }
 
-        /* Mobile optimizations */
+        /* Mobile-first optimizations */
         @media (max-width: 768px) {
           video {
             object-position: center center;
             height: 100vh;
             height: 100dvh;
+          }
+          
+          /* Mobile newsletter positioning */
+          .mobile-newsletter {
+            max-height: 60vh;
+            overflow-y: auto;
+          }
+          
+          /* Ensure close button is always accessible */
+          button[aria-label="Close newsletter"] {
+            top: -8px !important;
+            right: -8px !important;
+            z-index: 9999;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+          }
+        }
+
+        /* Extra small mobile devices */
+        @media (max-width: 480px) {
+          .mobile-newsletter {
+            max-height: 50vh;
+            border-width: 2px;
+          }
+          
+          /* Smaller shadows for performance */
+          .mobile-newsletter {
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3) !important;
           }
         }
 
@@ -361,6 +392,29 @@ export default function HeroSection() {
             object-fit: cover;
             width: 100vw;
             height: 100vh;
+          }
+          
+          /* Adjust newsletter for landscape */
+          .mobile-newsletter {
+            max-height: 70vh;
+          }
+          
+          /* Position higher in landscape */
+          [ref="newsletterRef"] {
+            bottom: 10vh !important;
+          }
+        }
+
+        /* iOS Safari specific optimizations */
+        @supports (-webkit-touch-callout: none) {
+          /* iOS safe area handling */
+          [ref="newsletterRef"] {
+            bottom: calc(5rem + env(safe-area-inset-bottom)) !important;
+          }
+          
+          /* Prevent zoom on input focus */
+          input[type="email"] {
+            font-size: 16px !important;
           }
         }
 
@@ -385,6 +439,11 @@ export default function HeroSection() {
           img {
             filter: brightness(1.2) contrast(1.3) !important;
           }
+          
+          .mobile-newsletter {
+            border-width: 4px !important;
+            background: white !important;
+          }
         }
 
         /* Focus styles for accessibility */
@@ -396,6 +455,21 @@ export default function HeroSection() {
         /* Newsletter close button hover effect */
         button:hover {
           transform: scale(1.1);
+        }
+
+        /* Touch device optimizations */
+        @media (hover: none) and (pointer: coarse) {
+          /* Remove hover effects on touch devices */
+          button:hover {
+            transform: none;
+          }
+          
+          /* Larger touch targets */
+          button[aria-label="Close newsletter"] {
+            min-width: 44px;
+            min-height: 44px;
+            padding: 8px;
+          }
         }
       `}</style>
     </section>
