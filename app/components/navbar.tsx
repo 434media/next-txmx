@@ -16,33 +16,18 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
   const buttonIconRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    // Navbar entrance animation
-    gsap.fromTo(
-      navRef.current,
-      { opacity: 0, y: -20 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 1.2,
-        ease: "power2.out",
-        delay: 0.8,
-      },
-    )
+    // Immediate navbar presentation - NO fade animation
+    gsap.set(navRef.current, {
+      opacity: 1,
+      y: 0,
+    })
 
-    // Button entrance animation
+    // Immediate button presentation - NO fade animation
     const buttonElements = [buttonTextRef.current, buttonIconRef.current]
-    gsap.fromTo(
-      buttonElements,
-      { opacity: 0, y: -10 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        stagger: 0.1,
-        ease: "power2.out",
-        delay: 1.2,
-      },
-    )
+    gsap.set(buttonElements, {
+      opacity: 1,
+      y: 0,
+    })
   }, [])
 
   // Enhanced button hover animation
@@ -105,7 +90,7 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
     // Text and icon animation
     gsap.to(buttonTextRef.current, {
       x: 10,
-      opacity: 0,
+      opacity: 0.7,
       duration: 0.2,
       ease: "power2.in",
       yoyo: true,

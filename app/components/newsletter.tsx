@@ -26,7 +26,7 @@ declare global {
 
 const isDevelopment = process.env.NODE_ENV === "development"
 
-interface NewsletterFormProps {
+interface NewsletterProps {
   onSuccess?: () => void
   className?: string
   compact?: boolean
@@ -40,7 +40,7 @@ export function Newsletter({
   compact = false,
   mobile = false,
   slideoutModal = false,
-}: NewsletterFormProps) {
+}: NewsletterProps) {
   const [email, setEmail] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
@@ -57,48 +57,68 @@ export function Newsletter({
   // Email validation regex pattern
   const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
-  // Enhanced entrance animation
+  // Enhanced entrance animation - NO FADE for slideout modal
   useEffect(() => {
     if (containerRef.current && logoRef.current) {
-      const tl = gsap.timeline()
-
-      // Set initial states
-      gsap.set([containerRef.current, logoRef.current], {
-        opacity: 0,
-        y: 30,
-        scale: 0.95,
-      })
-
-      // Animate entrance with stagger
-      tl.to(containerRef.current, {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        duration: 0.8,
-        ease: "back.out(1.4)",
-      }).to(
-        logoRef.current,
-        {
+      if (slideoutModal) {
+        // For slideout modal: NO fade animation, just immediate presentation
+        gsap.set([containerRef.current, logoRef.current], {
           opacity: 1,
           y: 0,
           scale: 1,
-          duration: 0.6,
-          ease: "back.out(1.7)",
-        },
-        "-=0.4",
-      )
+        })
 
-      // Add floating animation to logo (reduced on mobile)
-      gsap.to(logoRef.current, {
-        y: mobile ? -2 : -3,
-        duration: mobile ? 3 : 2.5,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
-        delay: 1,
-      })
+        // Simple, subtle floating animation only
+        gsap.to(logoRef.current, {
+          y: -3,
+          duration: 2.5,
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut",
+          delay: 0.5,
+        })
+      } else {
+        // For other contexts: keep original fade animation
+        const tl = gsap.timeline()
+
+        // Set initial states
+        gsap.set([containerRef.current, logoRef.current], {
+          opacity: 0,
+          y: 30,
+          scale: 0.95,
+        })
+
+        // Animate entrance with stagger
+        tl.to(containerRef.current, {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.8,
+          ease: "back.out(1.4)",
+        }).to(
+          logoRef.current,
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.6,
+            ease: "back.out(1.7)",
+          },
+          "-=0.4",
+        )
+
+        // Add floating animation to logo (reduced on mobile)
+        gsap.to(logoRef.current, {
+          y: mobile ? -2 : -3,
+          duration: mobile ? 3 : 2.5,
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut",
+          delay: 1,
+        })
+      }
     }
-  }, [mobile])
+  }, [mobile, slideoutModal])
 
   // Load Turnstile script only when needed
   useEffect(() => {
@@ -343,7 +363,7 @@ export function Newsletter({
                 priority
               />
             </div>
-            <p className="text-lg font-bold text-black italic">Welcome to the fight!</p>
+            <p className="text-lg font-bold text-black">Welcome to the fight!</p>
           </div>
 
           {/* Success Message - Matching Modal Button Style */}
@@ -431,7 +451,7 @@ export function Newsletter({
                 priority
               />
             </div>
-            <p className="text-lg font-bold text-black italic">Join the fight</p>
+            <p className="text-lg font-bold text-black">Join the fight</p>
           </div>
 
           {/* Form Section - Matching Modal Button Style */}
@@ -638,9 +658,7 @@ export function Newsletter({
 
         {/* Enhanced Footer */}
         <div className={`text-center ${mobile ? "mt-3 pt-2" : "mt-4 pt-3"} border-t-2 border-black`}>
-          <p className={`${mobile ? "text-xs" : "text-xs"} text-gray-600 font-bold tracking-widest`}>
-            TXMX • BOXING
-          </p>
+          <p className={`${mobile ? "text-xs" : "text-xs"} text-gray-600 font-bold tracking-widest`}>TXMX • BOXING</p>
         </div>
       </div>
     </div>
