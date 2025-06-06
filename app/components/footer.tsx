@@ -169,12 +169,7 @@ export default function Footer() {
 
           {/* Brand Tagline */}
           <div className="footer-element text-center">
-            <p className="text-white/60 text-xs font-medium tracking-widest italic">LEVANTAMOS LOS PUÑOS</p>
-          </div>
-
-          {/* Secondary Info */}
-          <div className="footer-element text-center">
-            <p className="text-white/40 text-xs tracking-wide">TXMX • BOXING</p>
+            <p className="text-white/60 text-xs font-medium tracking-widest">TXMX • BOXING</p>
           </div>
         </div>
       </div>

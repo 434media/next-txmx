@@ -215,7 +215,7 @@ export default function SlideOutModal({ isOpen, onClose }: SlideOutModalProps) {
               </button>
             </div>
 
-            {/* TXMX Logo with Bold Presentation */}
+            {/* TXMX Logo with Streamlined Presentation */}
             <div className="modal-element text-center mb-8">
               <div className="flex justify-center mb-4">
                 <Image
@@ -227,19 +227,11 @@ export default function SlideOutModal({ isOpen, onClose }: SlideOutModalProps) {
                   priority
                 />
               </div>
-              <div className="h-1 w-20 bg-black mx-auto mb-4"></div>
-              <p className="text-xl font-bold text-black italic">Levantamos Los Puños</p>
+              <p className="text-lg font-bold text-black">Made from blood, sweat, and tears</p>
             </div>
 
-            {/* Mission Statement */}
-            <div className="modal-element text-center mb-8">
-              <p className="text-sm text-gray-700 leading-relaxed font-medium">
-                Made with blood, sweat, and tears.
-              </p>
-            </div>
-
-            {/* Bold Link Buttons */}
-            <div className="flex-1 flex flex-col justify-center space-y-4 max-w-xs mx-auto w-full">
+            {/* Bold Link Buttons - More Prominent */}
+            <div className="flex-1 flex flex-col justify-center space-y-6 max-w-xs mx-auto w-full">
               {/* Instagram Link */}
               <a
                 href="https://www.instagram.com/txmxboxing/"
@@ -249,16 +241,16 @@ export default function SlideOutModal({ isOpen, onClose }: SlideOutModalProps) {
                 onMouseEnter={handleItemHover}
                 onMouseLeave={handleItemLeave}
               >
-                <div className="relative p-5 bg-white border-2 border-black hover:bg-gray-50 transition-colors">
+                <div className="relative p-6 bg-white border-2 border-black hover:bg-gray-50 transition-colors">
                   <div className="flex items-center space-x-4">
                     <div className="p-3 bg-black">
-                      <InstagramIcon className="w-5 h-5 text-white" />
+                      <InstagramIcon className="w-6 h-6 text-white" />
                     </div>
                     <div className="flex-1">
-                      <div className="text-black font-bold text-sm tracking-wide">FOLLOW THE FIGHT</div>
-                      <div className="text-gray-600 text-xs font-medium">@txmxboxing</div>
+                      <div className="text-black font-bold text-base tracking-wide">FOLLOW THE FIGHT</div>
+                      <div className="text-gray-600 text-sm font-medium">@txmxboxing</div>
                     </div>
-                    <ExternalLinkIcon className="w-4 h-4 text-gray-400 group-hover:text-black transition-colors" />
+                    <ExternalLinkIcon className="w-5 h-5 text-gray-400 group-hover:text-black transition-colors" />
                   </div>
                 </div>
               </a>
@@ -272,16 +264,16 @@ export default function SlideOutModal({ isOpen, onClose }: SlideOutModalProps) {
                 onMouseEnter={handleItemHover}
                 onMouseLeave={handleItemLeave}
               >
-                <div className="relative p-5 bg-white border-2 border-black hover:bg-gray-50 transition-colors">
+                <div className="relative p-6 bg-white border-2 border-black hover:bg-gray-50 transition-colors">
                   <div className="flex items-center space-x-4">
                     <div className="p-3 bg-black">
-                      <ShopifyIcon className="w-5 h-5 text-white" />
+                      <ShopifyIcon className="w-6 h-6 text-white" />
                     </div>
                     <div className="flex-1">
-                      <div className="text-black font-bold text-sm tracking-wide">GEAR UP</div>
-                      <div className="text-gray-600 text-xs font-medium">Official Store</div>
+                      <div className="text-black font-bold text-base tracking-wide">GEAR UP</div>
+                      <div className="text-gray-600 text-sm font-medium">Official Store</div>
                     </div>
-                    <ExternalLinkIcon className="w-4 h-4 text-gray-400 group-hover:text-black transition-colors" />
+                    <ExternalLinkIcon className="w-5 h-5 text-gray-400 group-hover:text-black transition-colors" />
                   </div>
                 </div>
               </a>
@@ -293,18 +285,16 @@ export default function SlideOutModal({ isOpen, onClose }: SlideOutModalProps) {
                 onMouseEnter={handleItemHover}
                 onMouseLeave={handleItemLeave}
               >
-                <div className="relative p-5 bg-white border-2 border-black hover:bg-gray-50 transition-colors">
+                <div className="relative p-6 bg-white border-2 border-black hover:bg-gray-50 transition-colors">
                   <div className="flex items-center space-x-4">
                     <div className="p-3 bg-black">
-                      <MailIcon className="w-5 h-5 text-white" />
+                      <MailIcon className="w-6 h-6 text-white" />
                     </div>
                     <div className="flex-1">
-                      <div className="text-black font-bold text-sm tracking-wide">JOIN THE FIGHT</div>
-                      <div className="text-gray-600 text-xs font-medium">
-                        Exclusive drops, insider access, and more
-                      </div>
+                      <div className="text-black font-bold text-base tracking-wide">JOIN THE FIGHT</div>
+                      <div className="text-gray-600 text-sm font-medium">Stay in the ring with us</div>
                     </div>
-                    <div className="w-4 h-4 text-gray-400 group-hover:text-black transition-colors flex items-center justify-center">
+                    <div className="w-5 h-5 text-gray-400 group-hover:text-black transition-colors flex items-center justify-center">
                       <div className="w-2 h-2 bg-current"></div>
                     </div>
                   </div>
@@ -314,7 +304,7 @@ export default function SlideOutModal({ isOpen, onClose }: SlideOutModalProps) {
 
             {/* Footer Message */}
             <div className="modal-element text-center mt-8 pt-6 border-t-2 border-black">
-              <p className="text-xs text-gray-600 font-medium tracking-wide">TXMX • BOXING</p>
+              <p className="text-sm text-gray-600 font-medium tracking-wide">TXMX • BOXING</p>
             </div>
           </div>
         )}
@@ -334,8 +324,8 @@ export default function SlideOutModal({ isOpen, onClose }: SlideOutModalProps) {
             </div>
 
             {/* Newsletter Form - Centered */}
-            <div className="flex-1 flex flex-col justify-center space-y-4 max-w-xs mx-auto w-full">
-              <Newsletter onSuccess={handleNewsletterSuccess} className="form-element" />
+            <div className="flex-1 flex flex-col justify-center space-y-6 max-w-xs mx-auto w-full">
+              <Newsletter onSuccess={handleNewsletterSuccess} className="form-element" slideoutModal={true} />
             </div>
           </div>
         )}

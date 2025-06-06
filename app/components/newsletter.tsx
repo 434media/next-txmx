@@ -4,6 +4,7 @@ import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import { gsap } from "gsap"
 import Image from "next/image"
+import { MailIcon } from "./icons/mail-icon"
 
 // Extend the Window interface to include the turnstile property
 declare global {
@@ -30,9 +31,16 @@ interface NewsletterFormProps {
   className?: string
   compact?: boolean
   mobile?: boolean
+  slideoutModal?: boolean
 }
 
-export function Newsletter({ onSuccess, className = "", compact = false, mobile = false }: NewsletterFormProps) {
+export function Newsletter({
+  onSuccess,
+  className = "",
+  compact = false,
+  mobile = false,
+  slideoutModal = false,
+}: NewsletterFormProps) {
   const [email, setEmail] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
@@ -319,6 +327,49 @@ export function Newsletter({ onSuccess, className = "", compact = false, mobile 
       : { width: 120, height: 60 }
   const padding = mobile ? "p-4 py-3" : compact ? "p-6 py-4" : "p-8"
 
+  if (slideoutModal && isSuccess) {
+    return (
+      <div className={`${className}`}>
+        <div ref={successRef} className="space-y-6">
+          {/* Success Header - Matching Modal Style */}
+          <div className="text-center">
+            <div className="flex justify-center mb-4">
+              <Image
+                src="https://ampd-asset.s3.us-east-2.amazonaws.com/TXMXBack.svg"
+                alt="TXMX Boxing Logo"
+                width={140}
+                height={70}
+                className="filter invert"
+                priority
+              />
+            </div>
+            <p className="text-lg font-bold text-black italic">Welcome to the fight!</p>
+          </div>
+
+          {/* Success Message - Matching Modal Button Style */}
+          <div className="relative p-6 bg-black text-white border-2 border-black">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-white">
+                <CheckIcon className="w-6 h-6 text-black" />
+              </div>
+              <div className="flex-1">
+                <div className="text-white font-bold text-base tracking-wide mb-2">SUCCESS!</div>
+                <div className="text-gray-300 text-sm font-medium">
+                  You're now part of the TXMX family. Get ready for exclusive drops and insider access.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Success Footer - Matching Modal Style */}
+          <div className="text-center pt-6 border-t-2 border-black">
+            <p className="text-sm text-gray-600 font-medium tracking-wide">SOMOS BOXEO</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   if (isSuccess) {
     return (
       <div className={`${className}`}>
@@ -357,6 +408,122 @@ export function Newsletter({ onSuccess, className = "", compact = false, mobile 
           {/* Success Footer */}
           <div className={`text-center ${mobile ? "mt-3 pt-2" : "mt-4 pt-3"} border-t-2 border-black`}>
             <p className={`${mobile ? "text-xs" : "text-xs"} text-gray-600 font-bold tracking-widest`}>SOMOS BOXEO</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (slideoutModal && !isSuccess) {
+    return (
+      <div className={`${className}`}>
+        <div ref={containerRef} className="space-y-6">
+          {/* Header Section - Matching Modal Style */}
+          <div className="text-center">
+            <div className="flex justify-center mb-4">
+              <Image
+                ref={logoRef}
+                src="https://ampd-asset.s3.us-east-2.amazonaws.com/TXMXBack.svg"
+                alt="TXMX Boxing Logo"
+                width={140}
+                height={70}
+                className="filter invert"
+                priority
+              />
+            </div>
+            <p className="text-lg font-bold text-black italic">Join the fight</p>
+          </div>
+
+          {/* Form Section - Matching Modal Button Style */}
+          <form
+            ref={formRef}
+            onSubmit={handleSubmit}
+            className="space-y-6"
+            aria-label="TXMX Newsletter subscription form"
+          >
+            {/* Email Input - Styled like Modal Button */}
+            <div className="relative p-6 bg-white border-2 border-black">
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-black">
+                  <MailIcon className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <label htmlFor="slideout-email" className="block text-black font-bold text-base tracking-wide mb-2">
+                    EMAIL ADDRESS
+                  </label>
+                  <input
+                    id="slideout-email"
+                    ref={inputRef}
+                    name="email"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    onFocus={handleInputFocus}
+                    onBlur={handleInputBlur}
+                    placeholder="Enter your email"
+                    className="w-full px-0 py-1 border-0 border-b-2 border-gray-300 bg-transparent text-black placeholder-gray-500 focus:outline-none focus:border-black transition-all duration-300 font-medium text-sm"
+                    aria-describedby={error ? "slideout-error" : undefined}
+                    disabled={isSubmitting}
+                    autoComplete="email"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Submit Button - Matching Modal Button Style */}
+            <button
+              ref={buttonRef}
+              type="submit"
+              disabled={isSubmitting}
+              onMouseEnter={handleButtonHover}
+              onMouseLeave={handleButtonLeave}
+              className="w-full relative p-6 bg-black text-white border-2 border-black hover:bg-gray-800 transition-colors disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              aria-label="Submit newsletter subscription"
+            >
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-white">
+                  {isSubmitting ? (
+                    <div className="w-6 h-6 border-2 border-black/30 border-t-black rounded-full animate-spin"></div>
+                  ) : (
+                    <ArrowRightIcon className="w-6 h-6 text-black" />
+                  )}
+                </div>
+                <div className="flex-1 text-left">
+                  <div className="text-white font-bold text-base tracking-wide">
+                    {isSubmitting ? "SUBMITTING..." : "SUBMIT"}
+                  </div>
+                  <div className="text-gray-300 text-sm font-medium">
+                    {isSubmitting ? "Processing your request" : "Join the TXMX family"}
+                  </div>
+                </div>
+              </div>
+            </button>
+
+            {!isDevelopment && (
+              <div
+                ref={turnstileRef}
+                data-theme="light"
+                data-size="flexible"
+                className="w-full flex justify-center"
+                aria-label="Security verification"
+              />
+            )}
+
+            {error && (
+              <div
+                id="slideout-error"
+                className="text-red-600 text-sm text-center font-bold tracking-wide p-4 bg-red-50 border-2 border-red-200"
+                role="alert"
+              >
+                {error}
+              </div>
+            )}
+          </form>
+
+          {/* Footer - Matching Modal Style */}
+          <div className="text-center pt-6 border-t-2 border-black">
+            <p className="text-sm text-gray-600 font-medium tracking-wide">TXMX • BOXING</p>
           </div>
         </div>
       </div>
