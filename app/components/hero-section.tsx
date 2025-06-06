@@ -276,48 +276,49 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* Newsletter Pop-in - Mobile Keyboard Optimized */}
+      {/* Newsletter Pop-in - Enhanced Mobile Centering */}
       {showNewsletter && (
-        <div
-          ref={newsletterRef}
-          className={`absolute bottom-20 sm:bottom-24 md:bottom-32 left-1/2 transform -translate-x-1/2 z-20 w-full max-w-xs sm:max-w-sm px-3 sm:px-4 ${isMobile ? "mobile-newsletter-container" : ""}`}
-          style={{
-            perspective: "1000px",
-          }}
-        >
-          {/* Close Button - Mobile Safe Positioning */}
-          <button
-            onClick={handleNewsletterClose}
-            className="absolute -top-2 -right-2 sm:-top-3 sm:-right-3 z-30 w-7 h-7 sm:w-8 sm:h-8 bg-black text-white border-2 border-white hover:bg-white hover:text-black transition-colors duration-300 flex items-center justify-center text-xs sm:text-sm font-bold"
-            aria-label="Close newsletter"
-            style={{
-              minHeight: "44px", // iOS touch target minimum
-              minWidth: "44px",
-            }}
-          >
-            ×
-          </button>
+        <div className="fixed inset-0 z-20 pointer-events-none">
+          <div className="relative h-full w-full flex items-end justify-center">
+            <div
+              ref={newsletterRef}
+              className="newsletter-popup pointer-events-auto"
+              style={{
+                perspective: "1000px",
+              }}
+            >
+              {/* Close Button - Perfectly Centered */}
+              <button
+                onClick={handleNewsletterClose}
+                className="close-button absolute z-30 bg-black text-white border-2 border-white hover:bg-white hover:text-black transition-colors duration-300 shadow-lg"
+                aria-label="Close newsletter"
+              >
+                <span className="close-icon">×</span>
+              </button>
 
-          {/* Newsletter Form - Clean Design */}
-          <div
-            style={{
-              background: "rgba(255, 255, 255, 0.95)",
-              backdropFilter: "blur(20px)",
-              WebkitBackdropFilter: "blur(20px)",
-              border: "3px solid white",
-              boxShadow: `
-                0 15px 40px rgba(0,0,0,0.4),
-                0 0 0 1px rgba(255,255,255,0.2),
-                inset 0 1px 0 rgba(255,255,255,0.3)
-              `,
-            }}
-          >
-            <Newsletter onSuccess={handleNewsletterSuccess} compact={true} mobile={isMobile} />
+              {/* Newsletter Form - Clean Design */}
+              <div
+                className="newsletter-content"
+                style={{
+                  background: "rgba(255, 255, 255, 0.95)",
+                  backdropFilter: "blur(20px)",
+                  WebkitBackdropFilter: "blur(20px)",
+                  border: "3px solid white",
+                  boxShadow: `
+                    0 15px 40px rgba(0,0,0,0.4),
+                    0 0 0 1px rgba(255,255,255,0.2),
+                    inset 0 1px 0 rgba(255,255,255,0.3)
+                  `,
+                }}
+              >
+                <Newsletter onSuccess={handleNewsletterSuccess} compact={true} mobile={isMobile} />
+              </div>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Enhanced CSS for Mobile Newsletter */}
+      {/* Enhanced CSS for Perfect Mobile Centering and Desktop Close Button */}
       <style jsx>{`
         /* Hardware acceleration for smooth performance */
         video {
@@ -331,14 +332,116 @@ export default function HeroSection() {
           transform: translateZ(0);
         }
 
-        /* Mobile newsletter container - prevent scroll fade */
-        .mobile-newsletter-container {
-          /* Ensure newsletter stays visible on mobile regardless of scroll */
-          opacity: 1 !important;
-          transform: translateX(-50%) !important;
+        /* Perfect Newsletter Centering - All Devices */
+        .newsletter-popup {
+          width: 100%;
+          max-width: 320px;
+          margin: 0 auto;
+          padding: 0 1rem;
+          margin-bottom: 5rem;
+          position: relative;
         }
 
-        /* Mobile-first optimizations */
+        /* Perfect Close Button Centering - All Devices */
+        .close-button {
+          top: -12px;
+          right: -12px;
+          width: 40px;
+          height: 40px;
+          min-width: 40px;
+          min-height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 0;
+          padding: 0;
+          line-height: 1;
+        }
+
+        .close-icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          height: 100%;
+          font-size: 18px;
+          font-weight: bold;
+          line-height: 1;
+        }
+
+        /* Desktop Close Button Optimization */
+        @media (min-width: 769px) {
+          .close-button {
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            min-height: 44px;
+            top: -6px;
+            right: -6px;
+          }
+
+          .close-icon {
+            font-size: 20px;
+          }
+
+          .newsletter-popup {
+            max-width: 380px;
+            padding: 0 1.5rem;
+            margin-bottom: 6rem;
+          }
+        }
+
+        /* Mobile-first responsive design */
+        @media (max-width: 480px) {
+          .newsletter-popup {
+            max-width: 280px;
+            padding: 0 0.75rem;
+            margin-bottom: 4rem;
+          }
+
+          .close-button {
+            width: 36px;
+            height: 36px;
+            min-width: 44px;
+            min-height: 44px;
+            top: -8px;
+            right: -8px;
+          }
+
+          .close-icon {
+            font-size: 16px;
+          }
+        }
+
+        @media (min-width: 481px) and (max-width: 768px) {
+          .newsletter-popup {
+            max-width: 340px;
+            padding: 0 1.25rem;
+            margin-bottom: 5.5rem;
+          }
+
+          .close-button {
+            width: 40px;
+            height: 40px;
+            min-width: 44px;
+            min-height: 44px;
+            top: -10px;
+            right: -10px;
+          }
+
+          .close-icon {
+            font-size: 18px;
+          }
+        }
+
+        /* Newsletter content styling */
+        .newsletter-content {
+          width: 100%;
+          border-radius: 0;
+          overflow: hidden;
+        }
+
+        /* Mobile optimizations */
         @media (max-width: 768px) {
           video {
             object-position: center center;
@@ -346,65 +449,63 @@ export default function HeroSection() {
             height: 100dvh;
           }
           
-          /* Mobile newsletter positioning */
-          .mobile-newsletter {
-            max-height: 60vh;
-            overflow-y: auto;
-          }
-          
-          /* Ensure close button is always accessible */
-          button[aria-label="Close newsletter"] {
-            top: -8px !important;
-            right: -8px !important;
-            z-index: 9999;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-          }
-
-          /* Prevent newsletter from fading on mobile scroll */
-          .mobile-newsletter-container {
-            opacity: 1 !important;
-            transform: translateX(-50%) translateY(0) !important;
-            transition: none !important;
+          /* Ensure newsletter stays perfectly centered */
+          .newsletter-popup {
+            transform: none !important;
+            left: auto !important;
+            right: auto !important;
+            position: relative !important;
           }
 
           /* Handle mobile keyboard appearance */
           @supports (-webkit-touch-callout: none) {
             /* iOS specific handling */
-            .mobile-newsletter-container {
-              position: fixed !important;
-              bottom: 1rem !important;
-              opacity: 1 !important;
-              transform: translateX(-50%) !important;
+            .newsletter-popup {
+              margin-bottom: calc(4rem + env(safe-area-inset-bottom));
             }
           }
 
           /* Android keyboard handling */
           @media screen and (max-height: 500px) {
-            .mobile-newsletter-container {
-              position: fixed !important;
-              bottom: 0.5rem !important;
-              opacity: 1 !important;
-              transform: translateX(-50%) scale(0.9) !important;
+            .newsletter-popup {
+              margin-bottom: 2rem;
+              transform: scale(0.9);
+              transform-origin: center bottom;
             }
           }
         }
 
         /* Extra small mobile devices */
-        @media (max-width: 480px) {
-          .mobile-newsletter {
-            max-height: 50vh;
-            border-width: 2px;
+        @media (max-width: 360px) {
+          .newsletter-popup {
+            max-width: 260px;
+            padding: 0 0.5rem;
+            margin-bottom: 3.5rem;
           }
           
-          /* Smaller shadows for performance */
-          .mobile-newsletter {
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3) !important;
+          .newsletter-content {
+            border-width: 2px;
           }
 
-          /* Ensure visibility on small screens */
-          .mobile-newsletter-container {
-            opacity: 1 !important;
-            transform: translateX(-50%) !important;
+          .close-button {
+            width: 32px;
+            height: 32px;
+            min-width: 44px;
+            min-height: 44px;
+            top: -6px;
+            right: -6px;
+          }
+
+          .close-icon {
+            font-size: 14px;
+          }
+        }
+
+        /* Large mobile devices */
+        @media (min-width: 414px) and (max-width: 768px) {
+          .newsletter-popup {
+            max-width: 360px;
+            padding: 0 1rem;
           }
         }
 
@@ -416,27 +517,15 @@ export default function HeroSection() {
             height: 100vh;
           }
           
-          /* Adjust newsletter for landscape */
-          .mobile-newsletter {
-            max-height: 70vh;
-          }
-          
-          /* Keep newsletter visible in landscape */
-          .mobile-newsletter-container {
-            bottom: 0.5rem !important;
-            opacity: 1 !important;
-            transform: translateX(-50%) scale(0.85) !important;
+          .newsletter-popup {
+            margin-bottom: 2rem;
+            transform: scale(0.85);
+            transform-origin: center bottom;
           }
         }
 
         /* iOS Safari specific optimizations */
         @supports (-webkit-touch-callout: none) {
-          /* iOS safe area handling */
-          .mobile-newsletter-container {
-            bottom: calc(1rem + env(safe-area-inset-bottom)) !important;
-            opacity: 1 !important;
-          }
-          
           /* Prevent zoom on input focus */
           input[type="email"] {
             font-size: 16px !important;
@@ -444,10 +533,10 @@ export default function HeroSection() {
 
           /* Handle iOS keyboard */
           @media screen and (max-height: 500px) {
-            .mobile-newsletter-container {
-              bottom: 0.25rem !important;
-              transform: translateX(-50%) scale(0.8) !important;
-              opacity: 1 !important;
+            .newsletter-popup {
+              margin-bottom: 1rem;
+              transform: scale(0.8);
+              transform-origin: center bottom;
             }
           }
         }
@@ -474,7 +563,7 @@ export default function HeroSection() {
             filter: brightness(1.2) contrast(1.3) !important;
           }
           
-          .mobile-newsletter {
+          .newsletter-content {
             border-width: 4px !important;
             background: white !important;
           }
@@ -486,29 +575,16 @@ export default function HeroSection() {
           outline-offset: 4px;
         }
 
-        /* Newsletter close button hover effect */
-        button:hover {
+        /* Close button hover effect */
+        .close-button:hover .close-icon {
           transform: scale(1.1);
         }
 
         /* Touch device optimizations */
         @media (hover: none) and (pointer: coarse) {
           /* Remove hover effects on touch devices */
-          button:hover {
+          .close-button:hover .close-icon {
             transform: none;
-          }
-          
-          /* Larger touch targets */
-          button[aria-label="Close newsletter"] {
-            min-width: 44px;
-            min-height: 44px;
-            padding: 8px;
-          }
-
-          /* Ensure newsletter stays visible on touch devices */
-          .mobile-newsletter-container {
-            opacity: 1 !important;
-            transform: translateX(-50%) !important;
           }
         }
 
@@ -516,24 +592,60 @@ export default function HeroSection() {
         @media (max-width: 768px) {
           /* When viewport height is reduced (keyboard visible) */
           @media (max-height: 600px) {
-            .mobile-newsletter-container {
-              position: fixed !important;
-              bottom: 0.5rem !important;
-              opacity: 1 !important;
-              transform: translateX(-50%) scale(0.9) !important;
-              z-index: 9999 !important;
+            .newsletter-popup {
+              margin-bottom: 1.5rem;
+              transform: scale(0.9);
+              transform-origin: center bottom;
             }
           }
 
           @media (max-height: 450px) {
-            .mobile-newsletter-container {
-              position: fixed !important;
-              bottom: 0.25rem !important;
-              opacity: 1 !important;
-              transform: translateX(-50%) scale(0.8) !important;
-              z-index: 9999 !important;
+            .newsletter-popup {
+              margin-bottom: 1rem;
+              transform: scale(0.8);
+              transform-origin: center bottom;
             }
           }
+        }
+
+        /* Ultra-wide mobile devices */
+        @media (min-width: 390px) and (max-width: 768px) {
+          .newsletter-popup {
+            max-width: 340px;
+          }
+        }
+
+        /* Tablet portrait mode */
+        @media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
+          .newsletter-popup {
+            max-width: 400px;
+            margin-bottom: 6rem;
+          }
+
+          .close-button {
+            width: 42px;
+            height: 42px;
+            min-width: 44px;
+            min-height: 44px;
+            top: -12px;
+            right: -12px;
+          }
+
+          .close-icon {
+            font-size: 19px;
+          }
+        }
+
+        /* Performance optimizations */
+        .newsletter-popup {
+          contain: layout style paint;
+          transform: translateZ(0);
+          will-change: transform;
+        }
+
+        /* Smooth scrolling prevention during newsletter display */
+        body:has(.newsletter-popup) {
+          overflow: hidden;
         }
       `}</style>
     </section>
