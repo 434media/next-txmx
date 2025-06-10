@@ -8,6 +8,7 @@ import SlideOutModal from "./components/slide-out-modal"
 import GlobalStyles from "./components/global-styles"
 import "./globals.css"
 import Footer from "./components/footer"
+import { Analytics } from "@vercel/analytics/next"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,6 +41,19 @@ export default function ClientLayout({
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#000000" />
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+        {/* Google Analytics Tag (gtag.js) */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-R7VB7PGM2J"></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-R7VB7PGM2J');
+            `,
+          }}
+        />
 
         {/* Meta Pixel Code */}
         <script
@@ -112,14 +126,11 @@ export default function ClientLayout({
         <meta name="google-site-verification" content="your-google-verification-code" />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black text-white overflow-x-hidden`}>
+        <Analytics />
+
         <GlobalStyles />
-
-        {/* Universal Navbar */}
         <Navbar onMenuClick={openModal} />
-
-        {/* Page Content */}
-        {children}
-        
+        {children}        
         <Footer />
         
         {/* Universal Slide Out Modal */}
