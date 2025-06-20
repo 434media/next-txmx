@@ -1,36 +1,139 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TXMX Boxing Website
 
-## Getting Started
+This repository contains the source code for the official TXMX Boxing landing page. It's a dynamic and visually-rich web experience built with Next.js, designed to engage a passionate fight fan audience.
 
-First, run the development server:
+## About The Application
 
-```bash
+This project is a modern, responsive landing page for the TXMX Boxing brand. It serves as the primary online presence, showcasing the brand's identity and providing a hub for community engagement.
+
+### Key Features
+
+*   **Modern Tech Stack**: Built with [Next.js](https://nextjs.org/) 15 (App Router), [React](https://react.dev/) 19, and [TypeScript](https://www.typescriptlang.org/).
+*   **Rich Animations**: Extensive use of [GSAP (GreenSock Animation Platform)](https://gsap.com/) for fluid, high-performance animations and transitions.
+*   **Responsive Design**: Styled with [Tailwind CSS](https://tailwindcss.com/) for a fully responsive layout that works seamlessly across all devices.
+*   **Newsletter Subscription**: A newsletter signup form integrated with [Airtable](https://www.airtable.com/) and secured by [Cloudflare Turnstile](https://www.cloudflare.com/products/turnstile/).
+*   **Slide-Out Modal**: An animated slide-out menu providing navigation to social media channels and the official store.
+
+### Project Structure
+
+The application is organized into several key directories:
+
+*   `app/`: The core of the Next.js application, using the App Router.
+    *   `app/page.tsx`: The main entry point and landing page.
+    *   `app/layout.tsx`: The root layout for the application.
+    *   `app/components/`: Contains all reusable React components like [`Navbar`](app/components/navbar.tsx), [`HeroSection`](app/components/hero-section.tsx), and [`Newsletter`](app/components/newsletter.tsx).
+    *   `app/api/`: Houses API routes, such as the [`newsletter` subscription endpoint](app/api/newsletter/route.ts).
+    *   `app/lib/`: Contains utility functions, like [`cn`](app/lib/utils.ts) for merging class names.
+*   `public/`: Stores static assets like images, fonts, and the [`manifest.json`](public/manifest.json).
+*   `styles/`: Global styles and Tailwind CSS configuration.
+
+## Getting Started: Running Locally
+
+To get a copy of the project up and running on your local machine, follow these steps.
+
+### 1. Clone the Repository
+
+```sh
+git clone <your-repository-url>
+cd next-txmx
+```
+
+### 2. Set Up Environment Variables
+
+Create a file named `.env.local` in the root of the project. You will need to get the following keys from the project administrator.
+
+```env
+# Airtable Configuration
+AIRTABLE_BASE_ID=your_airtable_base_id
+AIRTABLE_API_KEY=your_airtable_api_key
+
+# Cloudflare Turnstile Keys
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=your_turnstile_site_key
+TURNSTILE_SECRET_KEY=your_turnstile_secret_key
+```
+
+### 3. Install Dependencies
+
+Install the project dependencies using npm:
+
+```sh
+npm install
+```
+
+### 4. Run the Development Server
+
+Start the Next.js development server. The project is configured to use Turbopack for faster development.
+
+```sh
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## GitHub Collaboration Workflow
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+We follow a standard feature-branch workflow. All new work should be done on a dedicated branch and merged into `main` via a Pull Request (PR).
 
-## Learn More
+### Step 1: Sync Your Local `main` Branch
 
-To learn more about Next.js, take a look at the following resources:
+Before starting new work, ensure your local `main` branch is up-to-date with the remote repository.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```sh
+git checkout main
+git pull origin main
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Step 2: Create a New Branch
 
-## Deploy on Vercel
+Create a new branch from `main`. Use a descriptive naming convention, such as `feature/your-feature-name` or `fix/your-bug-fix`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```sh
+# Example for a new feature
+git checkout -b feature/add-fighter-profiles
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Step 3: Make and Commit Changes
+
+Make your code changes. Once you have a logical set of changes, stage and commit them with a clear message. We encourage using [Conventional Commits](https://www.conventionalcommits.org/) format.
+
+```sh
+# Stage all changes
+git add .
+
+# Commit with a conventional message
+git commit -m "feat: Add initial structure for fighter profile pages"
+```
+
+### Step 4: Push Your Branch to GitHub
+
+Push your new branch to the remote repository. The `-u` flag sets the upstream branch for future pushes.
+
+```sh
+git push -u origin feature/add-fighter-profiles
+```
+
+### Step 5: Create a Pull Request (PR)
+
+1.  Go to the repository on GitHub in your web browser.
+2.  You will see a prompt to create a Pull Request from your recently pushed branch. Click **"Compare & pull request"**.
+3.  Give your PR a clear title and a detailed description of the changes.
+4.  Assign reviewers and any relevant labels.
+5.  Click **"Create pull request"**.
+
+### Step 6: Code Review and Merge
+
+Your PR will be reviewed by other team members. They may request changes. Once the PR is approved and passes all checks, it will be merged into the `main` branch by a repository maintainer.
+
+### Step 7: Clean Up
+
+After your PR is merged, you can safely delete your branch to keep the repository clean.
+
+```sh
+# Switch back to the main branch
+git checkout main
+
+# Delete the local branch
+git branch -d feature/add-fighter-profiles
+```
+
+You can also delete the remote branch from the GitHub
