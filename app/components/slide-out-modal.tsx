@@ -247,7 +247,7 @@ export default function SlideOutModal({ isOpen, onClose }: SlideOutModalProps) {
                       <InstagramIcon className="w-6 h-6 text-white" />
                     </div>
                     <div className="flex-1">
-                      <div className="text-black font-bold text-base tracking-wide">FOLLOW THE FIGHT</div>
+                      <div className="text-black font-bold text-base tracking-wide">FOLLOW US</div>
                       <div className="text-gray-600 text-sm font-medium">@txmxboxing</div>
                     </div>
                     <ExternalLinkIcon className="w-5 h-5 text-gray-400 group-hover:text-black transition-colors" />
@@ -270,8 +270,8 @@ export default function SlideOutModal({ isOpen, onClose }: SlideOutModalProps) {
                       <ShopifyIcon className="w-6 h-6 text-white" />
                     </div>
                     <div className="flex-1">
-                      <div className="text-black font-bold text-base tracking-wide">GEAR UP</div>
-                      <div className="text-gray-600 text-sm font-medium">Official Store</div>
+                      <div className="text-black font-bold text-base tracking-wide">SHOP TXMX BOXING</div>
+                      <div className="text-gray-600 text-sm font-medium">Founders Tee Now Available</div>
                     </div>
                     <ExternalLinkIcon className="w-5 h-5 text-gray-400 group-hover:text-black transition-colors" />
                   </div>
@@ -292,7 +292,7 @@ export default function SlideOutModal({ isOpen, onClose }: SlideOutModalProps) {
                     </div>
                     <div className="flex-1">
                       <div className="text-black font-bold text-base tracking-wide">JOIN THE FIGHT</div>
-                      <div className="text-gray-600 text-sm font-medium">Stay in the ring with us</div>
+                      <div className="text-gray-600 text-sm font-medium">Exclusive Drops and Insider Access</div>
                     </div>
                     <div className="w-5 h-5 text-gray-400 group-hover:text-black transition-colors flex items-center justify-center">
                       <div className="w-2 h-2 bg-current"></div>
