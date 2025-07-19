@@ -9,6 +9,7 @@ import GlobalStyles from "./components/global-styles"
 import "./globals.css"
 import Footer from "./components/footer"
 import { Analytics } from "@vercel/analytics/next"
+import Script from "next/script"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -82,6 +83,13 @@ export default function ClientLayout({
           />
         </noscript>
         {/* End Meta Pixel Code */}
+
+        {/* Simpli.fi Retargeting Script */}
+        <Script
+          src="https://tag.simpli.fi/sifitag/5ea76a26-ff7f-46cf-b7d3-47031c857acb"
+          strategy="afterInteractive"
+          async
+        />
 
         <title>TXMX Boxing</title>
         <meta
