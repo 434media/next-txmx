@@ -420,7 +420,7 @@ export function Newsletter({
                 WELCOME TO THE FIGHT!
               </h3>
               <p className={`text-gray-700 ${mobile ? "text-xs" : "text-xs"} font-medium`}>
-                You're now part of the TXMX family. Get ready for exclusive drops and insider access to the ring.
+                Get ready for exclusive drops and insider access to the ring.
               </p>
             </div>
           </div>
