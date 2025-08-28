@@ -175,11 +175,11 @@ export default function TXMXNewsletter({ showModal, onClose }: TXMXNewsletterPro
         onClick={onClose}
       >
         <motion.div
-          initial={{ scale: 0.9, opacity: 0, y: 20 }}
+          initial={{ scale: 0.95, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
-          exit={{ scale: 0.9, opacity: 0, y: 20 }}
+          exit={{ scale: 0.95, opacity: 0, y: 20 }}
           transition={{ type: "spring", damping: 25, stiffness: 300 }}
-          className="relative w-full max-w-4xl bg-black border-2 border-white shadow-2xl overflow-hidden"
+          className="relative w-full max-w-4xl bg-black border-2 border-white shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Close Button */}
@@ -343,27 +343,27 @@ export default function TXMXNewsletter({ showModal, onClose }: TXMXNewsletterPro
                   ) : (
                     <motion.div
                       key="success-message"
-                      initial={{ opacity: 0, scale: 0.9 }}
+                      initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      className="text-center py-8"
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      className="text-center py-6"
                       role="status"
                       aria-live="polite"
                     >
-                      <div className="mb-6">
-                        <div className="w-20 h-20 bg-transparent border-2 border-white flex items-center justify-center mx-auto mb-6 group-hover:bg-white group-hover:border-black transition-all duration-500">
+                      <div className="mb-4">
+                        <div className="w-16 h-16 bg-transparent border-2 border-white flex items-center justify-center mx-auto mb-4 group-hover:bg-white group-hover:border-black transition-all duration-500">
                           <motion.div
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
-                            transition={{ delay: 0.2, type: "spring", damping: 15 }}
+                            transition={{ delay: 0.2, type: "spring", damping: 20, stiffness: 300 }}
                           >
-                            <CheckIcon className="h-10 w-10 text-white group-hover:text-black transition-colors duration-500" />
+                            <CheckIcon className="h-8 w-8 text-white group-hover:text-black transition-colors duration-500" />
                           </motion.div>
                         </div>
-                        <h3 className="text-2xl lg:text-3xl font-black text-white group-hover:text-black mb-4 tracking-wider uppercase transition-colors duration-500">
+                        <h3 className="text-xl lg:text-2xl font-black text-white group-hover:text-black mb-3 tracking-wider uppercase transition-colors duration-500">
                           SOMOS BOXEO
                         </h3>
-                        <p className="text-white group-hover:text-black text-lg leading-relaxed font-bold tracking-wide transition-colors duration-500">
+                        <p className="text-white group-hover:text-black text-base leading-relaxed font-bold tracking-wide transition-colors duration-500">
                           Exclusive drops and insider access.
                         </p>
                       </div>
