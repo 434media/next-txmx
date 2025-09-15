@@ -183,3 +183,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "An error occurred while subscribing to the newsletter" }, { status: 500 })
   }
 }
+
+// Handle other HTTP methods
+export async function GET() {
+  return NextResponse.json({ error: "Method not allowed" }, { status: 405 })
+}
