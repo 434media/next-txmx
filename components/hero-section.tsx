@@ -31,7 +31,7 @@ export default function HeroSection() {
   }, [])
 
   return (
-    <section ref={heroRef} className="relative h-screen w-full overflow-hidden">
+    <section ref={heroRef} className="relative w-full overflow-hidden h-screen">
       {/* Full Screen Hero Image with Distortion */}
       <div 
         ref={imageRef} 
@@ -157,7 +157,25 @@ export default function HeroSection() {
           section {
             height: 100vh;
             height: 100dvh;
+            min-height: 100vh;
+            min-height: 100dvh;
           }
+          
+          /* Maximize image area on mobile */
+          section > div:first-child {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+          }
+          
+          /* Adjust image positioning to show billboard text */
+          section img {
+            object-position: center 30% !important;
+          }
+          
           canvas {
             opacity: 0.15;
           }
