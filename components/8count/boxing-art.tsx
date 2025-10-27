@@ -129,7 +129,7 @@ export function BoxingArt() {
           <div className="w-1.5 h-1.5 bg-white" />
           <div className="w-1.5 h-1.5 bg-white" />
         </div>
-        <span className="text-xs font-mono text-zinc-500">[ FIG. 8 ]</span>
+        <span className="text-xs font-mono text-zinc-500">[ SHOP ]</span>
       </div>
 
       <div
@@ -142,14 +142,16 @@ export function BoxingArt() {
         <canvas ref={canvasRef} className="absolute inset-0 z-10 pointer-events-none" />
 
         <div className="absolute inset-0 flex items-center justify-center z-0">
-          <Image
-            src="https://ampd-asset.s3.us-east-2.amazonaws.com/TXMXBack.svg"
-            alt="TXMX Logo"
-            width={200}
-            height={200}
-            className="w-3/4 h-auto opacity-60 mix-blend-screen drop-shadow-sm" 
-            priority
-          />    
+          <a href="https://www.434media.com/shop" target="_blank" rel="noopener noreferrer">
+            <Image
+              src="https://ampd-asset.s3.us-east-2.amazonaws.com/bam2.jpg"
+              alt="TXMX Logo"
+              width={200}
+              height={200}
+              className="w-full h-auto opacity-60 mix-blend-screen drop-shadow-sm" 
+              priority
+            />    
+          </a>
         </div>
       </div>
 
@@ -157,7 +159,7 @@ export function BoxingArt() {
         <span>●</span>
         <span>●</span>
         <span>●</span>
-        <span className="mx-2">THE 8 COUNT</span>
+        <span className="mx-2">FOUNDERS TEE</span>
         <span>●</span>
         <span>●</span>
         <span>●</span>
