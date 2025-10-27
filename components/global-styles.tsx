@@ -167,7 +167,7 @@ export default function GlobalStyles() {
       }
 
       /* Prevent layout shift */
-      img, video {
+      img:not([class*="h-"]), video {
         max-width: 100%;
         height: auto;
       }
