@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next"
-import { feedItems } from "@/data/8count-feed"
+import { getFeedItems } from "@/lib/8count-data"
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://txmxboxing.com"
 
   // Main pages
@@ -19,6 +19,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
   ]
+
+  // Fetch articles from Airtable
+  const feedItems = await getFeedItems()
 
   // Article pages
   const articles = feedItems.map((item) => ({

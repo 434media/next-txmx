@@ -32,6 +32,7 @@ What to expect in the rematch: Both fighters will come with new game plans. Fury
     authors: ["Marcus Stone", "Elena Rodriguez"],
     topics: ["Champions", "Technique"],
     readTime: 8,
+    image: "https://images.unsplash.com/photo-1517646331032-9e8563c520a1?w=1200&h=630&fit=crop&crop=center",
   },
   {
     id: "2",
@@ -53,6 +54,7 @@ Many fighters try to copy the shoulder roll without understanding the footwork b
     authors: ["Coach James Williams"],
     topics: ["Technique", "Training"],
     readTime: 12,
+    image: "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=1200&h=630&fit=crop&crop=center",
   },
   {
     id: "3",
@@ -73,6 +75,7 @@ His fighting style - the float and sting - was revolutionary. He proved heavywei
     authors: ["Dr. Sarah Thompson"],
     topics: ["History", "Legends", "Champions"],
     readTime: 10,
+    image: "https://images.unsplash.com/photo-1564577160324-112d603f750f?w=1200&h=630&fit=crop&crop=center",
   },
   {
     id: "4",

@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import type { Metadata } from "next"
-import { feedItems } from "@/data/8count-feed"
+import { getFeedItems, getFeedItemBySlug } from "@/lib/8count-data"
 import { ArrowLeft, Calendar, Clock, User } from "lucide-react"
 
 interface PageProps {
@@ -11,13 +11,14 @@ interface PageProps {
 }
 
 export async function generateStaticParams() {
+  const feedItems = await getFeedItems()
   return feedItems.map((item) => ({
     slug: item.slug,
   }))
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const article = feedItems.find((item) => item.slug === params.slug)
+  const article = await getFeedItemBySlug(params.slug)
 
   if (!article) {
     return {
@@ -77,8 +78,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
-export default function ArticlePage({ params }: PageProps) {
-  const article = feedItems.find((item) => item.slug === params.slug)
+export default async function ArticlePage({ params }: PageProps) {
+  const [article, feedItems] = await Promise.all([
+    getFeedItemBySlug(params.slug),
+    getFeedItems()
+  ])
 
   if (!article) {
     notFound()
@@ -211,12 +215,6 @@ export default function ArticlePage({ params }: PageProps) {
                   <Calendar className="w-3.5 h-3.5" />
                   <span className="uppercase tracking-wider">{article.date}</span>
                 </time>
-                {article.readTime && (
-                  <div className="flex items-center gap-1.5 text-xs font-mono text-zinc-500">
-                    <Clock className="w-3.5 h-3.5" />
-                    <span>{article.readTime} min read</span>
-                  </div>
-                )}
               </div>
 
               <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white mb-6 leading-tight">
@@ -240,6 +238,17 @@ export default function ArticlePage({ params }: PageProps) {
                 <span>{article.authors.join(", ")}</span>
               </div>
             </header>
+
+            {/* Article Image */}
+            {article.image && (
+              <div className="mb-8">
+                <img
+                  src={article.image}
+                  alt={article.title}
+                  className="w-full h-64 sm:h-80 md:h-96 object-cover border border-white/20"
+                />
+              </div>
+            )}
 
             {/* Article Content */}
             <div className="prose prose-invert prose-lg max-w-none">
@@ -308,13 +317,24 @@ export default function ArticlePage({ params }: PageProps) {
                   <Link
                     key={item.id}
                     href={`/the8count/${item.slug}`}
-                    className="block border border-white/20 bg-black/40 p-4 hover:bg-white/5 transition-colors group"
+                    className="block border border-white/20 bg-black/40 hover:bg-white/5 transition-colors group overflow-hidden"
                   >
-                    <div className="text-xs font-mono text-zinc-500 mb-2">{item.date}</div>
-                    <h3 className="text-base font-bold text-white group-hover:text-zinc-300 transition-colors mb-2">
-                      {item.title}
-                    </h3>
-                    <p className="text-sm text-zinc-500 line-clamp-2">{item.summary}</p>
+                    {item.image && (
+                      <div className="aspect-video w-full overflow-hidden">
+                        <img
+                          src={item.image}
+                          alt={item.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                    )}
+                    <div className="p-4">
+                      <div className="text-xs font-mono text-zinc-500 mb-2">{item.date}</div>
+                      <h3 className="text-base font-bold text-white group-hover:text-zinc-300 transition-colors mb-2">
+                        {item.title}
+                      </h3>
+                      <p className="text-sm text-zinc-500 line-clamp-2">{item.summary}</p>
+                    </div>
                   </Link>
                 ))}
             </div>
