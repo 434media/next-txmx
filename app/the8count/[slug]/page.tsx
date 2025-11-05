@@ -18,7 +18,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const article = await getFeedItemBySlug(params.slug)
+  const { slug } = await params
+  const article = await getFeedItemBySlug(slug)
 
   if (!article) {
     return {
@@ -79,8 +80,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function ArticlePage({ params }: PageProps) {
+  const { slug } = await params
   const [article, feedItems] = await Promise.all([
-    getFeedItemBySlug(params.slug),
+    getFeedItemBySlug(slug),
     getFeedItems()
   ])
 
