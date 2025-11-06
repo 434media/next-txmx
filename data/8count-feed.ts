@@ -1,299 +1,217 @@
+export interface NewsletterSpotlight {
+  title: string
+  description: string
+  image: string
+  ctaText: string
+  ctaLink: string
+}
+
+export interface NewsletterContent {
+  heroImage: {
+    desktop: string
+    mobile: string
+  }
+  foundersNote: {
+    text: string
+    image: string
+  }
+  lastMonthGif: string
+  spotlights: NewsletterSpotlight[]
+  featuredPost: {
+    title: string
+    image: string
+    content: string
+  }
+  theDropGif: string
+  upcomingEvent: {
+    title: string
+    description: string
+    image: string
+    ctaText: string
+    ctaLink: string
+  }
+}
+
 export interface FeedItem {
   id: string
-  slug: string
   date: string
   title: string
-  type: "fight-recap" | "training" | "news" | "community"
+  type: "video" | "article" | "podcast" | "newsletter" | "fight-recap" | "training" | "news" | "community"
   summary: string
-  content: string
   authors: string[]
   topics: string[]
-  readTime?: number
+  link: string
+  slug: string
+  ogImage: string
+  content?: string
   image?: string
+  readTime?: number
+  published?: boolean
+  newsletterContent?: NewsletterContent
 }
 
 export const feedItems: FeedItem[] = [
   {
     id: "1",
-    slug: "fury-vs-usyk-rematch-breakdown",
-    date: "2025.01.20",
-    title: "Fury vs Usyk II: The Rematch That Will Define a Generation",
-    type: "fight-recap",
+    date: "2025.6.02",
+    title: "The Road to RGVSW",
+    type: "newsletter",
     summary:
-      "A comprehensive breakdown of the highly anticipated rematch between Tyson Fury and Oleksandr Usyk. Technical analysis of the first fight's key moments and what adjustments both camps need to make for the rematch.",
-    content: `The heavyweight division hasn't seen this level of skill and drama in decades. When Fury and Usyk first met, we witnessed a masterclass in boxing IQ from both fighters. Now, with the rematch looming, the chess match continues.
-
-Key Takeaways from Fight One:
-- Usyk's ability to switch stances disrupted Fury's rhythm
-- Fury's size advantage was neutralized by Usyk's movement
-- The championship rounds will be crucial
-
-What to expect in the rematch: Both fighters will come with new game plans. Fury needs to establish his jab earlier, while Usyk must find ways to conserve energy for the later rounds.`,
-    authors: ["Marcus Stone", "Elena Rodriguez"],
-    topics: ["Champions", "Technique"],
+      "You can't tell meaningful stories from a distance which is why our team headed to Brownsville for RGV Startup Week 2025.",
+    authors: ["Digital Canvas Team"],
+    topics: ["Community", "Innovation", "Creative"],
+    link: "/thefeed/the-road-to-rgvsw",
+    slug: "the-road-to-rgvsw",
+    ogImage: "/images/feed/rgvsw-og.png",
+    content: "You can't tell meaningful stories from a distance which is why our team headed to Brownsville for RGV Startup Week 2025. This wasn't a one-off trip. We've been building relationships in the Rio Grande Valley for months.",
+    image: "https://ampd-asset.s3.us-east-2.amazonaws.com/The+Feed/junehero.jpg",
     readTime: 8,
-    image: "https://images.unsplash.com/photo-1517646331032-9e8563c520a1?w=1200&h=630&fit=crop&crop=center",
+    published: true,
+    newsletterContent: {
+      heroImage: {
+        desktop: "https://ampd-asset.s3.us-east-2.amazonaws.com/The+Feed/junehero.jpg",
+        mobile: "https://ampd-asset.s3.us-east-2.amazonaws.com/The+Feed/june-mobile.png",
+      },
+      foundersNote: {
+        text: "Whether it’s SDOH work in the Valley, closing the digital gap with TechBloc, supporting ecosystem builders at Emerge and Rise, or sharing a message with a connected community — it all comes back to one thing: access. Access to health, tech, capital, or simply a seat at the table. The stories we tell are about real people building real things. Actions Speak Louder!",
+        image: "https://ampd-asset.s3.us-east-2.amazonaws.com/The+Feed/june-founder.png",
+      },
+      lastMonthGif: "https://ampd-asset.s3.us-east-2.amazonaws.com/The+Feed/motion.gif",
+      spotlights: [
+        {
+          title: "Emerge and Rise Open House ",
+          description:
+            "Vemos Vamos & DevSA link up with Lina Rugova and Christine Colburn for a closer look at the vision behind Emerge and Rise.",
+          image: "https://ampd-asset.s3.us-east-2.amazonaws.com/The+Feed/emergeopenhouse.jpeg",
+          ctaText: "Learn More",
+          ctaLink: "https://emergeandrise.org/",
+        },
+        {
+          title: "Cine Las Americas",
+          description: "Our very own Miguel Cedillo struck a chord at this years Cine Las Americas International Film Festival.",
+          image: "https://ampd-asset.s3.us-east-2.amazonaws.com/The+Feed/cinemiguel.jpeg",
+          ctaText: "Learn More",
+          ctaLink: "https://cinelasamericas.org/",
+        },
+        {
+          title: "Closing the Digital Gap",
+          description: "What happens when 110 families suddenly get access to tech they never had? TechBloc, Human-I-T, and SA Hope Center teamed up to find out. See how access to technology is still reshaping health and economic equity.",
+          image: "https://ampd-asset.s3.us-east-2.amazonaws.com/The+Feed/closinggap.jpg",
+          ctaText: "Learn More",
+          ctaLink: "https://www.sanantoniotechday.com/",
+        },
+      ],
+      featuredPost: {
+        title: "The Road to RGVSW: Proximity Matters",
+        image: "https://ampd-asset.s3.us-east-2.amazonaws.com/The+Feed/junefeatured.jpeg",
+        content:
+          "You can’t tell meaningful stories from a distance which is why our team headed to Brownsville for RGV Startup Week 2025. This wasn’t a one-off trip. We’ve been building relationships in the Rio Grande Valley for months. <br/><br/> At 434 Media, we believe storytelling is a team sport. It takes care, consistency, and cultural awareness to bring someone else’s vision to life, especially when those stories are shaping the future of public health, economic opportunity, and innovation. <br/><br/><strong>Que es SDOH? Glad you asked!</strong>",
+      },
+      theDropGif: "https://ampd-asset.s3.us-east-2.amazonaws.com/The+Feed/drop.gif",
+      upcomingEvent: {
+        title: "AIM 2025 Health R&D Summit",
+        description:
+          "Never miss a meetup. Explore our new community events page. Events are added weekly so check back often!",
+        image: "https://ampd-asset.s3.us-east-2.amazonaws.com/aim-group.jpg",
+        ctaText: "Explore Events",
+        ctaLink: "https://www.434media.com/events",
+      },
+    },
   },
   {
     id: "2",
-    slug: "mayweather-defensive-masterclass",
-    date: "2025.01.18",
-    title: "The Shoulder Roll: Breaking Down Mayweather's Defensive Genius",
-    type: "training",
+    date: "2025.11.03",
+    title: "434 Crashes SASW 10th Year",
+    type: "newsletter",
     summary:
-      "An in-depth technical guide to Floyd Mayweather's signature defensive technique. Learn the fundamentals of the shoulder roll and how to incorporate it into your own game.",
-    content: `Floyd Mayweather Jr. redefined defensive boxing with his perfection of the shoulder roll technique. This wasn't just natural talent - it was thousands of hours of deliberate practice.
-
-The Fundamentals:
-1. Positioning - Keep your lead shoulder high
-2. Weight distribution - Stay on the balls of your feet
-3. Head movement - Roll with punches, don't just block
-
-Common Mistakes:
-Many fighters try to copy the shoulder roll without understanding the footwork beneath it. The roll is useless without proper positioning.`,
-    authors: ["Coach James Williams"],
-    topics: ["Technique", "Training"],
-    readTime: 12,
-    image: "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=1200&h=630&fit=crop&crop=center",
-  },
-  {
-    id: "3",
-    slug: "ali-legacy-60-years",
-    date: "2025.01.15",
-    title: "Muhammad Ali: 60 Years Since 'I Shook Up The World'",
-    type: "news",
-    summary:
-      "Reflecting on Muhammad Ali's victory over Sonny Liston and how it changed boxing forever. The cultural impact of Ali's career extends far beyond the ring.",
-    content: `Sixty years ago, a young Cassius Clay shocked the world by defeating the seemingly invincible Sonny Liston. What followed was more than boxing history - it was a cultural revolution.
-
-Ali's Impact:
-- Brought unprecedented showmanship to boxing
-- Used his platform for social justice
-- Inspired generations of athletes to speak out
-
-His fighting style - the float and sting - was revolutionary. He proved heavyweights could move like middleweights.`,
-    authors: ["Dr. Sarah Thompson"],
-    topics: ["History", "Legends", "Champions"],
+      "If SASW 2025 proved anything, it's that San Antonio has incredible momentum right now and it's fueled by those bold enough to imagine what's next.",
+    authors: ["Digital Canvas Team"],
+    topics: ["Development", "Design", "Technology"],
+    link: "/thefeed/434-crashes-sasw-10th-year",
+    slug: "434-crashes-sasw-10th-year",
+    ogImage: "/images/feed/434-crashes-sasw-10th-year-og.png",
+    content: "As the sun set over downtown from the top of 300 Main, our team joined hundreds of founders, creators, and dreamers at TechBloc's networking mixer during San Antonio Startup Week 2025.",
+    image: "https://ampd-asset.s3.us-east-2.amazonaws.com/The+Feed/November+Cover_Desktop.jpg",
     readTime: 10,
-    image: "https://images.unsplash.com/photo-1564577160324-112d603f750f?w=1200&h=630&fit=crop&crop=center",
-  },
-  {
-    id: "4",
-    slug: "nutrition-guide-fight-camp",
-    date: "2025.01.12",
-    title: "Fueling the Fighter: Nutrition Strategies for Fight Camp",
-    type: "training",
-    summary:
-      "A comprehensive nutrition guide for fighters preparing for competition. Learn how to optimize your diet for performance, recovery, and making weight safely.",
-    content: `Making weight while maintaining strength and energy is one of the biggest challenges fighters face. Here's how the pros do it.
-
-Phase 1: Building Phase (12-8 weeks out)
-- High protein intake (1.2g per lb bodyweight)
-- Complex carbs for energy
-- Healthy fats for hormone production
-
-Phase 2: Cutting Phase (8-4 weeks out)
-- Gradual calorie reduction
-- Increase water intake
-- Monitor weight daily
-
-Phase 3: Peak Week
-- Strategic water manipulation
-- Sodium management
-- Final weight cut protocols`,
-    authors: ["Dr. Michael Chen", "Nutritionist Lisa Park"],
-    topics: ["Nutrition", "Training"],
-    readTime: 15,
-  },
-  {
-    id: "5",
-    slug: "local-gym-spotlight-broadway",
-    date: "2025.01.10",
-    title: "Gym Spotlight: Broadway Boxing's Impact on Community",
-    type: "community",
-    summary:
-      "How one local boxing gym is changing lives and keeping kids off the streets. The story of Broadway Boxing and its founder's mission to give back.",
-    content: `In the heart of the city, Broadway Boxing stands as more than just a gym - it's a sanctuary for youth who need direction.
-
-Founder Tony Martinez opened the gym 15 years ago with a simple mission: provide a safe space for kids to learn discipline, respect, and self-defense.
-
-The Impact:
-- 200+ youth served annually
-- 15 amateur champions produced
-- 2 current pros who started here
-- 0% of members involved in gang activity
-
-"Boxing saved my life," says Martinez. "Now I'm using it to save others."`,
-    authors: ["Community Reporter Jessica Adams"],
-    topics: ["Community"],
-    readTime: 6,
-  },
-  {
-    id: "6",
-    slug: "hand-wrapping-ultimate-guide",
-    date: "2025.01.08",
-    title: "The Art of Hand Wrapping: Protect Your Most Important Tools",
-    type: "training",
-    summary:
-      "Master the essential skill of hand wrapping. Different wrapping techniques for training, sparring, and competition explained step-by-step.",
-    content: `Your hands are your weapons. Protecting them properly isn't optional - it's mandatory.
-
-Why Hand Wraps Matter:
-- Prevent boxer's fracture
-- Support wrist joint
-- Compress knuckles
-- Absorb sweat
-
-Classic Wrap Technique (180"):
-1. Loop around thumb
-2. Three wraps around wrist
-3. Three wraps around knuckles
-4. Between each finger
-5. Lock it down around wrist
-
-Pro tip: Always wrap the same way every time. Build muscle memory.`,
-    authors: ["Coach Ramon Vasquez"],
-    topics: ["Technique", "Equipment", "Training"],
-    readTime: 7,
-  },
-  {
-    id: "7",
-    slug: "tyson-prime-vs-ali-prime",
-    date: "2025.01.05",
-    title: "The Eternal Question: Prime Tyson vs Prime Ali",
-    type: "news",
-    summary:
-      "A deep dive into the greatest hypothetical matchup in boxing history. Breaking down styles, attributes, and what would happen if these legends met in their primes.",
-    content: `It's the debate that never dies. Two of the greatest heavyweights of all time, separated by decades. Who would win?
-
-Mike Tyson's Advantages:
-- Explosive power
-- Peek-a-boo defense
-- Intimidation factor
-- First-round knockout ability
-
-Muhammad Ali's Advantages:
-- Superior footwork
-- Reach and height
-- Endurance
-- Ring IQ
-
-The Verdict: Ali's movement would frustrate Tyson early. If Tyson couldn't catch him in the first 4 rounds, Ali would take over and outbox him. Ali by late TKO or decision.`,
-    authors: ["Fight Analyst Robert Cruz"],
-    topics: ["Legends", "History"],
-    readTime: 11,
-  },
-  {
-    id: "8",
-    slug: "crawford-vs-canelo-possibility",
-    date: "2025.01.03",
-    title: "Crawford at 168? Breaking Down the Canelo Super Fight",
-    type: "news",
-    summary:
-      "Terence Crawford hints at moving up to super middleweight to face Canelo Álvarez. Is this fight realistic, and what would need to happen to make it a reality?",
-    content: `Terence "Bud" Crawford shocked the boxing world with recent comments about facing Canelo Álvarez at 168 pounds. Is this fight possible?
-
-The Reality Check:
-- Crawford is naturally 147-154 lbs
-- Canelo fights at 168 lbs
-- That's a 20+ pound difference
-- Crawford is 37 years old
-
-Historical Context:
-Remember when Roy Jones Jr. moved up to heavyweight? He won, but the move ultimately damaged his legacy when he came back down.
-
-The Verdict: It's a money fight, but not a smart fight for Crawford's legacy. Sometimes the best fights are the ones that don't happen.`,
-    authors: ["Senior Writer David Kim"],
-    topics: ["Champions", "Upcoming"],
-    readTime: 9,
-  },
-  {
-    id: "9",
-    slug: "mental-game-championship-rounds",
-    date: "2025.01.01",
-    title: "The Mental Game: Winning When Your Body Says Quit",
-    type: "training",
-    summary:
-      "Sports psychology insights for fighters. How champions develop mental toughness and what you can learn from their approach to pressure situations.",
-    content: `The fight is won in training, but championships are won in the mind. When both fighters are exhausted, who has the mental edge?
-
-Mental Training Techniques:
-1. Visualization - See yourself winning before you step in the ring
-2. Breathing control - Calm your mind under pressure
-3. Positive self-talk - Your inner voice matters
-4. Embracing discomfort - Learn to love the grind
-
-Championship Rounds:
-Rounds 10-12 are where legends are made. Your body will beg you to quit. Your mind must be stronger.
-
-Practice mental toughness in every training session. The mind is a muscle too.`,
-    authors: ["Sports Psychologist Dr. Amanda Foster"],
-    topics: ["Psychology", "Training", "Champions"],
-    readTime: 13,
-  },
-  {
-    id: "10",
-    slug: "glove-buyers-guide-2025",
-    date: "2024.12.28",
-    title: "Boxing Gloves Buyer's Guide: Finding Your Perfect Pair",
-    type: "training",
-    summary:
-      "Everything you need to know about boxing gloves. From size selection to brand comparisons, make an informed decision on your next glove purchase.",
-    content: `Not all gloves are created equal. Here's how to choose the right pair for your needs.
-
-Glove Weight Guide:
-- 8-10 oz: Competition only
-- 12 oz: Light sparring
-- 14 oz: Standard sparring
-- 16 oz: Heavy sparring/heavy bag
-
-Top Brands Compared:
-1. Winning - The gold standard (price: $$$)
-2. Cleto Reyes - Puncher's glove (price: $$)
-3. Everlast - Budget-friendly (price: $)
-4. Grant - Custom fit perfection (price: $$$)
-
-What to Look For:
-- Proper wrist support
-- Quality stitching
-- Comfortable padding
-- Break-in period
-
-Investment tip: Buy once, cry once. Quality gloves last years.`,
-    authors: ["Equipment Expert Tom Bradley"],
-    topics: ["Equipment", "Training"],
-    readTime: 10,
+    published: true,
+    newsletterContent: {
+      heroImage: {
+        desktop: "https://ampd-asset.s3.us-east-2.amazonaws.com/The+Feed/November+Cover_Desktop.jpg",
+        mobile: "https://ampd-asset.s3.us-east-2.amazonaws.com/The+Feed/November+Cover.jpg",
+      },
+      foundersNote: {
+        text: "It’s been a busy month! From <strong>Texas Venture Fest</strong>, where we talked a lil’ pinche, through <strong>San Antonio Startup Week</strong>, one theme kept echoing: <br/> <br/> <strong>San Antonio Rising!</strong> <br/> <br/> As we stand on the precipice of a historic vote (read: <a href=\"https://sanantonioreport.org/what-is-prop-a-prop-b-bexar-county-venue-tax-election-ballot-language-explainer/\" style=\"color: blue; text-decoration: underline;\">What are Prop A and Prop B</a>), I’m reminded of the confidence we found in the people and partners shaping this city’s future. The energy, ambition, and creativity we witnessed this week — and in so many others working to leave a legacy that’s both rich and enriching — are proof that San Antonio’s future is as bright as the minds fueling the current conversation. <br/> <br/> As for 11/4: <strong>Don’t be a Goober…</strong><a href=\"https://sanantonioreport.org/uber-leave-san-antonio-lyft-fence/\" style=\"color: blue; text-decoration: underline;\">again</a>.",
+        image: "https://ampd-asset.s3.us-east-2.amazonaws.com/The+Feed/Marcos5.PNG",
+      },
+      lastMonthGif: "https://ampd-asset.s3.us-east-2.amazonaws.com/The+Feed/motion.gif",
+      spotlights: [
+        {
+          title: "Expanding the Mission of Collaboration",
+          description:
+            "<strong>AIM 2026</strong> returns with an expanded focus on creating an always-on environment that connects AIM programming to the broader innovation ecosystem through <strong>VelocityTX</strong> and community partnerships. <br/> <br/> This year-round approach strengthens collaboration across academia, industry, and the military—cementing San Antonio’s position as a national hub for bioscience, dual-use innovation, and economic growth. Curious about innovating in the Federal space?",
+          image: "https://ampd-asset.s3.us-east-2.amazonaws.com/The+Feed/aimannounced.png",
+          ctaText: "Register Now!",
+          ctaLink: "https://www.aimsatx.com/",
+        },
+        {
+          title: "Vemos Vamos Launches The Culture Deck",
+          description:
+            "You’re early — and that’s a good thing. This growing library functions like a hand of cards, a set of creative insights and cultural drops you can use to play smarter in business and storytelling. Be the first to receive The Culture Deck when it launches.",
+          image: "https://ampd-asset.s3.us-east-2.amazonaws.com/The+Feed/vemosinsights.jpg",
+          ctaText: "Subscribe Here",
+          ctaLink: "https://www.vemosvamos.com/",
+        },
+        {
+          title: "learn2AI Launched with a Bold Vision for the 210",
+          description:
+            "<strong>San Antonio Startup Week</strong> may have wrapped, but the momentum continues. This year, <a href=\"https://www.learn2ai.co/\" style=\"color: blue; text-decoration: underline;\">Learn2AI</a>, <a href=\"https://www.434media.com/\" style=\"color: blue; text-decoration: underline;\">434 MEDIA</a>, and <a href=\"https://www.devsa.community/\" style=\"color: blue; text-decoration: underline;\">DEVSA</a> set out to make San Antonio one of the most AI-literate cities by 2030. <br/> <br/> The collaboration debuted with an interactive workshop where founders and small businesses got a peek under the hood of agenticAI, exploring the technical layers behind how functional AI agents are built and applied in real-world use cases. <br/> <br/>  Read the full story and see what’s next for this collaboration.",
+          image: "https://ampd-asset.s3.us-east-2.amazonaws.com/The+Feed/agents.png",
+          ctaText: "Learn More",
+          ctaLink: "https://www.434media.com/blog/a-new-chapter-for-san-antonios-tech-community",
+        },
+      ],
+      featuredPost: {
+        title: "434 Crashes SASW 10th Year",
+        image: "https://ampd-asset.s3.us-east-2.amazonaws.com/The+Feed/saswcrash.jpeg",
+        content:
+          "As the sun set over downtown from the top of 300 Main, our team joined hundreds of founders, creators, and dreamers at TechBloc’s networking mixer during <strong>San Antonio Startup Week 2025</strong>. The space was alive with conversation, ideas traded hands as easily as handshakes, and the view mirrored the energy of a city on the rise. <br/> <br/> It was also a night of milestones, as <strong>Beto Altamirano</strong> took the mic for his first public address as <strong>TechBloc’s new CEO</strong>, sharing a message that resonated across the rooftop: <br/> <br/> “The next Rackspace, the next tech company to put San Antonio on the global map is already taking shape.” <br/> <br/> During <strong>San Antonio Startup Week</strong>, we teamed up with <strong>VelocityTX</strong>, <strong>Univision San Antonio</strong>, and <strong>Methodist Healthcare Ministries</strong> to lead conversations around innovation and inclusion reaching over <strong>800,000</strong> impressions across platforms. <br/> <br/> If SASW 2025 proved anything, it’s that San Antonio has incredible momentum right now and it’s fueled by those bold enough to imagine what’s next.",
+      },
+      theDropGif: "https://ampd-asset.s3.us-east-2.amazonaws.com/The+Feed/drop.gif",
+      upcomingEvent: {
+        title: "The First Python Conference in San Antonio",
+        description:
+          "Alamo Python, the PyTexas Foundation, and DEVSA are excited to activate the first-ever Python conference in San Antonio!",
+        image: "https://ampd-asset.s3.us-east-2.amazonaws.com/The+Feed/flyers-11-python.png",
+        ctaText: "Explore Events",
+        ctaLink: "https://www.434media.com/events",
+      },
+    },
   },
 ]
 
-// Helper function to count items by type
-function countByType(type: FeedItem["type"]): number {
-  return feedItems.filter((item) => item.type === type).length
-}
-
-// Helper function to count items by topic
-function countByTopic(topic: string): number {
-  return feedItems.filter((item) => item.topics.some((t) => t.toLowerCase() === topic.toLowerCase())).length
-}
-
-// Dynamically generated feed types with actual counts
-export const feedTypes = [
-  { id: "fight-recap", label: "Fight Recap", count: countByType("fight-recap") },
-  { id: "training", label: "Training", count: countByType("training") },
-  { id: "news", label: "News", count: countByType("news") },
-  { id: "community", label: "Community", count: countByType("community") },
-]
-
-// Dynamically generated feed topics with actual counts
+export const feedTypes = ["video", "article", "podcast", "newsletter", "fight-recap", "training", "news", "community"] as const
 export const feedTopics = [
-  { id: "technique", label: "Technique", count: countByTopic("Technique") },
-  { id: "champions", label: "Champions", count: countByTopic("Champions") },
-  { id: "history", label: "History", count: countByTopic("History") },
-  { id: "equipment", label: "Equipment", count: countByTopic("Equipment") },
-  { id: "nutrition", label: "Nutrition", count: countByTopic("Nutrition") },
-  { id: "psychology", label: "Psychology", count: countByTopic("Psychology") },
-  { id: "legends", label: "Legends", count: countByTopic("Legends") },
-  { id: "upcoming", label: "Upcoming", count: countByTopic("Upcoming") },
-  { id: "training", label: "Training", count: countByTopic("Training") },
-  { id: "community", label: "Community", count: countByTopic("Community") },
-]
+  "Community",
+  "Innovation", 
+  "Creative",
+  "Development",
+  "Design",
+  "Technology",
+  "Collaboration",
+  "Trends",
+  "Review",
+  "Milestones",
+  "Podcast",
+  "Creators",
+  "Interviews",
+  "Technique",
+  "Champions",
+  "History",
+  "Equipment", 
+  "Nutrition",
+  "Psychology",
+  "Legends",
+  "Upcoming",
+  "Training",
+] as const
+export const feedAuthors = ["Digital Canvas Team", "Dev Team", "Creative Team", "Podcast Team"] as const

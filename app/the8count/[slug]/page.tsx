@@ -2,13 +2,17 @@ import { notFound } from "next/navigation"
 import Link from "next/link"
 import type { Metadata } from "next"
 import { getFeedItems, getFeedItemBySlug } from "@/lib/8count-data"
-import { ArrowLeft, Calendar, Clock, User } from "lucide-react"
+import { ArrowLeft, Calendar, Clock, User, ExternalLink } from "lucide-react"
+import Image from "next/image"
 
 interface PageProps {
   params: {
     slug: string
   }
 }
+
+// Revalidate every 60 seconds to get fresh data from Airtable
+export const revalidate = 60
 
 export async function generateStaticParams() {
   const feedItems = await getFeedItems()
@@ -37,31 +41,31 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     keywords: ["boxing", "TXMX", "The 8 Count", article.type, ...article.topics, ...article.authors].join(", "),
     authors: article.authors.map((name) => ({ name })),
     openGraph: {
-      title: article.title,
-      description: article.summary,
-      url,
-      siteName: "TXMX Boxing - The 8 Count",
-      locale: "en_US",
-      type: "article",
-      publishedTime: publishedDate,
-      authors: article.authors,
-      tags: article.topics,
-      images: [
-        {
-          url: article.image || "https://txmxboxing.com/og-image-8count.jpg",
-          width: 1200,
-          height: 630,
-          alt: article.title,
+          title: article.title,
+          description: article.summary,
+          url,
+          siteName: "TXMX Boxing - The 8 Count",
+          locale: "en_US",
+          type: "article",
+          publishedTime: publishedDate,
+          authors: article.authors,
+          tags: article.topics,
+          images: [
+            {
+              url: article.image || article.ogImage || "https://txmxboxing.com/og-image-8count.jpg",
+              width: 1200,
+              height: 630,
+              alt: article.title,
+            },
+          ],
         },
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: article.title,
-      description: article.summary,
-      images: [article.image || "https://txmxboxing.com/og-image-8count.jpg"],
-      creator: "@txmxboxing",
-    },
+        twitter: {
+          card: "summary_large_image",
+          title: article.title,
+          description: article.summary,
+          images: [article.image || article.ogImage || "https://txmxboxing.com/og-image-8count.jpg"],
+          creator: "@txmxboxing",
+        },
     alternates: {
       canonical: url,
     },
@@ -95,6 +99,10 @@ export default async function ArticlePage({ params }: PageProps) {
     training: "Training",
     news: "News",
     community: "Community",
+    video: "Video",
+    article: "Article", 
+    podcast: "Podcast",
+    newsletter: "Newsletter",
   }
 
   const publishedDate = article.date.replace(/\./g, "-")
@@ -115,7 +123,7 @@ export default async function ArticlePage({ params }: PageProps) {
             "@type": "BlogPosting",
             headline: article.title,
             description: article.summary,
-            image: article.image || "https://txmxboxing.com/og-image-8count.jpg",
+            image: article.image || article.ogImage || "https://txmxboxing.com/og-image-8count.jpg",
             datePublished: publishedDate,
             dateModified: publishedDate,
             author: article.authors.map((author) => ({
@@ -134,9 +142,9 @@ export default async function ArticlePage({ params }: PageProps) {
               "@type": "WebPage",
               "@id": `https://txmxboxing.com/the8count/${article.slug}`,
             },
-            articleBody: article.content,
+            articleBody: article.content || article.summary,
             keywords: article.topics.join(", "),
-            wordCount: article.content.split(" ").length,
+            wordCount: (article.content || article.summary).split(" ").length,
             timeRequired: `PT${article.readTime || 5}M`,
           }),
         }}
@@ -173,96 +181,246 @@ export default async function ArticlePage({ params }: PageProps) {
         }}
       />
 
-      <main className="pt-32 pb-20 px-4 md:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
+      {/* Newsletter Template */}
+      {article.type === "newsletter" && article.newsletterContent ? (
+        <main className="pt-32 pb-20">
           {/* Breadcrumbs */}
-          <nav aria-label="Breadcrumb" className="mb-8">
-            <ol className="flex items-center gap-2 text-xs font-mono text-zinc-500">
-              <li>
-                <a href="/" className="hover:text-white transition-colors">
-                  Home
-                </a>
-              </li>
-              <li>/</li>
-              <li>
-                <Link href="/the8count" className="hover:text-white transition-colors">
-                  The 8 Count
-                </Link>
-              </li>
-              <li>/</li>
-              <li aria-current="page" className="text-white truncate">
-                {article.title}
-              </li>
-            </ol>
+          <nav aria-label="Breadcrumb" className="mb-8 px-4 md:px-6 lg:px-8">
+            <div className="max-w-4xl mx-auto">
+              <ol className="flex items-center gap-2 text-xs font-mono text-zinc-500">
+                <li>
+                  <a href="/" className="hover:text-white transition-colors">
+                    Home
+                  </a>
+                </li>
+                <li>/</li>
+                <li>
+                  <Link href="/the8count" className="hover:text-white transition-colors">
+                    The 8 Count
+                  </Link>
+                </li>
+                <li>/</li>
+                <li aria-current="page" className="text-white truncate">
+                  {article.title}
+                </li>
+              </ol>
+            </div>
           </nav>
 
           {/* Back Button */}
-          <Link
-            href="/the8count"
-            className="inline-flex items-center gap-2 text-zinc-400 hover:text-white transition-colors mb-12 group"
-          >
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            <span className="text-sm font-mono uppercase tracking-wider">Back to The 8 Count</span>
-          </Link>
-
-          {/* Article */}
-          <article>
-            {/* Article Header */}
-            <header className="border-b border-white/20 pb-8 mb-8">
-              <div className="flex flex-wrap items-center gap-3 mb-6">
-                <span className="px-3 py-1 text-xs font-mono uppercase border border-white/30 bg-white/10 text-white">
-                  {typeLabels[article.type]}
-                </span>
-                <time dateTime={publishedDate} className="flex items-center gap-1.5 text-xs font-mono text-zinc-500">
-                  <Calendar className="w-3.5 h-3.5" />
-                  <span className="uppercase tracking-wider">{article.date}</span>
-                </time>
-              </div>
-
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white mb-6 leading-tight">
-                {article.title}
-              </h1>
-
-              <div className="flex flex-wrap gap-2 mb-6">
-                {article.topics.map((topic) => (
-                  <span
-                    key={topic}
-                    className="px-2.5 py-1 text-xs font-mono bg-white/5 text-zinc-400 border border-zinc-700 uppercase"
-                  >
-                    {topic}
-                  </span>
-                ))}
-              </div>
-
-              <div className="flex items-center gap-2 text-sm text-zinc-400">
-                <User className="w-4 h-4" />
-                <span className="text-white/60 font-mono uppercase text-xs tracking-wider">By</span>
-                <span>{article.authors.join(", ")}</span>
-              </div>
-            </header>
-
-            {/* Article Image */}
-            {article.image && (
-              <div className="mb-8">
-                <img
-                  src={article.image}
-                  alt={article.title}
-                  className="w-full h-64 sm:h-80 md:h-96 object-cover border border-white/20"
-                />
-              </div>
-            )}
-
-            {/* Article Content */}
-            <div className="prose prose-invert prose-lg max-w-none">
-              <div className="text-xl text-zinc-300 leading-relaxed mb-8 font-light border-l-2 border-white/20 pl-6">
-                {article.summary}
-              </div>
-
-              <div className="text-zinc-400 leading-relaxed space-y-6 whitespace-pre-line">{article.content}</div>
+          <div className="px-4 md:px-6 lg:px-8 mb-8">
+            <div className="max-w-4xl mx-auto">
+              <Link
+                href="/the8count"
+                className="inline-flex items-center gap-2 text-zinc-400 hover:text-white transition-colors group"
+              >
+                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                <span className="text-sm font-mono uppercase tracking-wider">Back to The 8 Count</span>
+              </Link>
             </div>
+          </div>
 
-            {/* Article Footer */}
-            <footer className="mt-16 pt-8 border-t border-white/20">
+          {/* Hero Image */}
+          <div className="mb-8">
+            <div className="hidden md:block">
+              <Image
+                src={article.newsletterContent.heroImage.desktop}
+                alt={article.title}
+                width={1200}
+                height={600}
+                className="w-full h-auto object-cover"
+                priority
+              />
+            </div>
+            <div className="md:hidden">
+              <Image
+                src={article.newsletterContent.heroImage.mobile}
+                alt={article.title}
+                width={400}
+                height={600}
+                className="w-full h-auto object-cover"
+                priority
+              />
+            </div>
+          </div>
+
+          {/* Newsletter Content */}
+          <div className="px-4 md:px-6 lg:px-8">
+            <div className="max-w-4xl mx-auto space-y-12">
+              
+              {/* Header */}
+              <header className="border-b border-white/20 pb-8">
+                <div className="flex flex-wrap items-center gap-3 mb-6">
+                  <span className="px-3 py-1 text-xs font-mono uppercase border border-white/30 bg-white/10 text-white">
+                    Newsletter
+                  </span>
+                  <time dateTime={publishedDate} className="flex items-center gap-1.5 text-xs font-mono text-zinc-500">
+                    <Calendar className="w-3.5 h-3.5" />
+                    <span className="uppercase tracking-wider">{article.date}</span>
+                  </time>
+                </div>
+
+                <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white mb-6 leading-tight">
+                  {article.title}
+                </h1>
+
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {article.topics.map((topic) => (
+                    <span
+                      key={topic}
+                      className="px-2.5 py-1 text-xs font-mono bg-white/5 text-zinc-400 border border-zinc-700 uppercase"
+                    >
+                      {topic}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="flex items-center gap-2 text-sm text-zinc-400">
+                  <User className="w-4 h-4" />
+                  <span className="text-white/60 font-mono uppercase text-xs tracking-wider">By</span>
+                  <span>{article.authors.join(", ")}</span>
+                </div>
+              </header>
+
+              {/* Founder's Note */}
+              <section className="grid md:grid-cols-3 gap-8 items-start">
+                <div className="md:col-span-2">
+                  <h2 className="text-2xl font-black text-white mb-4 uppercase">Founder's Note</h2>
+                  <div 
+                    className="text-zinc-300 leading-relaxed prose prose-invert prose-lg max-w-none"
+                    dangerouslySetInnerHTML={{ __html: article.newsletterContent.foundersNote.text }}
+                  />
+                </div>
+                <div className="order-first md:order-last">
+                  <div className="aspect-[4/5] w-full overflow-hidden border border-white/20">
+                    <Image
+                      src={article.newsletterContent.foundersNote.image}
+                      alt="Founder"
+                      width={400}
+                      height={500}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+              </section>
+
+              {/* Last Month GIF */}
+              <section className="text-center">
+                <Image
+                  src={article.newsletterContent.lastMonthGif}
+                  alt="Last Month"
+                  width={600}
+                  height={400}
+                  className="mx-auto border border-white/20"
+                />
+              </section>
+
+              {/* Spotlights */}
+              <section>
+                <h2 className="text-3xl font-black text-white mb-8 uppercase text-center">Spotlights</h2>
+                <div className="grid gap-8">
+                  {article.newsletterContent.spotlights.map((spotlight, index) => (
+                    <div key={index} className="grid md:grid-cols-2 gap-6 items-center border border-white/20 bg-black/40 p-6">
+                      <div className={index % 2 === 0 ? "order-1" : "order-2"}>
+                        <h3 className="text-xl font-bold text-white mb-4">{spotlight.title}</h3>
+                        <div 
+                          className="text-zinc-300 leading-relaxed mb-6 prose prose-invert max-w-none"
+                          dangerouslySetInnerHTML={{ __html: spotlight.description }}
+                        />
+                        <a
+                          href={spotlight.ctaLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-6 py-3 bg-white hover:bg-white/90 text-black font-bold uppercase text-sm transition-colors"
+                        >
+                          {spotlight.ctaText}
+                          <ExternalLink className="w-4 h-4" />
+                        </a>
+                      </div>
+                      <div className={index % 2 === 0 ? "order-2" : "order-1"}>
+                        <Image
+                          src={spotlight.image}
+                          alt={spotlight.title}
+                          width={400}
+                          height={300}
+                          className="w-full h-auto object-cover border border-white/20"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* Featured Post */}
+              <section className="border border-white/20 bg-black/40 p-8">
+                <h2 className="text-3xl font-black text-white mb-8 uppercase text-center">Featured</h2>
+                <div className="grid md:grid-cols-2 gap-8 items-start">
+                  <div>
+                    <Image
+                      src={article.newsletterContent.featuredPost.image}
+                      alt={article.newsletterContent.featuredPost.title}
+                      width={500}
+                      height={400}
+                      className="w-full h-auto object-cover border border-white/20"
+                    />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-white mb-4">{article.newsletterContent.featuredPost.title}</h3>
+                    <div 
+                      className="text-zinc-300 leading-relaxed prose prose-invert max-w-none"
+                      dangerouslySetInnerHTML={{ __html: article.newsletterContent.featuredPost.content }}
+                    />
+                  </div>
+                </div>
+              </section>
+
+              {/* The Drop GIF */}
+              <section className="text-center">
+                <h2 className="text-3xl font-black text-white mb-8 uppercase">The Drop</h2>
+                <Image
+                  src={article.newsletterContent.theDropGif}
+                  alt="The Drop"
+                  width={600}
+                  height={400}
+                  className="mx-auto border border-white/20"
+                />
+              </section>
+
+              {/* Upcoming Event */}
+              <section className="border border-white/20 bg-black/40 p-8">
+                <h2 className="text-3xl font-black text-white mb-8 uppercase text-center">Upcoming</h2>
+                <div className="grid md:grid-cols-2 gap-8 items-center">
+                  <div>
+                    <h3 className="text-xl font-bold text-white mb-4">{article.newsletterContent.upcomingEvent.title}</h3>
+                    <p className="text-zinc-300 leading-relaxed mb-6">{article.newsletterContent.upcomingEvent.description}</p>
+                    <a
+                      href={article.newsletterContent.upcomingEvent.ctaLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-white hover:bg-white/90 text-black font-bold uppercase text-sm transition-colors"
+                    >
+                      {article.newsletterContent.upcomingEvent.ctaText}
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                  </div>
+                  <div>
+                    <Image
+                      src={article.newsletterContent.upcomingEvent.image}
+                      alt={article.newsletterContent.upcomingEvent.title}
+                      width={400}
+                      height={300}
+                      className="w-full h-auto object-cover border border-white/20"
+                    />
+                  </div>
+                </div>
+              </section>
+
+            </div>
+          </div>
+
+          {/* Footer */}
+          <footer className="mt-16 pt-8 border-t border-white/20 px-4 md:px-6 lg:px-8">
+            <div className="max-w-4xl mx-auto">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
                 <div>
                   <p className="text-xs font-mono text-zinc-500 uppercase tracking-wider mb-3">Share This Story</p>
@@ -299,50 +457,184 @@ export default async function ArticlePage({ params }: PageProps) {
                   More Stories →
                 </Link>
               </div>
-            </footer>
-          </article>
-
-          {/* Related Articles */}
-          <section className="mt-16 pt-8 border-t border-white/20" aria-labelledby="related-heading">
-            <h2 id="related-heading" className="text-2xl font-black text-white mb-6 uppercase">
-              Related Stories
-            </h2>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {feedItems
-                .filter(
-                  (item) =>
-                    item.slug !== article.slug &&
-                    (item.type === article.type || item.topics.some((topic) => article.topics.includes(topic))),
-                )
-                .slice(0, 4)
-                .map((item) => (
-                  <Link
-                    key={item.id}
-                    href={`/the8count/${item.slug}`}
-                    className="block border border-white/20 bg-black/40 hover:bg-white/5 transition-colors group overflow-hidden"
-                  >
-                    {item.image && (
-                      <div className="aspect-video w-full overflow-hidden">
-                        <img
-                          src={item.image}
-                          alt={item.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                      </div>
-                    )}
-                    <div className="p-4">
-                      <div className="text-xs font-mono text-zinc-500 mb-2">{item.date}</div>
-                      <h3 className="text-base font-bold text-white group-hover:text-zinc-300 transition-colors mb-2">
-                        {item.title}
-                      </h3>
-                      <p className="text-sm text-zinc-500 line-clamp-2">{item.summary}</p>
-                    </div>
-                  </Link>
-                ))}
             </div>
-          </section>
-        </div>
-      </main>
+          </footer>
+        </main>
+      ) : (
+        // Default Article Layout
+        <main className="pt-32 pb-20 px-4 md:px-6 lg:px-8">
+          <div className="max-w-4xl mx-auto">
+            {/* Breadcrumbs */}
+            <nav aria-label="Breadcrumb" className="mb-8">
+              <ol className="flex items-center gap-2 text-xs font-mono text-zinc-500">
+                <li>
+                  <a href="/" className="hover:text-white transition-colors">
+                    Home
+                  </a>
+                </li>
+                <li>/</li>
+                <li>
+                  <Link href="/the8count" className="hover:text-white transition-colors">
+                    The 8 Count
+                  </Link>
+                </li>
+                <li>/</li>
+                <li aria-current="page" className="text-white truncate">
+                  {article.title}
+                </li>
+              </ol>
+            </nav>
+
+            {/* Back Button */}
+            <Link
+              href="/the8count"
+              className="inline-flex items-center gap-2 text-zinc-400 hover:text-white transition-colors mb-12 group"
+            >
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+              <span className="text-sm font-mono uppercase tracking-wider">Back to The 8 Count</span>
+            </Link>
+
+            {/* Article */}
+            <article>
+              {/* Article Header */}
+              <header className="border-b border-white/20 pb-8 mb-8">
+                <div className="flex flex-wrap items-center gap-3 mb-6">
+                  <span className="px-3 py-1 text-xs font-mono uppercase border border-white/30 bg-white/10 text-white">
+                    {typeLabels[article.type as keyof typeof typeLabels] || article.type}
+                  </span>
+                  <time dateTime={publishedDate} className="flex items-center gap-1.5 text-xs font-mono text-zinc-500">
+                    <Calendar className="w-3.5 h-3.5" />
+                    <span className="uppercase tracking-wider">{article.date}</span>
+                  </time>
+                </div>
+
+                <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white mb-6 leading-tight">
+                  {article.title}
+                </h1>
+
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {article.topics.map((topic) => (
+                    <span
+                      key={topic}
+                      className="px-2.5 py-1 text-xs font-mono bg-white/5 text-zinc-400 border border-zinc-700 uppercase"
+                    >
+                      {topic}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="flex items-center gap-2 text-sm text-zinc-400">
+                  <User className="w-4 h-4" />
+                  <span className="text-white/60 font-mono uppercase text-xs tracking-wider">By</span>
+                  <span>{article.authors.join(", ")}</span>
+                </div>
+              </header>
+
+              {/* Article Image */}
+              {(article.image || article.ogImage) && (
+                <div className="mb-8">
+                  <img
+                    src={article.image || article.ogImage}
+                    alt={article.title}
+                    className="w-full h-64 sm:h-80 md:h-96 object-cover border border-white/20"
+                  />
+                </div>
+              )}
+
+              {/* Article Content */}
+              <div className="prose prose-invert prose-lg max-w-none">
+                <div className="text-xl text-zinc-300 leading-relaxed mb-8 font-light border-l-2 border-white/20 pl-6">
+                  {article.summary}
+                </div>
+
+                <div className="text-zinc-400 leading-relaxed space-y-6 whitespace-pre-line">
+                  {article.content || article.summary}
+                </div>
+              </div>
+
+              {/* Article Footer */}
+              <footer className="mt-16 pt-8 border-t border-white/20">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+                  <div>
+                    <p className="text-xs font-mono text-zinc-500 uppercase tracking-wider mb-3">Share This Story</p>
+                    <div className="flex gap-4">
+                      <a
+                        href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(article.title)}&url=https://txmxboxing.com/the8count/${article.slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-zinc-400 hover:text-white transition-colors"
+                        aria-label="Share on X (Twitter)"
+                      >
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                        </svg>
+                      </a>
+                      <a
+                        href={`https://www.facebook.com/sharer/sharer.php?u=https://txmxboxing.com/the8count/${article.slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-zinc-400 hover:text-white transition-colors"
+                        aria-label="Share on Facebook"
+                      >
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                        </svg>
+                      </a>
+                    </div>
+                  </div>
+
+                  <Link
+                    href="/the8count"
+                    className="px-6 py-3 bg-white hover:bg-white/90 text-black font-bold uppercase text-sm transition-colors border border-white/20"
+                  >
+                    More Stories →
+                  </Link>
+                </div>
+              </footer>
+            </article>
+
+            {/* Related Articles */}
+            <section className="mt-16 pt-8 border-t border-white/20" aria-labelledby="related-heading">
+              <h2 id="related-heading" className="text-2xl font-black text-white mb-6 uppercase">
+                Related Stories
+              </h2>
+              <div className="grid gap-4 sm:grid-cols-2">
+                {feedItems
+                  .filter(
+                    (item) =>
+                      item.slug !== article.slug &&
+                      (item.type === article.type || item.topics.some((topic) => article.topics.includes(topic))),
+                  )
+                  .slice(0, 4)
+                  .map((item) => (
+                    <Link
+                      key={item.id}
+                      href={`/the8count/${item.slug}`}
+                      className="block border border-white/20 bg-black/40 hover:bg-white/5 transition-colors group overflow-hidden"
+                    >
+                      {(item.image || item.ogImage) && (
+                        <div className="aspect-video w-full overflow-hidden">
+                          <img
+                            src={item.image || item.ogImage}
+                            alt={item.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        </div>
+                      )}
+                      <div className="p-4">
+                        <div className="text-xs font-mono text-zinc-500 mb-2">{item.date}</div>
+                        <h3 className="text-base font-bold text-white group-hover:text-zinc-300 transition-colors mb-2">
+                          {item.title}
+                        </h3>
+                        <p className="text-sm text-zinc-500 line-clamp-2">{item.summary}</p>
+                      </div>
+                    </Link>
+                  ))}
+              </div>
+            </section>
+          </div>
+        </main>
+      )}
     </>
   )
 }

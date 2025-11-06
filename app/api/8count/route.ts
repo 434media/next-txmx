@@ -15,7 +15,7 @@ export interface AirtableFeedItem {
   slug: string
   date: string
   title: string
-  type: "fight-recap" | "training" | "news" | "community"
+  type: "fight-recap" | "training" | "news" | "community" | "newsletter"
   summary: string
   content: string
   authors: string[]
@@ -23,65 +23,93 @@ export interface AirtableFeedItem {
   readTime?: number
   image?: string
   published?: boolean
+  newsletterContent?: string // JSON string for newsletter content
 }
 
 export async function GET() {
   try {
-    const records = await base("8count")
-      .select({
-        // Sort by date descending (newest first)
-        sort: [{ field: "Date", direction: "desc" }],
-        // Only fetch published articles
-        filterByFormula: "{Published} = TRUE()"
-      })
-      .all()
+    // Get all records without filtering or sorting to avoid field name issues
+    // We'll handle filtering and sorting in the application layer
+    const records = await base("8count").select().all()
 
     const feedItems: AirtableFeedItem[] = records.map((record) => {
       const fields = record.fields as any
 
       // Parse authors from comma-separated string or array
       let authors: string[] = []
-      if (fields.Authors) {
-        if (Array.isArray(fields.Authors)) {
-          authors = fields.Authors
-        } else if (typeof fields.Authors === "string") {
-          authors = fields.Authors.split(",").map((author: string) => author.trim())
+      if (fields.Authors || fields.authors) {
+        const authorsField = fields.Authors || fields.authors
+        if (Array.isArray(authorsField)) {
+          authors = authorsField
+        } else if (typeof authorsField === "string") {
+          authors = authorsField.split(",").map((author: string) => author.trim())
         }
       }
 
       // Parse topics from comma-separated string or array
       let topics: string[] = []
-      if (fields.Topics) {
-        if (Array.isArray(fields.Topics)) {
-          topics = fields.Topics
-        } else if (typeof fields.Topics === "string") {
-          topics = fields.Topics.split(",").map((topic: string) => topic.trim())
+      if (fields.Topics || fields.topics) {
+        const topicsField = fields.Topics || fields.topics
+        if (Array.isArray(topicsField)) {
+          topics = topicsField
+        } else if (typeof topicsField === "string") {
+          topics = topicsField.split(",").map((topic: string) => topic.trim())
         }
+      }
+
+      // Handle date field - try multiple possible field names, prioritizing published_date
+      let date = ""
+      if (fields.published_date) {
+        date = fields.published_date
+      } else if (fields["published_date"]) {
+        date = fields["published_date"]
+      } else if (fields.Date) {
+        date = fields.Date
+      } else if (fields.date) {
+        date = fields.date
+      } else if (fields["Publication Date"]) {
+        date = fields["Publication Date"]
+      } else if (fields.Created) {
+        date = fields.Created
+      } else {
+        // Fallback to current date if no date field found
+        date = new Date().toISOString().split('T')[0].replace(/-/g, '.')
       }
 
       return {
         id: record.id,
-        slug: fields.Slug || "",
-        date: fields.Date || "",
-        title: fields.Title || "",
-        type: fields.Type?.toLowerCase() || "news",
-        summary: fields.Summary || "",
-        content: fields.Content || "",
+        slug: fields.Slug || fields.slug || "",
+        date: date,
+        title: fields.Title || fields.title || "",
+        type: (fields.Type || fields.type || "news").toLowerCase(),
+        summary: fields.Summary || fields.summary || "",
+        content: fields.Content || fields.content || "",
         authors,
         topics,
-        readTime: fields["Read Time"] || undefined,
-        image: fields.Image?.[0]?.url || undefined,
-        published: fields.Published || false
+        readTime: fields["Read Time"] || fields.readTime || undefined,
+        image: fields.Image?.[0]?.url || fields.image?.[0]?.url || undefined,
+        published: fields.Published !== false, // Default to true if field doesn't exist
+        newsletterContent: fields["Newsletter Content"] || fields.newsletterContent || undefined
       }
     })
 
-    // Cache for 5 minutes
+    // Filter and sort in JavaScript
+    const publishedItems = feedItems.filter(item => item.published && item.title && item.slug)
+    
+    // Sort by date in JavaScript (most recent first)
+    const sortedFeedItems = publishedItems.sort((a, b) => {
+      const dateA = new Date(a.date.replace(/\./g, "-")).getTime()
+      const dateB = new Date(b.date.replace(/\./g, "-")).getTime()
+      return dateB - dateA // Most recent first
+    })
+
+    // Cache for 1 minute only to allow for quicker updates
     return NextResponse.json(
-      { feedItems },
+      { feedItems: sortedFeedItems },
       {
         status: 200,
         headers: {
-          "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600"
+          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120"
         }
       }
     )

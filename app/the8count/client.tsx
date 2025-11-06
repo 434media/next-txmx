@@ -19,13 +19,20 @@ export function The8CountClient({ feedItems, feedTypes, feedTopics }: The8CountC
   const [showNewsletter, setShowNewsletter] = useState(true)
 
   const filteredItems = useMemo(() => {
-    return feedItems.filter((item) => {
-      const typeMatch = selectedTypes.length === 0 || selectedTypes.includes(item.type)
-      const topicMatch =
-        selectedTopics.length === 0 ||
-        item.topics.some((topic: string) => selectedTopics.includes(topic.toLowerCase().replace(/\s+/g, "-")))
-      return typeMatch && topicMatch
-    })
+    return feedItems
+      .filter((item) => {
+        const typeMatch = selectedTypes.length === 0 || selectedTypes.includes(item.type)
+        const topicMatch =
+          selectedTopics.length === 0 ||
+          item.topics.some((topic: string) => selectedTopics.includes(topic.toLowerCase().replace(/\s+/g, "-")))
+        return typeMatch && topicMatch
+      })
+      .sort((a, b) => {
+        // Convert date format from "2025.11.03" to comparable format
+        const dateA = new Date(a.date.replace(/\./g, "-")).getTime()
+        const dateB = new Date(b.date.replace(/\./g, "-")).getTime()
+        return dateB - dateA // Most recent first (descending order)
+      })
   }, [selectedTypes, selectedTopics, feedItems])
 
   const handleTypeToggle = (type: string) => {
