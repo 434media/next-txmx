@@ -276,10 +276,11 @@ export default function IconicSeriesPage() {
                 </div>
 
                 {/* Call to Action */}
+
                 <div className="w-full md:-mx-8 lg:-mx-0 -mb-12 md:-mb-12">
                   {/* Mobile Background */}
                   <div 
-                    className="md:hidden relative w-screen -mx-4 min-h-[500px] flex items-start justify-start overflow-hidden"
+                    className="md:hidden relative w-screen -mx-4 min-h-[520px] flex flex-col items-start justify-between overflow-hidden"
                     style={{
                       backgroundImage: 'url(https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/mobile-footer2.png)',
                       backgroundSize: 'cover',
@@ -287,13 +288,12 @@ export default function IconicSeriesPage() {
                       backgroundRepeat: 'no-repeat'
                     }}
                   >
-                    {/* Dark overlay for text readability */}
                     <div className="absolute inset-0 bg-black/5"></div>
                     
-                    {/* Content */}
+                    {/* Top Content */}
                     <div className="relative z-10 px-6 py-16 w-full text-left">
                       <h3 className="text-3xl font-bold text-white mb-4 tracking-wide text-left">
-                        ⚡ ACT FAST. SEATS ARE LIMITED.
+                        ACT FAST. SEATS ARE LIMITED.
                       </h3>
                       <p className="text-white text-xl mb-2 leading-relaxed font-semibold text-left">
                         This is a once-in-a-lifetime access moment.
@@ -302,11 +302,52 @@ export default function IconicSeriesPage() {
                         Choose your package. Lock it in. Be part of history.
                       </p>
                     </div>
+
+                    <div className="relative z-10 w-full px-6 pb-8">
+                      <div className="grid grid-cols-4 gap-4 items-center">
+                        <a href="https://www.434media.com" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
+                          <Image
+                            src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/flyers-63-434.png"
+                            alt="434 Media"
+                            width={80}
+                            height={80}
+                            className="h-12 w-auto object-contain brightness-0 invert opacity-90 hover:opacity-100 transition-opacity"
+                          />
+                        </a>
+                        <a href="https://www.icontalks.com" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
+                          <Image
+                            src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/flyers-63-icon.png"
+                            alt="Icon ICAN"
+                            width={80}
+                            height={80}
+                            className="h-12 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity"
+                          />
+                        </a>
+                        <a href="https://www.samwatson.org" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
+                          <Image
+                            src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/flyers-63-WATSON.png"
+                            alt="Team Watson"
+                            width={80}
+                            height={80}
+                            className="h-12 w-auto object-contain brightness-0 invert opacity-90 hover:opacity-100 transition-opacity"
+                          />
+                        </a>
+                        <a href="https://www.lifeonmy.com" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
+                          <Image
+                            src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/flyers-63-driven.png"
+                            alt="LIFEONMY"
+                            width={80}
+                            height={80}
+                            className="h-12 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity"
+                          />
+                        </a>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Desktop Background */}
                   <div 
-                    className="hidden md:flex relative w-full min-h-[660px] items-start justify-center overflow-hidden"
+                    className="hidden md:flex relative w-full min-h-[660px] flex-col items-center justify-between overflow-hidden"
                     style={{
                       backgroundImage: 'url(https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/Bottom.png)',
                       backgroundSize: 'cover',
@@ -314,13 +355,12 @@ export default function IconicSeriesPage() {
                       backgroundRepeat: 'no-repeat'
                     }}
                   >
-                    {/* Dark overlay for text readability */}
                     <div className="absolute inset-0 bg-black/5"></div>
                     
-                    {/* Content */}
+                    {/* Top Content */}
                     <div className="relative z-10 text-center px-4 py-12 max-w-3xl mx-auto">
                       <h3 className="text-4xl font-bold text-white mb-4 tracking-wide">
-                        ⚡ ACT FAST. SEATS ARE LIMITED.
+                        ACT FAST. SEATS ARE LIMITED.
                       </h3>
                       <p className="text-white text-2xl mb-2 leading-relaxed font-semibold">
                         This is a once-in-a-lifetime access moment.
@@ -328,6 +368,47 @@ export default function IconicSeriesPage() {
                       <p className="text-white/90 text-lg leading-relaxed">
                         Choose your package. Lock it in. Be part of history.
                       </p>
+                    </div>
+
+                    <div className="relative z-10 w-full px-8 pb-12">
+                      <div className="max-w-4xl mx-auto grid grid-cols-4 gap-8 items-center">
+                        <a href="https://www.434media.com" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
+                          <Image
+                            src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/flyers-63-434.png"
+                            alt="434 Media"
+                            width={140}
+                            height={140}
+                            className="h-20 w-auto object-contain brightness-0 invert opacity-90 hover:opacity-100 transition-opacity"
+                          />
+                        </a>
+                        <a href="https://www.icontalks.com" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
+                          <Image
+                            src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/flyers-63-icon.png"
+                            alt="Icon ICAN"
+                            width={140}
+                            height={140}
+                            className="h-20 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity"
+                          />
+                        </a>
+                        <a href="https://www.samwatson.org" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
+                          <Image
+                            src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/flyers-63-WATSON.png"
+                            alt="Team Watson"
+                            width={140}
+                            height={140}
+                            className="h-20 w-auto object-contain brightness-0 invert opacity-90 hover:opacity-100 transition-opacity"
+                          />
+                        </a>
+                        <a href="https://www.lifeonmy.com" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
+                          <Image
+                            src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/flyers-63-driven.png"
+                            alt="LIFEONMY"
+                            width={140}
+                            height={140}
+                            className="h-20 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity"
+                          />
+                        </a>
+                      </div>
                     </div>
                   </div>
                 </div>
