@@ -115,16 +115,6 @@ export default function IconicSeriesPage() {
                     Review options below and secure your access to this historic event.
                   </p>
                 </div>
-
-                {/* Date */}
-                <div className="pt-4 pb-6 text-left">
-                  <p className="text-lg font-bold text-white tracking-wide">
-                    Wednesday, December 3rd | Filmed Live | San Antonio, TX
-                  </p>
-                  <p className="text-sm text-white/70 mt-1.5">
-                    Includes promoter-level access to Pitbull vs. Roach at Frost Bank Center, Dec 6
-                  </p>
-                </div>
               </div>
             </div>
 
