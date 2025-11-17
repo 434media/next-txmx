@@ -313,7 +313,7 @@ export default function IconicSeriesPage() {
                             className="h-12 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity"
                           />
                         </a>
-                        <a href="https://www.samwatson.org" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
+                        <a href="https://www.instagram.com/samwatsongolfclassic/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
                           <Image
                             src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/flyers-63-WATSON.png"
                             alt="Team Watson"
@@ -322,7 +322,7 @@ export default function IconicSeriesPage() {
                             className="h-12 w-auto object-contain brightness-0 invert opacity-90 hover:opacity-100 transition-opacity"
                           />
                         </a>
-                        <a href="https://www.lifeonmy.com" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
+                        <a href="https://www.lifedriven.org/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
                           <Image
                             src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/flyers-63-driven.png"
                             alt="LIFEONMY"
@@ -380,7 +380,7 @@ export default function IconicSeriesPage() {
                             className="h-20 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity"
                           />
                         </a>
-                        <a href="https://www.samwatson.org" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
+                        <a href="https://www.instagram.com/samwatsongolfclassic/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
                           <Image
                             src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/flyers-63-WATSON.png"
                             alt="Team Watson"
@@ -389,7 +389,7 @@ export default function IconicSeriesPage() {
                             className="h-20 w-auto object-contain brightness-0 invert opacity-90 hover:opacity-100 transition-opacity"
                           />
                         </a>
-                        <a href="https://www.lifeonmy.com" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
+                        <a href="https://www.lifedriven.org/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
                           <Image
                             src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/flyers-63-driven.png"
                             alt="LIFEONMY"
