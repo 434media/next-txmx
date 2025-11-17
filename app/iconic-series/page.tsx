@@ -34,8 +34,8 @@ export default function IconicSeriesPage() {
       {/* Content */}
       <div className="relative z-10">
         {/* Hero Section */}
-        <section className="min-h-screen flex flex-col items-center justify-center px-4 py-12 md:py-16 md:pt-20">
-          <div className="max-w-7xl mx-auto w-full">
+        <section className="min-h-screen flex flex-col items-center justify-center px-4 md:px-4 py-12 md:py-16 md:pt-20">
+          <div className="w-full md:max-w-7xl md:mx-auto">
             {/* Desktop Layout */}
             <div className="hidden md:flex md:flex-col md:items-center md:justify-center">
               {/* Presenters Text Above Logo */}
@@ -67,28 +67,64 @@ export default function IconicSeriesPage() {
               </div>
             </div>
 
-            <div className="md:hidden text-center space-y-4">
-              {/* Hero Logo */}
-              <div className="mb-4">
+            {/* Mobile Layout */}
+            <div className="md:hidden w-screen -mx-4 relative pt-4">
+              {/* Hero Image - Full Width */}
+              <div className="relative w-full">
                 <Image
-                  src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/mobile-hero.png"
+                  src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/mobile-hero2.png"
                   alt="Rise of a Champion"
                   width={800}
                   height={400}
-                  className="w-full max-w-3xl mx-auto"
+                  className="w-full block"
                   priority
                 />
+                
+                {/* Presenters Text Overlay - Positioned at top of image */}
+                <div className="absolute top-1 left-0 right-0 text-center px-4">
+                  <p className="text-white/80 text-xs tracking-[0.3em] font-light uppercase drop-shadow-lg">
+                    ICONTALKS x TXMX Boxing Present
+                  </p>
+                </div>
               </div>
 
-              {/* ONO Section Image */}
-              <div className="w-full">
-                <Image
-                  src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/ono-section.png"
-                  alt="One Night Only"
-                  width={800}
-                  height={600}
-                  className="w-full"
-                />
+              {/* Mobile Event Info - positioned below hero with negative margin */}
+              <div className="-mt-32 px-4 relative z-10">
+                {/* Event Title */}
+                <div className="space-y-2 mb-4">
+                  <h1 className="text-4xl font-bold text-white tracking-tight leading-tight text-center">
+                    ONE NIGHT. <span className='block'>INVITATION ONLY.</span>
+                  </h1>
+                </div>
+
+                {/* Event Description */}
+                <div className="mt-16 text-sm text-white/90 leading-relaxed space-y-3 text-left">
+                  <p className="leading-relaxed">
+                    This invitation-only experience honors four of the biggest names in the sport — all from San Antonio — as they're celebrated in their hometown and captured live for the nationally distributed series <span className="text-[#FFB800] font-semibold italic">Rise of a Champion</span>, produced by 434 Media and powered by TXMX Boxing x ICON Talks.
+                  </p>
+                  <p className="font-semibold text-white text-base tracking-wide">
+                    No public tickets. No open guest list.
+                  </p>
+                  <p className="leading-relaxed">
+                    This experience is offered exclusively to a curated room of athletes, entertainers, and industry leaders to celebrate greatness and build meaningful connections.
+                  </p>
+                  <p className="font-semibold text-[#FFB800] text-base tracking-wide">
+                    Packages are limited and moving.
+                  </p>
+                  <p className="leading-relaxed">
+                    Review options below and secure your access to this historic event.
+                  </p>
+                </div>
+
+                {/* Date */}
+                <div className="pt-4 pb-6 text-left">
+                  <p className="text-lg font-bold text-white tracking-wide">
+                    Wednesday, December 3rd | Filmed Live | San Antonio, TX
+                  </p>
+                  <p className="text-sm text-white/70 mt-1.5">
+                    Includes promoter-level access to Pitbull vs. Roach at Frost Bank Center, Dec 6
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -134,7 +170,7 @@ export default function IconicSeriesPage() {
         </section>
 
         {/* Sponsor Packages */}
-        <section className="py-12 px-4">
+        <section className="py-2 px-4">
           <div className="max-w-7xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold md:text-center text-[#FFB800] mb-2 tracking-wide">
               🎟️ SPONSORSHIP PACKAGES
@@ -240,12 +276,12 @@ export default function IconicSeriesPage() {
                 </div>
 
                 {/* Call to Action */}
-                <div className="w-full mx-0 md:-mx-8 lg:-mx-0 -mb-12 md:-mb-12">
+                <div className="w-full md:-mx-8 lg:-mx-0 -mb-12 md:-mb-12">
                   {/* Mobile Background */}
                   <div 
-                    className="md:hidden relative w-full min-h-[500px] flex items-start justify-center overflow-hidden"
+                    className="md:hidden relative w-screen -mx-4 min-h-[500px] flex items-start justify-start overflow-hidden"
                     style={{
-                      backgroundImage: 'url(https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/MobileFooter.png)',
+                      backgroundImage: 'url(https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/mobile-footer2.png)',
                       backgroundSize: 'cover',
                       backgroundPosition: 'center center',
                       backgroundRepeat: 'no-repeat'
@@ -255,14 +291,14 @@ export default function IconicSeriesPage() {
                     <div className="absolute inset-0 bg-black/5"></div>
                     
                     {/* Content */}
-                    <div className="relative z-10 px-6 py-16 w-full md:text-center">
-                      <h3 className="text-3xl font-bold text-white mb-4 tracking-wide">
+                    <div className="relative z-10 px-6 py-16 w-full text-left">
+                      <h3 className="text-3xl font-bold text-white mb-4 tracking-wide text-left">
                         ⚡ ACT FAST. SEATS ARE LIMITED.
                       </h3>
-                      <p className="text-white text-xl mb-2 leading-relaxed font-semibold">
+                      <p className="text-white text-xl mb-2 leading-relaxed font-semibold text-left">
                         This is a once-in-a-lifetime access moment.
                       </p>
-                      <p className="text-white/90 text-base leading-relaxed">
+                      <p className="text-white/90 text-base leading-relaxed text-left">
                         Choose your package. Lock it in. Be part of history.
                       </p>
                     </div>
