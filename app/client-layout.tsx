@@ -107,7 +107,7 @@ export default function ClientLayout({
           property="og:description"
           content="TXMX Boxing is a dynamic media platform designed to connect brands with a passionate fight fan audience. By celebrating the rich cultural heritage of Texas and Mexico, TXMX Boxing offers unique opportunities for brands to authentically engage with a community that is deeply rooted in both sport and culture."
         />
-        <meta property="og:url" content="https://txmx-boxing.com" />
+        <meta property="og:url" content="https://txmxboxing.com" />
         <meta property="og:site_name" content="TXMX Boxing" />
         <meta property="og:image" content="/og-image.jpg" />
         <meta property="og:image:width" content="1200" />

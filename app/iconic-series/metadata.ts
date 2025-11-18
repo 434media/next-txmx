@@ -1,6 +1,4 @@
-import { Metadata } from 'next'
-import IconicSeriesClient from './iconic-series-client'
-import { generateEventJsonLd, generateBreadcrumbJsonLd, generateOrganizationJsonLd } from '../lib/json-ld'
+import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Rise of a Champion - Iconic Series | TXMX Boxing',
@@ -29,11 +27,11 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Rise of a Champion - Iconic Series | TXMX Boxing',
     description: 'An exclusive invitation-only experience honoring four of San Antonio\'s greatest boxing champions. Filmed live for national distribution. Sponsorship packages available.',
-    url: '/iconic-series',
+    url: 'https://txmxboxing.com/iconic-series',
     siteName: 'TXMX Boxing',
     images: [
       {
-        url: 'https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/ROAC.png',
+        url: '/opengraph-image.jpg',
         width: 1200,
         height: 630,
         alt: 'Rise of a Champion - San Antonio Boxing Champions',
@@ -46,7 +44,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Rise of a Champion - Iconic Series | TXMX Boxing',
     description: 'An exclusive invitation-only experience honoring San Antonio\'s greatest boxing champions. December 3rd. Sponsorship packages available.',
-    images: ['https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/ROAC.png'],
+    images: ['/twitter-image.jpg'],
     creator: '@txmx',
   },
   robots: {
@@ -61,31 +59,6 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: '/iconic-series',
+    canonical: 'https://txmxboxing.com/iconic-series',
   },
-}
-
-export default function IconicSeriesPage() {
-  const eventJsonLd = generateEventJsonLd()
-  const breadcrumbJsonLd = generateBreadcrumbJsonLd('Iconic Series')
-  const organizationJsonLd = generateOrganizationJsonLd()
-
-  return (
-    <>
-      {/* JSON-LD Structured Data */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(eventJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
-      />
-      <IconicSeriesClient />
-    </>
-  )
 }
