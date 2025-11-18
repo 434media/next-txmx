@@ -154,12 +154,12 @@ export default function IconicSeriesPage() {
           <div className="max-w-4xl mx-auto">
             {/* Invitation Header */}
             <div className="text-center mb-12 md:mb-16">
-              <div className="inline-block">
-                <div className="border-t border-b border-[#FFB800]/40 py-4 md:py-5 px-10 md:px-20 mb-2">
-                  <h2 className="text-sm md:text-base text-[#FFB800] tracking-[0.35em] font-light uppercase">
-                    HONOREES
-                  </h2>
-                </div>
+              <div className="flex items-center justify-center gap-4 md:gap-6 mb-2">
+                <div className="h-px bg-[#FFB800]/40 w-12 md:w-24"></div>
+                <h2 className="text-2xl md:text-4xl text-[#FFB800] tracking-[0.35em] font-normal uppercase">
+                  HONOREES
+                </h2>
+                <div className="h-px bg-[#FFB800]/40 w-12 md:w-24"></div>
               </div>
               <p className="text-white/60 text-sm md:text-base max-w-2xl mx-auto leading-relaxed tracking-wide font-light mt-6">
                 You are cordially invited to celebrate San Antonio's finest
@@ -168,48 +168,57 @@ export default function IconicSeriesPage() {
 
             {/* Honorees List */}
             <div className="space-y-10 md:space-y-14">
+              {/* Visionary Icon Awards - First Group */}
+              <div className="text-left md:text-center border-b border-white/10 pb-10">
+                <h3 className="text-[#FFB800] text-2xl md:text-4xl tracking-wide mb-5 md:mb-7 italic font-normal" style={{ fontFamily: '"Lucida Calligraphy", cursive, serif' }}>
+                  Visionary Icon Awards
+                </h3>
+                <div className="space-y-2 md:space-y-3">
+                  <p className="text-white text-lg md:text-2xl font-normal leading-tight">
+                    • Jesse "Bam" Rodriguez
+                  </p>
+                  <p className="text-white text-lg md:text-2xl font-normal leading-tight">
+                    • Mario "El Azteca" Barrios
+                  </p>
+                  <p className="text-white text-lg md:text-2xl font-normal leading-tight">
+                    • Joshua "The Professor" Franco
+                  </p>
+                </div>
+              </div>
+
+              {/* Visionary Icon Awards - Second Group */}
+              <div className="text-left md:text-center border-b border-white/10 pb-10">
+                <h3 className="text-[#FFB800] text-2xl md:text-4xl tracking-wide mb-5 md:mb-7 italic font-normal" style={{ fontFamily: '"Lucida Calligraphy", cursive, serif' }}>
+                  Visionary Icon Awards
+                </h3>
+                <div className="space-y-2 md:space-y-3">
+                  <p className="text-white text-lg md:text-2xl font-normal leading-tight">
+                    • Stephen Jackson
+                  </p>
+                  <p className="text-white text-lg md:text-2xl font-normal leading-tight">
+                    • Matt Barnes
+                  </p>
+                </div>
+              </div>
+
               {/* Humanitarian Icon Award */}
               <div className="text-left md:text-center border-b border-white/10 pb-10">
-                <p className="text-[#FFB800]/70 text-xs md:text-sm tracking-[0.3em] uppercase mb-4 md:mb-5 font-light">
+                <h3 className="text-[#FFB800] text-2xl md:text-4xl tracking-wide mb-5 md:mb-7 italic font-normal" style={{ fontFamily: '"Lucida Calligraphy", cursive, serif' }}>
                   Humanitarian Icon Award
-                </p>
-                <h3 className="text-3xl md:text-5xl text-white font-light tracking-wide leading-tight">
-                  Sam Watson
                 </h3>
+                <p className="text-white text-lg md:text-2xl font-normal leading-tight">
+                  • Sam Watson
+                </p>
               </div>
 
               {/* Icon Award */}
-              <div className="text-left md:text-center border-b border-white/10 pb-10">
-                <p className="text-[#FFB800]/70 text-xs md:text-sm tracking-[0.3em] uppercase mb-4 md:mb-5 font-light">
-                  Icon Award
-                </p>
-                <h3 className="text-3xl md:text-5xl text-white font-light tracking-wide leading-tight">
-                  Jesse James Leija
-                </h3>
-              </div>
-
-              {/* Visionary Icon Awards */}
               <div className="text-left md:text-center pb-8">
-                <p className="text-[#FFB800]/70 text-xs md:text-sm tracking-[0.3em] uppercase mb-5 md:mb-7 font-light">
-                  Visionary Icon Awards
+                <h3 className="text-[#FFB800] text-2xl md:text-4xl tracking-wide mb-5 md:mb-7 italic font-normal" style={{ fontFamily: '"Lucida Calligraphy", cursive, serif' }}>
+                  Icon Award
+                </h3>
+                <p className="text-white text-lg md:text-2xl font-normal leading-tight">
+                  • Jesse James Leija
                 </p>
-                <div className="space-y-4 md:space-y-5">
-                  <h3 className="text-2xl md:text-4xl text-white font-light tracking-wide leading-tight">
-                    Jesse "Bam" Rodriguez
-                  </h3>
-                  <h3 className="text-2xl md:text-4xl text-white font-light tracking-wide leading-tight">
-                    Mario "El Azteca" Barrios
-                  </h3>
-                  <h3 className="text-2xl md:text-4xl text-white font-light tracking-wide leading-tight">
-                    Joshua "The Professor" Franco
-                  </h3>
-                  <h3 className="text-2xl md:text-4xl text-white font-light tracking-wide leading-tight">
-                    Stephen Jackson
-                  </h3>
-                  <h3 className="text-2xl md:text-4xl text-white font-light tracking-wide leading-tight">
-                    Matt Barnes
-                  </h3>
-                </div>
               </div>
             </div>
 
