@@ -91,24 +91,24 @@ export default function IconicSeriesPage() {
               {/* Mobile Event Info - positioned below hero with negative margin */}
               <div className="-mt-32 px-4 relative z-10">
                 {/* Event Title */}
-                <div className="space-y-2 mb-4">
-                  <h1 className="text-4xl font-bold text-white tracking-tight leading-tight text-center">
-                    ONE NIGHT. <span className='block'>INVITATION ONLY.</span>
+                <div className="space-y-2 mb-6">
+                  <h1 className="text-[2.75rem] font-bold text-white tracking-tight leading-[1.1] text-center">
+                    ONE NIGHT. <span className='block mt-1'>INVITATION ONLY.</span>
                   </h1>
                 </div>
 
                 {/* Event Description */}
-                <div className="mt-16 text-sm text-white/90 leading-relaxed space-y-3 text-left">
+                <div className="mt-16 text-base text-white/90 leading-relaxed space-y-4 text-left">
                   <p className="leading-relaxed">
                     This invitation-only experience honors four of the biggest names in the sport — all from San Antonio — as they're celebrated in their hometown and captured live for the nationally distributed series <span className="text-[#FFB800] font-semibold italic">Rise of a Champion</span>, produced by 434 Media and powered by TXMX Boxing x ICON Talks.
                   </p>
-                  <p className="font-semibold text-white text-base tracking-wide">
+                  <p className="font-bold text-white text-lg tracking-wide">
                     No public tickets. No open guest list.
                   </p>
                   <p className="leading-relaxed">
                     This experience is offered exclusively to a curated room of athletes, entertainers, and industry leaders to celebrate greatness and build meaningful connections.
                   </p>
-                  <p className="font-semibold text-[#FFB800] text-base tracking-wide">
+                  <p className="font-bold text-[#FFB800] text-lg tracking-wide">
                     Packages are limited and moving.
                   </p>
                   <p className="leading-relaxed">
@@ -119,26 +119,26 @@ export default function IconicSeriesPage() {
             </div>
 
             {/* Desktop Event Info - positioned below hero */}
-            <div className="hidden md:block text-center mt-8 space-y-5">
+            <div className="hidden md:block text-center mt-8 space-y-6">
               {/* Event Title */}
               <div className="space-y-2">
-                <h1 className="text-4xl lg:text-6xl font-bold text-white tracking-tight leading-tight">
+                <h1 className="text-5xl lg:text-6xl font-bold text-white tracking-tight leading-[1.1]">
                   ONE NIGHT. INVITATION ONLY.
                 </h1>
               </div>
 
               {/* Event Description */}
-              <div className="text-base md:text-lg text-white/90 max-w-4xl mx-auto leading-relaxed space-y-3">
+              <div className="text-lg md:text-xl text-white/90 max-w-4xl mx-auto leading-relaxed space-y-4">
                 <p className="leading-relaxed">
                   This invitation-only experience honors four of the biggest names in the sport — all from San Antonio — as they're celebrated in their hometown and captured live for the nationally distributed series <span className="text-[#FFB800] font-semibold italic">Rise of a Champion</span>, produced by 434 Media and powered by TXMX Boxing x ICON Talks.
                 </p>
-                <p className="font-semibold text-white text-lg tracking-wide">
+                <p className="font-bold text-white text-xl tracking-wide">
                   No public tickets. No open guest list.
                 </p>
                 <p className="leading-relaxed">
                   This experience is offered exclusively to a curated room of athletes, entertainers, and industry leaders to celebrate greatness and build meaningful connections.
                 </p>
-                <p className="font-semibold text-[#FFB800] text-lg tracking-wide">
+                <p className="font-bold text-[#FFB800] text-xl tracking-wide">
                   Packages are limited and moving.
                 </p>
                 <p className="leading-relaxed">
@@ -149,15 +149,86 @@ export default function IconicSeriesPage() {
           </div>
         </section>
 
+        {/* Honorees Section */}
+        <section className="py-12 md:py-16 px-4 -mt-10 md:-mt-10">
+          <div className="max-w-4xl mx-auto">
+            {/* Invitation Header */}
+            <div className="text-center mb-12 md:mb-16">
+              <div className="inline-block">
+                <div className="border-t border-b border-[#FFB800]/40 py-4 md:py-5 px-10 md:px-20 mb-2">
+                  <h2 className="text-sm md:text-base text-[#FFB800] tracking-[0.35em] font-light uppercase">
+                    HONOREES
+                  </h2>
+                </div>
+              </div>
+              <p className="text-white/60 text-sm md:text-base max-w-2xl mx-auto leading-relaxed tracking-wide font-light mt-6">
+                You are cordially invited to celebrate San Antonio's finest
+              </p>
+            </div>
+
+            {/* Honorees List */}
+            <div className="space-y-10 md:space-y-14">
+              {/* Humanitarian Icon Award */}
+              <div className="text-left md:text-center border-b border-white/10 pb-10">
+                <p className="text-[#FFB800]/70 text-xs md:text-sm tracking-[0.3em] uppercase mb-4 md:mb-5 font-light">
+                  Humanitarian Icon Award
+                </p>
+                <h3 className="text-3xl md:text-5xl text-white font-light tracking-wide leading-tight">
+                  Sam Watson
+                </h3>
+              </div>
+
+              {/* Icon Award */}
+              <div className="text-left md:text-center border-b border-white/10 pb-10">
+                <p className="text-[#FFB800]/70 text-xs md:text-sm tracking-[0.3em] uppercase mb-4 md:mb-5 font-light">
+                  Icon Award
+                </p>
+                <h3 className="text-3xl md:text-5xl text-white font-light tracking-wide leading-tight">
+                  Jesse James Leija
+                </h3>
+              </div>
+
+              {/* Visionary Icon Awards */}
+              <div className="text-left md:text-center pb-8">
+                <p className="text-[#FFB800]/70 text-xs md:text-sm tracking-[0.3em] uppercase mb-5 md:mb-7 font-light">
+                  Visionary Icon Awards
+                </p>
+                <div className="space-y-4 md:space-y-5">
+                  <h3 className="text-2xl md:text-4xl text-white font-light tracking-wide leading-tight">
+                    Jesse "Bam" Rodriguez
+                  </h3>
+                  <h3 className="text-2xl md:text-4xl text-white font-light tracking-wide leading-tight">
+                    Mario "El Azteca" Barrios
+                  </h3>
+                  <h3 className="text-2xl md:text-4xl text-white font-light tracking-wide leading-tight">
+                    Joshua "The Professor" Franco
+                  </h3>
+                  <h3 className="text-2xl md:text-4xl text-white font-light tracking-wide leading-tight">
+                    Stephen Jackson
+                  </h3>
+                  <h3 className="text-2xl md:text-4xl text-white font-light tracking-wide leading-tight">
+                    Matt Barnes
+                  </h3>
+                </div>
+              </div>
+            </div>
+
+            {/* Decorative Bottom Border */}
+            <div className="flex items-center justify-center mt-4 md:mt-2">
+              <div className="h-px bg-gradient-to-r from-transparent via-[#FFB800]/30 to-transparent w-full max-w-md"></div>
+            </div>
+          </div>
+        </section>
+
         {/* Sponsor Packages */}
         <section className="py-2 px-4">
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold md:text-center text-[#FFB800] mb-2 tracking-wide">
+            <h2 className="text-3xl md:text-5xl font-bold md:text-center text-[#FFB800] mb-3 tracking-wide">
               🎟️ SPONSORSHIP PACKAGES
             </h2>
-            <div className="md:text-center text-white/80 text-base mb-10 max-w-3xl mx-auto leading-relaxed">
-              <p className="font-semibold text-lg text-white mb-1">Wednesday, December 3rd | Filmed Live | San Antonio, TX</p>
-              <p className="text-sm text-white/70">Includes promoter-level access to Pitbull vs. Roach at Frost Bank Center, Dec 6</p>
+            <div className="md:text-center text-white/80 text-base mb-12 max-w-3xl mx-auto leading-relaxed">
+              <p className="font-bold text-lg md:text-xl text-white mb-2">Wednesday, December 3rd | Filmed Live | San Antonio, TX</p>
+              <p className="text-sm md:text-base text-white/70">Includes promoter-level access to Pitbull vs. Roach at Frost Bank Center, Dec 6</p>
             </div>
 
             {selectedPackage ? (
@@ -201,19 +272,19 @@ export default function IconicSeriesPage() {
                   {SPONSOR_PACKAGES.map((pkg) => (
                     <div
                       key={pkg.id}
-                      className="bg-white/5 backdrop-blur-sm border border-white/10 p-5 hover:border-[#FFB800] transition-all duration-300 flex flex-col"
+                      className="bg-white/5 backdrop-blur-sm border border-white/10 p-6 hover:border-[#FFB800] transition-all duration-300 flex flex-col"
                     >
-                      <div className="text-3xl mb-2">{pkg.emoji}</div>
-                      <h3 className="text-xl font-bold text-[#FFB800] mb-1.5 tracking-wide">
+                      <div className="text-4xl mb-3">{pkg.emoji}</div>
+                      <h3 className="text-2xl font-bold text-[#FFB800] mb-2 tracking-wide">
                         {formatPrice(pkg.priceInCents)}{pkg.id === 'corporate-package' ? '+' : ''}
                       </h3>
-                      <p className="text-lg font-semibold text-white mb-1.5 leading-tight">{pkg.name}</p>
+                      <p className="text-xl font-semibold text-white mb-2 leading-tight">{pkg.name}</p>
                       {pkg.availability && (
-                        <p className="text-[10px] text-[#FFB800] font-bold mb-3 uppercase tracking-wider">
+                        <p className="text-xs text-[#FFB800] font-bold mb-4 uppercase tracking-wider">
                           {pkg.availability}
                         </p>
                       )}
-                      <p className="text-white/70 mb-4 text-xs italic leading-relaxed">{pkg.description}</p>
+                      <p className="text-white/70 mb-5 text-sm italic leading-relaxed">{pkg.description}</p>
                       
                       <ul className="space-y-1.5 mb-5 flex-grow text-xs leading-relaxed">
                         {pkg.features.map((feature, idx) => (
@@ -235,11 +306,11 @@ export default function IconicSeriesPage() {
                 </div>
 
                 {/* Optional Upgrades */}
-                <div className="max-w-4xl mx-auto mb-10 p-5 bg-white/5 backdrop-blur-sm border border-white/10">
-                  <h3 className="text-xl font-bold text-[#FFB800] mb-3 md:text-center tracking-wide">
+                <div className="max-w-4xl mx-auto mb-12 p-6 md:p-8 bg-white/5 backdrop-blur-sm border border-white/10">
+                  <h3 className="text-xl md:text-2xl font-bold text-[#FFB800] mb-4 md:text-center tracking-wide">
                     🔁 Optional Upgrades (All Packages Eligible)
                   </h3>
-                  <ul className="space-y-1.5 text-white/90 text-sm">
+                  <ul className="space-y-2.5 text-white/90 text-sm md:text-base">
                     <li className="flex items-start leading-relaxed">
                       <span className="text-[#FFB800] mr-3">•</span>
                       <span>Floor Row 1 ticket upgrades (available upon request)</span>
@@ -272,15 +343,21 @@ export default function IconicSeriesPage() {
                     
                     {/* Top Content */}
                     <div className="relative z-10 px-6 py-16 w-full text-left">
-                      <h3 className="text-3xl font-bold text-white mb-4 tracking-wide text-left">
+                      <h3 className="text-[2rem] font-bold text-white mb-5 tracking-wide leading-tight">
                         ACT FAST. SEATS ARE LIMITED.
                       </h3>
-                      <p className="text-white text-xl mb-2 leading-relaxed font-semibold text-left">
+                      <p className="text-white text-xl mb-3 leading-relaxed font-bold">
                         This is a once-in-a-lifetime access moment.
                       </p>
-                      <p className="text-white/90 text-base leading-relaxed text-left">
+                      <p className="text-white/90 text-base leading-relaxed mb-8">
                         Choose your package. Lock it in. Be part of history.
                       </p>
+                      <div className="pt-5 border-t border-white/20">
+                        <p className="text-white/70 text-sm leading-relaxed">
+                          Please direct inquiries, or for check/ACH payments to:<br />
+                          <a href="mailto:marcos@434MEDIA.COM" className="text-[#FFB800] hover:text-[#FFB800]/90 transition-colors font-medium mt-1 inline-block">marcos@434MEDIA.COM</a>
+                        </p>
+                      </div>
                     </div>
 
                     <div className="relative z-10 w-full px-6 pb-8">
@@ -345,9 +422,15 @@ export default function IconicSeriesPage() {
                       <p className="text-white text-2xl mb-2 leading-relaxed font-semibold">
                         This is a once-in-a-lifetime access moment.
                       </p>
-                      <p className="text-white/90 text-lg leading-relaxed">
+                      <p className="text-white/90 text-lg leading-relaxed mb-8">
                         Choose your package. Lock it in. Be part of history.
                       </p>
+                      <div className="pt-6 border-t border-white/10 max-w-2xl mx-auto">
+                        <p className="text-white/70 text-base leading-relaxed">
+                          Please direct inquiries, or for check/ACH payments to:<br />
+                          <a href="mailto:marcos@434MEDIA.COM" className="text-[#FFB800] hover:text-[#FFB800]/90 transition-colors font-medium text-lg mt-2 inline-block">marcos@434MEDIA.COM</a>
+                        </p>
+                      </div>
                     </div>
 
                     <div className="relative z-10 w-full px-8 pb-12">
