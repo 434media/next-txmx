@@ -111,7 +111,7 @@ export default function IconicSeriesPage() {
                     This experience is offered exclusively to a curated room of athletes, entertainers, and industry leaders to celebrate greatness and build meaningful connections.
                   </p>
                   <p className="font-bold text-[#FFB800] text-lg tracking-wide">
-                    Packages are limited and moving.
+                    Packages are limited.
                   </p>
                   <p className="leading-relaxed">
                     Review options below and secure your access to this historic event.
@@ -141,7 +141,7 @@ export default function IconicSeriesPage() {
                   This experience is offered exclusively to a curated room of athletes, entertainers, and industry leaders to celebrate greatness and build meaningful connections.
                 </p>
                 <p className="font-bold text-[#FFB800] text-xl tracking-wide">
-                  Packages are limited and moving.
+                  Packages are limited.
                 </p>
                 <p className="leading-relaxed">
                   Review options below and secure your access to this historic event.
@@ -156,6 +156,9 @@ export default function IconicSeriesPage() {
           <div className="max-w-4xl mx-auto">
             {/* Invitation Header */}
             <div className="text-center mb-12 md:mb-16">
+              <p className="text-white/60 text-sm md:text-base max-w-2xl mx-auto leading-relaxed tracking-wide font-light mb-2">
+                You are cordially invited to celebrate San Antonio's finest
+              </p>
               <div className="flex items-center justify-center gap-4 md:gap-6 mb-2">
                 <div className="h-px bg-[#FFB800]/40 w-12 md:w-24"></div>
                 <h2 className="text-2xl md:text-3xl text-[#FFB800] tracking-[0.35em] font-bold uppercase">
@@ -163,9 +166,7 @@ export default function IconicSeriesPage() {
                 </h2>
                 <div className="h-px bg-[#FFB800]/40 w-12 md:w-24"></div>
               </div>
-              <p className="text-white/60 text-sm md:text-base max-w-2xl mx-auto leading-relaxed tracking-wide font-light mt-6">
-                You are cordially invited to celebrate San Antonio's finest
-              </p>
+              
             </div>
 
             {/* Honorees List */}
