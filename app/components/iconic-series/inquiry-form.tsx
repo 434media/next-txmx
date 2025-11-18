@@ -210,7 +210,7 @@ export default function InquiryForm() {
         </div>
 
         {/* Turnstile Widget */}
-        <div id="turnstile-container" className="flex justify-center"></div>
+        <div id="turnstile-container" data-size="flexible" className="flex justify-center"></div>
 
         {error && (
           <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-sm">
