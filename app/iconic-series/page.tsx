@@ -328,10 +328,10 @@ export default function IconicSeriesPage() {
 
                 {/* Call to Action */}
 
-                <div className="w-full md:-mx-8 lg:-mx-0 -mb-12 md:-mb-12">
+                <div className="w-full md:-mx-8 lg:-mx-0 mb-0">
                   {/* Mobile Background */}
                   <div 
-                    className="md:hidden relative w-screen -mx-4 min-h-[520px] flex flex-col items-start justify-between overflow-hidden"
+                    className="md:hidden relative w-screen -mx-4 min-h-[520px] flex flex-col items-start justify-between overflow-hidden mb-0"
                     style={{
                       backgroundImage: 'url(https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/mobile-footer2.png)',
                       backgroundSize: 'cover',
@@ -346,13 +346,13 @@ export default function IconicSeriesPage() {
                       <h3 className="text-[2rem] font-bold text-white mb-5 tracking-wide leading-tight">
                         ACT FAST. SEATS ARE LIMITED.
                       </h3>
-                      <p className="text-white text-xl mb-3 leading-relaxed font-bold">
+                      <p className="text-white text-lg mb-3 tracking-tight leading-relaxed font-bold">
                         This is a once-in-a-lifetime access moment.
                       </p>
-                      <p className="text-white/90 text-base leading-relaxed mb-8">
+                      <p className="text-white/90 text-sm leading-relaxed mb-2">
                         Choose your package. Lock it in. Be part of history.
                       </p>
-                      <div className="pt-5 border-t border-white/20">
+                      <div className="pt-2 border-t border-white/20">
                         <p className="text-white/70 text-sm leading-relaxed">
                           Please direct inquiries, or for check/ACH payments to:<br />
                           <a href="mailto:marcos@434MEDIA.COM" className="text-[#FFB800] hover:text-[#FFB800]/90 transition-colors font-medium mt-1 inline-block">marcos@434MEDIA.COM</a>
