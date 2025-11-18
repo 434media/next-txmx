@@ -25,32 +25,32 @@ This guide will help you create the necessary tables in your existing Airtable b
 
 Create the following fields in this exact order:
 
-#### Field 1: Name
+#### Field 1: First Name
 - **Field Type:** Single line text
-- **Field Name:** `Name`
-- No additional configuration needed
+- **Field Name:** `First Name`
 
-#### Field 2: Email
+#### Field 2: Last Name
+- **Field Type:** Single line text
+- **Field Name:** `Last Name`
+
+#### Field 3: Email
 - **Field Type:** Email
 - **Field Name:** `Email`
-- No additional configuration needed
 
-#### Field 3: Phone
+#### Field 4: Phone
 - **Field Type:** Phone number
 - **Field Name:** `Phone`
-- No additional configuration needed
 
-#### Field 4: Company
+#### Field 5: Company
 - **Field Type:** Single line text
 - **Field Name:** `Company`
-- No additional configuration needed
 
-#### Field 5: Message
+#### Field 6: Message
 - **Field Type:** Long text
 - **Field Name:** `Message`
 - Enable "Enable rich text formatting" (optional)
 
-#### Field 6: Inquiry Type
+#### Field 7: Inquiry Type
 - **Field Type:** Single select
 - **Field Name:** `Inquiry Type`
 - **Options:**
@@ -59,23 +59,22 @@ Create the following fields in this exact order:
   - Other
 - Assign colors to each option (optional)
 
-#### Field 7: Submission Date
-- **Field Type:** Date
-- **Field Name:** `Submission Date`
+#### Field 8: Submission Date
 - **Field Type:** Created time
 - **Field Name:** `Submission Date`
 - Airtable will automatically populate this when records are created
 
 ### 4. Verify Inquiries Table Configuration
 
-Your Inquiries table should have exactly these 6 fields:
-1. Name (Single line text)
-2. Email (Email)
-3. Phone (Phone number)
-4. Company (Single line text)
-5. Message (Long text)
-6. Inquiry Type (Single select: Custom Package, Optional Upgrade, Other)
-7. Submission Date (Created time)
+Your Inquiries table should have exactly these 8 fields:
+1. First Name (Single line text)
+2. Last Name (Single line text)
+3. Email (Email)
+4. Phone (Phone number)
+5. Company (Single line text)
+6. Message (Long text)
+7. Inquiry Type (Single select: Custom Package, Optional Upgrade, Other)
+8. Submission Date (Created time)
 
 ---
 
@@ -142,12 +141,13 @@ Your RSVP table should have exactly these 6 fields:
 3. Scroll down to the inquiry form
 
 4. Fill out the form with test data:
-   - Name: Test User
+   - Inquiry Type: Select any option
+   - First Name: John
+   - Last Name: Doe
    - Email: test@example.com
    - Phone: (555) 123-4567
    - Company: Test Company
    - Message: This is a test inquiry
-   - Inquiry Type: Select any option
 
 5. Click "Send Message"
 

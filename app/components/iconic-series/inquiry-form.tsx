@@ -6,7 +6,8 @@ import Script from 'next/script'
 
 export default function InquiryForm() {
   const [formData, setFormData] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     company: '',
     email: '',
     phone: '',
@@ -73,7 +74,8 @@ export default function InquiryForm() {
       console.log('[Inquiry Form] Submission successful')
       setSubmitted(true)
       setFormData({ 
-        name: '', 
+        firstName: '', 
+        lastName: '', 
         company: '', 
         email: '', 
         phone: '', 
@@ -139,27 +141,28 @@ export default function InquiryForm() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-white/90 mb-2">
-              Name *
+            <label htmlFor="firstName" className="block text-sm font-medium text-white/90 mb-2">
+              First Name *
             </label>
             <input
               type="text"
-              id="name"
+              id="firstName"
               required
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              value={formData.firstName}
+              onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
               className="w-full px-4 py-3 bg-white/5 border border-white/10 text-white rounded-sm focus:outline-none focus:border-[#FFB800] transition-colors"
             />
           </div>
           <div>
-            <label htmlFor="company" className="block text-sm font-medium text-white/90 mb-2">
-              Company
+            <label htmlFor="lastName" className="block text-sm font-medium text-white/90 mb-2">
+              Last Name *
             </label>
             <input
               type="text"
-              id="company"
-              value={formData.company}
-              onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+              id="lastName"
+              required
+              value={formData.lastName}
+              onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
               className="w-full px-4 py-3 bg-white/5 border border-white/10 text-white rounded-sm focus:outline-none focus:border-[#FFB800] transition-colors"
             />
           </div>
@@ -192,6 +195,19 @@ export default function InquiryForm() {
               className="w-full px-4 py-3 bg-white/5 border border-white/10 text-white rounded-sm focus:outline-none focus:border-[#FFB800] transition-colors"
             />
           </div>
+        </div>
+
+        <div>
+          <label htmlFor="company" className="block text-sm font-medium text-white/90 mb-2">
+            Company
+          </label>
+          <input
+            type="text"
+            id="company"
+            value={formData.company}
+            onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+            className="w-full px-4 py-3 bg-white/5 border border-white/10 text-white rounded-sm focus:outline-none focus:border-[#FFB800] transition-colors"
+          />
         </div>
 
         <div>

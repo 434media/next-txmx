@@ -17,11 +17,11 @@ if (airtableBaseId && airtableApiKey) {
 
 export async function POST(request: Request) {
   try {
-    const { name, email, phone, company, message, inquiryType } = await request.json()
+    const { firstName, lastName, email, phone, company, message, inquiryType } = await request.json()
     const turnstileToken = request.headers.get("cf-turnstile-response")
     const remoteIp = request.headers.get("CF-Connecting-IP")
 
-    console.log('[Iconic Series Inquiry] Received submission:', { name, email, inquiryType, isDevelopment })
+    console.log('[Iconic Series Inquiry] Received submission:', { firstName, lastName, email, inquiryType, isDevelopment })
 
     if (!base) {
       console.error("Airtable configuration is missing")
@@ -69,7 +69,8 @@ export async function POST(request: Request) {
     await base("Inquiries").create([
       {
         fields: {
-          Name: name,
+          "First Name": firstName,
+          "Last Name": lastName,
           Email: email,
           Phone: phone,
           Company: company || "",

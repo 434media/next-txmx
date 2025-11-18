@@ -20,9 +20,10 @@ const getStripePromise = () => {
   return stripePromise
 }
 
-export default function SponsorCheckout({ packageId }: { packageId: string }) {
+export default function SponsorCheckout({ packageId, onSuccess }: { packageId: string; onSuccess?: () => void }) {
   const [stripePromise, setStripePromise] = useState<ReturnType<typeof loadStripe> | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [paymentComplete, setPaymentComplete] = useState(false)
 
   useEffect(() => {
     const promise = getStripePromise()
@@ -37,6 +38,13 @@ export default function SponsorCheckout({ packageId }: { packageId: string }) {
     () => startCheckoutSession(packageId),
     [packageId]
   )
+
+  const handleComplete = useCallback(() => {
+    setPaymentComplete(true)
+    if (onSuccess) {
+      onSuccess()
+    }
+  }, [onSuccess])
 
   if (error) {
     return (
@@ -57,11 +65,29 @@ export default function SponsorCheckout({ packageId }: { packageId: string }) {
     )
   }
 
+  if (paymentComplete) {
+    return (
+      <div className="w-full p-12 text-center">
+        <div className="text-6xl mb-6">✓</div>
+        <h3 className="text-3xl font-bold text-[#FFB800] mb-4">Thank You for Your Sponsorship!</h3>
+        <p className="text-white/80 text-lg mb-4">
+          Your payment has been successfully processed.
+        </p>
+        <p className="text-white/60 text-base">
+          You will receive a confirmation email shortly with all the details about your sponsorship package.
+        </p>
+      </div>
+    )
+  }
+
   return (
     <div id="checkout" className="w-full">
       <EmbeddedCheckoutProvider
         stripe={stripePromise}
-        options={{ fetchClientSecret: startCheckoutSessionForPackage }}
+        options={{ 
+          fetchClientSecret: startCheckoutSessionForPackage,
+          onComplete: handleComplete
+        }}
       >
         <EmbeddedCheckout />
       </EmbeddedCheckoutProvider>

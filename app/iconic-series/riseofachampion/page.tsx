@@ -91,12 +91,6 @@ export default function RiseOfAChampionPage() {
                   <p className="leading-relaxed">
                     This invitation-only experience honors four of the biggest names in the sport — all from San Antonio — as they're celebrated in their hometown and captured live for the nationally distributed series <span className="text-[#FFB800] font-semibold italic">Rise of a Champion</span>, powered by TXMX Boxing and produced by ICON Talks x 434 Media.
                   </p>
-                  <p className="font-bold text-white text-lg tracking-wide">
-                    No public tickets. No open guest list.
-                  </p>
-                  <p className="leading-relaxed">
-                    This experience is offered exclusively to a curated room of athletes, entertainers, and industry leaders to celebrate greatness and build meaningful connections.
-                  </p>
                   <p className="font-bold text-[#FFB800] text-lg tracking-wide">
                     RSVP below to confirm your attendance.
                   </p>
@@ -118,12 +112,6 @@ export default function RiseOfAChampionPage() {
                 <p className="leading-relaxed">
                   This invitation-only experience honors four of the biggest names in the sport — all from San Antonio — as they're celebrated in their hometown and captured live for the nationally distributed series <span className="text-[#FFB800] font-semibold italic">Rise of a Champion</span>, powered by TXMX Boxing and produced by ICON Talks x 434 Media.
                 </p>
-                <p className="font-bold text-white text-xl tracking-wide">
-                  No public tickets. No open guest list.
-                </p>
-                <p className="leading-relaxed">
-                  This experience is offered exclusively to a curated room of athletes, entertainers, and industry leaders to celebrate greatness and build meaningful connections.
-                </p>
                 <p className="font-bold text-[#FFB800] text-xl tracking-wide">
                   RSVP below to confirm your attendance.
                 </p>
@@ -133,7 +121,7 @@ export default function RiseOfAChampionPage() {
         </section>
 
         {/* RSVP Section */}
-        <section className="py-6 px-4">
+        <section className="py-2 md:py-6 px-4">
           <div className="max-w-7xl md:max-w-4xl mx-auto">
             <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-6 md:p-10 rounded-sm">
               <div className="md:text-center mb-8">
@@ -256,7 +244,7 @@ export default function RiseOfAChampionPage() {
 
             {/* Desktop Background */}
             <div 
-              className="hidden md:flex relative w-full min-h-[660px] flex-col items-center justify-center overflow-hidden"
+              className="hidden md:flex relative w-full min-h-[720px] flex-col items-center justify-center overflow-hidden"
               style={{
                 backgroundImage: 'url(https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/Bottom.png)',
                 backgroundSize: 'cover',

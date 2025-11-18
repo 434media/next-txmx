@@ -11,6 +11,7 @@ import InquiryForm from '../components/iconic-series/inquiry-form'
 export default function IconicSeriesPage() {
   const [selectedPackage, setSelectedPackage] = useState<string | null>(null)
   const [showCustomForm, setShowCustomForm] = useState(false)
+  const [paymentSuccess, setPaymentSuccess] = useState(false)
 
   const formatPrice = (cents: number) => {
     return `$${(cents / 100).toLocaleString()}`
@@ -244,7 +245,10 @@ export default function IconicSeriesPage() {
             {selectedPackage ? (
               <div className="max-w-4xl mx-auto">
                 <Button
-                  onClick={() => setSelectedPackage(null)}
+                  onClick={() => {
+                    setSelectedPackage(null)
+                    setPaymentSuccess(false)
+                  }}
                   variant="outline"
                   className="mb-8 text-white border-white/20 hover:bg-white/10"
                 >
@@ -252,9 +256,12 @@ export default function IconicSeriesPage() {
                 </Button>
                 <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-8 rounded-sm">
                   <h3 className="text-2xl font-bold text-[#FFB800] mb-6">
-                    Complete Your Sponsorship
+                    {paymentSuccess ? 'Thank You!' : 'Complete Your Sponsorship'}
                   </h3>
-                  <SponsorCheckout packageId={selectedPackage} />
+                  <SponsorCheckout 
+                    packageId={selectedPackage} 
+                    onSuccess={() => setPaymentSuccess(true)}
+                  />
                 </div>
               </div>
             ) : showCustomForm ? (
@@ -359,7 +366,7 @@ export default function IconicSeriesPage() {
                         <ul className="space-y-4 text-white/80 text-sm">
                           <li className="flex items-start leading-relaxed">
                             <span className="text-[#FFB800] mr-3 text-lg">•</span>
-                            <span>Floor Row 1 ticket upgrades (available upon request)</span>
+                            <span>Ticket upgrades (available upon request)</span>
                           </li>
                           <li className="flex items-start leading-relaxed">
                             <span className="text-[#FFB800] mr-3 text-lg">•</span>
@@ -372,7 +379,7 @@ export default function IconicSeriesPage() {
                         </ul>
                         
                         <div className="mt-8 pt-6 border-t border-white/10">
-                          <p className="text-white/70 text-sm leading-relaxed max-w-md">
+                          <p className="text-white/70 text-sm leading-relaxed max-w-xs tracking-tight">
                             For inquiries about upgrades or alternative payment methods (check/ACH), please use the contact form.
                           </p>
                         </div>
