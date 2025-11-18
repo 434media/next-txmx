@@ -100,7 +100,7 @@ export default function IconicSeriesPage() {
                 {/* Event Description */}
                 <div className="mt-16 text-base text-white/90 leading-relaxed space-y-4 text-left">
                   <p className="leading-relaxed">
-                    This invitation-only experience honors four of the biggest names in the sport — all from San Antonio — as they're celebrated in their hometown and captured live for the nationally distributed series <span className="text-[#FFB800] font-semibold italic">Rise of a Champion</span>, produced by 434 Media and powered by TXMX Boxing x ICON Talks.
+                    This invitation-only experience honors four of the biggest names in the sport — all from San Antonio — as they're celebrated in their hometown and captured live for the nationally distributed series <span className="text-[#FFB800] font-semibold italic">Rise of a Champion</span>, powered by TXMX Boxing and produced by ICON Talks x 434 Media.
                   </p>
                   <p className="font-bold text-white text-lg tracking-wide">
                     No public tickets. No open guest list.
@@ -130,7 +130,7 @@ export default function IconicSeriesPage() {
               {/* Event Description */}
               <div className="text-lg md:text-xl text-white/90 max-w-4xl mx-auto leading-relaxed space-y-4">
                 <p className="leading-relaxed">
-                  This invitation-only experience honors four of the biggest names in the sport — all from San Antonio — as they're celebrated in their hometown and captured live for the nationally distributed series <span className="text-[#FFB800] font-semibold italic">Rise of a Champion</span>, produced by 434 Media and powered by TXMX Boxing x ICON Talks.
+                  This invitation-only experience honors four of the biggest names in the sport — all from San Antonio — as they're celebrated in their hometown and captured live for the nationally distributed series <span className="text-[#FFB800] font-semibold italic">Rise of a Champion</span>, powered by TXMX Boxing and produced by ICON Talks x 434 Media.
                 </p>
                 <p className="font-bold text-white text-xl tracking-wide">
                   No public tickets. No open guest list.
@@ -314,25 +314,68 @@ export default function IconicSeriesPage() {
                   ))}
                 </div>
 
+                {/* Payment & Contact Info */}
+                <div className="max-w-7xl md:max-w-2xl mx-auto mb-8">
+                  <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-6 md:p-8 rounded-sm">
+                    <div className="text-left md:text-center space-y-4">
+                      <p className="text-white/90 text-sm md:text-base leading-relaxed">
+                        For inquiries or alternative payment methods (check/ACH), please contact:<br />
+                        <a 
+                          href="mailto:marcos@434MEDIA.COM" 
+                          className="text-[#FFB800] hover:text-[#FFB800]/90 transition-colors font-semibold text-base md:text-lg mt-2 inline-block"
+                        >
+                          marcos@434MEDIA.COM
+                        </a>
+                      </p>
+                      <div className="pt-4 border-t border-white/10">
+                        <div className="flex items-start md:items-center md:justify-center gap-2 text-white/60 text-xs md:text-sm">
+                          <svg className="w-4 h-4 flex-shrink-0 mt-0.5 md:mt-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                          </svg>
+                          <span className="font-medium">All payments powered by Stripe</span>
+                          <span className="hidden md:inline">•</span>
+                          <span className="hidden md:inline">256-bit SSL encryption</span>
+                        </div>
+                        <p className="text-white/50 text-xs mt-2 md:hidden">256-bit SSL encryption</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Optional Upgrades */}
-                <div className="max-w-4xl mx-auto mb-12 p-6 md:p-8 bg-white/5 backdrop-blur-sm border border-white/10">
-                  <h3 className="text-xl md:text-2xl font-bold text-[#FFB800] mb-4 md:text-center tracking-wide">
-                    🔁 Optional Upgrades (All Packages Eligible)
-                  </h3>
-                  <ul className="space-y-2.5 text-white/90 text-sm md:text-base">
-                    <li className="flex items-start leading-relaxed">
-                      <span className="text-[#FFB800] mr-3">•</span>
-                      <span>Floor Row 1 ticket upgrades (available upon request)</span>
-                    </li>
-                    <li className="flex items-start leading-relaxed">
-                      <span className="text-[#FFB800] mr-3">•</span>
-                      <span>Hotel & experience add-ons via concierge</span>
-                    </li>
-                    <li className="flex items-start leading-relaxed">
-                      <span className="text-[#FFB800] mr-3">•</span>
-                      <span>Custom media integrations by request</span>
-                    </li>
-                  </ul>
+                <div className="max-w-7xl md:max-w-2xl mx-auto mb-8">
+                  <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-6 md:p-8 rounded-sm">
+                    <h3 className="text-xl md:text-2xl font-bold text-[#FFB800] mb-6 text-left md:text-center tracking-wide">
+                      🔁 Optional Upgrades
+                    </h3>
+                    <p className="text-white/70 text-xs md:text-sm text-left md:text-center mb-6 uppercase tracking-wider font-medium">
+                      Available for All Packages
+                    </p>
+                    <ul className="space-y-3 text-white/90 text-sm md:text-base mb-6">
+                      <li className="flex items-start leading-relaxed">
+                        <span className="text-[#FFB800] mr-3 text-lg">•</span>
+                        <span>Floor Row 1 ticket upgrades (available upon request)</span>
+                      </li>
+                      <li className="flex items-start leading-relaxed">
+                        <span className="text-[#FFB800] mr-3 text-lg">•</span>
+                        <span>Hotel & experience add-ons via concierge</span>
+                      </li>
+                      <li className="flex items-start leading-relaxed">
+                        <span className="text-[#FFB800] mr-3 text-lg">•</span>
+                        <span>Custom media integrations by request</span>
+                      </li>
+                    </ul>
+                    <div className="pt-4 border-t border-white/10 text-left md:text-center">
+                      <a 
+                        href="mailto:marcos@434MEDIA.COM?subject=Upgrade Inquiry - Rise of a Champion"
+                        className="inline-block"
+                      >
+                        <Button className="bg-[#FFB800] text-black hover:bg-[#FFB800]/90 font-semibold px-6 py-3 text-sm tracking-wide">
+                          Contact Us for Upgrades
+                        </Button>
+                      </a>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Call to Action */}
@@ -358,15 +401,9 @@ export default function IconicSeriesPage() {
                       <p className="text-white text-lg mb-3 tracking-tight leading-relaxed font-bold">
                         This is a once-in-a-lifetime access moment.
                       </p>
-                      <p className="text-white/90 text-sm leading-relaxed mb-2">
+                      <p className="text-white/90 text-sm leading-relaxed">
                         Choose your package. Lock it in. Be part of history.
                       </p>
-                      <div className="pt-2 border-t border-white/20">
-                        <p className="text-white/70 text-sm leading-relaxed">
-                          Please direct inquiries, or for check/ACH payments to:<br />
-                          <a href="mailto:marcos@434MEDIA.COM" className="text-[#FFB800] hover:text-[#FFB800]/90 transition-colors font-medium mt-1 inline-block">marcos@434MEDIA.COM</a>
-                        </p>
-                      </div>
                     </div>
 
                     <div className="relative z-10 w-full px-6 pb-8">
@@ -431,15 +468,9 @@ export default function IconicSeriesPage() {
                       <p className="text-white text-2xl mb-2 leading-relaxed font-semibold">
                         This is a once-in-a-lifetime access moment.
                       </p>
-                      <p className="text-white/90 text-lg leading-relaxed mb-8">
+                      <p className="text-white/90 text-lg leading-relaxed">
                         Choose your package. Lock it in. Be part of history.
                       </p>
-                      <div className="pt-6 border-t border-white/10 max-w-2xl mx-auto">
-                        <p className="text-white/70 text-base leading-relaxed">
-                          Please direct inquiries, or for check/ACH payments to:<br />
-                          <a href="mailto:marcos@434MEDIA.COM" className="text-[#FFB800] hover:text-[#FFB800]/90 transition-colors font-medium text-lg mt-2 inline-block">marcos@434MEDIA.COM</a>
-                        </p>
-                      </div>
                     </div>
 
                     <div className="relative z-10 w-full px-8 pb-12">
