@@ -156,7 +156,7 @@ export default function IconicSeriesPage() {
             <div className="text-center mb-12 md:mb-16">
               <div className="flex items-center justify-center gap-4 md:gap-6 mb-2">
                 <div className="h-px bg-[#FFB800]/40 w-12 md:w-24"></div>
-                <h2 className="text-2xl md:text-4xl text-[#FFB800] tracking-[0.35em] font-normal uppercase">
+                <h2 className="text-2xl md:text-3xl text-[#FFB800] tracking-[0.35em] font-bold uppercase">
                   HONOREES
                 </h2>
                 <div className="h-px bg-[#FFB800]/40 w-12 md:w-24"></div>
@@ -170,7 +170,7 @@ export default function IconicSeriesPage() {
             <div className="space-y-10 md:space-y-14">
               {/* Visionary Icon Awards - First Group */}
               <div className="text-left md:text-center border-b border-white/10 pb-10">
-                <h3 className="text-[#FFB800] text-2xl md:text-4xl tracking-wide mb-5 md:mb-7 italic font-normal" style={{ fontFamily: '"Lucida Calligraphy", cursive, serif' }}>
+                <h3 className="text-[#FFB800] text-2xl md:text-4xl tracking-wide mb-5 md:mb-7 italic font-bold" style={{ fontFamily: '"Lucida Calligraphy", cursive, serif' }}>
                   Visionary Icon Awards
                 </h3>
                 <div className="space-y-2 md:space-y-3">
@@ -188,7 +188,7 @@ export default function IconicSeriesPage() {
 
               {/* Visionary Icon Awards - Second Group */}
               <div className="text-left md:text-center border-b border-white/10 pb-10">
-                <h3 className="text-[#FFB800] text-2xl md:text-4xl tracking-wide mb-5 md:mb-7 italic font-normal" style={{ fontFamily: '"Lucida Calligraphy", cursive, serif' }}>
+                <h3 className="text-[#FFB800] text-2xl md:text-4xl tracking-wide mb-5 md:mb-7 italic font-bold" style={{ fontFamily: '"Lucida Calligraphy", cursive, serif' }}>
                   Visionary Icon Awards
                 </h3>
                 <div className="space-y-2 md:space-y-3">
@@ -203,7 +203,7 @@ export default function IconicSeriesPage() {
 
               {/* Humanitarian Icon Award */}
               <div className="text-left md:text-center border-b border-white/10 pb-10">
-                <h3 className="text-[#FFB800] text-2xl md:text-4xl tracking-wide mb-5 md:mb-7 italic font-normal" style={{ fontFamily: '"Lucida Calligraphy", cursive, serif' }}>
+                <h3 className="text-[#FFB800] text-2xl md:text-4xl tracking-wide mb-5 md:mb-7 italic font-bold" style={{ fontFamily: '"Lucida Calligraphy", cursive, serif' }}>
                   Humanitarian Icon Award
                 </h3>
                 <p className="text-white text-lg md:text-2xl font-normal leading-tight">
@@ -213,7 +213,7 @@ export default function IconicSeriesPage() {
 
               {/* Icon Award */}
               <div className="text-left md:text-center pb-8">
-                <h3 className="text-[#FFB800] text-2xl md:text-4xl tracking-wide mb-5 md:mb-7 italic font-normal" style={{ fontFamily: '"Lucida Calligraphy", cursive, serif' }}>
+                <h3 className="text-[#FFB800] text-2xl md:text-4xl tracking-wide mb-5 md:mb-7 italic font-bold" style={{ fontFamily: '"Lucida Calligraphy", cursive, serif' }}>
                   Icon Award
                 </h3>
                 <p className="text-white text-lg md:text-2xl font-normal leading-tight">
