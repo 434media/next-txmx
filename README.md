@@ -1,4 +1,4 @@
-# TXMX Boxing Website
+# TXMX Boxing
 
 This repository contains the source code for the official TXMX Boxing landing page. It's a dynamic and visually-rich web experience built with Next.js, designed to engage a passionate fight fan audience.
 
