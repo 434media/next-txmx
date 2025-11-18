@@ -2,17 +2,22 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { EmbeddedCheckout, EmbeddedCheckoutProvider } from '@stripe/react-stripe-js'
-import { loadStripe } from '@stripe/stripe-js'
+import { loadStripe, Stripe } from '@stripe/stripe-js'
 import { startCheckoutSession } from '@/app/actions/iconic-series-stripe'
 
-// Only initialize Stripe if the publishable key is available
+// Memoize Stripe promise to avoid recreating it
+let stripePromise: Promise<Stripe | null> | null = null
+
 const getStripePromise = () => {
-  const key = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
-  if (!key) {
-    console.error('NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is not defined')
-    return null
+  if (!stripePromise) {
+    const key = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+    if (!key) {
+      console.error('NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is not defined')
+      return null
+    }
+    stripePromise = loadStripe(key)
   }
-  return loadStripe(key)
+  return stripePromise
 }
 
 export default function SponsorCheckout({ packageId }: { packageId: string }) {
