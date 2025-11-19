@@ -26,6 +26,9 @@ export const metadata: Metadata = {
   authors: [{ name: 'TXMX Boxing' }, { name: 'Icon Talks' }],
   creator: 'TXMX Boxing x Icon Talks',
   publisher: 'TXMX Boxing',
+  other: {
+    'image': 'https://txmxboxing.com/iconic-series/opengraph-image.png',
+  },
   openGraph: {
     title: 'Rise of a Champion - Iconic Series | TXMX Boxing',
     description: 'An exclusive invitation-only experience honoring four of San Antonio\'s greatest boxing champions. Filmed live for national distribution. Sponsorship packages available.',

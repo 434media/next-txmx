@@ -27,6 +27,9 @@ export const metadata: Metadata = {
   authors: [{ name: 'TXMX Boxing' }, { name: 'Icon Talks' }],
   creator: 'TXMX Boxing x Icon Talks',
   publisher: 'TXMX Boxing',
+  other: {
+    'image': 'https://txmxboxing.com/iconic-series/riseofachampion/opengraph-image.png',
+  },
   openGraph: {
     title: 'RSVP - Rise of a Champion | December 3rd, San Antonio',
     description: 'Confirm your attendance for this exclusive invitation-only celebration of San Antonio\'s boxing legends. Filmed live for the nationally distributed Rise of a Champion series. One night. Invitation only.',
