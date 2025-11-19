@@ -27,16 +27,16 @@ export const metadata: Metadata = {
   creator: 'TXMX Boxing x Icon Talks',
   publisher: 'TXMX Boxing',
   other: {
-    'image': 'https://txmxboxing.com/iconic-series/opengraph-image.png',
+    'image': 'https://www.txmxboxing.com/iconic-series/opengraph-image.png',
   },
   openGraph: {
     title: 'Rise of a Champion - Iconic Series | TXMX Boxing',
     description: 'An exclusive invitation-only experience honoring four of San Antonio\'s greatest boxing champions. Filmed live for national distribution. Sponsorship packages available.',
-    url: 'https://txmxboxing.com/iconic-series',
+    url: 'https://www.txmxboxing.com/iconic-series',
     siteName: 'TXMX Boxing',
     images: [
       {
-        url: 'https://txmxboxing.com/iconic-series/opengraph-image.png',
+        url: 'https://www.txmxboxing.com/iconic-series/opengraph-image.png',
         width: 1200,
         height: 630,
         alt: 'Rise of a Champion - Iconic Series | TXMX Boxing',
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Rise of a Champion - Iconic Series | TXMX Boxing',
     description: 'An exclusive invitation-only experience honoring San Antonio\'s greatest boxing champions. December 3rd. Sponsorship packages available.',
-    images: ['https://txmxboxing.com/iconic-series/opengraph-image.png'],
+    images: ['https://www.txmxboxing.com/iconic-series/opengraph-image.png'],
     creator: '@txmx',
   },
   robots: {
@@ -65,7 +65,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: 'https://txmxboxing.com/iconic-series',
+    canonical: 'https://www.txmxboxing.com/iconic-series',
   },
 }
 

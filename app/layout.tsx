@@ -3,7 +3,7 @@ import type { Metadata } from "next"
 import ClientLayout from "./client-layout"
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://txmxboxing.com'),
+  metadataBase: new URL('https://www.txmxboxing.com'),
 }
 
 export default function RootLayout({
