@@ -120,7 +120,7 @@ export default async function Image() {
               gap: 8,
             }}
           >
-            <div>Honoring San Antonio&apos;s Boxing Legends</div>
+            <div>Celebrating San Antonio&apos;s Boxing Champions</div>
             <div style={{ fontSize: 20, color: '#rgba(255, 255, 255, 0.6)' }}>
               Jesse Rodriguez • Mario Barrios • Joshua Franco • Jesse James Leija
             </div>

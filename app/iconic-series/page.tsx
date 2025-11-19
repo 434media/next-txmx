@@ -31,14 +31,6 @@ export const metadata: Metadata = {
     description: 'An exclusive invitation-only experience honoring four of San Antonio\'s greatest boxing champions. Filmed live for national distribution. Sponsorship packages available.',
     url: '/iconic-series',
     siteName: 'TXMX Boxing',
-    images: [
-      {
-        url: 'https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/ROAC.png',
-        width: 1200,
-        height: 630,
-        alt: 'Rise of a Champion - San Antonio Boxing Champions',
-      },
-    ],
     locale: 'en_US',
     type: 'website',
   },
@@ -46,7 +38,6 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Rise of a Champion - Iconic Series | TXMX Boxing',
     description: 'An exclusive invitation-only experience honoring San Antonio\'s greatest boxing champions. December 3rd. Sponsorship packages available.',
-    images: ['https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/ROAC.png'],
     creator: '@txmx',
   },
   robots: {

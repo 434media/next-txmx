@@ -32,14 +32,6 @@ export const metadata: Metadata = {
     description: 'Confirm your attendance for this exclusive invitation-only celebration of San Antonio\'s boxing legends. Filmed live for the nationally distributed Rise of a Champion series. One night. Invitation only.',
     url: '/iconic-series/riseofachampion',
     siteName: 'TXMX Boxing',
-    images: [
-      {
-        url: 'https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/mobile-hero2.png',
-        width: 1200,
-        height: 630,
-        alt: 'Rise of a Champion - RSVP for December 3rd in San Antonio',
-      },
-    ],
     locale: 'en_US',
     type: 'website',
   },
@@ -47,7 +39,6 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'RSVP - Rise of a Champion | December 3rd, San Antonio',
     description: 'Confirm your attendance for this exclusive celebration of San Antonio\'s boxing legends. One night. Invitation only. Filmed live.',
-    images: ['https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/mobile-hero2.png'],
     creator: '@txmx',
   },
   robots: {
