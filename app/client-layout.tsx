@@ -97,39 +97,7 @@ export default function ClientLayout({
           content="TXMX Boxing is a dynamic media platform designed to connect brands with a passionate fight fan audience. By celebrating the rich cultural heritage of Texas and Mexico, TXMX Boxing offers unique opportunities for brands to authentically engage with a community that is deeply rooted in both sport and culture."
         />
         <meta name="keywords" content="boxing, fitness, Mexican boxing, TXMX, training, equipment" />
-        <meta name="author" content="TXMX" />
-        <meta name="creator" content="TXMX" />
-        <meta name="publisher" content="TXMX" />
-
-        {/* Open Graph */}
-        <meta property="og:title" content="TXMX Boxing" />
-        <meta
-          property="og:description"
-          content="TXMX Boxing is a dynamic media platform designed to connect brands with a passionate fight fan audience. By celebrating the rich cultural heritage of Texas and Mexico, TXMX Boxing offers unique opportunities for brands to authentically engage with a community that is deeply rooted in both sport and culture."
-        />
-        <meta property="og:url" content="https://txmxboxing.com" />
-        <meta property="og:site_name" content="TXMX Boxing" />
-        <meta property="og:image" content="/og-image.jpg" />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta property="og:image:alt" content="TXMX Boxing" />
-        <meta property="og:locale" content="en_US" />
-        <meta property="og:type" content="website" />
-
-        {/* Twitter */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Levantamos Los Puños" />
-        <meta
-          name="twitter:description"
-          content="TXMX Boxing is a dynamic media platform designed to connect brands with a passionate fight fan audience. By celebrating the rich cultural heritage of Texas and Mexico, TXMX Boxing offers unique opportunities for brands to authentically engage with a community that is deeply rooted in both sport and culture."
-        />
-        <meta name="twitter:image" content="/og-image.jpg" />
-        <meta name="twitter:creator" content="@txmx" />
-
-        {/* Robots */}
-        <meta name="robots" content="index, follow" />
-        <meta name="googlebot" content="index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1" />
-
+        {/* Note: Meta tags are now handled by Next.js Metadata API in layout.tsx and page.tsx files */}
         {/* Verification */}
         <meta name="google-site-verification" content="your-google-verification-code" />
       </head>
