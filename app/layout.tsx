@@ -13,12 +13,21 @@ export const metadata: Metadata = {
     siteName: 'TXMX Boxing',
     locale: 'en_US',
     type: 'website',
+    images: [
+      {
+        url: 'https://www.txmxboxing.com/opengraph-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'TXMX Boxing',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'TXMX Boxing',
     description: 'TXMX Boxing - Connecting brands with passionate fight fans.',
     creator: '@txmx',
+    images: ['https://www.txmxboxing.com/opengraph-image.png'],
   },
 }
 
