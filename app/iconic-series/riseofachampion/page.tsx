@@ -30,8 +30,17 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'RSVP - Rise of a Champion | December 3rd, San Antonio',
     description: 'Confirm your attendance for this exclusive invitation-only celebration of San Antonio\'s boxing legends. Filmed live for the nationally distributed Rise of a Champion series. One night. Invitation only.',
-    url: '/iconic-series/riseofachampion',
+    url: 'https://txmxboxing.com/iconic-series/riseofachampion',
     siteName: 'TXMX Boxing',
+    images: [
+      {
+        url: 'https://txmxboxing.com/iconic-series/riseofachampion/opengraph-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'RSVP - Rise of a Champion | December 3rd, San Antonio',
+        type: 'image/png',
+      },
+    ],
     locale: 'en_US',
     type: 'website',
   },
@@ -39,6 +48,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'RSVP - Rise of a Champion | December 3rd, San Antonio',
     description: 'Confirm your attendance for this exclusive celebration of San Antonio\'s boxing legends. One night. Invitation only. Filmed live.',
+    images: ['https://txmxboxing.com/iconic-series/riseofachampion/opengraph-image.png'],
     creator: '@txmx',
   },
   robots: {
