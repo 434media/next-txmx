@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     siteName: 'TXMX Boxing',
     images: [
       {
-        url: '/iconic-series/riseofachampion/opengraph-image.jpg',
+        url: '/iconic-series/riseofachampion/opengraph-image.png',
         width: 1200,
         height: 630,
         alt: 'Rise of a Champion - RSVP for December 3rd in San Antonio',

@@ -89,7 +89,7 @@ export default function RiseOfAChampionClient() {
                 {/* Event Description */}
                 <div className="mt-16 text-base text-white/90 leading-relaxed space-y-4 text-left">
                   <p className="leading-relaxed">
-                    This invitation-only experience honors four of the biggest names in the sport — all from San Antonio — as they're celebrated in their hometown and captured live for the nationally distributed series <span className="text-[#FFB800] font-semibold italic">Rise of a Champion</span>, powered by TXMX Boxing and produced by ICON Talks x 434 Media.
+                    This invitation-only experience honors four of the biggest names in the sport — all from San Antonio — as they're celebrated in their hometown and captured live for the nationally distributed series <span className="text-[#FFB800] font-semibold italic">Rise of a Champion</span>, powered by TXMX Boxing and produced by ICON Media x 434 Media.
                   </p>
                   <p className="font-bold text-[#FFB800] text-lg tracking-wide">
                     RSVP below to confirm your attendance.
@@ -110,7 +110,7 @@ export default function RiseOfAChampionClient() {
               {/* Event Description */}
               <div className="text-lg md:text-xl text-white/90 max-w-4xl mx-auto leading-relaxed space-y-4">
                 <p className="leading-relaxed">
-                  This invitation-only experience honors four of the biggest names in the sport — all from San Antonio — as they're celebrated in their hometown and captured live for the nationally distributed series <span className="text-[#FFB800] font-semibold italic">Rise of a Champion</span>, powered by TXMX Boxing and produced by ICON Talks x 434 Media.
+                  This invitation-only experience honors four of the biggest names in the sport — all from San Antonio — as they're celebrated in their hometown and captured live for the nationally distributed series <span className="text-[#FFB800] font-semibold italic">Rise of a Champion</span>, powered by TXMX Boxing and produced by ICON Media x 434 Media.
                 </p>
                 <p className="font-bold text-[#FFB800] text-xl tracking-wide">
                   RSVP below to confirm your attendance.
