@@ -62,7 +62,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: '/iconic-series',
+    canonical: 'https://txmxboxing.com/iconic-series',
   },
 }
 

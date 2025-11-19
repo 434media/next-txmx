@@ -63,7 +63,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: '/iconic-series/riseofachampion',
+    canonical: 'https://txmxboxing.com/iconic-series/riseofachampion',
   },
 }
 
