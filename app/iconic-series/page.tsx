@@ -19,8 +19,6 @@ export const metadata: Metadata = {
     'Boxing Champions',
     'Texas Boxing',
     'Invitation Only Event',
-    'Stephen Jackson',
-    'Matt Barnes',
     'Sam Watson'
   ],
   authors: [{ name: 'TXMX Boxing' }, { name: 'Icon Talks' }],

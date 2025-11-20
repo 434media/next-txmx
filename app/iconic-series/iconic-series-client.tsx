@@ -189,21 +189,6 @@ export default function IconicSeriesClient() {
                 </div>
               </div>
 
-              {/* Visionary Icon Awards - Second Group */}
-              <div className="text-left md:text-center border-b border-white/10 pb-10">
-                <h3 className="text-[#FFB800] text-2xl md:text-4xl tracking-wide mb-5 md:mb-7 italic font-bold" style={{ fontFamily: '"Lucida Calligraphy", cursive, serif' }}>
-                  Visionary Icon Awards
-                </h3>
-                <div className="space-y-2 md:space-y-3">
-                  <p className="text-white text-lg md:text-2xl font-normal leading-tight">
-                    • Stephen Jackson
-                  </p>
-                  <p className="text-white text-lg md:text-2xl font-normal leading-tight">
-                    • Matt Barnes
-                  </p>
-                </div>
-              </div>
-
               {/* Humanitarian Icon Award */}
               <div className="text-left md:text-center border-b border-white/10 pb-10">
                 <h3 className="text-[#FFB800] text-2xl md:text-4xl tracking-wide mb-5 md:mb-7 italic font-bold" style={{ fontFamily: '"Lucida Calligraphy", cursive, serif' }}>

@@ -18,8 +18,6 @@ export const metadata: Metadata = {
     'December 3rd Event',
     'Invitation Only',
     'San Antonio Champions',
-    'Stephen Jackson',
-    'Matt Barnes',
     'Sam Watson',
     'Humanitarian Icon Award',
     'Visionary Icon Awards'
