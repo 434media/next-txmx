@@ -121,7 +121,7 @@ export default function IconicSeriesClient() {
             </div>
 
             {/* Desktop Event Info - positioned below hero */}
-            <div className="hidden md:block text-center mt-8 space-y-6">
+            <div className="hidden md:block text-center -mt-16 space-y-6">
               {/* Event Title */}
               <div className="space-y-2">
                 <h1 className="text-5xl lg:text-6xl font-bold text-white tracking-tight leading-[1.1]">
@@ -181,7 +181,7 @@ export default function IconicSeriesClient() {
                     • Jesse "Bam" Rodriguez
                   </p>
                   <p className="text-white text-lg md:text-2xl font-normal leading-tight">
-                    • Selena Barrios
+                    • Selina Barrios
                   </p>
                   <p className="text-white text-lg md:text-2xl font-normal leading-tight">
                     • Joshua "The Professor" Franco

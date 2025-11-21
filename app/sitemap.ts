@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://txmxboxing.com'
+  const baseUrl = 'https://www.txmxboxing.com'
   
   return [
     {
@@ -11,13 +11,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
     {
-      url: `${baseUrl}/iconic-series`,
+      url: `${baseUrl}/riseofachampion`,
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/iconic-series/riseofachampion`,
+      url: `${baseUrl}/riseofachampion/rsvp`,
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 0.9,

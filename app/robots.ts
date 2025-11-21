@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/api/', '/actions/'],
     },
-    sitemap: 'https://txmxboxing.com/sitemap.xml',
+    sitemap: 'https://www.txmxboxing.com/sitemap.xml',
   }
 }

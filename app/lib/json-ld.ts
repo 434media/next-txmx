@@ -26,7 +26,7 @@ export function generateEventJsonLd() {
       {
         '@type': 'Organization',
         name: 'TXMX Boxing',
-        url: 'https://txmxboxing.com',
+        url: 'https://www.txmxboxing.com',
       },
       {
         '@type': 'Organization',
@@ -70,7 +70,7 @@ export function generateEventJsonLd() {
       priceCurrency: 'USD',
       lowPrice: 10000,
       highPrice: 100000,
-      url: 'https://txmxboxing.com/iconic-series',
+      url: 'https://www.txmxboxing.com/riseofachampion',
     },
   }
 }
@@ -84,13 +84,13 @@ export function generateBreadcrumbJsonLd(pageName: string) {
         '@type': 'ListItem',
         position: 1,
         name: 'Home',
-        item: 'https://txmxboxing.com',
+        item: 'https://www.txmxboxing.com',
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: 'Iconic Series',
-        item: 'https://txmxboxing.com/iconic-series',
+        item: 'https://www.txmxboxing.com/riseofachampion',
       },
       ...(pageName === 'RSVP'
         ? [
@@ -98,7 +98,7 @@ export function generateBreadcrumbJsonLd(pageName: string) {
               '@type': 'ListItem',
               position: 3,
               name: 'RSVP',
-              item: 'https://txmxboxing.com/iconic-series/riseofachampion',
+              item: 'https://www.txmxboxing.com/riseofachampion/rsvp',
             },
           ]
         : []),
@@ -111,8 +111,8 @@ export function generateOrganizationJsonLd() {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'TXMX Boxing',
-    url: 'https://txmxboxing.com',
-    logo: 'https://txmxboxing.com/og-image.jpg',
+    url: 'https://www.txmxboxing.com',
+    logo: 'https://www.txmxboxing.com/opengraph-image.png',
     sameAs: [
       'https://www.instagram.com/txmxboxing',
       'https://twitter.com/txmx',
