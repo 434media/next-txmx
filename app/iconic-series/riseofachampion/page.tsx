@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     'Icon Talks',
     'San Antonio Boxing',
     'Jesse Bam Rodriguez',
-    'Mario El Azteca Barrios',
+    'Selena Barrios',
     'Joshua The Professor Franco',
     'Jesse James Leija',
     'Boxing Event RSVP',

@@ -45,9 +45,9 @@ export default function RiseOfAChampionClient() {
               </div>
 
               {/* Champions Image Below - touching the logo */}
-              <div className="w-full max-w-5xl -mt-52">
+              <div className="w-full max-w-5xl -mt-88">
                 <Image
-                  src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/champswhite.png"
+                  src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/awardsv6.png"
                   alt="San Antonio Champions"
                   width={1200}
                   height={600}
@@ -61,7 +61,7 @@ export default function RiseOfAChampionClient() {
               {/* Hero Image - Full Width */}
               <div className="relative w-full">
                 <Image
-                  src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/mobile-hero2.png"
+                  src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/rise-mobilev2.png"
                   alt="Rise of a Champion"
                   width={800}
                   height={400}
