@@ -81,7 +81,7 @@ Your Inquiries table should have exactly these 8 fields:
 ## Table 2: RSVP (Rise of a Champion Event)
 
 ### 1. Create RSVP Table
-1. In the same base `appjhfV2ev2hb2hox`, click **+** to add another table
+1. In the same base, add another table
 2. Name the table: **RSVP**
 3. Delete any default fields Airtable creates
 
@@ -103,27 +103,41 @@ Your Inquiries table should have exactly these 8 fields:
 - **Field Type:** Phone number
 - **Field Name:** `Phone`
 
-#### Field 5: Attending
+#### Field 5: Invited By
+- **Field Type:** Single select
+- **Field Name:** `Invited By`
+- **Options:**
+  - ICONTALKS
+  - TXMX BOXING
+  - 434 MEDIA
+  - J. Leija
+  - S. Barrios
+  - J. Rodriguez
+  - J. Franco
+  - S. Watson
+
+#### Field 6: Attending
 - **Field Type:** Single select
 - **Field Name:** `Attending`
 - **Options:**
   - Yes
   - No
 
-#### Field 6: Submission Date
+#### Field 7: Submission Date
 - **Field Type:** Created time
 - **Field Name:** `Submission Date`
 - Airtable will automatically populate this when records are created
 
 ### 3. Verify RSVP Table Configuration
 
-Your RSVP table should have exactly these 6 fields:
+Your RSVP table should have exactly these 7 fields:
 1. First Name (Single line text)
 2. Last Name (Single line text)
 3. Email (Email)
 4. Phone (Phone number)
-5. Attending (Single select: Yes, No)
-6. Submission Date (Created time)
+5. Invited By (Single select)
+6. Attending (Single select: Yes, No)
+7. Submission Date (Created time)
 
 ---
 
