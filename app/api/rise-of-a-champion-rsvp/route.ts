@@ -17,11 +17,11 @@ if (airtableBaseId && airtableApiKey) {
 
 export async function POST(request: Request) {
   try {
-    const { firstName, lastName, email, phone, attending } = await request.json()
+    const { firstName, lastName, email, phone, invitedBy } = await request.json()
     const turnstileToken = request.headers.get("cf-turnstile-response")
     const remoteIp = request.headers.get("CF-Connecting-IP")
 
-    console.log('[Rise of a Champion RSVP] Received submission:', { firstName, lastName, email, attending, isDevelopment })
+    console.log('[Rise of a Champion RSVP] Received submission:', { firstName, lastName, email, invitedBy, isDevelopment })
 
     if (!base) {
       console.error("Airtable configuration is missing")
@@ -73,7 +73,8 @@ export async function POST(request: Request) {
           "Last Name": lastName,
           Email: email,
           Phone: phone,
-          Attending: attending,
+          "Invited By": invitedBy,
+          "Attending": "Yes",
         },
       },
     ])

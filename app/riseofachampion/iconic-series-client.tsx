@@ -178,13 +178,13 @@ export default function IconicSeriesClient() {
                 </h3>
                 <div className="space-y-2 md:space-y-3">
                   <p className="text-white text-lg md:text-2xl font-normal leading-tight">
-                    • Jesse "Bam" Rodriguez
-                  </p>
-                  <p className="text-white text-lg md:text-2xl font-normal leading-tight">
                     • Selina Barrios
                   </p>
                   <p className="text-white text-lg md:text-2xl font-normal leading-tight">
                     • Joshua "The Professor" Franco
+                  </p>
+                  <p className="text-white text-lg md:text-2xl font-normal leading-tight">
+                    • Jesse "Bam" Rodriguez
                   </p>
                 </div>
               </div>

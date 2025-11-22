@@ -10,7 +10,7 @@ export default function RsvpForm() {
     lastName: '',
     email: '',
     phone: '',
-    attending: 'Yes'
+    invitedBy: 'ICONTALKS',
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
@@ -76,7 +76,7 @@ export default function RsvpForm() {
         lastName: '', 
         email: '', 
         phone: '', 
-        attending: 'Yes'
+        invitedBy: 'ICONTALKS'
       })
       
       // Reset Turnstile
@@ -177,18 +177,24 @@ export default function RsvpForm() {
       </div>
 
       <div>
-        <label htmlFor="attending" className="block text-sm font-medium text-white/90 mb-2">
-          Will you be attending? *
+        <label htmlFor="invitedBy" className="block text-sm font-medium text-white/90 mb-2">
+          Invited by *
         </label>
         <select
-          id="attending"
+          id="invitedBy"
           required
-          value={formData.attending}
-          onChange={(e) => setFormData({ ...formData, attending: e.target.value })}
+          value={formData.invitedBy}
+          onChange={(e) => setFormData({ ...formData, invitedBy: e.target.value })}
           className="w-full px-4 py-3 bg-white/5 border border-white/10 text-white rounded-sm focus:outline-none focus:border-[#FFB800] transition-colors"
         >
-          <option value="Yes">Yes</option>
-          <option value="No">No</option>
+          <option value="ICONTALKS">ICONTALKS</option>
+          <option value="TXMX BOXING">TXMX BOXING</option>
+          <option value="434 MEDIA">434 MEDIA</option>
+          <option value="J. Leija">J. Leija</option>
+          <option value="S. Barrios">S. Barrios</option>
+          <option value="J. Rodriguez">J. Rodriguez</option>
+          <option value="J. Franco">J. Franco</option>
+          <option value="S. Watson">S. Watson</option>
         </select>
       </div>
 
@@ -208,6 +214,11 @@ export default function RsvpForm() {
       >
         {isSubmitting ? 'Submitting...' : 'Confirm RSVP'}
       </Button>
+      
+      <p className="text-xs text-white/50 text-center mt-4 uppercase tracking-widest">
+        ATTIRE: FASHIONABLY CHIC
+      </p>
+
       {process.env.NODE_ENV === 'development' && (
         <p className="text-xs text-white/50 text-center mt-2">
           Development mode - Turnstile verification bypassed
