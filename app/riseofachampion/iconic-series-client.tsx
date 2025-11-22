@@ -91,16 +91,16 @@ export default function IconicSeriesClient() {
               </div>
 
               {/* Mobile Event Info - positioned below hero with negative margin */}
-              <div className="-mt-32 px-4 relative z-10">
+              <div className="-mt-44 px-4 relative z-10">
                 {/* Event Title */}
-                <div className="space-y-2 mb-6">
-                  <h1 className="text-[2.75rem] font-bold text-white tracking-tight leading-[1.1] text-center">
-                    ONE NIGHT. <span className='block mt-1'>INVITATION ONLY.</span>
+                <div className="space-y-2 mb-6 px-6">
+                  <h1 className="text-5xl font-bold text-white/80 tracking-[0.1em] leading-[1.1]">
+                    ONE NIGHT <span className='block mt-1'>INVITATION ONLY.</span>
                   </h1>
                 </div>
 
                 {/* Event Description */}
-                <div className="mt-16 text-base text-white/90 leading-relaxed space-y-4 text-left">
+                <div className="mt-10 text-base text-white/90 leading-relaxed space-y-4 text-left">
                   <p className="leading-relaxed">
                     This invitation-only experience honors four of the biggest names in the sport — all from San Antonio — as they're celebrated in their hometown and captured live for the nationally distributed series <span className="text-[#FFB800] font-semibold italic">Rise of a Champion</span>, powered by TXMX Boxing and produced by ICON Media x 434 Media.
                   </p>
@@ -121,10 +121,10 @@ export default function IconicSeriesClient() {
             </div>
 
             {/* Desktop Event Info - positioned below hero */}
-            <div className="hidden md:block text-center -mt-16 space-y-6">
+            <div className="hidden md:block text-center -mt-32 space-y-6">
               {/* Event Title */}
               <div className="space-y-2">
-                <h1 className="text-5xl lg:text-6xl font-bold text-white tracking-tight leading-[1.1]">
+                <h1 className="text-6xl lg:text-8xl font-bold text-white/80 tracking-[0.1em] leading-[1.1]">
                   ONE NIGHT. INVITATION ONLY.
                 </h1>
               </div>
