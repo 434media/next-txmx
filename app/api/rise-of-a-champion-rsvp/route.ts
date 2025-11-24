@@ -1,13 +1,11 @@
 import { NextResponse } from "next/server"
 import Airtable from "airtable"
-import axios from "axios"
-import crypto from "crypto"
+
 
 const isDevelopment = process.env.NODE_ENV === "development"
 
 const airtableBaseId = process.env.AIRTABLE_ICONIC_SERIES_BASE_ID
 const airtableApiKey = process.env.AIRTABLE_API_KEY
-const turnstileSecretKey = process.env.TURNSTILE_SECRET_KEY
 
 let base: any = null
 
@@ -18,8 +16,7 @@ if (airtableBaseId && airtableApiKey) {
 export async function POST(request: Request) {
   try {
     const { firstName, lastName, email, phone, invitedBy } = await request.json()
-    const turnstileToken = request.headers.get("cf-turnstile-response")
-    const remoteIp = request.headers.get("CF-Connecting-IP")
+
 
     console.log('[Rise of a Champion RSVP] Received submission:', { firstName, lastName, email, invitedBy, isDevelopment })
 
@@ -28,40 +25,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Server configuration error. Please check Airtable settings." }, { status: 500 })
     }
 
-    if (!isDevelopment) {
-      if (!turnstileSecretKey) {
-        console.error("Turnstile secret key is not defined")
-        return NextResponse.json({ error: "Server configuration error" }, { status: 500 })
-      }
 
-      // Verify Turnstile token
-      if (turnstileToken) {
-        console.log('[Rise of a Champion RSVP] Verifying Turnstile token...')
-        const idempotencyKey = crypto.randomUUID()
-        const turnstileVerification = await axios.post(
-          "https://challenges.cloudflare.com/turnstile/v0/siteverify",
-          new URLSearchParams({
-            secret: turnstileSecretKey,
-            response: turnstileToken,
-            remoteip: remoteIp || "",
-            idempotency_key: idempotencyKey,
-          }),
-          {
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          },
-        )
-
-        if (!turnstileVerification.data.success) {
-          const errorCodes = turnstileVerification.data["error-codes"] || []
-          console.error("Turnstile verification failed:", errorCodes)
-          return NextResponse.json({ error: "Turnstile verification failed", errorCodes }, { status: 400 })
-        }
-      } else {
-        return NextResponse.json({ error: "Turnstile token is missing" }, { status: 400 })
-      }
-    } else {
-      console.log('[Rise of a Champion RSVP] Development mode - skipping Turnstile verification')
-    }
 
     // Create record in Airtable
     console.log('[Rise of a Champion RSVP] Creating Airtable record...')

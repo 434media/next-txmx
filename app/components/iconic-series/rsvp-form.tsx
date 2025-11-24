@@ -1,8 +1,7 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { Button } from '../ui/button'
-import Script from 'next/script'
 
 export default function RsvpForm() {
   const [formData, setFormData] = useState({
@@ -15,50 +14,18 @@ export default function RsvpForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
-  const turnstileWidgetId = useRef<string | null>(null)
 
-  const handleTurnstileLoad = () => {
-    if (typeof window !== 'undefined' && (window as any).turnstile) {
-      const container = document.getElementById('rsvp-turnstile-container')
-      if (container && !turnstileWidgetId.current) {
-        const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
-        if (!siteKey) {
-          console.warn('[RSVP Form] Turnstile site key not configured')
-          // In development, auto-set token to allow testing
-          if (process.env.NODE_ENV === 'development') {
-            setTurnstileToken('dev-mode-bypass')
-          }
-          return
-        }
-        turnstileWidgetId.current = (window as any).turnstile.render(container, {
-          sitekey: siteKey,
-          callback: (token: string) => {
-            setTurnstileToken(token)
-          },
-          theme: 'dark',
-        })
-      }
-    }
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
     setError(null)
 
-    // In development, bypass Turnstile requirement
-    const isDev = process.env.NODE_ENV === 'development'
-    const tokenToSend = isDev && !turnstileToken ? 'dev-mode-bypass' : turnstileToken
-
-    console.log('[RSVP Form] Submitting form...', { isDev, hasToken: !!tokenToSend })
-
     try {
       const response = await fetch('/api/rise-of-a-champion-rsvp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'cf-turnstile-response': tokenToSend || '',
         },
         body: JSON.stringify(formData),
       })
@@ -79,10 +46,7 @@ export default function RsvpForm() {
         invitedBy: 'ICONTALKS'
       })
       
-      // Reset Turnstile
-      if (turnstileWidgetId.current && (window as any).turnstile) {
-        (window as any).turnstile.reset(turnstileWidgetId.current)
-      }
+
     } catch (err) {
       console.error('Error submitting RSVP:', err)
       setError(err instanceof Error ? err.message : 'An error occurred')
@@ -111,11 +75,6 @@ export default function RsvpForm() {
 
   return (
     <>
-      <Script
-        src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-        onLoad={handleTurnstileLoad}
-        strategy="lazyOnload"
-      />
       
       <form onSubmit={handleSubmit} className="space-y-5">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -198,8 +157,7 @@ export default function RsvpForm() {
         </select>
       </div>
 
-      {/* Turnstile Widget */}
-      <div id="rsvp-turnstile-container" data-size="flexible" className="flex justify-center"></div>
+
 
       {error && (
         <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-sm">
@@ -219,11 +177,7 @@ export default function RsvpForm() {
         ATTIRE: FASHIONABLY CHIC
       </p>
 
-      {process.env.NODE_ENV === 'development' && (
-        <p className="text-xs text-white/50 text-center mt-2">
-          Development mode - Turnstile verification bypassed
-        </p>
-      )}
+
     </form>
     </>
   )
