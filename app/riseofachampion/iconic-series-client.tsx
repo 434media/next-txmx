@@ -381,36 +381,11 @@ export default function IconicSeriesClient() {
                     </div>
                   </div>
                 </div>
-
-                {/* Call to Action */}
-
-                <div className="w-full md:-mx-8 lg:-mx-0 mb-0">
-                  {/* Mobile Background */}
-                  <div 
-                    className="md:hidden relative w-screen -mx-4 min-h-[520px] flex flex-col items-start justify-between overflow-hidden mb-0"
-                    style={{
-                      backgroundImage: 'url(https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/mobile-footer2.png)',
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center center',
-                      backgroundRepeat: 'no-repeat'
-                    }}
-                  >
-                    <div className="absolute inset-0 bg-black/5"></div>
-                    
-                    {/* Top Content */}
-                    <div className="relative z-10 px-6 py-16 w-full text-left">
-                      <h3 className="text-[2rem] font-bold text-white mb-5 tracking-wide leading-tight">
-                        ACT FAST. SEATS ARE LIMITED.
-                      </h3>
-                      <p className="text-white text-lg mb-3 tracking-tight leading-relaxed font-bold">
-                        This is a once-in-a-lifetime access moment.
-                      </p>
-                      <p className="text-white/90 text-sm leading-relaxed">
-                        Choose your package. Lock it in. Be part of history.
-                      </p>
-                    </div>
-
-                    <div className="relative z-10 w-full px-6 pb-8">
+                {/* Partner Logos Section */}
+                <section className="py-12 px-4">
+                  <div className="max-w-7xl mx-auto">
+                    {/* Mobile Logos */}
+                    <div className="md:hidden">
                       <div className="grid grid-cols-4 gap-4 items-center">
                         <a href="https://www.434media.com" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
                           <Image
@@ -450,34 +425,9 @@ export default function IconicSeriesClient() {
                         </a>
                       </div>
                     </div>
-                  </div>
-
-                  {/* Desktop Background */}
-                  <div 
-                    className="hidden md:flex relative w-full min-h-[660px] flex-col items-center justify-between overflow-hidden"
-                    style={{
-                      backgroundImage: 'url(https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/Bottom.png)',
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center',
-                      backgroundRepeat: 'no-repeat'
-                    }}
-                  >
-                    <div className="absolute inset-0 bg-black/5"></div>
-                    
-                    {/* Top Content */}
-                    <div className="relative z-10 text-center px-4 py-12 max-w-3xl mx-auto">
-                      <h3 className="text-4xl font-bold text-white mb-4 tracking-wide">
-                        ACT FAST. SEATS ARE LIMITED.
-                      </h3>
-                      <p className="text-white text-2xl mb-2 leading-relaxed font-semibold">
-                        This is a once-in-a-lifetime access moment.
-                      </p>
-                      <p className="text-white/90 text-lg leading-relaxed">
-                        Choose your package. Lock it in. Be part of history.
-                      </p>
-                    </div>
-
-                    <div className="relative z-10 w-full px-8 pb-12">
+        
+                    {/* Desktop Logos */}
+                    <div className="hidden md:block">
                       <div className="max-w-4xl mx-auto grid grid-cols-4 gap-8 items-center">
                         <a href="https://www.434media.com" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
                           <Image
@@ -518,7 +468,7 @@ export default function IconicSeriesClient() {
                       </div>
                     </div>
                   </div>
-                </div>
+                </section>
               </>
             )}
           </div>

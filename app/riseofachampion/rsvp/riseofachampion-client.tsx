@@ -224,37 +224,6 @@ export default function RiseOfAChampionClient() {
             </div>
           </div>
         </section>
-
-        {/* Call to Action Footer */}
-        <section className="py-0 px-0 mt-0">
-          <div className="w-full">
-            {/* Mobile Background */}
-            <div 
-              className="md:hidden relative w-screen min-h-[520px] flex flex-col items-start justify-between overflow-hidden mb-0"
-              style={{
-                backgroundImage: 'url(https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/mobile-footer2.png)',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center center',
-                backgroundRepeat: 'no-repeat'
-              }}
-            >
-              <div className="absolute inset-0 bg-black/5"></div>
-            </div>
-
-            {/* Desktop Background */}
-            <div 
-              className="hidden md:flex relative w-full min-h-[720px] flex-col items-center justify-center overflow-hidden"
-              style={{
-                backgroundImage: 'url(https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/Bottom.png)',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat'
-              }}
-            >
-              <div className="absolute inset-0 bg-black/5"></div>
-            </div>
-          </div>
-        </section>
       </div>
     </div>
   )
