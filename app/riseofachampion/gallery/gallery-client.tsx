@@ -105,7 +105,7 @@ export default function GalleryClient() {
             </Link>
 
             {/* Logo */}
-            <div className="text-center">
+            <div className="-mt-16 md:-mt-24 text-center">
               <Image
                 src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/ROAC.png"
                 alt="Rise of a Champion"
@@ -117,19 +117,15 @@ export default function GalleryClient() {
             </div>
 
             {/* Title */}
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-3 text-center -mt-2">
+            <h1 className="-mt-14 md:-mt-20 text-4xl md:text-5xl font-bold text-white mb-3 text-center">
               EVENT GALLERY
             </h1>
 
             {/* Description */}
             <p className="text-white/70 text-center mb-3">
-              Relive the unforgettable moments from our celebration of San Antonio's boxing legends.
+              Relive the moments from our celebration of San Antonio's boxing legends.
             </p>
             
-            <p className="text-[#FFB800] text-center mb-10 font-semibold">
-              {GALLERY_IMAGES.length} exclusive photos • Free access
-            </p>
-
             {/* Unlock Form */}
             <div className="bg-white/5 border border-white/10 rounded-lg p-6 md:p-8 mb-12">
               <div className="text-center mb-6">
