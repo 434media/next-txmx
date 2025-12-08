@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import IconicSeriesClient from './iconic-series-client'
-import { generateEventJsonLd, generateBreadcrumbJsonLd, generateOrganizationJsonLd } from '../lib/json-ld'
+import { generateEventJsonLd, generateBreadcrumbJsonLd, generateOrganizationJsonLd } from '../../lib/json-ld'
 
 export const metadata: Metadata = {
   title: 'Rise of a Champion - Iconic Series | TXMX Boxing',

@@ -194,7 +194,7 @@ export default function TXMXNewsletter({ showModal, onClose }: TXMXNewsletterPro
           <div className="flex flex-col lg:flex-row min-h-[600px]">
             {/* Left Side - Image */}
             <div className="lg:w-1/2 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/20 z-10" />
+              <div className="absolute inset-0 bg-linear-to-r from-transparent to-black/20 z-10" />
               <Image
                 src="https://ampd-asset.s3.us-east-2.amazonaws.com/bam3.jpg"
                 alt="TXMX Boxing Fighter"

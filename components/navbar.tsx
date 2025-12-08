@@ -23,7 +23,7 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
               alt="TXMX Logo"
               width={160}
               height={44}
-              className="!h-12 md:!h-16 w-auto"
+              className="h-12! md:h-16! w-auto"
               priority
               style={{ display: "block" }}
             />

@@ -1,7 +1,7 @@
 'use server'
 
-import { stripe } from '../lib/stripe'
-import { SPONSOR_PACKAGES } from '../lib/iconic-series-products'
+import { stripe } from '../../lib/stripe'
+import { SPONSOR_PACKAGES } from '../../lib/iconic-series-products'
 
 export async function startCheckoutSession(packageId: string) {
   const sponsorPackage = SPONSOR_PACKAGES.find(p => p.id === packageId)
