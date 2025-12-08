@@ -170,16 +170,25 @@ export default function GalleryClient() {
 
             {/* Success Message */}
             <div className="text-center mb-8">
-              <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/30 px-4 py-2 rounded-full mb-4">
+              <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/30 px-4 py-2 rounded-sm mb-4">
                 <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <span className="text-green-400 text-sm font-semibold">Gallery Unlocked</span>
               </div>
-              <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
-                Event Photos
-              </h1>
-              <p className="text-white/60">Click any photo to view full size</p>
+              
+              {/* Logo */}
+              <div className="-mt-10 flex justify-center">
+                <Image
+                  src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/ROAC.png"
+                  alt="Rise of a Champion"
+                  width={200}
+                  height={60}
+                  className="w-auto h-6"
+                />
+              </div>
+              
+              <p className="-mt-10 text-white/60">Click any photo to view full size</p>
             </div>
 
             {/* Category Filter */}
@@ -189,7 +198,7 @@ export default function GalleryClient() {
                   <button
                     key={cat.id}
                     onClick={() => setSelectedCategory(cat.id)}
-                    className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
+                    className={`px-4 py-2 rounded-sm text-sm font-semibold transition-all ${
                       selectedCategory === cat.id
                         ? "bg-[#FFB800] text-black"
                         : "bg-white/5 text-white/70 hover:bg-white/10 hover:text-white"
@@ -244,7 +253,7 @@ export default function GalleryClient() {
 
             {/* Footer */}
             <div className="text-center border-t border-white/10 pt-8">
-              <p className="text-white/50 text-sm mb-4">Presented by</p>
+              <p className="text-white/40 text-xs md:text-sm mb-6 uppercase tracking-[0.2em] font-light">Presented by</p>
               <div className="flex items-center justify-center gap-8 flex-wrap">
                 <Image
                   src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/flyers-63-434.png"

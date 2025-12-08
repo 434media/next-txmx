@@ -50,20 +50,30 @@ export default function ImageModal({ image, onClose, onPrevious, onNext }: Image
   }
 
   const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: "Rise of a Champion - Event Photo",
-          text: "Check out this photo from the Rise of a Champion event!",
-          url: window.location.href,
-        })
-      } catch (error) {
-        console.error("Share failed:", error)
-      }
-    } else {
-      // Fallback: copy link to clipboard
-      navigator.clipboard.writeText(window.location.href)
-      alert("Link copied to clipboard!")
+    const currentUrl = window.location.href
+    
+    try {
+      await navigator.clipboard.writeText(currentUrl)
+      
+      // Create notification
+      const notification = document.createElement('div')
+      notification.className = 'fixed top-4 right-4 z-[70] bg-black/90 backdrop-blur-md border border-[#FFB800] rounded-sm p-4 flex items-center gap-3 animate-slide-in'
+      notification.innerHTML = `
+        <svg class="w-5 h-5 text-[#FFB800]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+        <span class="text-white font-semibold">Link copied to clipboard!</span>
+      `
+      
+      document.body.appendChild(notification)
+      
+      setTimeout(() => {
+        notification.style.opacity = '0'
+        notification.style.transition = 'opacity 0.3s ease-out'
+        setTimeout(() => notification.remove(), 300)
+      }, 2000)
+    } catch (err) {
+      console.error('Failed to copy link:', err)
     }
   }
 
