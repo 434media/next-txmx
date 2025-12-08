@@ -251,28 +251,28 @@ export default function GalleryClient() {
                   alt="434 Media"
                   width={80}
                   height={40}
-                  className="h-8 w-auto opacity-60"
+                    className="h-12 w-auto object-contain brightness-0 invert opacity-90 hover:opacity-100 transition-opacity"
                 />
                 <Image
                   src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/flyers-63-icon.png"
                   alt="Icon to iCan"
                   width={80}
                   height={40}
-                  className="h-8 w-auto opacity-60"
+                  className="h-12 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity"
                 />
                 <Image
                   src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/flyers-63-WATSON.png"
                   alt="Team Watson"
                   width={80}
                   height={40}
-                  className="h-8 w-auto opacity-60"
+                  className="h-12 w-auto object-contain brightness-0 invert opacity-90 hover:opacity-100 transition-opacity"
                 />
                 <Image
                   src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/flyers-63-driven.png"
                   alt="Life Driven"
                   width={80}
                   height={40}
-                  className="h-8 w-auto opacity-60"
+                  className="h-12 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity"
                 />
               </div>
             </div>
