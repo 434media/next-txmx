@@ -193,22 +193,22 @@ export default function SlideOutModal({ isOpen, onClose }: SlideOutModalProps) {
       {/* Enhanced Overlay */}
       <div ref={overlayRef} className="absolute inset-0 backdrop-blur-md bg-black/80" onClick={onClose} />
 
-      {/* Modal Content - Bold Box Design */}
+      {/* Modal Content - Black Background Design */}
       <div
         ref={modalContentRef}
-        className="absolute right-0 top-0 h-full w-full max-w-md overflow-y-auto bg-white border-l-4 border-black"
+        className="absolute right-0 top-0 h-full w-full max-w-md overflow-y-auto bg-black border-l-4 border-white"
         style={{
-          boxShadow: "-20px 0 60px rgba(0,0,0,0.5)",
+          boxShadow: "-20px 0 60px rgba(255,255,255,0.1)",
         }}
       >
         {/* Main Content */}
         {modalState === "main" && (
-          <div ref={mainContentRef} className="flex flex-col h-full p-8 text-black">
+          <div ref={mainContentRef} className="flex flex-col h-full p-8 text-white">
             {/* Header - Close Button */}
             <div className="modal-element flex justify-end mb-8">
               <button
                 onClick={onClose}
-                className="p-3 bg-black text-white hover:bg-gray-800 transition-colors"
+                className="p-3 bg-white text-black hover:bg-gray-200 transition-colors"
                 aria-label="Close menu"
               >
                 <XIcon className="w-5 h-5" />
@@ -223,14 +223,14 @@ export default function SlideOutModal({ isOpen, onClose }: SlideOutModalProps) {
                   alt="TXMX Boxing Logo"
                   width={140}
                   height={70}
-                  className="filter invert"
+                  className="brightness-0 invert"
                   priority
                 />
               </div>
-              <p className="text-lg font-bold text-black">Made from blood, sweat, and tears</p>
+              <p className="text-lg font-bold text-white">Made from blood, sweat, and tears</p>
             </div>
 
-            {/* Bold Link Buttons - More Prominent */}
+            {/* Typography-Focused Link Buttons */}
             <div className="flex-1 flex flex-col justify-center space-y-6 max-w-xs mx-auto w-full">
               {/* Rise of a Champion Link */}
               <a
@@ -239,20 +239,10 @@ export default function SlideOutModal({ isOpen, onClose }: SlideOutModalProps) {
                 onMouseEnter={handleItemHover}
                 onMouseLeave={handleItemLeave}
               >
-                <div className="relative p-6 bg-white border-2 border-black hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center space-x-4">
-                    <div className="p-3 bg-[#FFB800] border-2 border-black">
-                      <svg className="w-6 h-6 text-black" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
-                      </svg>
-                    </div>
-                    <div className="flex-1">
-                      <div className="text-black font-bold text-base tracking-wide">RISE OF A CHAMPION</div>
-                      <div className="text-gray-600 text-sm font-medium">Exclusive Event Gallery</div>
-                    </div>
-                    <div className="w-5 h-5 text-gray-400 group-hover:text-black transition-colors flex items-center justify-center">
-                      <div className="w-2 h-2 bg-current"></div>
-                    </div>
+                <div className="relative p-6 bg-black border-2 border-white hover:bg-white hover:border-white transition-colors">
+                  <div className="text-center">
+                    <div className="text-white group-hover:text-black font-bold text-xl tracking-wider transition-colors mb-1">RISE OF A CHAMPION</div>
+                    <div className="text-gray-400 group-hover:text-gray-800 text-sm font-medium tracking-wide transition-colors">Relive the Moments</div>
                   </div>
                 </div>
               </a>
@@ -266,16 +256,10 @@ export default function SlideOutModal({ isOpen, onClose }: SlideOutModalProps) {
                 onMouseEnter={handleItemHover}
                 onMouseLeave={handleItemLeave}
               >
-                <div className="relative p-6 bg-white border-2 border-black hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center space-x-4">
-                    <div className="p-3 bg-black">
-                      <InstagramIcon className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="text-black font-bold text-base tracking-wide">FOLLOW US</div>
-                      <div className="text-gray-600 text-sm font-medium">@txmxboxing</div>
-                    </div>
-                    <ExternalLinkIcon className="w-5 h-5 text-gray-400 group-hover:text-black transition-colors" />
+                <div className="relative p-6 bg-black border-2 border-white hover:bg-white hover:border-white transition-colors">
+                  <div className="text-center">
+                    <div className="text-white group-hover:text-black font-bold text-xl tracking-wider transition-colors mb-1">FOLLOW US</div>
+                    <div className="text-gray-400 group-hover:text-gray-800 text-sm font-medium tracking-wide transition-colors">@txmxboxing</div>
                   </div>
                 </div>
               </a>
@@ -289,16 +273,10 @@ export default function SlideOutModal({ isOpen, onClose }: SlideOutModalProps) {
                 onMouseEnter={handleItemHover}
                 onMouseLeave={handleItemLeave}
               >
-                <div className="relative p-6 bg-white border-2 border-black hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center space-x-4">
-                    <div className="p-3 bg-black">
-                      <ShopifyIcon className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="text-black font-bold text-base tracking-wide">SHOP TXMX BOXING</div>
-                      <div className="text-gray-600 text-sm font-medium">Founders Tee Now Available</div>
-                    </div>
-                    <ExternalLinkIcon className="w-5 h-5 text-gray-400 group-hover:text-black transition-colors" />
+                <div className="relative p-6 bg-black border-2 border-white hover:bg-white hover:border-white transition-colors">
+                  <div className="text-center">
+                    <div className="text-white group-hover:text-black font-bold text-xl tracking-wider transition-colors mb-1">SHOP TXMX BOXING</div>
+                    <div className="text-gray-400 group-hover:text-gray-800 text-sm font-medium tracking-wide transition-colors">Founders Tee Now Available</div>
                   </div>
                 </div>
               </a>
@@ -310,38 +288,30 @@ export default function SlideOutModal({ isOpen, onClose }: SlideOutModalProps) {
                 onMouseEnter={handleItemHover}
                 onMouseLeave={handleItemLeave}
               >
-                <div className="relative p-6 bg-white border-2 border-black hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center space-x-4">
-                    <div className="p-3 bg-black">
-                      <MailIcon className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="text-black font-bold text-base tracking-wide">JOIN THE FIGHT</div>
-                      <div className="text-gray-600 text-sm font-medium">Exclusive Drops and Insider Access</div>
-                    </div>
-                    <div className="w-5 h-5 text-gray-400 group-hover:text-black transition-colors flex items-center justify-center">
-                      <div className="w-2 h-2 bg-current"></div>
-                    </div>
+                <div className="relative p-6 bg-black border-2 border-white hover:bg-white hover:border-white transition-colors">
+                  <div className="text-center">
+                    <div className="text-white group-hover:text-black font-bold text-xl tracking-wider transition-colors mb-1">JOIN THE 8 COUNT</div>
+                    <div className="text-gray-400 group-hover:text-gray-800 text-sm font-medium tracking-wide transition-colors">A FEED FOR FIGHT FANS</div>
                   </div>
                 </div>
               </button>
             </div>
 
             {/* Footer Message */}
-            <div className="modal-element text-center mt-8 pt-6 border-t-2 border-black">
-              <p className="text-sm text-gray-600 font-medium tracking-wide">TXMX • BOXING</p>
+            <div className="modal-element text-center mt-8 pt-6 border-t-2 border-white">
+              <p className="text-sm text-gray-400 font-medium tracking-wide">TXMX • BOXING</p>
             </div>
           </div>
         )}
 
         {/* Contact Content */}
         {modalState === "contact" && (
-          <div ref={contactContentRef} className="flex flex-col h-full p-8 text-black">
+          <div ref={contactContentRef} className="flex flex-col h-full p-8 text-white">
             {/* Header - Back Button */}
             <div className="flex justify-start mb-8">
               <button
                 onClick={handleBackClick}
-                className="p-3 bg-black text-white hover:bg-gray-800 transition-colors"
+                className="p-3 bg-white text-black hover:bg-gray-200 transition-colors"
                 aria-label="Go back"
               >
                 <ArrowLeftIcon className="w-5 h-5" />
