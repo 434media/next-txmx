@@ -24,17 +24,17 @@ export default function IconicSeriesClient() {
       {/* Content */}
       <div className="relative z-10">
         {/* Hero Section */}
-        <section className="min-h-screen flex flex-col items-center justify-center px-4 md:px-4 py-12 md:py-16 md:pt-20">
-          <div className="w-full md:max-w-7xl md:mx-auto">
-            {/* Desktop Layout */}
-            <div className="hidden md:flex md:flex-col md:items-center md:justify-center">
+        <section className="min-h-screen flex flex-col items-center justify-center px-4 mt-8 md:mt-0 py-12 md:py-16 md:pt-20">
+          <div className="w-full max-w-7xl mx-auto">
+            {/* Unified Responsive Layout */}
+            <div className="flex flex-col items-center justify-center">
               {/* Presenters Text Above Logo */}
-              <p className="text-white/70 text-xs md:text-sm tracking-[0.3em] mb-2 font-light uppercase">
+              <p className="text-white/70 text-xs md:text-sm tracking-[0.3em] mb-2 md:mb-2 font-light uppercase text-center">
                 ICONTALKS x TXMX Boxing Present
               </p>
               
-              {/* Hero Logo at Top - touching the champions image */}
-              <div className="w-full max-w-4xl mb-0 pb-0 -mt-24">
+              {/* Hero Logo - Responsive */}
+              <div className="w-full max-w-xl md:max-w-4xl mb-0 pb-0 -mt-8 md:-mt-24">
                 <Image
                   src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/ROAC.png"
                   alt="Rise of a Champion"
@@ -45,8 +45,8 @@ export default function IconicSeriesClient() {
                 />
               </div>
 
-              {/* Champions Image Below - touching the logo */}
-              <div className="w-full max-w-5xl -mt-88">
+              {/* Champions Image - Responsive */}
+              <div className="w-full max-w-2xl md:max-w-5xl -mt-36 md:-mt-88">
                 <Image
                   src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/awardsv6.png"
                   alt="San Antonio Champions"
@@ -57,65 +57,17 @@ export default function IconicSeriesClient() {
               </div>
             </div>
 
-            {/* Mobile Layout */}
-            <div className="md:hidden w-screen -mx-4 relative pt-4">
-              {/* Hero Image - Full Width */}
-              <div className="relative w-full">
-                <Image
-                  src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/rise-mobilev2.png"
-                  alt="Rise of a Champion"
-                  width={800}
-                  height={400}
-                  className="w-full block"
-                  priority
-                />
-                
-                {/* Presenters Text Overlay - Positioned at top of image */}
-                <div className="absolute top-1 left-0 right-0 text-center px-4">
-                  <p className="text-white/80 text-xs tracking-[0.3em] font-light uppercase drop-shadow-lg">
-                    ICONTALKS x TXMX Boxing Present
-                  </p>
-                </div>
-              </div>
-
-              {/* Mobile Event Info - positioned below hero with negative margin */}
-              <div className="-mt-44 px-4 relative z-10">
-                {/* Event Title */}
-                <div className="space-y-1 mb-6">
-                  <h1 className="text-4xl font-bold text-white/80 tracking-wider leading-tight">
-                    A HISTORIC <span className='block mt-0.5'>CELEBRATION</span>
-                  </h1>
-                </div>
-
-                {/* Event Description */}
-                <div className="mt-8 text-sm sm:text-base text-white/90 leading-relaxed space-y-3 text-left">
-                  <p className="leading-relaxed">
-                    This invitation-only experience honored four of the biggest names in the sport — all from San Antonio — as they were celebrated in their hometown and captured live for the nationally distributed series <span className="text-[#FFB800] font-semibold italic">Rise of a Champion</span>, powered by TXMX Boxing and produced by ICON Media x 434 Media.
-                  </p>
-                  <p className="leading-relaxed">
-                    The event brought together a curated room of athletes, entertainers, and industry leaders to celebrate greatness and build meaningful connections.
-                  </p>
-                  <a 
-                    href="/riseofachampion/gallery"
-                    className="block text-2xl sm:text-3xl font-bold text-center text-[#FFB800] hover:text-[#FFB800]/80 mt-6 tracking-wide transition-colors"
-                  >
-                    VIEW EVENT GALLERY →
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            {/* Desktop Event Info - positioned below hero */}
-            <div className="hidden md:block text-center -mt-32 space-y-8">
+            {/* Event Info - Unified Responsive Section */}
+            <div className="text-center -mt-20 md:-mt-32 space-y-6 md:space-y-8">
               {/* Event Title */}
-              <div className="space-y-3">
-                <h1 className="text-5xl lg:text-7xl xl:text-8xl font-bold text-white/90 tracking-wide leading-tight">
+              <div className="space-y-2 md:space-y-3">
+                <h1 className="text-4xl md:text-5xl lg:text-7xl xl:text-8xl font-bold text-white/90 tracking-wide leading-tight">
                   A HISTORIC CELEBRATION
                 </h1>
               </div>
 
               {/* Event Description */}
-              <div className="text-base lg:text-lg xl:text-xl text-white/90 max-w-4xl mx-auto leading-relaxed space-y-6 px-4">
+              <div className="text-sm md:text-base lg:text-lg xl:text-xl text-white/90 max-w-4xl mx-auto leading-relaxed space-y-4 md:space-y-6 px-2 md:px-4">
                 <p className="leading-relaxed">
                   This invitation-only experience honored four of the biggest names in the sport — all from San Antonio — as they were celebrated in their hometown and captured live for the nationally distributed series <span className="text-[#FFB800] font-semibold italic">Rise of a Champion</span>, powered by TXMX Boxing and produced by ICON Media x 434 Media.
                 </p>
@@ -124,7 +76,7 @@ export default function IconicSeriesClient() {
                 </p>
                 <a 
                   href="/riseofachampion/gallery"
-                  className="block text-4xl lg:text-5xl font-bold text-center text-[#FFB800] hover:text-[#FFB800]/80 mt-8 tracking-wide transition-colors"
+                  className="block text-2xl md:text-4xl lg:text-5xl font-bold text-center text-[#FFB800] hover:text-[#FFB800]/80 mt-6 md:mt-8 tracking-wide transition-colors"
                 >
                   VIEW EVENT GALLERY
                 </a>
