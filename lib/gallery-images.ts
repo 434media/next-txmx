@@ -1,6 +1,6 @@
 // Rise of a Champion Event Gallery Images
 // Using temporary placeholder images for testing - replace with actual S3 URLs
-export const GALLERY_IMAGES = [
+export const GALLERY_IMAGES: GalleryImage[] = [
   // Red Carpet (15 images)
   { id: "1", src: "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=800&h=800&fit=crop", alt: "Red Carpet Arrival", category: "red-carpet" },
   { id: "2", src: "https://images.unsplash.com/photo-1551958219-acbc608c6377?w=800&h=800&fit=crop", alt: "Celebrity Guest", category: "red-carpet" },
@@ -19,24 +19,24 @@ export const GALLERY_IMAGES = [
   { id: "15", src: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&h=800&fit=crop&hue=10", alt: "Red Carpet Final", category: "red-carpet" },
 
   // Champions (18 images)
-  { id: "16", src: "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=800&h=800&fit=crop&hue=30", alt: "Champion Portrait", category: "champions" },
-  { id: "17", src: "https://images.unsplash.com/photo-1551958219-acbc608c6377?w=800&h=800&fit=crop&hue=30", alt: "Boxing Legend", category: "champions" },
-  { id: "18", src: "https://images.unsplash.com/photo-1464047736614-af63643285bf?w=800&h=800&fit=crop&hue=30", alt: "Award Winner", category: "champions" },
-  { id: "19", src: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&h=800&fit=crop&hue=30", alt: "Champion Celebration", category: "champions" },
-  { id: "20", src: "https://images.unsplash.com/photo-1566737236500-c8ac43014a67?w=800&h=800&fit=crop&hue=30", alt: "Honoree Moment", category: "champions" },
-  { id: "21", src: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&h=800&fit=crop&hue=30", alt: "Champion Speech", category: "champions" },
-  { id: "22", src: "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=800&h=800&fit=crop&hue=30", alt: "Award Acceptance", category: "champions" },
-  { id: "23", src: "https://images.unsplash.com/photo-1519167758481-83f29da8c057?w=800&h=800&fit=crop&hue=30", alt: "Champion Trophy", category: "champions" },
-  { id: "24", src: "https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=800&h=800&fit=crop&hue=30", alt: "Boxing Star", category: "champions" },
-  { id: "25", src: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800&h=800&fit=crop&hue=30", alt: "Legendary Boxer", category: "champions" },
-  { id: "26", src: "https://images.unsplash.com/photo-1605152276897-4f618f831968?w=800&h=800&fit=crop&hue=30", alt: "Champion Recognition", category: "champions" },
-  { id: "27", src: "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=800&h=800&fit=crop&hue=60", alt: "Honoree Portrait", category: "champions" },
-  { id: "28", src: "https://images.unsplash.com/photo-1551958219-acbc608c6377?w=800&h=800&fit=crop&hue=60", alt: "Champion Group", category: "champions" },
-  { id: "29", src: "https://images.unsplash.com/photo-1464047736614-af63643285bf?w=800&h=800&fit=crop&hue=60", alt: "Award Ceremony", category: "champions" },
-  { id: "30", src: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&h=800&fit=crop&hue=60", alt: "Boxing Icon", category: "champions" },
-  { id: "31", src: "https://images.unsplash.com/photo-1566737236500-c8ac43014a67?w=800&h=800&fit=crop&hue=60", alt: "Champion Photo", category: "champions" },
-  { id: "32", src: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&h=800&fit=crop&hue=60", alt: "Award Winners", category: "champions" },
-  { id: "33", src: "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=800&h=800&fit=crop&hue=60", alt: "Champion Final", category: "champions" },
+  { id: "16", src: "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=800&h=800&fit=crop&hue=30", alt: "Champion Portrait", category: "honorees" },
+  { id: "17", src: "https://images.unsplash.com/photo-1551958219-acbc608c6377?w=800&h=800&fit=crop&hue=30", alt: "Boxing Legend", category: "honorees" },
+  { id: "18", src: "https://images.unsplash.com/photo-1464047736614-af63643285bf?w=800&h=800&fit=crop&hue=30", alt: "Award Winner", category: "honorees" },
+  { id: "19", src: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&h=800&fit=crop&hue=30", alt: "Champion Celebration", category: "honorees" },
+  { id: "20", src: "https://images.unsplash.com/photo-1566737236500-c8ac43014a67?w=800&h=800&fit=crop&hue=30", alt: "Honoree Moment", category: "honorees" },
+  { id: "21", src: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&h=800&fit=crop&hue=30", alt: "Champion Speech", category: "honorees" },
+  { id: "22", src: "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=800&h=800&fit=crop&hue=30", alt: "Award Acceptance", category: "honorees" },
+  { id: "23", src: "https://images.unsplash.com/photo-1519167758481-83f29da8c057?w=800&h=800&fit=crop&hue=30", alt: "Champion Trophy", category: "honorees" },
+  { id: "24", src: "https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=800&h=800&fit=crop&hue=30", alt: "Boxing Star", category: "honorees" },
+  { id: "25", src: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800&h=800&fit=crop&hue=30", alt: "Legendary Boxer", category: "honorees" },
+  { id: "26", src: "https://images.unsplash.com/photo-1605152276897-4f618f831968?w=800&h=800&fit=crop&hue=30", alt: "Champion Recognition", category: "honorees" },
+  { id: "27", src: "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=800&h=800&fit=crop&hue=60", alt: "Honoree Portrait", category: "honorees" },
+  { id: "28", src: "https://images.unsplash.com/photo-1551958219-acbc608c6377?w=800&h=800&fit=crop&hue=60", alt: "Champion Group", category: "honorees" },
+  { id: "29", src: "https://images.unsplash.com/photo-1464047736614-af63643285bf?w=800&h=800&fit=crop&hue=60", alt: "Award Ceremony", category: "honorees" },
+  { id: "30", src: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&h=800&fit=crop&hue=60", alt: "Boxing Icon", category: "honorees" },
+  { id: "31", src: "https://images.unsplash.com/photo-1566737236500-c8ac43014a67?w=800&h=800&fit=crop&hue=60", alt: "Champion Photo", category: "honorees" },
+  { id: "32", src: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&h=800&fit=crop&hue=60", alt: "Award Winners", category: "honorees" },
+  { id: "33", src: "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=800&h=800&fit=crop&hue=60", alt: "Champion Final", category: "honorees" },
 
   // Music (10 images)
   { id: "34", src: "https://images.unsplash.com/photo-1519167758481-83f29da8c057?w=800&h=800&fit=crop&hue=90", alt: "Live Performance", category: "music" },
@@ -60,5 +60,12 @@ export const GALLERY_IMAGES = [
   { id: "50", src: "https://images.unsplash.com/photo-1551958219-acbc608c6377?w=800&h=800&fit=crop&hue=180", alt: "Event Reception", category: "reception" },
 ]
 
-export type GalleryImage = (typeof GALLERY_IMAGES)[number]
-export type GalleryCategory = "all" | "red-carpet" | "champions" | "music" | "reception"
+// TypeScript types for gallery images
+export type GalleryCategory = "all" | "red-carpet" | "honorees" | "music" | "reception"
+
+export interface GalleryImage {
+  id: string
+  src: string
+  alt: string
+  category: Exclude<GalleryCategory, "all">
+}

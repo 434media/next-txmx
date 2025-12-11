@@ -12,13 +12,35 @@ export default function GalleryClient() {
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState<GalleryCategory>("all")
+  const [images, setImages] = useState<GalleryImage[]>(GALLERY_IMAGES)
+  const [fetchError, setFetchError] = useState<string | null>(null)
+  const [imageLoadingStates, setImageLoadingStates] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
     const unlocked = sessionStorage.getItem("galleryUnlocked")
     if (unlocked === "true") {
       setIsUnlocked(true)
     }
-    setIsLoading(false)
+    
+    // Fetch images from API (falls back to placeholder images on error)
+    fetch('/api/gallery')
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch images')
+        return res.json()
+      })
+      .then(data => {
+        if (data && Array.isArray(data) && data.length > 0) {
+          setImages(data)
+        }
+      })
+      .catch(err => {
+        console.error('Error fetching gallery images:', err)
+        setFetchError(err.message)
+        // Keep using placeholder images from GALLERY_IMAGES
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
   }, [])
 
   const handleUnlock = () => {
@@ -47,15 +69,15 @@ export default function GalleryClient() {
 
   // Filter images based on selected category
   const filteredImages = selectedCategory === "all" 
-    ? GALLERY_IMAGES 
-    : GALLERY_IMAGES.filter(img => img.category === selectedCategory)
+    ? images 
+    : images.filter(img => img.category === selectedCategory)
 
   const categories = [
-    { id: "all" as GalleryCategory, label: "All Photos", count: GALLERY_IMAGES.length },
-    { id: "red-carpet" as GalleryCategory, label: "Red Carpet", count: GALLERY_IMAGES.filter(img => img.category === "red-carpet").length },
-    { id: "champions" as GalleryCategory, label: "Champions", count: GALLERY_IMAGES.filter(img => img.category === "champions").length },
-    { id: "music" as GalleryCategory, label: "Music", count: GALLERY_IMAGES.filter(img => img.category === "music").length },
-    { id: "reception" as GalleryCategory, label: "Reception", count: GALLERY_IMAGES.filter(img => img.category === "reception").length },
+    { id: "all" as GalleryCategory, label: "All Photos", count: images.length },
+    { id: "red-carpet" as GalleryCategory, label: "Red Carpet", count: images.filter(img => img.category === "red-carpet").length },
+    { id: "honorees" as GalleryCategory, label: "Honorees", count: images.filter(img => img.category === "honorees").length },
+    { id: "music" as GalleryCategory, label: "Music", count: images.filter(img => img.category === "music").length },
+    { id: "reception" as GalleryCategory, label: "Reception", count: images.filter(img => img.category === "reception").length },
   ]
 
   if (isLoading) {
@@ -74,7 +96,7 @@ export default function GalleryClient() {
           {/* Background Grid - Fixed behind content */}
           <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
             <div className="absolute inset-0 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-0.5 opacity-30">
-              {GALLERY_IMAGES.slice(0, 20).map((image) => (
+              {images.slice(0, 20).map((image) => (
                 <div key={image.id} className="aspect-square relative">
                   <Image
                     src={image.src}
@@ -126,6 +148,10 @@ export default function GalleryClient() {
               Relive the moments from our celebration of San Antonio's boxing legends.
             </p>
             
+            <p className="text-[#FFB800] text-center mb-10 font-semibold">
+              {images.length} exclusive photos • Free access
+            </p>
+
             {/* Unlock Form */}
             <div className="bg-white/5 border border-white/10 rounded-lg p-6 md:p-8 mb-12">
               <div className="text-center mb-6">
@@ -215,18 +241,34 @@ export default function GalleryClient() {
 
             {/* Photo Grid */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-12">
-              {filteredImages.map((image) => (
+              {filteredImages.map((image, index) => (
                 <button
                   key={image.id}
                   onClick={() => handleImageClick(image)}
                   className="aspect-square bg-white/5 rounded-lg overflow-hidden group relative focus:outline-none focus:ring-2 focus:ring-[#FFB800]"
                 >
+                  {/* Loading skeleton */}
+                  {imageLoadingStates[image.id] !== false && (
+                    <div className="absolute inset-0 bg-linear-to-br from-black/40 via-[#FFB800]/10 to-black/40 animate-pulse">
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-8 h-8 border-2 border-[#FFB800] border-t-transparent rounded-full animate-spin" />
+                      </div>
+                    </div>
+                  )}
                   <Image
                     src={image.src}
                     alt={image.alt}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                     sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    priority={index < 8}
+                    loading={index < 8 ? 'eager' : 'lazy'}
+                    onLoadingComplete={() => {
+                      setImageLoadingStates(prev => ({ ...prev, [image.id]: false }))
+                    }}
+                    onError={() => {
+                      setImageLoadingStates(prev => ({ ...prev, [image.id]: false }))
+                    }}
                   />
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
                     <svg
