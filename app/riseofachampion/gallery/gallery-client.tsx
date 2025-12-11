@@ -12,7 +12,7 @@ export default function GalleryClient() {
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState<GalleryCategory>("all")
-  const [images, setImages] = useState<GalleryImage[]>(GALLERY_IMAGES)
+  const [images, setImages] = useState<GalleryImage[]>([])
   const [fetchError, setFetchError] = useState<string | null>(null)
   const [imageLoadingStates, setImageLoadingStates] = useState<Record<string, boolean>>({})
 
@@ -22,21 +22,25 @@ export default function GalleryClient() {
       setIsUnlocked(true)
     }
     
-    // Fetch images from API (falls back to placeholder images on error)
+    // Fetch images from Google Drive API
     fetch('/api/gallery')
       .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch images')
+        if (!res.ok) {
+          throw new Error(`Failed to fetch images (${res.status})`)
+        }
         return res.json()
       })
       .then(data => {
         if (data && Array.isArray(data) && data.length > 0) {
           setImages(data)
+          setFetchError(null)
+        } else {
+          setFetchError('No images found in Google Drive folder')
         }
       })
       .catch(err => {
         console.error('Error fetching gallery images:', err)
-        setFetchError(err.message)
-        // Keep using placeholder images from GALLERY_IMAGES
+        setFetchError(err.message || 'Unable to connect to Google Drive')
       })
       .finally(() => {
         setIsLoading(false)
@@ -148,9 +152,45 @@ export default function GalleryClient() {
               Relive the moments from our celebration of San Antonio's boxing legends.
             </p>
             
-            <p className="text-[#FFB800] text-center mb-10 font-semibold">
-              {images.length} exclusive photos • Free access
-            </p>
+            {/* Loading State */}
+            {isLoading && (
+              <div className="bg-[#FFB800]/10 border border-[#FFB800]/30 rounded-lg p-6 mb-10">
+                <div className="flex items-center justify-center gap-3">
+                  <div className="w-5 h-5 border-2 border-[#FFB800] border-t-transparent rounded-full animate-spin"></div>
+                  <p className="text-[#FFB800] font-semibold">Connecting to Google Drive...</p>
+                </div>
+              </div>
+            )}
+
+            {/* Error State */}
+            {fetchError && !isLoading && (
+              <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-6 mb-10">
+                <div className="flex items-start gap-3">
+                  <svg className="w-6 h-6 text-red-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div className="flex-1">
+                    <h3 className="text-red-400 font-semibold mb-1">Unable to Load Gallery</h3>
+                    <p className="text-red-300/80 text-sm mb-3">{fetchError}</p>
+                    <p className="text-red-300/60 text-xs">
+                      The gallery images are stored in Google Drive. Please ensure environment variables are configured in Vercel:
+                      <br />
+                      • GOOGLE_SERVICE_ACCOUNT_EMAIL
+                      <br />
+                      • GOOGLE_PRIVATE_KEY
+                      <br />
+                      • GOOGLE_DRIVE_FOLDER_ID
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {!isLoading && !fetchError && (
+              <p className="text-[#FFB800] text-center mb-10 font-semibold">
+                {images.length} exclusive photos • Free access
+              </p>
+            )}
 
             {/* Unlock Form */}
             <div className="bg-white/5 border border-white/10 rounded-lg p-6 md:p-8 mb-12">
@@ -232,15 +272,68 @@ export default function GalleryClient() {
               </div>
             </div>
 
+            {/* Loading State */}
+            {isLoading && (
+              <div className="bg-[#FFB800]/10 border border-[#FFB800]/30 rounded-lg p-8 mb-10">
+                <div className="flex flex-col items-center justify-center gap-4">
+                  <div className="w-12 h-12 border-3 border-[#FFB800] border-t-transparent rounded-full animate-spin"></div>
+                  <div className="text-center">
+                    <p className="text-[#FFB800] font-semibold text-lg mb-1">Connecting to Google Drive...</p>
+                    <p className="text-white/60 text-sm">Loading your exclusive event photos</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Error State */}
+            {fetchError && !isLoading && (
+              <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-8 mb-10">
+                <div className="flex flex-col items-start gap-4">
+                  <div className="flex items-start gap-3 w-full">
+                    <svg className="w-8 h-8 text-red-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div className="flex-1">
+                      <h3 className="text-red-400 font-bold text-lg mb-2">Unable to Load Gallery Images</h3>
+                      <p className="text-red-300/90 mb-3">{fetchError}</p>
+                      <div className="bg-red-500/10 border border-red-500/20 rounded p-4 mb-4">
+                        <p className="text-red-300/80 text-sm font-semibold mb-2">Configuration Required:</p>
+                        <p className="text-red-300/60 text-xs mb-3">
+                          The gallery images are stored in Google Drive. Please configure these environment variables in Vercel:
+                        </p>
+                        <ul className="text-red-300/70 text-xs space-y-1 font-mono">
+                          <li>• GOOGLE_SERVICE_ACCOUNT_EMAIL</li>
+                          <li>• GOOGLE_PRIVATE_KEY</li>
+                          <li>• GOOGLE_DRIVE_FOLDER_ID</li>
+                        </ul>
+                      </div>
+                      <button
+                        onClick={() => window.location.reload()}
+                        className="inline-flex items-center gap-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300 px-4 py-2 rounded text-sm font-semibold transition-colors"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        Retry Connection
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Photo Count */}
-            <div className="text-center mb-6">
-              <p className="text-white/50 text-sm">
-                Showing {filteredImages.length} {filteredImages.length === 1 ? 'photo' : 'photos'}
-              </p>
-            </div>
+            {!isLoading && !fetchError && (
+              <div className="text-center mb-6">
+                <p className="text-white/50 text-sm">
+                  Showing {filteredImages.length} {filteredImages.length === 1 ? 'photo' : 'photos'}
+                </p>
+              </div>
+            )}
 
             {/* Photo Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-12">
+            {!isLoading && !fetchError && images.length > 0 && (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-12">
               {filteredImages.map((image, index) => (
                 <button
                   key={image.id}
@@ -287,7 +380,8 @@ export default function GalleryClient() {
                   </div>
                 </button>
               ))}
-            </div>
+              </div>
+            )}
 
             {/* Footer */}
             <div className="text-center border-t border-white/10 pt-8">
