@@ -299,7 +299,7 @@ export default function SlideOutModal({ isOpen, onClose }: SlideOutModalProps) {
 
             {/* Footer Message */}
             <div className="modal-element text-center mt-8 pt-6 border-t-2 border-white">
-              <p className="text-sm text-gray-400 font-medium tracking-wide">TXMX • BOXING</p>
+              <p className="text-sm text-gray-400 font-medium tracking-wide">TXMX BOXING</p>
             </div>
           </div>
         )}

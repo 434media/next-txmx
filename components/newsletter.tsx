@@ -171,7 +171,7 @@ export function Newsletter({
     setError(null)
 
     if (!email.trim()) {
-      setError("Enter your email to join the fight")
+      setError("Enter your email to join the 8 Count")
       inputRef.current?.focus()
 
       // Error shake animation (reduced on mobile)
@@ -249,7 +249,7 @@ export function Newsletter({
       })
 
       if (!response.ok) {
-        let errorMessage = "Failed to join the fight"
+        let errorMessage = "Failed to join the 8 Count"
         try {
           const errorData = await response.json()
           errorMessage = errorData.error || errorMessage
@@ -359,31 +359,26 @@ export function Newsletter({
                 alt="TXMX Boxing Logo"
                 width={140}
                 height={70}
-                className="filter invert"
+                className="brightness-0 invert"
                 priority
               />
             </div>
-            <p className="text-lg font-bold text-black">Welcome to the fight!</p>
+            <p className="text-lg font-bold text-white">Welcome to the fight!</p>
           </div>
 
-          {/* Success Message - Matching Modal Button Style */}
-          <div className="relative p-6 bg-black text-white border-2 border-black">
-            <div className="flex items-center space-x-4">
-              <div className="p-3 bg-white">
-                <CheckIcon className="w-6 h-6 text-black" />
-              </div>
-              <div className="flex-1">
-                <div className="text-white font-bold text-base tracking-wide mb-2">SUCCESS!</div>
-                <div className="text-gray-300 text-sm font-medium">
-                  You're now part of the TXMX family. Get ready for exclusive drops and insider access.
-                </div>
+          {/* Success Message - Typography Focused */}
+          <div className="relative p-6 bg-black text-white border-2 border-white">
+            <div className="text-center">
+              <div className="text-white font-bold text-xl tracking-wider mb-3">SUCCESS!</div>
+              <div className="text-gray-300 text-sm font-medium leading-relaxed">
+                You're now part of the TXMX family. Get ready for exclusive drops and insider access.
               </div>
             </div>
           </div>
 
           {/* Success Footer - Matching Modal Style */}
-          <div className="text-center pt-6 border-t-2 border-black">
-            <p className="text-sm text-gray-600 font-medium tracking-wide">SOMOS BOXEO</p>
+          <div className="text-center pt-6 border-t-2 border-white">
+            <p className="text-sm text-gray-400 font-medium tracking-wide">SOMOS BOXEO</p>
           </div>
         </div>
       </div>
@@ -447,11 +442,11 @@ export function Newsletter({
                 alt="TXMX Boxing Logo"
                 width={140}
                 height={70}
-                className="filter invert"
+                className="brightness-0 invert"
                 priority
               />
             </div>
-            <p className="text-lg font-bold text-black">Join the fight</p>
+            <p className="text-lg font-bold text-white">Join the 8 Count</p>
           </div>
 
           {/* Form Section - Matching Modal Button Style */}
@@ -461,61 +456,47 @@ export function Newsletter({
             className="space-y-6"
             aria-label="TXMX Newsletter subscription form"
           >
-            {/* Email Input - Styled like Modal Button */}
-            <div className="relative p-6 bg-white border-2 border-black">
-              <div className="flex items-center space-x-4">
-                <div className="p-3 bg-black">
-                  <MailIcon className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex-1">
-                  <label htmlFor="slideout-email" className="block text-black font-bold text-base tracking-wide mb-2">
-                    EMAIL ADDRESS
-                  </label>
-                  <input
-                    id="slideout-email"
-                    ref={inputRef}
-                    name="email"
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    onFocus={handleInputFocus}
-                    onBlur={handleInputBlur}
-                    placeholder="Enter your email"
-                    className="w-full px-0 py-1 border-0 border-b-2 border-gray-300 bg-transparent text-black placeholder-gray-500 focus:outline-none focus:border-black transition-all duration-300 font-medium text-sm"
-                    aria-describedby={error ? "slideout-error" : undefined}
-                    disabled={isSubmitting}
-                    autoComplete="email"
-                  />
-                </div>
+            {/* Email Input - Typography Focused */}
+            <div className="relative p-6 bg-black border-2 border-white hover:bg-white hover:border-white transition-colors group">
+              <div className="text-center">
+                <label htmlFor="slideout-email" className="block text-white group-hover:text-black font-bold text-xl tracking-wider transition-colors mb-3">
+                  EMAIL ADDRESS
+                </label>
+                <input
+                  id="slideout-email"
+                  ref={inputRef}
+                  name="email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onFocus={handleInputFocus}
+                  onBlur={handleInputBlur}
+                  placeholder="your@email.com"
+                  className="w-full px-4 py-2 border-2 border-white/30 bg-transparent text-white group-hover:text-black group-hover:border-black/30 placeholder-gray-400 group-hover:placeholder-gray-600 focus:outline-none focus:border-white group-hover:focus:border-black transition-all duration-300 font-medium text-sm text-center"
+                  aria-describedby={error ? "slideout-error" : undefined}
+                  disabled={isSubmitting}
+                  autoComplete="email"
+                />
               </div>
             </div>
 
-            {/* Submit Button - Matching Modal Button Style */}
+            {/* Submit Button - Typography Focused */}
             <button
               ref={buttonRef}
               type="submit"
               disabled={isSubmitting}
               onMouseEnter={handleButtonHover}
               onMouseLeave={handleButtonLeave}
-              className="w-full relative p-6 bg-black text-white border-2 border-black hover:bg-gray-800 transition-colors disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              className="w-full relative p-6 bg-black text-white border-2 border-white hover:bg-white hover:border-white transition-colors disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black group"
               aria-label="Submit newsletter subscription"
             >
-              <div className="flex items-center space-x-4">
-                <div className="p-3 bg-white">
-                  {isSubmitting ? (
-                    <div className="w-6 h-6 border-2 border-black/30 border-t-black rounded-full animate-spin"></div>
-                  ) : (
-                    <ArrowRightIcon className="w-6 h-6 text-black" />
-                  )}
+              <div className="text-center">
+                <div className="text-white group-hover:text-black font-bold text-xl tracking-wider transition-colors mb-1">
+                  {isSubmitting ? "SUBMITTING..." : "SUBMIT"}
                 </div>
-                <div className="flex-1 text-left">
-                  <div className="text-white font-bold text-base tracking-wide">
-                    {isSubmitting ? "SUBMITTING..." : "SUBMIT"}
-                  </div>
-                  <div className="text-gray-300 text-sm font-medium">
-                    {isSubmitting ? "Processing your request" : "Join the TXMX family"}
-                  </div>
+                <div className="text-gray-400 group-hover:text-gray-800 text-sm font-medium tracking-wide transition-colors">
+                  {isSubmitting ? "Processing your request" : "Join the TXMX family"}
                 </div>
               </div>
             </button>
@@ -523,7 +504,7 @@ export function Newsletter({
             {!isDevelopment && (
               <div
                 ref={turnstileRef}
-                data-theme="light"
+                data-theme="dark"
                 data-size="flexible"
                 className="w-full flex justify-center"
                 aria-label="Security verification"
@@ -533,7 +514,7 @@ export function Newsletter({
             {error && (
               <div
                 id="slideout-error"
-                className="text-red-600 text-sm text-center font-bold tracking-wide p-4 bg-red-50 border-2 border-red-200"
+                className="text-red-400 text-sm text-center font-bold tracking-wide p-4 bg-red-900/20 border-2 border-red-400"
                 role="alert"
               >
                 {error}
@@ -542,8 +523,8 @@ export function Newsletter({
           </form>
 
           {/* Footer - Matching Modal Style */}
-          <div className="text-center pt-6 border-t-2 border-black">
-            <p className="text-sm text-gray-600 font-medium tracking-wide">TXMX • BOXING</p>
+          <div className="text-center pt-6 border-t-2 border-white">
+            <p className="text-sm text-gray-400 font-medium tracking-wide">TXMX • BOXING</p>
           </div>
         </div>
       </div>
@@ -571,7 +552,7 @@ export function Newsletter({
         {/* Enhanced Value Proposition */}
         <div className={`text-center ${mobile ? "mb-3" : "mb-4"}`}>
           <h3 className={`${mobile ? "text-xs" : "text-sm"} font-bold text-black mb-2 tracking-wide`}>
-            JOIN THE FIGHT
+            JOIN THE 8 COUNT
           </h3>
           <p className={`${mobile ? "text-xs" : "text-xs"} text-gray-700 leading-relaxed font-medium`}>
             Get exclusive drops, insider access, and be first in the ring for limited releases.
@@ -599,7 +580,7 @@ export function Newsletter({
               onChange={(e) => setEmail(e.target.value)}
               onFocus={handleInputFocus}
               onBlur={handleInputBlur}
-              placeholder="Enter your email to join the fight"
+              placeholder="Enter your email to join the 8 Count"
               className={`w-full ${mobile ? "px-2 py-2" : "px-3 py-2"} border-2 border-black bg-white text-black placeholder-gray-500 focus:outline-none focus:border-gray-600 transition-all duration-300 font-medium ${mobile ? "text-sm" : "text-sm"}`}
               style={{ fontSize: mobile ? "16px" : "14px" }} // Prevent iOS zoom
               aria-describedby={error ? "newsletter-error" : undefined}
@@ -658,7 +639,7 @@ export function Newsletter({
 
         {/* Enhanced Footer */}
         <div className={`text-center ${mobile ? "mt-3 pt-2" : "mt-4 pt-3"} border-t-2 border-black`}>
-          <p className={`${mobile ? "text-xs" : "text-xs"} text-gray-600 font-bold tracking-widest`}>TXMX • BOXING</p>
+          <p className={`${mobile ? "text-xs" : "text-xs"} text-gray-600 font-bold tracking-widest`}>TXMX BOXING</p>
         </div>
       </div>
     </div>
