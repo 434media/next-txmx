@@ -95,9 +95,12 @@ export default function IconicSeriesClient() {
                   <p className="leading-relaxed">
                     The event brought together a curated room of athletes, entertainers, and industry leaders to celebrate greatness and build meaningful connections.
                   </p>
-                  <p className="text-2xl sm:text-3xl font-bold text-center text-[#FFB800] mt-6 tracking-wide">
-                    VIEW EVENT GALLERY
-                  </p>
+                  <a 
+                    href="/riseofachampion/gallery"
+                    className="block text-2xl sm:text-3xl font-bold text-center text-[#FFB800] hover:text-[#FFB800]/80 mt-6 tracking-wide transition-colors"
+                  >
+                    VIEW EVENT GALLERY →
+                  </a>
                 </div>
               </div>
             </div>
@@ -119,9 +122,12 @@ export default function IconicSeriesClient() {
                 <p className="leading-relaxed">
                   The event brought together a curated room of athletes, entertainers, and industry leaders to celebrate greatness and build meaningful connections.
                 </p>
-                <p className="text-4xl lg:text-5xl font-bold text-center text-[#FFB800] mt-8 tracking-wide">
+                <a 
+                  href="/riseofachampion/gallery"
+                  className="block text-4xl lg:text-5xl font-bold text-center text-[#FFB800] hover:text-[#FFB800]/80 mt-8 tracking-wide transition-colors"
+                >
                   VIEW EVENT GALLERY
-                </p>
+                </a>
               </div>
             </div>
           </div>
@@ -196,11 +202,6 @@ export default function IconicSeriesClient() {
         {/* Gallery CTA Section */}
         <section className="py-2 px-4">
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-3xl md:text-5xl font-bold md:text-center text-[#FFB800] mb-3 tracking-wide">
-              VIEW EVENT GALLERY
-            </h2>
-            
-
             <div className="max-w-4xl mx-auto">
               <div className="relative overflow-hidden bg-white/5 backdrop-blur-sm border border-white/10 p-8 md:p-12 rounded-sm text-center">
                 {/* Background Grid */}
