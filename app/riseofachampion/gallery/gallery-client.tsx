@@ -17,9 +17,24 @@ export default function GalleryClient() {
   const [imageLoadingStates, setImageLoadingStates] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
-    const unlocked = sessionStorage.getItem("galleryUnlocked")
-    if (unlocked === "true") {
-      setIsUnlocked(true)
+    // Check localStorage with 90-day expiration
+    const unlockData = localStorage.getItem("galleryUnlocked")
+    if (unlockData) {
+      try {
+        const { unlocked, timestamp } = JSON.parse(unlockData)
+        const now = Date.now()
+        const ninetyDaysInMs = 90 * 24 * 60 * 60 * 1000 // 90 days in milliseconds
+        
+        if (unlocked && timestamp && (now - timestamp < ninetyDaysInMs)) {
+          setIsUnlocked(true)
+        } else {
+          // Expired or invalid - clear localStorage
+          localStorage.removeItem("galleryUnlocked")
+        }
+      } catch (err) {
+        // Invalid JSON - clear localStorage
+        localStorage.removeItem("galleryUnlocked")
+      }
     }
     
     // Fetch images from Google Drive API

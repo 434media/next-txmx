@@ -38,8 +38,12 @@ export default function GalleryUnlockForm({ onUnlock }: GalleryUnlockFormProps) 
         throw new Error(data.error || "Something went wrong")
       }
 
-      // Store in sessionStorage to persist unlock state
-      sessionStorage.setItem("galleryUnlocked", "true")
+      // Store in localStorage with timestamp for 90-day expiration
+      const unlockData = {
+        unlocked: true,
+        timestamp: Date.now()
+      }
+      localStorage.setItem("galleryUnlocked", JSON.stringify(unlockData))
       onUnlock()
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred")
