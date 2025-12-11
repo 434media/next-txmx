@@ -30,9 +30,12 @@ export async function POST(request: Request) {
 
     console.log("[Gallery Access] Checking for existing RSVP record...")
 
+    // Properly escape email for Airtable formula: escape backslashes first, then single quotes
+    const escapedEmail = email.replace(/\\/g, "\\\\").replace(/'/g, "\\'")
+
     const existingRecords = await base("RSVP")
       .select({
-        filterByFormula: `{Email} = '${email.replace(/'/g, "\\'")}'`,
+        filterByFormula: `{Email} = '${escapedEmail}'`,
         maxRecords: 1,
       })
       .firstPage()
