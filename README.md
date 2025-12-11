@@ -1,19 +1,5 @@
 # TXMX Boxing
 
-This repository contains the source code for the official TXMX Boxing landing page. It's a dynamic and visually-rich web experience built with Next.js, designed to engage a passionate fight fan audience.
-
-## About The Application
-
-This project is a modern, responsive landing page for the TXMX Boxing brand. It serves as the primary online presence, showcasing the brand's identity and providing a hub for community engagement.
-
-### Key Features
-
-*   **Modern Tech Stack**: Built with [Next.js](https://nextjs.org/) 15 (App Router), [React](https://react.dev/) 19, and [TypeScript](https://www.typescriptlang.org/).
-*   **Rich Animations**: Extensive use of [GSAP (GreenSock Animation Platform)](https://gsap.com/) for fluid, high-performance animations and transitions.
-*   **Responsive Design**: Styled with [Tailwind CSS](https://tailwindcss.com/) for a fully responsive layout that works seamlessly across all devices.
-*   **Newsletter Subscription**: A newsletter signup form integrated with [Airtable](https://www.airtable.com/) and secured by [Cloudflare Turnstile](https://www.cloudflare.com/products/turnstile/).
-*   **Slide-Out Modal**: An animated slide-out menu providing navigation to social media channels and the official store.
-
 ### Project Structure
 
 The application is organized into several key directories:
