@@ -31,9 +31,15 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
 
           {/* Desktop Navigation Links - Hidden on mobile */}
           <div className="hidden md:flex items-center space-x-8">
+            <a
+              href="/riseofachampion"
+              className="text-white text-sm font-bold tracking-widest hover:text-white/80 hover:underline decoration-2 underline-offset-4 transition-all duration-300"
+            >
+              RISE OF A CHAMPION
+            </a>
             {/* <a
               href="/the8count"
-              className="text-white text-sm font-bold tracking-widest hover:text-white/80 hover:underline hover:-translate-y-0.5 decoration-2 underline-offset-4 transition-all duration-300"
+              className="text-white text-sm font-bold tracking-widest hover:text-white/80 hover:underline decoration-2 underline-offset-4 transition-all duration-300"
             >
               THE 8 COUNT
             </a> */}
@@ -41,7 +47,7 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
               href="https://434media.com/shop"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-white text-sm font-bold tracking-widest hover:text-white/80 hover:underline hover:-translate-y-0.5 decoration-2 underline-offset-4 transition-all duration-300"
+              className="text-white text-sm font-bold tracking-widest hover:text-white/80 hover:underline decoration-2 underline-offset-4 transition-all duration-300"
             >
               SHOP FOUNDERS TEE
             </a>
@@ -49,7 +55,7 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
               href="https://www.instagram.com/txmxboxing/"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-white text-sm font-bold tracking-widest hover:text-white/80 hover:underline hover:-translate-y-0.5 decoration-2 underline-offset-4 transition-all duration-300"
+              className="text-white text-sm font-bold tracking-widest hover:text-white/80 hover:underline decoration-2 underline-offset-4 transition-all duration-300"
             >
               @TXMXBOXING
             </a>

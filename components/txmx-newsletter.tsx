@@ -205,10 +205,7 @@ export default function TXMXNewsletter({ showModal, onClose }: TXMXNewsletterPro
             </div>
 
             {/* Right Side - Newsletter Form */}
-            <div className="lg:w-1/2 p-8 lg:p-12 flex flex-col justify-center relative overflow-hidden group">
-              {/* Background Animation */}
-              <div className="absolute inset-0 bg-white transform -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-out" />
-
+            <div className="lg:w-1/2 p-8 lg:p-12 flex flex-col justify-center relative overflow-hidden">
               <div className="relative z-10">
                 {/* Header with Logo */}
                 <div className="text-center mb-8">
@@ -226,7 +223,7 @@ export default function TXMXNewsletter({ showModal, onClose }: TXMXNewsletterPro
                           alt="TXMX Boxing Logo"
                           width={160}
                           height={80}
-                          className="filter brightness-0 invert group-hover:brightness-100 group-hover:invert transition-all duration-500"
+                          className="filter brightness-0 invert"
                           priority
                           onError={(e) => {
                             // Fallback if image fails to load
@@ -237,7 +234,7 @@ export default function TXMXNewsletter({ showModal, onClose }: TXMXNewsletterPro
                           }}
                         />
                         {/* Text fallback */}
-                        <div className="hidden text-4xl lg:text-5xl font-black text-white group-hover:text-black tracking-wider uppercase transition-colors duration-500">
+                        <div className="hidden text-4xl lg:text-5xl font-black text-white tracking-wider uppercase">
                           TXMX BOXING
                         </div>
                       </div>
@@ -250,7 +247,7 @@ export default function TXMXNewsletter({ showModal, onClose }: TXMXNewsletterPro
                     transition={{ delay: 0.2 }}
                     className="mb-6"
                   >
-                    <h2 className="text-2xl lg:text-3xl font-black text-white group-hover:text-black tracking-wider uppercase transition-colors duration-500">
+                    <h2 className="text-2xl lg:text-3xl font-black text-white tracking-wider uppercase">
                       Made from Blood, Sweat, and Tears
                     </h2>
                   </motion.div>
@@ -261,8 +258,8 @@ export default function TXMXNewsletter({ showModal, onClose }: TXMXNewsletterPro
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.3 }}
                   >
-                    <p className="text-lg text-white group-hover:text-black leading-relaxed font-bold tracking-wide transition-colors duration-500">
-                      Get exclusive drops, insider access, and be first in the ring for limited releases.
+                    <p className="text-lg text-white leading-relaxed font-bold tracking-wide">
+                      Get exclusive drops, and access to <strong>The 8 Count: A Feed for Fight Fans</strong>
                     </p>
                   </motion.div>
                 </div>
@@ -293,19 +290,18 @@ export default function TXMXNewsletter({ showModal, onClose }: TXMXNewsletterPro
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           placeholder="ENTER YOUR EMAIL"
-                          className="w-full px-6 py-4 border-2 border-white bg-transparent text-white placeholder-white/70 focus:outline-none focus:border-white transition-all duration-500 text-lg font-bold tracking-wider uppercase group-hover:border-black group-hover:text-black group-hover:placeholder-black/70"
+                          className="w-full px-6 py-4 border-2 border-white bg-transparent text-white placeholder-white/70 focus:outline-none focus:border-white transition-all duration-500 text-lg font-bold tracking-wider uppercase"
                           aria-describedby={error ? "newsletter-error" : undefined}
                           disabled={isSubmitting}
                           autoComplete="email"
                         />
                       </div>
 
-                      <div className="relative overflow-hidden group/button">
-                        <div className="absolute inset-0 bg-white transform -translate-x-full group-hover/button:translate-x-0 transition-transform duration-500 ease-out" />
+                      <div className="relative overflow-hidden">
                         <button
                           type="submit"
                           disabled={isSubmitting}
-                          className="relative w-full bg-transparent border-2 border-white text-white py-4 px-8 font-black text-xl tracking-wider uppercase transition-colors duration-500 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black active:scale-[0.98] transform group-hover:border-black group-hover:text-black group-hover/button:border-black group-hover/button:text-black"
+                          className="relative w-full bg-transparent border-2 border-white text-white py-4 px-8 font-black text-xl tracking-wider uppercase transition-colors duration-500 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black active:scale-[0.98] transform hover:bg-white hover:text-black"
                           aria-label="Join TXMX newsletter"
                         >
                           <motion.div
@@ -313,7 +309,7 @@ export default function TXMXNewsletter({ showModal, onClose }: TXMXNewsletterPro
                             transition={isSubmitting ? { duration: 1.5, repeat: Number.POSITIVE_INFINITY } : {}}
                             className="flex items-center justify-center"
                           >
-                            {isSubmitting ? "JOINING THE FIGHT..." : "JOIN THE FIGHT"}
+                            {isSubmitting ? "JOINING THE 8 COUNT..." : "JOIN THE 8 COUNT"}
                           </motion.div>
                         </button>
                       </div>
@@ -351,19 +347,19 @@ export default function TXMXNewsletter({ showModal, onClose }: TXMXNewsletterPro
                       aria-live="polite"
                     >
                       <div className="mb-4">
-                        <div className="w-16 h-16 bg-transparent border-2 border-white flex items-center justify-center mx-auto mb-4 group-hover:bg-white group-hover:border-black transition-all duration-500">
+                        <div className="w-16 h-16 bg-transparent border-2 border-white flex items-center justify-center mx-auto mb-4">
                           <motion.div
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
                             transition={{ delay: 0.2, type: "spring", damping: 20, stiffness: 300 }}
                           >
-                            <CheckIcon className="h-8 w-8 text-white group-hover:text-black transition-colors duration-500" />
+                            <CheckIcon className="h-8 w-8 text-white" />
                           </motion.div>
                         </div>
-                        <h3 className="text-xl lg:text-2xl font-black text-white group-hover:text-black mb-3 tracking-wider uppercase transition-colors duration-500">
+                        <h3 className="text-xl lg:text-2xl font-black text-white mb-3 tracking-wider uppercase">
                           SOMOS BOXEO
                         </h3>
-                        <p className="text-white group-hover:text-black text-base leading-relaxed font-bold tracking-wide transition-colors duration-500">
+                        <p className="text-white text-base leading-relaxed font-bold tracking-wide">
                           Exclusive drops and insider access.
                         </p>
                       </div>

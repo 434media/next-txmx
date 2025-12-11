@@ -232,6 +232,31 @@ export default function SlideOutModal({ isOpen, onClose }: SlideOutModalProps) {
 
             {/* Bold Link Buttons - More Prominent */}
             <div className="flex-1 flex flex-col justify-center space-y-6 max-w-xs mx-auto w-full">
+              {/* Rise of a Champion Link */}
+              <a
+                href="/riseofachampion"
+                className="modal-element group relative block"
+                onMouseEnter={handleItemHover}
+                onMouseLeave={handleItemLeave}
+              >
+                <div className="relative p-6 bg-white border-2 border-black hover:bg-gray-50 transition-colors">
+                  <div className="flex items-center space-x-4">
+                    <div className="p-3 bg-[#FFB800] border-2 border-black">
+                      <svg className="w-6 h-6 text-black" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-black font-bold text-base tracking-wide">RISE OF A CHAMPION</div>
+                      <div className="text-gray-600 text-sm font-medium">Exclusive Event Gallery</div>
+                    </div>
+                    <div className="w-5 h-5 text-gray-400 group-hover:text-black transition-colors flex items-center justify-center">
+                      <div className="w-2 h-2 bg-current"></div>
+                    </div>
+                  </div>
+                </div>
+              </a>
+
               {/* Instagram Link */}
               <a
                 href="https://www.instagram.com/txmxboxing/"
