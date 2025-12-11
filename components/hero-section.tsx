@@ -57,21 +57,31 @@ export default function HeroSection() {
         })
       }
 
-      // Simple scroll fade for logo
+      // Simple scroll fade for logo - optimized with throttling
+      let scrollTimeout: NodeJS.Timeout
       const handleScroll = () => {
-        const scrollY = window.scrollY
-        const scrollPercent = Math.min(scrollY / (window.innerHeight * 0.8), 1)
+        // Throttle scroll events for better performance
+        if (scrollTimeout) return
+        
+        scrollTimeout = setTimeout(() => {
+          const scrollY = window.scrollY
+          const scrollPercent = Math.min(scrollY / (window.innerHeight * 0.8), 1)
 
-        // Fade logo on scroll
-        gsap.to(logoRef.current, {
-          opacity: 1 - scrollPercent,
-          y: scrollPercent * -50,
-          duration: 0.1,
-          ease: "none",
-        })
+          // Fade logo on scroll with GPU acceleration
+          gsap.to(logoRef.current, {
+            opacity: 1 - scrollPercent,
+            y: scrollPercent * -50,
+            duration: 0,
+            ease: "none",
+            force3D: true,
+            overwrite: "auto",
+          })
+          
+          scrollTimeout = null as any
+        }, 16) // ~60fps
       }
 
-      // Add event listeners
+      // Add event listeners with passive flag for better scroll performance
       window.addEventListener("scroll", handleScroll, { passive: true })
 
       if (logoRef.current) {
@@ -168,7 +178,7 @@ export default function HeroSection() {
             alt="TXMX Boxing"
             width={600}
             height={300}
-            className="relative w-[280px] h-[140px] sm:w-[360px] sm:h-[180px] md:w-[480px] md:h-[240px] lg:w-[600px] lg:h-[300px] object-contain"
+            className="relative w-[280px] h-[140px] sm:w-[360px] sm:h-[180px] md:w-[480px] md:h-60 lg:w-[600px] lg:h-[300px] object-contain"
             style={{
               filter: `
                 brightness(1.1) 

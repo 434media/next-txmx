@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import RiseOfAChampionClient from './riseofachampion-client'
-import { generateEventJsonLd, generateBreadcrumbJsonLd, generateOrganizationJsonLd } from '../../lib/json-ld'
+import { generateEventJsonLd, generateBreadcrumbJsonLd, generateOrganizationJsonLd } from '../../../lib/json-ld'
 
 export const metadata: Metadata = {
   title: 'RSVP - Rise of a Champion | TXMX Boxing x Icon Talks',

@@ -3,11 +3,11 @@
 import type React from "react"
 import { Geist, Geist_Mono } from "next/font/google"
 import { useState } from "react"
-import Navbar from "./components/navbar"
-import SlideOutModal from "./components/slide-out-modal"
-import GlobalStyles from "./components/global-styles"
+import Navbar from "../components/navbar"
+import SlideOutModal from "../components/slide-out-modal"
+import GlobalStyles from "../components/global-styles"
 import "./globals.css"
-import Footer from "./components/footer"
+import Footer from "../components/footer"
 import { Analytics } from "@vercel/analytics/next"
 import Script from "next/script"
 
@@ -34,7 +34,7 @@ export default function ClientLayout({
   const closeModal = () => setIsModalOpen(false)
 
   return (
-    <html lang="en" className="scroll-smooth" translate="no">
+    <html lang="en" className="scroll-smooth">
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -101,7 +101,7 @@ export default function ClientLayout({
         {/* Verification */}
         <meta name="google-site-verification" content="your-google-verification-code" />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black text-white overflow-x-hidden`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black text-white`} style={{ overflowY: 'auto', height: 'auto', minHeight: '100vh' }}>
         <Analytics />
 
         <GlobalStyles />

@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import RsvpForm from '../../components/iconic-series/rsvp-form'
+import { GALLERY_IMAGES } from '../../../lib/gallery-images'
 
 export default function RiseOfAChampionClient() {
   return (
@@ -82,10 +82,10 @@ export default function RiseOfAChampionClient() {
                 {/* Event Description */}
                 <div className="mt-10 text-base text-white/90 leading-relaxed space-y-4 text-left">
                   <p className="leading-relaxed">
-                    This invitation-only experience honors four of the biggest names in the sport — all from San Antonio — as they're celebrated in their hometown and captured live for the nationally distributed series <span className="text-[#FFB800] font-semibold italic">Rise of a Champion</span>, powered by TXMX Boxing and produced by ICON Media x 434 Media.
+                    This invitation-only experience honored four of the biggest names in the sport — all from San Antonio — as they were celebrated in their hometown and captured live for the nationally distributed series <span className="text-[#FFB800] font-semibold italic">Rise of a Champion</span>, powered by TXMX Boxing and produced by ICON Media x 434 Media.
                   </p>
                   <p className="font-bold text-[#FFB800] text-lg tracking-wide">
-                    RSVP below to confirm your attendance.
+                    View photos from this unforgettable evening.
                   </p>
                 </div>
               </div>
@@ -95,43 +95,64 @@ export default function RiseOfAChampionClient() {
             <div className="hidden md:block text-center -mt-40 space-y-6">
               {/* Event Title */}
               <div className="space-y-4">
-                <h1 className="text-6xl lg:text-8xl font-bold text-white/80 tracking-[0.1em] leading-[1.1]">
-                  VIP INVITE
+                <h1 className="text-6xl lg:text-8xl font-bold text-white/80 tracking-widest leading-[1.1]">
+                  A NIGHT TO REMEMBER
                 </h1>
                 <p className="text-white/90 text-xl tracking-[0.2em] uppercase font-light">
-                  DEC 3, Tobin Center, 7p - 10p
-                </p>
-                <p className="text-white/90 text-xl tracking-[0.2em] uppercase font-light">
-                  ATTIRE: FASHIONABLY CHIC
+                  DEC 3, 2024, Tobin Center
                 </p>
               </div>
 
               {/* Event Description */}
               <div className="text-lg md:text-xl text-white/90 max-w-4xl mx-auto leading-relaxed space-y-4">
                 <p className="leading-relaxed">
-                  This invitation-only experience honors four of the biggest names in the sport — all from San Antonio — as they're celebrated in their hometown and captured live for the nationally distributed series <span className="text-[#FFB800] font-semibold italic">Rise of a Champion</span>, powered by TXMX Boxing and produced by ICON Media x 434 Media.
+                  This invitation-only experience honored four of the biggest names in the sport — all from San Antonio — as they were celebrated in their hometown and captured live for the nationally distributed series <span className="text-[#FFB800] font-semibold italic">Rise of a Champion</span>, powered by TXMX Boxing and produced by ICON Media x 434 Media.
                 </p>
                 <p className="font-bold text-[#FFB800] text-xl tracking-wide">
-                  RSVP below to confirm your attendance.
+                  View photos from this unforgettable evening.
                 </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* RSVP Section */}
+        {/* Gallery CTA Section */}
         <section className="py-2 md:py-6 px-4 -mt-6 md:-mt-10">
           <div className="max-w-7xl md:max-w-4xl mx-auto">
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-6 md:p-10 rounded-sm">
-              <div className="md:text-center mb-8">
-                <h2 className="text-3xl md:text-4xl font-bold text-[#FFB800] mb-4 tracking-wide">
-                  🎟️ CONFIRM YOUR ATTENDANCE
-                </h2>
-                <p className="text-white/80 text-base md:text-lg leading-relaxed">
-                  Wednesday, December 3rd | Filmed Live | San Antonio, TX
-                </p>
+            <div className="relative overflow-hidden bg-white/5 backdrop-blur-sm border border-white/10 p-6 md:p-10 rounded-sm text-center">
+              {/* Background Grid */}
+              <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+                <div className="absolute inset-0 grid grid-cols-3 md:grid-cols-4 gap-0.5 opacity-20">
+                  {GALLERY_IMAGES.slice(0, 12).map((image) => (
+                    <div key={image.id} className="aspect-square relative">
+                      <Image
+                        src={image.src}
+                        alt=""
+                        fill
+                        className="object-cover blur-[3px]"
+                        sizes="(max-width: 768px) 33vw, 25vw"
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div className="absolute inset-0 bg-black/70" />
               </div>
-              <RsvpForm />
+              
+              {/* Content */}
+              <div className="relative z-10">
+                <h2 className="text-3xl md:text-4xl font-bold text-[#FFB800] mb-4 tracking-wide">
+                  Event Gallery
+                </h2>
+                <p className="text-white/80 text-base md:text-lg leading-relaxed mb-8">
+                  Relive the unforgettable moments from December 3rd, 2024. Browse exclusive photos from the celebration, featuring red carpet arrivals, championship moments, live performances, and more.
+                </p>
+                <a 
+                  href="/riseofachampion/gallery"
+                  className="inline-block bg-[#FFB800] text-black hover:bg-[#FFB800]/90 font-bold py-4 px-8 rounded-sm transition-all text-lg"
+                >
+                  View Event Gallery →
+                </a>
+              </div>
             </div>
           </div>
         </section>

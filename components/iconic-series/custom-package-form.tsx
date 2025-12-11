@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '../../components/ui/button'
-import { submitCustomPackageInquiry } from '../../actions/contact-form'
+import { submitCustomPackageInquiry } from '../../app/actions/contact-form'
 
 export default function CustomPackageForm() {
   const [formData, setFormData] = useState({

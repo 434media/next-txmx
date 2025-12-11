@@ -1,21 +1,9 @@
 'use client'
 
-import { useState } from 'react'
 import Image from 'next/image'
-import { Button } from '../components/ui/button'
-import { SPONSOR_PACKAGES } from '../lib/iconic-series-products'
-import SponsorCheckout from '../components/iconic-series/sponsor-checkout'
-import CustomPackageForm from '../components/iconic-series/custom-package-form'
-import InquiryForm from '../components/iconic-series/inquiry-form'
+import { GALLERY_IMAGES } from '../../lib/gallery-images'
 
 export default function IconicSeriesClient() {
-  const [selectedPackage, setSelectedPackage] = useState<string | null>(null)
-  const [showCustomForm, setShowCustomForm] = useState(false)
-  const [paymentSuccess, setPaymentSuccess] = useState(false)
-
-  const formatPrice = (cents: number) => {
-    return `$${(cents / 100).toLocaleString()}`
-  }
 
   return (
     <div className="min-h-screen bg-black relative">
@@ -94,27 +82,21 @@ export default function IconicSeriesClient() {
               <div className="-mt-44 px-4 relative z-10">
                 {/* Event Title */}
                 <div className="space-y-2 mb-6 px-6">
-                  <h1 className="text-5xl font-bold text-white/80 tracking-[0.1em] leading-[1.1]">
-                    ONE NIGHT <span className='block mt-1'>INVITATION ONLY.</span>
+                  <h1 className="text-5xl font-bold text-white/80 tracking-widest leading-[1.1]">
+                    A HISTORIC <span className='block mt-1'>CELEBRATION</span>
                   </h1>
                 </div>
 
                 {/* Event Description */}
                 <div className="mt-10 text-base text-white/90 leading-relaxed space-y-4 text-left">
                   <p className="leading-relaxed">
-                    This invitation-only experience honors four of the biggest names in the sport — all from San Antonio — as they're celebrated in their hometown and captured live for the nationally distributed series <span className="text-[#FFB800] font-semibold italic">Rise of a Champion</span>, powered by TXMX Boxing and produced by ICON Media x 434 Media.
-                  </p>
-                  <p className="font-bold text-white text-lg tracking-wide">
-                    No public tickets. No open guest list.
+                    This invitation-only experience honored four of the biggest names in the sport — all from San Antonio — as they were celebrated in their hometown and captured live for the nationally distributed series <span className="text-[#FFB800] font-semibold italic">Rise of a Champion</span>, powered by TXMX Boxing and produced by ICON Media x 434 Media.
                   </p>
                   <p className="leading-relaxed">
-                    This experience is offered exclusively to a curated room of athletes, entertainers, and industry leaders to celebrate greatness and build meaningful connections.
+                    The event brought together a curated room of athletes, entertainers, and industry leaders to celebrate greatness and build meaningful connections.
                   </p>
                   <p className="font-bold text-[#FFB800] text-lg tracking-wide">
-                    Packages are limited.
-                  </p>
-                  <p className="leading-relaxed">
-                    Review options below and secure your access to this historic event.
+                    View photos from this unforgettable evening in our gallery.
                   </p>
                 </div>
               </div>
@@ -124,27 +106,21 @@ export default function IconicSeriesClient() {
             <div className="hidden md:block text-center -mt-32 space-y-6">
               {/* Event Title */}
               <div className="space-y-2">
-                <h1 className="text-6xl lg:text-8xl font-bold text-white/80 tracking-[0.1em] leading-[1.1]">
-                  ONE NIGHT. INVITATION ONLY.
+                <h1 className="text-6xl lg:text-8xl font-bold text-white/80 tracking-widest leading-[1.1]">
+                  A HISTORIC CELEBRATION
                 </h1>
               </div>
 
               {/* Event Description */}
               <div className="text-lg md:text-xl text-white/90 max-w-4xl mx-auto leading-relaxed space-y-4">
                 <p className="leading-relaxed">
-                  This invitation-only experience honors four of the biggest names in the sport — all from San Antonio — as they're celebrated in their hometown and captured live for the nationally distributed series <span className="text-[#FFB800] font-semibold italic">Rise of a Champion</span>, powered by TXMX Boxing and produced by ICON Media x 434 Media.
-                </p>
-                <p className="font-bold text-white text-xl tracking-wide">
-                  No public tickets. No open guest list.
+                  This invitation-only experience honored four of the biggest names in the sport — all from San Antonio — as they were celebrated in their hometown and captured live for the nationally distributed series <span className="text-[#FFB800] font-semibold italic">Rise of a Champion</span>, powered by TXMX Boxing and produced by ICON Media x 434 Media.
                 </p>
                 <p className="leading-relaxed">
-                  This experience is offered exclusively to a curated room of athletes, entertainers, and industry leaders to celebrate greatness and build meaningful connections.
+                  The event brought together a curated room of athletes, entertainers, and industry leaders to celebrate greatness and build meaningful connections.
                 </p>
                 <p className="font-bold text-[#FFB800] text-xl tracking-wide">
-                  Packages are limited.
-                </p>
-                <p className="leading-relaxed">
-                  Review options below and secure your access to this historic event.
+                  View photos from this unforgettable evening in our gallery.
                 </p>
               </div>
             </div>
@@ -157,7 +133,7 @@ export default function IconicSeriesClient() {
             {/* Invitation Header */}
             <div className="text-center mb-12 md:mb-16">
               <p className="text-white/60 text-sm md:text-base max-w-2xl mx-auto leading-relaxed tracking-wide font-light mb-2">
-                You are cordially invited to celebrate San Antonio's finest
+                Celebrating San Antonio's Finest
               </p>
               <div className="flex items-center justify-center gap-4 md:gap-6 mb-2">
                 <div className="h-px bg-[#FFB800]/40 w-12 md:w-24"></div>
@@ -212,176 +188,63 @@ export default function IconicSeriesClient() {
 
             {/* Decorative Bottom Border */}
             <div className="flex items-center justify-center mt-4 md:mt-2">
-              <div className="h-px bg-gradient-to-r from-transparent via-[#FFB800]/30 to-transparent w-full max-w-md"></div>
+              <div className="h-px bg-linear-to-r from-transparent via-[#FFB800]/30 to-transparent w-full max-w-md"></div>
             </div>
           </div>
         </section>
 
-        {/* Sponsor Packages */}
+        {/* Gallery CTA Section */}
         <section className="py-2 px-4">
           <div className="max-w-7xl mx-auto">
             <h2 className="text-3xl md:text-5xl font-bold md:text-center text-[#FFB800] mb-3 tracking-wide">
-              🎟️ SPONSORSHIP PACKAGES
+              📸 EVENT GALLERY
             </h2>
             <div className="md:text-center text-white/80 text-base mb-12 max-w-3xl mx-auto leading-relaxed">
-              <p className="font-bold text-lg md:text-xl text-white mb-2">Wednesday, December 3rd | Filmed Live | San Antonio, TX</p>
-              <p className="text-sm md:text-base text-white/70">Includes promoter-level access to Pitbull vs. Roach at Frost Bank Center, Dec 6</p>
+              <p className="font-bold text-lg md:text-xl text-white mb-2">December 3rd, 2024 | Filmed Live | San Antonio, TX</p>
+              <p className="text-sm md:text-base text-white/70">View exclusive photos from this unforgettable evening</p>
             </div>
 
-            {selectedPackage ? (
-              <div className="max-w-4xl mx-auto">
-                <Button
-                  onClick={() => {
-                    setSelectedPackage(null)
-                    setPaymentSuccess(false)
-                  }}
-                  variant="outline"
-                  className="mb-8 text-white border-white/20 hover:bg-white/10"
-                >
-                  ← Back to Packages
-                </Button>
-                <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-8 rounded-sm">
-                  <h3 className="text-2xl font-bold text-[#FFB800] mb-6">
-                    {paymentSuccess ? 'Thank You!' : 'Complete Your Sponsorship'}
-                  </h3>
-                  <SponsorCheckout 
-                    packageId={selectedPackage} 
-                    onSuccess={() => setPaymentSuccess(true)}
-                  />
+            <div className="max-w-4xl mx-auto">
+              <div className="relative overflow-hidden bg-white/5 backdrop-blur-sm border border-white/10 p-8 md:p-12 rounded-sm text-center">
+                {/* Background Grid */}
+                <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+                  <div className="absolute inset-0 grid grid-cols-3 md:grid-cols-4 gap-0.5 opacity-20">
+                    {GALLERY_IMAGES.slice(0, 12).map((image) => (
+                      <div key={image.id} className="aspect-square relative">
+                        <Image
+                          src={image.src}
+                          alt=""
+                          fill
+                          className="object-cover blur-[3px]"
+                          sizes="(max-width: 768px) 33vw, 25vw"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  <div className="absolute inset-0 bg-black/70" />
                 </div>
-              </div>
-            ) : showCustomForm ? (
-              <div className="max-w-4xl mx-auto">
-                <Button
-                  onClick={() => setShowCustomForm(false)}
-                  variant="outline"
-                  className="mb-8 text-white border-white/20 hover:bg-white/10"
-                >
-                  ← Back to Packages
-                </Button>
-                <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-8 rounded-sm">
-                  <h3 className="text-3xl font-bold text-[#FFB800] mb-4 text-center">
-                    Custom Package Inquiry
+                
+                {/* Content */}
+                <div className="relative z-10">
+                  <h3 className="text-3xl md:text-4xl font-bold text-[#FFB800] mb-4">
+                    Relive the Moments
                   </h3>
-                  <p className="text-white/80 text-center mb-8">
-                    Looking for a tailored sponsorship opportunity? Let us create a custom package for you.
+                  <p className="text-white/80 text-lg mb-8 leading-relaxed">
+                    Browse exclusive photos from the Rise of a Champion celebration, featuring red carpet arrivals, championship moments, live performances, and the unforgettable reception.
                   </p>
-                  <CustomPackageForm />
+                  <a 
+                    href="/riseofachampion/gallery"
+                    className="inline-block bg-[#FFB800] text-black hover:bg-[#FFB800]/90 font-bold py-4 px-8 rounded-sm transition-all text-lg"
+                  >
+                    View Event Gallery →
+                  </a>
                 </div>
               </div>
-            ) : (
-              <>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-                  {SPONSOR_PACKAGES.map((pkg) => (
-                    <div
-                      key={pkg.id}
-                      className="bg-white/5 backdrop-blur-sm border border-white/10 p-6 hover:border-[#FFB800] transition-all duration-300 flex flex-col"
-                    >
-                      <div className="text-4xl mb-3">{pkg.emoji}</div>
-                      <h3 className="text-2xl font-bold text-[#FFB800] mb-2 tracking-wide">
-                        {formatPrice(pkg.priceInCents)}{pkg.id === 'corporate-package' ? '+' : ''}
-                      </h3>
-                      <p className="text-xl font-semibold text-white mb-2 leading-tight">{pkg.name}</p>
-                      {pkg.availability && (
-                        <p className="text-xs text-[#FFB800] font-bold mb-4 uppercase tracking-wider">
-                          {pkg.availability}
-                        </p>
-                      )}
-                      <p className="text-white/70 mb-5 text-sm italic leading-relaxed">{pkg.description}</p>
-                      
-                      <ul className="space-y-1.5 mb-5 flex-grow text-xs leading-relaxed">
-                        {pkg.features.map((feature, idx) => (
-                          <li key={idx} className="text-white/90 flex items-start">
-                            <span className="text-[#FFB800] mr-2 flex-shrink-0">✓</span>
-                            <span>{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
+            </div>
+          </div>
+        </section>
 
-                      <Button
-                        onClick={() => setSelectedPackage(pkg.id)}
-                        className="w-full bg-[#FFB800] text-black hover:bg-[#FFB800]/90 font-bold py-3 mt-auto text-sm tracking-wide"
-                      >
-                        Select Package
-                      </Button>
-                      
-                      {/* Stripe Payment Badge - Mobile Only */}
-                      <div className="md:hidden mt-3 pt-3 border-t border-white/10">
-                        <div className="flex flex-col items-center gap-1 text-white/50 text-xs">
-                          <div className="flex items-center gap-1.5">
-                            <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                            </svg>
-                            <span className="font-medium">Powered by Stripe</span>
-                          </div>
-                          <span className="text-white/40 text-[10px]">256-bit SSL encryption</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Payment Security Section - Desktop Only */}
-                <div className="hidden md:block max-w-7xl mx-auto mb-10">
-                  <div className="">
-                    <div className="flex items-center justify-center gap-2 text-white/60 text-sm">
-                      <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                      </svg>
-                      <span className="font-medium">All payments powered by Stripe</span>
-                      <span className="mx-2">•</span>
-                      <span>256-bit SSL encryption</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Inquiries & Upgrades Section */}
-                <div className="max-w-7xl md:max-w-4xl mx-auto mb-12">
-                  <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-6 md:p-8 rounded-sm">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-                      {/* Left Side - Inquiries & Upgrades Info */}
-                      <div>
-                        <h3 className="text-2xl font-bold text-[#FFB800] mb-6 tracking-wide">
-                          🔁 Optional Upgrades
-                        </h3>
-                        
-                        <p className="text-white/60 text-xs uppercase tracking-wider font-medium mb-6">
-                          Available for All Packages
-                        </p>
-                        
-                        <ul className="space-y-4 text-white/80 text-sm">
-                          <li className="flex items-start leading-relaxed">
-                            <span className="text-[#FFB800] mr-3 text-lg">•</span>
-                            <span>Ticket upgrades (available upon request)</span>
-                          </li>
-                          <li className="flex items-start leading-relaxed">
-                            <span className="text-[#FFB800] mr-3 text-lg">•</span>
-                            <span>Hotel & experience add-ons via concierge</span>
-                          </li>
-                          <li className="flex items-start leading-relaxed">
-                            <span className="text-[#FFB800] mr-3 text-lg">•</span>
-                            <span>Custom media integrations by request</span>
-                          </li>
-                        </ul>
-                        
-                        <div className="mt-8 pt-6 border-t border-white/10">
-                          <p className="text-white/70 text-sm leading-relaxed max-w-xs tracking-tight">
-                            For inquiries about upgrades or alternative payment methods (check/ACH), please use the contact form.
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Right Side - Contact Form */}
-                      <div>
-                        <h3 className="text-2xl font-bold text-[#FFB800] mb-6 tracking-wide">
-                          ✉️ Contact Us
-                        </h3>
-                        <InquiryForm />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                {/* Partner Logos Section */}
+        {/* Partner Logos Section */}
                 <section className="py-12 px-4">
                   <div className="max-w-7xl mx-auto">
                     {/* Mobile Logos */}
@@ -469,10 +332,6 @@ export default function IconicSeriesClient() {
                     </div>
                   </div>
                 </section>
-              </>
-            )}
-          </div>
-        </section>
       </div>
     </div>
   )
