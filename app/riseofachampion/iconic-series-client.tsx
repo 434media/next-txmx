@@ -81,46 +81,46 @@ export default function IconicSeriesClient() {
               {/* Mobile Event Info - positioned below hero with negative margin */}
               <div className="-mt-44 px-4 relative z-10">
                 {/* Event Title */}
-                <div className="space-y-2 mb-6 px-6">
-                  <h1 className="text-5xl font-bold text-white/80 tracking-widest leading-[1.1]">
-                    A HISTORIC <span className='block mt-1'>CELEBRATION</span>
+                <div className="space-y-1 mb-6">
+                  <h1 className="text-4xl font-bold text-white/80 tracking-wider leading-tight">
+                    A HISTORIC <span className='block mt-0.5'>CELEBRATION</span>
                   </h1>
                 </div>
 
                 {/* Event Description */}
-                <div className="mt-10 text-base text-white/90 leading-relaxed space-y-4 text-left">
+                <div className="mt-8 text-sm sm:text-base text-white/90 leading-relaxed space-y-3 text-left">
                   <p className="leading-relaxed">
                     This invitation-only experience honored four of the biggest names in the sport — all from San Antonio — as they were celebrated in their hometown and captured live for the nationally distributed series <span className="text-[#FFB800] font-semibold italic">Rise of a Champion</span>, powered by TXMX Boxing and produced by ICON Media x 434 Media.
                   </p>
                   <p className="leading-relaxed">
                     The event brought together a curated room of athletes, entertainers, and industry leaders to celebrate greatness and build meaningful connections.
                   </p>
-                  <p className="font-bold text-[#FFB800] text-lg tracking-wide">
-                    View photos from this unforgettable evening in our gallery.
+                  <p className="text-2xl sm:text-3xl font-bold text-center text-[#FFB800] mt-6 tracking-wide">
+                    VIEW EVENT GALLERY
                   </p>
                 </div>
               </div>
             </div>
 
             {/* Desktop Event Info - positioned below hero */}
-            <div className="hidden md:block text-center -mt-32 space-y-6">
+            <div className="hidden md:block text-center -mt-32 space-y-8">
               {/* Event Title */}
-              <div className="space-y-2">
-                <h1 className="text-6xl lg:text-8xl font-bold text-white/80 tracking-widest leading-[1.1]">
+              <div className="space-y-3">
+                <h1 className="text-5xl lg:text-7xl xl:text-8xl font-bold text-white/90 tracking-wide leading-tight">
                   A HISTORIC CELEBRATION
                 </h1>
               </div>
 
               {/* Event Description */}
-              <div className="text-lg md:text-xl text-white/90 max-w-4xl mx-auto leading-relaxed space-y-4">
+              <div className="text-base lg:text-lg xl:text-xl text-white/90 max-w-4xl mx-auto leading-relaxed space-y-6 px-4">
                 <p className="leading-relaxed">
                   This invitation-only experience honored four of the biggest names in the sport — all from San Antonio — as they were celebrated in their hometown and captured live for the nationally distributed series <span className="text-[#FFB800] font-semibold italic">Rise of a Champion</span>, powered by TXMX Boxing and produced by ICON Media x 434 Media.
                 </p>
                 <p className="leading-relaxed">
                   The event brought together a curated room of athletes, entertainers, and industry leaders to celebrate greatness and build meaningful connections.
                 </p>
-                <p className="font-bold text-[#FFB800] text-xl tracking-wide">
-                  View photos from this unforgettable evening in our gallery.
+                <p className="text-4xl lg:text-5xl font-bold text-center text-[#FFB800] mt-8 tracking-wide">
+                  VIEW EVENT GALLERY
                 </p>
               </div>
             </div>
@@ -197,12 +197,9 @@ export default function IconicSeriesClient() {
         <section className="py-2 px-4">
           <div className="max-w-7xl mx-auto">
             <h2 className="text-3xl md:text-5xl font-bold md:text-center text-[#FFB800] mb-3 tracking-wide">
-              📸 EVENT GALLERY
+              VIEW EVENT GALLERY
             </h2>
-            <div className="md:text-center text-white/80 text-base mb-12 max-w-3xl mx-auto leading-relaxed">
-              <p className="font-bold text-lg md:text-xl text-white mb-2">December 3rd, 2024 | Filmed Live | San Antonio, TX</p>
-              <p className="text-sm md:text-base text-white/70">View exclusive photos from this unforgettable evening</p>
-            </div>
+            
 
             <div className="max-w-4xl mx-auto">
               <div className="relative overflow-hidden bg-white/5 backdrop-blur-sm border border-white/10 p-8 md:p-12 rounded-sm text-center">
