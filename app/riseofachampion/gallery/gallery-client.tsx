@@ -11,7 +11,7 @@ export default function GalleryClient() {
   const [isUnlocked, setIsUnlocked] = useState(false)
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [selectedCategory, setSelectedCategory] = useState<GalleryCategory>("all")
+  const [selectedCategory, setSelectedCategory] = useState<GalleryCategory>("red-carpet")
   const [images, setImages] = useState<GalleryImage[]>([])
   const [fetchError, setFetchError] = useState<string | null>(null)
   const [imageLoadingStates, setImageLoadingStates] = useState<Record<string, boolean>>({})
@@ -100,7 +100,7 @@ export default function GalleryClient() {
           {/* Background Grid - Fixed behind content */}
           <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
             <div className="absolute inset-0 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-0.5 opacity-30">
-              {images.slice(0, 20).map((image) => (
+              {images.filter(img => img.category === "red-carpet").slice(0, 20).map((image) => (
                 <div key={image.id} className="aspect-square relative">
                   <Image
                     src={image.src}
