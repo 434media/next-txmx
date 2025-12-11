@@ -68,10 +68,10 @@ export default function IconicSeriesClient() {
 
               {/* Event Description */}
               <div className="text-sm md:text-base lg:text-lg xl:text-xl text-white/90 max-w-4xl mx-auto leading-relaxed space-y-4 md:space-y-6 px-2 md:px-4">
-                <p className="leading-relaxed">
+                <p className="leading-relaxed tracking-tight md:tracking-wide">
                   This invitation-only experience honored four of the biggest names in the sport — all from San Antonio — as they were celebrated in their hometown and captured live for the nationally distributed series <span className="text-[#FFB800] font-semibold italic">Rise of a Champion</span>, powered by TXMX Boxing and produced by ICON Media x 434 Media.
                 </p>
-                <p className="leading-relaxed">
+                <p className="leading-relaxed tracking-tight md:tracking-wide">
                   The event brought together a curated room of athletes, entertainers, and industry leaders to celebrate greatness and build meaningful connections.
                 </p>
                 <a 
