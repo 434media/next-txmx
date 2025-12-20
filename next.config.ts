@@ -6,7 +6,34 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  
+
+  async redirects() {
+    return [
+      {
+        source: "/",
+        has: [
+          {
+            type: "host",
+            value: "riseofachampion.com",
+          },
+        ],
+        destination: "https://www.txmxboxing.com/riseofachampion",
+        permanent: true,
+      },
+      {
+        source: "/(.*)",
+        has: [
+          {
+            type: "host",
+            value: "riseofachampion.com",
+          },
+        ],
+        destination: "https://www.txmxboxing.com/riseofachampion",
+        permanent: true,
+      },
+    ];
+  },
+
   images: {
     remotePatterns: [
       {
