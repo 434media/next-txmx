@@ -32,10 +32,6 @@ Create a file named `.env.local` in the root of the project. You will need to ge
 # Airtable Configuration
 AIRTABLE_BASE_ID=your_airtable_base_id
 AIRTABLE_API_KEY=your_airtable_api_key
-
-# Cloudflare Turnstile Keys
-NEXT_PUBLIC_TURNSTILE_SITE_KEY=your_turnstile_site_key
-TURNSTILE_SECRET_KEY=your_turnstile_secret_key
 ```
 
 ### 3. Install Dependencies

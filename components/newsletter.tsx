@@ -6,26 +6,6 @@ import { gsap } from "gsap"
 import Image from "next/image"
 import { MailIcon } from "./icons/mail-icon"
 
-// Extend the Window interface to include the turnstile property
-declare global {
-  interface Window {
-    turnstile?: {
-      render: (
-        element: HTMLElement,
-        options: {
-          sitekey: string
-          callback: (token: string) => void
-          "refresh-expired"?: "auto" | "manual"
-        },
-      ) => string
-      getResponse: (widgetId: string) => string | null
-      reset: (widgetId: string) => void
-    }
-  }
-}
-
-const isDevelopment = process.env.NODE_ENV === "development"
-
 interface NewsletterProps {
   onSuccess?: () => void
   className?: string
@@ -45,8 +25,6 @@ export function Newsletter({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const turnstileRef = useRef<HTMLDivElement>(null)
-  const [turnstileWidget, setTurnstileWidget] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const successRef = useRef<HTMLDivElement>(null)
@@ -120,47 +98,6 @@ export function Newsletter({
     }
   }, [mobile, slideoutModal])
 
-  // Load Turnstile script only when needed
-  useEffect(() => {
-    if (isDevelopment || turnstileWidget) return
-
-    const loadTurnstile = () => {
-      if (document.getElementById("turnstile-script")) return
-
-      const script = document.createElement("script")
-      script.id = "turnstile-script"
-      script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js"
-      script.async = true
-      script.defer = true
-      document.body.appendChild(script)
-
-      script.onload = () => {
-        if (window.turnstile && turnstileRef.current) {
-          const widgetId = window.turnstile.render(turnstileRef.current, {
-            sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "",
-            callback: () => {
-              // Token received, no action needed here
-            },
-            "refresh-expired": "auto",
-          })
-          setTurnstileWidget(widgetId)
-        }
-      }
-    }
-
-    loadTurnstile()
-
-    return () => {
-      if (turnstileWidget && window.turnstile) {
-        try {
-          window.turnstile.reset(turnstileWidget)
-        } catch (error) {
-          console.error("Error resetting Turnstile widget:", error)
-        }
-      }
-    }
-  }, [turnstileWidget])
-
   const validateEmail = (email: string): boolean => {
     return emailPattern.test(email)
   }
@@ -226,24 +163,10 @@ export function Newsletter({
     }
 
     try {
-      let turnstileResponse = undefined
-
-      if (!isDevelopment) {
-        if (!window.turnstile || !turnstileWidget) {
-          throw new Error("Security verification not loaded. Please refresh and try again.")
-        }
-
-        turnstileResponse = window.turnstile.getResponse(turnstileWidget)
-        if (!turnstileResponse) {
-          throw new Error("Please complete the security verification")
-        }
-      }
-
       const response = await fetch("/api/newsletter", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(turnstileResponse && { "cf-turnstile-response": turnstileResponse }),
         },
         body: JSON.stringify({ email }),
       })
@@ -276,10 +199,6 @@ export function Newsletter({
       }
 
       setTimeout(() => setIsSuccess(false), 6000)
-
-      if (!isDevelopment && turnstileWidget && window.turnstile) {
-        window.turnstile.reset(turnstileWidget)
-      }
     } catch (error) {
       console.error("Error subscribing to newsletter:", error)
 
@@ -501,16 +420,6 @@ export function Newsletter({
               </div>
             </button>
 
-            {!isDevelopment && (
-              <div
-                ref={turnstileRef}
-                data-theme="dark"
-                data-size="flexible"
-                className="w-full flex justify-center"
-                aria-label="Security verification"
-              />
-            )}
-
             {error && (
               <div
                 id="slideout-error"
@@ -615,16 +524,6 @@ export function Newsletter({
               )}
             </div>
           </button>
-
-          {!isDevelopment && !mobile && (
-            <div
-              ref={turnstileRef}
-              data-theme="light"
-              data-size="flexible"
-              className="w-full flex justify-center"
-              aria-label="Security verification"
-            />
-          )}
 
           {error && (
             <div
