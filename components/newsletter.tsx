@@ -274,7 +274,7 @@ export function Newsletter({
           <div className="text-center">
             <div className="flex justify-center mb-4">
               <Image
-                src="https://ampd-asset.s3.us-east-2.amazonaws.com/TXMXBack.svg"
+                src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/TXMXBack.svg"
                 alt="TXMX Boxing Logo"
                 width={140}
                 height={70}
@@ -312,7 +312,7 @@ export function Newsletter({
           <div className={`text-center ${mobile ? "mb-3" : "mb-4"}`}>
             <div className={`flex justify-center ${mobile ? "mb-3" : "mb-4"}`}>
               <Image
-                src="https://ampd-asset.s3.us-east-2.amazonaws.com/TXMXBack.svg"
+                src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/TXMXBack.svg"
                 alt="TXMX Boxing Logo"
                 width={logoSize.width}
                 height={logoSize.height}
@@ -357,7 +357,7 @@ export function Newsletter({
             <div className="flex justify-center mb-4">
               <Image
                 ref={logoRef}
-                src="https://ampd-asset.s3.us-east-2.amazonaws.com/TXMXBack.svg"
+                src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/TXMXBack.svg"
                 alt="TXMX Boxing Logo"
                 width={140}
                 height={70}
@@ -448,7 +448,7 @@ export function Newsletter({
           <div className={`flex justify-center ${mobile ? "mb-3" : "mb-4"}`}>
             <Image
               ref={logoRef}
-              src="https://ampd-asset.s3.us-east-2.amazonaws.com/TXMXBack.svg"
+              src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/TXMXBack.svg"
               alt="TXMX Boxing Logo"
               width={logoSize.width}
               height={logoSize.height}

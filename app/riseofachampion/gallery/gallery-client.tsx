@@ -148,7 +148,7 @@ export default function GalleryClient() {
             {/* Logo */}
             <div className="-mt-16 md:-mt-24 text-center">
               <Image
-                src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/ROAC.png"
+                src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/iconic-series/ROAC.png"
                 alt="Rise of a Champion"
                 width={400}
                 height={120}
@@ -257,7 +257,7 @@ export default function GalleryClient() {
               {/* Logo */}
               <div className="-mt-10 flex justify-center">
                 <Image
-                  src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/ROAC.png"
+                  src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/iconic-series/ROAC.png"
                   alt="Rise of a Champion"
                   width={200}
                   height={60}
@@ -403,28 +403,28 @@ export default function GalleryClient() {
               <p className="text-white/40 text-xs md:text-sm mb-6 uppercase tracking-[0.2em] font-light">Presented by</p>
               <div className="flex items-center justify-center gap-8 flex-wrap">
                 <Image
-                  src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/flyers-63-434.png"
+                  src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/iconic-series/flyers-63-434.png"
                   alt="434 Media"
                   width={80}
                   height={40}
                     className="h-12 w-auto object-contain brightness-0 invert opacity-90 hover:opacity-100 transition-opacity"
                 />
                 <Image
-                  src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/flyers-63-icon.png"
+                  src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/iconic-series/flyers-63-icon.png"
                   alt="Icon to iCan"
                   width={80}
                   height={40}
                   className="h-12 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity"
                 />
                 <Image
-                  src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/flyers-63-WATSON.png"
+                  src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/iconic-series/flyers-63-WATSON.png"
                   alt="Team Watson"
                   width={80}
                   height={40}
                   className="h-12 w-auto object-contain brightness-0 invert opacity-90 hover:opacity-100 transition-opacity"
                 />
                 <Image
-                  src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/flyers-63-driven.png"
+                  src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/iconic-series/flyers-63-driven.png"
                   alt="Life Driven"
                   width={80}
                   height={40}

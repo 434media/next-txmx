@@ -19,8 +19,8 @@ export function generateEventJsonLd() {
       },
     },
     image: [
-      'https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/ROAC.png',
-      'https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/champswhite.png',
+      'https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/iconic-series/ROAC.png',
+      'https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/iconic-series/champswhite.png',
     ],
     organizer: [
       {

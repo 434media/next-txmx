@@ -11,7 +11,7 @@ export default function IconicSeriesClient() {
       <div 
         className="fixed inset-0 z-0"
         style={{
-          backgroundImage: 'url(https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/BG.png)',
+          backgroundImage: 'url(https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/iconic-series/BG.png)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundAttachment: 'fixed'
@@ -36,7 +36,7 @@ export default function IconicSeriesClient() {
               {/* Hero Logo - Responsive */}
               <div className="w-full max-w-xl md:max-w-4xl mb-0 pb-0 -mt-8 md:-mt-24">
                 <Image
-                  src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/ROAC.png"
+                  src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/iconic-series/ROAC.png"
                   alt="Rise of a Champion"
                   width={1200}
                   height={400}
@@ -48,7 +48,7 @@ export default function IconicSeriesClient() {
               {/* Champions Image - Responsive */}
               <div className="w-full max-w-2xl md:max-w-5xl -mt-36 md:-mt-88">
                 <Image
-                  src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/awardsv6.png"
+                  src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/iconic-series/awardsv6.png"
                   alt="San Antonio Champions"
                   width={1200}
                   height={600}
@@ -202,7 +202,7 @@ export default function IconicSeriesClient() {
                       <div className="grid grid-cols-4 gap-4 items-center">
                         <a href="https://www.434media.com" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
                           <Image
-                            src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/flyers-63-434.png"
+                            src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/iconic-series/flyers-63-434.png"
                             alt="434 Media"
                             width={80}
                             height={80}
@@ -211,7 +211,7 @@ export default function IconicSeriesClient() {
                         </a>
                         <a href="https://www.icontalks.com" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
                           <Image
-                            src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/flyers-63-icon.png"
+                            src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/iconic-series/flyers-63-icon.png"
                             alt="Icon ICAN"
                             width={80}
                             height={80}
@@ -220,7 +220,7 @@ export default function IconicSeriesClient() {
                         </a>
                         <a href="https://www.instagram.com/samwatsongolfclassic/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
                           <Image
-                            src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/flyers-63-WATSON.png"
+                            src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/iconic-series/flyers-63-WATSON.png"
                             alt="Team Watson"
                             width={80}
                             height={80}
@@ -229,7 +229,7 @@ export default function IconicSeriesClient() {
                         </a>
                         <a href="https://www.lifedriven.org/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
                           <Image
-                            src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/flyers-63-driven.png"
+                            src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/iconic-series/flyers-63-driven.png"
                             alt="LIFEONMY"
                             width={80}
                             height={80}
@@ -244,7 +244,7 @@ export default function IconicSeriesClient() {
                       <div className="max-w-4xl mx-auto grid grid-cols-4 gap-8 items-center">
                         <a href="https://www.434media.com" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
                           <Image
-                            src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/flyers-63-434.png"
+                            src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/iconic-series/flyers-63-434.png"
                             alt="434 Media"
                             width={140}
                             height={140}
@@ -253,7 +253,7 @@ export default function IconicSeriesClient() {
                         </a>
                         <a href="https://www.icontalks.com" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
                           <Image
-                            src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/flyers-63-icon.png"
+                            src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/iconic-series/flyers-63-icon.png"
                             alt="Icon ICAN"
                             width={140}
                             height={140}
@@ -262,7 +262,7 @@ export default function IconicSeriesClient() {
                         </a>
                         <a href="https://www.instagram.com/samwatsongolfclassic/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
                           <Image
-                            src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/flyers-63-WATSON.png"
+                            src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/iconic-series/flyers-63-WATSON.png"
                             alt="Team Watson"
                             width={140}
                             height={140}
@@ -271,7 +271,7 @@ export default function IconicSeriesClient() {
                         </a>
                         <a href="https://www.lifedriven.org/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
                           <Image
-                            src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/flyers-63-driven.png"
+                            src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/iconic-series/flyers-63-driven.png"
                             alt="LIFEONMY"
                             width={140}
                             height={140}

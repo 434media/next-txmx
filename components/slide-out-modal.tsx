@@ -219,7 +219,7 @@ export default function SlideOutModal({ isOpen, onClose }: SlideOutModalProps) {
             <div className="modal-element text-center mb-8">
               <div className="flex justify-center mb-4">
                 <Image
-                  src="https://ampd-asset.s3.us-east-2.amazonaws.com/TXMXBack.svg"
+                  src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/TXMXBack.svg"
                   alt="TXMX Boxing Logo"
                   width={140}
                   height={70}

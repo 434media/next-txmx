@@ -121,7 +121,7 @@ export default function HeroSection() {
           objectPosition: "center center",
         }}
       >
-        <source src="https://ampd-asset.s3.us-east-2.amazonaws.com/TXMX+Hero+Banner.mp4" type="video/mp4" />
+        <source src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/TXMX%20Hero%20Banner.mp4" type="video/mp4" />
         <track kind="captions" />
       </video>
 
@@ -174,7 +174,7 @@ export default function HeroSection() {
 
           {/* Clean Logo Presentation */}
           <Image
-            src="https://ampd-asset.s3.us-east-2.amazonaws.com/TXMXBack.svg"
+            src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/TXMXBack.svg"
             alt="TXMX Boxing"
             width={600}
             height={300}

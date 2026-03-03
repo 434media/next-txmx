@@ -19,7 +19,7 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
             aria-label="TXMX Boxing Home"
           >
             <Image
-              src="https://ampd-asset.s3.us-east-2.amazonaws.com/iconic-series/TXMXDistressedTransparent.png"
+              src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/iconic-series/TXMXDistressedTransparent.png"
               alt="TXMX Logo"
               width={160}
               height={44}
