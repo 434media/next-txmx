@@ -258,7 +258,41 @@ export default function SlideOutModal({ isOpen, onClose }: SlideOutModalProps) {
               >
                 <div className="relative p-6 bg-black border-2 border-white hover:bg-white hover:border-white transition-colors">
                   <div className="text-center">
-                    <div className="text-white group-hover:text-black font-bold text-xl tracking-wider transition-colors mb-1">FOLLOW US</div>
+                    <div className="text-white group-hover:text-black font-bold text-xl tracking-wider transition-colors mb-1">INSTAGRAM</div>
+                    <div className="text-gray-400 group-hover:text-gray-800 text-sm font-medium tracking-wide transition-colors">@txmxboxing</div>
+                  </div>
+                </div>
+              </a>
+
+              {/* YouTube Link */}
+              <a
+                href="https://www.youtube.com/@txmxboxing/shorts"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="modal-element group relative block"
+                onMouseEnter={handleItemHover}
+                onMouseLeave={handleItemLeave}
+              >
+                <div className="relative p-6 bg-black border-2 border-white hover:bg-white hover:border-white transition-colors">
+                  <div className="text-center">
+                    <div className="text-white group-hover:text-black font-bold text-xl tracking-wider transition-colors mb-1">YOUTUBE</div>
+                    <div className="text-gray-400 group-hover:text-gray-800 text-sm font-medium tracking-wide transition-colors">@txmxboxing</div>
+                  </div>
+                </div>
+              </a>
+
+              {/* TikTok Link */}
+              <a
+                href="https://www.tiktok.com/@txmxboxing"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="modal-element group relative block"
+                onMouseEnter={handleItemHover}
+                onMouseLeave={handleItemLeave}
+              >
+                <div className="relative p-6 bg-black border-2 border-white hover:bg-white hover:border-white transition-colors">
+                  <div className="text-center">
+                    <div className="text-white group-hover:text-black font-bold text-xl tracking-wider transition-colors mb-1">TIKTOK</div>
                     <div className="text-gray-400 group-hover:text-gray-800 text-sm font-medium tracking-wide transition-colors">@txmxboxing</div>
                   </div>
                 </div>
