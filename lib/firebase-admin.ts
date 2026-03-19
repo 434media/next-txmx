@@ -10,7 +10,11 @@ function getApp(): App {
 
   const projectId = process.env.FIREBASE_PROJECT_ID
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL
-  const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n')
+  const rawKey = process.env.FIREBASE_PRIVATE_KEY
+  // Handle keys that may be JSON-stringified (extra quotes) or have literal \n
+  const privateKey = rawKey
+    ?.replace(/^["']|["']$/g, '')  // strip wrapping quotes
+    .replace(/\\n/g, '\n')         // convert literal \n to newlines
 
   if (!projectId || !clientEmail || !privateKey) {
     throw new Error(
