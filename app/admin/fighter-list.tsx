@@ -12,7 +12,7 @@ interface FighterListProps {
 }
 
 const inputClass =
-  'w-full bg-white/[0.04] border border-white/[0.12] text-white text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800]/60 focus:ring-1 focus:ring-[#FFB800]/20 placeholder:text-white/25 rounded-md'
+  'w-full bg-white/4 border border-white/12 text-white text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800]/60 focus:ring-1 focus:ring-[#FFB800]/20 placeholder:text-white/25 rounded-md'
 const labelClass = 'block text-[10px] font-semibold text-white/40 tracking-[0.15em] mb-1'
 
 export default function FighterList({ fighters, onDelete, onUpdate }: FighterListProps) {
@@ -179,14 +179,14 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search by name, nickname, or city..."
-            className="flex-1 bg-white/[0.04] border border-white/[0.12] text-white text-[13px] leading-tight px-4 py-2.5 focus:outline-none focus:border-[#FFB800]/60 focus:ring-1 focus:ring-[#FFB800]/20 placeholder:text-white/25 rounded-md"
+            className="flex-1 bg-white/4 border border-white/12 text-white text-[13px] leading-tight px-4 py-2.5 focus:outline-none focus:border-[#FFB800]/60 focus:ring-1 focus:ring-[#FFB800]/20 placeholder:text-white/25 rounded-md"
           />
         </div>
         <div className="flex flex-wrap gap-2">
           <select
             value={filterWeight}
             onChange={e => setFilterWeight(e.target.value)}
-            className="bg-white/[0.04] border border-white/[0.12] text-white text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800]/60 rounded-md"
+            className="bg-white/4 border border-white/12 text-white text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800]/60 rounded-md"
           >
             <option value="all">All Weight Classes</option>
             {activeWeightClasses.map(wc => (
@@ -196,7 +196,7 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
           <select
             value={filterRegion}
             onChange={e => setFilterRegion(e.target.value)}
-            className="bg-white/[0.04] border border-white/[0.12] text-white text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800]/60 rounded-md"
+            className="bg-white/4 border border-white/12 text-white text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800]/60 rounded-md"
           >
             <option value="all">All Regions</option>
             <option value="TX">TX</option>
@@ -206,7 +206,7 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
           <select
             value={filterStatus}
             onChange={e => setFilterStatus(e.target.value)}
-            className="bg-white/[0.04] border border-white/[0.12] text-white text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800]/60 rounded-md"
+            className="bg-white/4 border border-white/12 text-white text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800]/60 rounded-md"
           >
             <option value="all">All Status</option>
             <option value="active">Active</option>
@@ -216,7 +216,7 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
           <select
             value={filterSex}
             onChange={e => setFilterSex(e.target.value)}
-            className="bg-white/[0.04] border border-white/[0.12] text-white text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800]/60 rounded-md"
+            className="bg-white/4 border border-white/12 text-white text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800]/60 rounded-md"
           >
             <option value="all">All Divisions</option>
             <option value="male">Men</option>
@@ -225,7 +225,7 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
           <select
             value={sortBy}
             onChange={e => setSortBy(e.target.value)}
-            className="bg-white/[0.04] border border-white/[0.12] text-white text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800]/60 rounded-md"
+            className="bg-white/4 border border-white/12 text-white text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800]/60 rounded-md"
           >
             <option value="name">Sort: Name</option>
             <option value="wins">Sort: Most Wins</option>
@@ -264,7 +264,7 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
                     startEditing(fighter)
                   }
                 }}
-                className="w-full flex items-center gap-3.5 px-4 py-3.5 text-left hover:bg-white/[0.03] transition-colors"
+                className="w-full flex items-center gap-3.5 px-4 py-3.5 text-left hover:bg-white/3 transition-colors"
               >
                 {/* Profile Image or Placeholder */}
                 {fighter.profileImageUrl ? (
@@ -319,7 +319,7 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
 
                 {/* Expand Arrow */}
                 <svg
-                  className={`w-4 h-4 text-white/30 transition-transform duration-200 flex-shrink-0 ${isEditing ? 'rotate-180' : ''}`}
+                  className={`w-4 h-4 text-white/30 transition-transform duration-200 shrink-0 ${isEditing ? 'rotate-180' : ''}`}
                   fill="none" stroke="currentColor" viewBox="0 0 24 24"
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -617,7 +617,7 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
                   )}
 
                   {/* Actions */}
-                  <div className="flex items-center justify-between pt-4 border-t border-white/[0.06]">
+                  <div className="flex items-center justify-between pt-4 border-t border-white/6">
                     <button
                       onClick={() => handleDelete(fighter.id!, `${fighter.firstName} ${fighter.lastName}`)}
                       disabled={deletingId === fighter.id}

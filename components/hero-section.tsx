@@ -61,7 +61,7 @@ export default function HeroSection() {
             alt="TXMX Boxing"
             width={600}
             height={300}
-            className="relative w-[240px] h-[120px] sm:w-[320px] sm:h-[160px] md:w-[420px] md:h-[210px] lg:w-[520px] lg:h-[260px] object-contain"
+            className="relative w-60 h-[120px] sm:w-[320px] sm:h-40 md:w-[420px] md:h-[210px] lg:w-[520px] lg:h-[260px] object-contain"
             style={{
               filter: "drop-shadow(0 4px 24px rgba(0,0,0,0.4))",
             }}

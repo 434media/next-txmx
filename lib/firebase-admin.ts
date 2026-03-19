@@ -3,20 +3,27 @@ import 'server-only'
 import { initializeApp, getApps, cert, type App } from 'firebase-admin/app'
 import { getFirestore } from 'firebase-admin/firestore'
 
-let app: App
+function getApp(): App {
+  if (getApps().length > 0) {
+    return getApps()[0]
+  }
 
-if (getApps().length === 0) {
-  app = initializeApp({
-    credential: cert({
-      projectId: process.env.FIREBASE_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-    }),
+  const projectId = process.env.FIREBASE_PROJECT_ID
+  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL
+  const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n')
+
+  if (!projectId || !clientEmail || !privateKey) {
+    throw new Error(
+      'Missing Firebase credentials. Set FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, and FIREBASE_PRIVATE_KEY environment variables.'
+    )
+  }
+
+  return initializeApp({
+    credential: cert({ projectId, clientEmail, privateKey }),
   })
-} else {
-  app = getApps()[0]
 }
 
+const app = getApp()
 const firestore = getFirestore(app, 'txmx')
 
 export { firestore }
