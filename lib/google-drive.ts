@@ -1,8 +1,10 @@
 import { google } from 'googleapis'
 import type { GalleryImage, GalleryCategory } from './gallery-images'
 
-// Initialize Google Auth with service account
-const getAuth = () => {
+const isDev = process.env.NODE_ENV === 'development'
+
+// Shared Google Auth — used by all Drive operations
+export const getAuth = () => {
   const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL
   const privateKey = process.env.GOOGLE_PRIVATE_KEY
 
@@ -18,6 +20,16 @@ const getAuth = () => {
     scopes: ['https://www.googleapis.com/auth/drive.readonly'],
   })
 }
+
+// Validate Google Drive file IDs (alphanumeric, hyphens, underscores)
+const DRIVE_FILE_ID_PATTERN = /^[a-zA-Z0-9_-]+$/
+export const isValidDriveFileId = (id: string): boolean =>
+  id.length > 0 && id.length <= 128 && DRIVE_FILE_ID_PATTERN.test(id)
+
+// In-memory cache for image list
+let cachedImages: GalleryImage[] | null = null
+let cacheTimestamp = 0
+const CACHE_TTL_MS = 60 * 60 * 1000 // 1 hour
 
 // Map Google Drive folder names to app categories
 const categoryMap: Record<string, Exclude<GalleryCategory, 'all'>> = {
@@ -57,62 +69,69 @@ interface DriveFile {
 
 // Fetch all images from a Google Drive folder and its subfolders
 export async function getImagesFromDrive(folderId: string): Promise<GalleryImage[]> {
+  // Return cached result if still valid
+  if (cachedImages && Date.now() - cacheTimestamp < CACHE_TTL_MS) {
+    if (isDev) console.log('[Google Drive] Returning cached images')
+    return cachedImages
+  }
+
   try {
     const auth = getAuth()
     const drive = google.drive({ version: 'v3', auth })
 
-    // Get all files in the folder and subfolders
     const allFiles: DriveFile[] = []
     
-    // Function to recursively get files from folders
+    // Recursively get files with pagination support
     const getFilesRecursive = async (parentId: string, folderName?: string) => {
-      console.log(`[Google Drive] Fetching files from folder: ${folderName || 'root'} (${parentId})`)
+      if (isDev) console.log(`[Google Drive] Fetching files from folder: ${folderName || 'root'} (${parentId})`)
       
-      const response = await drive.files.list({
-        q: `'${parentId}' in parents and trashed=false`,
-        fields: 'files(id, name, mimeType, parents)',
-        pageSize: 1000,
-        supportsAllDrives: true,
-        includeItemsFromAllDrives: true,
-      })
+      let pageToken: string | undefined
 
-      const files = response.data.files || []
-      console.log(`[Google Drive] Found ${files.length} files in ${folderName || 'root'}`)
+      do {
+        const response = await drive.files.list({
+          q: `'${parentId}' in parents and trashed=false`,
+          fields: 'nextPageToken, files(id, name, mimeType, parents)',
+          pageSize: 1000,
+          pageToken,
+          supportsAllDrives: true,
+          includeItemsFromAllDrives: true,
+        })
 
-      for (const file of files) {
-        if (file.mimeType === 'application/vnd.google-apps.folder' && file.id) {
-          // Recursively get files from subfolder
-          console.log(`[Google Drive] Found subfolder: ${file.name}`)
-          await getFilesRecursive(file.id, file.name ?? undefined)
-        } else if (file.mimeType?.startsWith('image/') && file.id) {
-          // Add image file with folder context
-          console.log(`[Google Drive] Found image: ${file.name} (${file.mimeType})`)
-          allFiles.push({
-            id: file.id,
-            name: folderName ? `${folderName}/${file.name ?? 'Untitled'}` : file.name ?? 'Untitled',
-            mimeType: file.mimeType,
-            parents: file.parents ?? undefined,
-          })
+        const files = response.data.files || []
+        if (isDev) console.log(`[Google Drive] Found ${files.length} files in ${folderName || 'root'}`)
+
+        for (const file of files) {
+          if (file.mimeType === 'application/vnd.google-apps.folder' && file.id) {
+            if (isDev) console.log(`[Google Drive] Found subfolder: ${file.name}`)
+            await getFilesRecursive(file.id, file.name ?? undefined)
+          } else if (file.mimeType?.startsWith('image/') && file.id) {
+            allFiles.push({
+              id: file.id,
+              name: folderName ? `${folderName}/${file.name ?? 'Untitled'}` : file.name ?? 'Untitled',
+              mimeType: file.mimeType,
+              parents: file.parents ?? undefined,
+            })
+          }
         }
-      }
+
+        pageToken = response.data.nextPageToken ?? undefined
+      } while (pageToken)
     }
 
     await getFilesRecursive(folderId)
-    console.log(`[Google Drive] Total images found: ${allFiles.length}`)
+    if (isDev) console.log(`[Google Drive] Total images found: ${allFiles.length}`)
 
     // Transform to GalleryImage format
     const images: GalleryImage[] = allFiles
       .filter((file): file is Required<DriveFile> => !!file.id)
-      .map((file, index) => {
-      // Get category from folder name or file name
+      .map((file) => {
       const category = getCategoryFromName(file.name ?? '')
       
-      // Generate alt text from filename
       const altText = (file.name || 'Event photo')
-        .split('/').pop() // Get filename without folder
-        ?.replace(/\.[^/.]+$/, '') // Remove extension
-        .replace(/[-_]/g, ' ') // Replace hyphens/underscores with spaces
-        .replace(/\d+/g, '') // Remove numbers
+        .split('/').pop()
+        ?.replace(/\.[^/.]+$/, '')
+        .replace(/[-_]/g, ' ')
+        .replace(/\d+/g, '')
         .trim() || 'Event photo'
 
       return {
@@ -122,6 +141,10 @@ export async function getImagesFromDrive(folderId: string): Promise<GalleryImage
         category,
       }
     })
+
+    // Update cache
+    cachedImages = images
+    cacheTimestamp = Date.now()
 
     return images
   } catch (error) {

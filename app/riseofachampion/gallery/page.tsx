@@ -1,10 +1,11 @@
 import type { Metadata } from "next"
 import GalleryClient from "./gallery-client"
+import { generateBreadcrumbJsonLd, generateOrganizationJsonLd } from '../../../lib/json-ld'
 
 export const metadata: Metadata = {
-  title: "Event Gallery | Rise of a Champion | TXMX Boxing",
+  title: 'Event Gallery - Rise of a Champion',
   description:
-    "View and download exclusive photos from the Rise of a Champion event - an invitation-only celebration honoring San Antonio's boxing legends Jesse \"Bam\" Rodriguez, Selina Barrios, Joshua Franco, and Jesse James Leija. Filmed live on December 3rd, 2024 at the Tobin Center by TXMX Boxing x Icon Talks.",
+    "View and download exclusive photos from the Rise of a Champion event - an invitation-only celebration honoring San Antonio's boxing legends Jesse \"Bam\" Rodriguez, Selina Barrios, Joshua Franco, and Jesse James Leija. Red carpet arrivals, championship moments, and live performances captured by TXMX Boxing x Icon Talks.",
   keywords: [
     'Rise of a Champion Gallery',
     'TXMX Boxing Photos',
@@ -22,26 +23,17 @@ export const metadata: Metadata = {
   creator: 'TXMX Boxing x Icon Talks',
   publisher: 'TXMX Boxing',
   openGraph: {
-    title: "Event Gallery | Rise of a Champion | TXMX Boxing",
-    description: "Relive the unforgettable moments from Rise of a Champion - an exclusive celebration honoring San Antonio's boxing legends. View exclusive photos from red carpet arrivals, championship moments, and live performances.",
-    url: "https://www.txmxboxing.com/riseofachampion/gallery",
-    siteName: "TXMX Boxing",
-    images: [
-      {
-        url: 'https://www.txmxboxing.com/riseofachampion/opengraph-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'Rise of a Champion Event Gallery',
-      },
-    ],
+    title: 'Event Gallery - Rise of a Champion | TXMX Boxing',
+    description: "Relive the unforgettable moments from Rise of a Champion. Exclusive photos from red carpet arrivals, championship moments, and live performances honoring San Antonio's boxing legends.",
+    url: 'https://www.txmxboxing.com/riseofachampion/gallery',
+    siteName: 'TXMX Boxing',
     locale: 'en_US',
-    type: "website",
+    type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Event Gallery | Rise of a Champion',
+    title: 'Event Gallery - Rise of a Champion | TXMX Boxing',
     description: "Exclusive photos from the Rise of a Champion celebration honoring San Antonio's boxing legends.",
-    images: ['https://www.txmxboxing.com/riseofachampion/opengraph-image.png'],
     creator: '@txmx',
   },
   robots: {
@@ -61,5 +53,20 @@ export const metadata: Metadata = {
 }
 
 export default function GalleryPage() {
-  return <GalleryClient />
+  const breadcrumbJsonLd = generateBreadcrumbJsonLd('Gallery')
+  const organizationJsonLd = generateOrganizationJsonLd()
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+      />
+      <GalleryClient />
+    </>
+  )
 }

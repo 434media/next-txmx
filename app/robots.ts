@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/api/', '/actions/'],
+      disallow: ['/api/', '/actions/', '/admin/'],
     },
     sitemap: 'https://www.txmxboxing.com/sitemap.xml',
   }

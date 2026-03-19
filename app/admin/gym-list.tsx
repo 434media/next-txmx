@@ -66,12 +66,12 @@ export default function GymList({ fighters }: GymListProps) {
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Search gyms, cities, or fighters..."
-          className="flex-1 bg-white/[0.04] border border-white/[0.12] text-white text-[13px] leading-tight px-4 py-2.5 focus:outline-none focus:border-[#FFB800]/60 focus:ring-1 focus:ring-[#FFB800]/20 placeholder:text-white/25 rounded-md"
+          className="flex-1 bg-white/4 border border-white/12 text-white text-[13px] leading-tight px-4 py-2.5 focus:outline-none focus:border-[#FFB800]/60 focus:ring-1 focus:ring-[#FFB800]/20 placeholder:text-white/25 rounded-md"
         />
         <select
           value={sortBy}
           onChange={e => setSortBy(e.target.value as 'name' | 'fighters')}
-          className="bg-white/[0.04] border border-white/[0.12] text-white text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800]/60 rounded-md"
+          className="bg-white/4 border border-white/12 text-white text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800]/60 rounded-md"
         >
           <option value="fighters">Sort: Most Fighters</option>
           <option value="name">Sort: Name</option>
@@ -86,7 +86,7 @@ export default function GymList({ fighters }: GymListProps) {
         {filtered.map(gym => (
           <div
             key={gym.name}
-            className="border border-white/[0.08] rounded-lg p-5 hover:border-white/[0.15] transition-colors"
+            className="border border-white/8 rounded-lg p-5 hover:border-white/15 transition-colors"
           >
             <div className="flex items-start justify-between mb-3">
               <div>
@@ -95,7 +95,7 @@ export default function GymList({ fighters }: GymListProps) {
                   <p className="text-white/30 text-[11px] mt-1">{gym.cities.join(' • ')}</p>
                 )}
               </div>
-              <div className="text-right flex-shrink-0 ml-4">
+              <div className="text-right shrink-0 ml-4">
                 <span className="text-[#FFB800] font-mono text-lg font-semibold tabular-nums">{gym.fighters.length}</span>
                 <p className="text-white/30 text-[10px] font-medium tracking-[0.15em]">FIGHTER{gym.fighters.length !== 1 ? 'S' : ''}</p>
               </div>
@@ -104,7 +104,7 @@ export default function GymList({ fighters }: GymListProps) {
               {gym.fighters.map(f => (
                 <span
                   key={f.id}
-                  className="text-[11px] bg-white/[0.04] border border-white/[0.08] px-2 py-1 rounded text-white/60 leading-none"
+                  className="text-[11px] bg-white/4 border border-white/8 px-2 py-1 rounded text-white/60 leading-none"
                 >
                   {f.firstName} {f.lastName}
                   <span className="text-white/25 ml-1 font-mono tabular-nums">

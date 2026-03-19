@@ -3,8 +3,8 @@ import RiseOfAChampionClient from './riseofachampion-client'
 import { generateEventJsonLd, generateBreadcrumbJsonLd, generateOrganizationJsonLd } from '../../../lib/json-ld'
 
 export const metadata: Metadata = {
-  title: 'RSVP - Rise of a Champion | TXMX Boxing x Icon Talks',
-  description: 'Confirm your attendance for the exclusive Rise of a Champion event on December 3rd in San Antonio, TX. An invitation-only celebration honoring Jesse "Bam" Rodriguez, Mario Barrios, Joshua Franco, and Jesse James Leija. Filmed live for national distribution.',
+  title: 'RSVP - Rise of a Champion',
+  description: 'Confirm your attendance for the exclusive Rise of a Champion event in San Antonio, TX. An invitation-only celebration honoring Jesse "Bam" Rodriguez, Selina Barrios, Joshua Franco, and Jesse James Leija. Filmed live for national distribution by TXMX Boxing x Icon Talks.',
   keywords: [
     'Rise of a Champion RSVP',
     'TXMX Boxing Event',
@@ -15,41 +15,27 @@ export const metadata: Metadata = {
     'Joshua The Professor Franco',
     'Jesse James Leija',
     'Boxing Event RSVP',
-    'December 3rd Event',
     'Invitation Only',
     'San Antonio Champions',
     'Sam Watson',
     'Humanitarian Icon Award',
-    'Visionary Icon Awards'
+    'Visionary Icon Awards',
   ],
   authors: [{ name: 'TXMX Boxing' }, { name: 'Icon Talks' }],
   creator: 'TXMX Boxing x Icon Talks',
   publisher: 'TXMX Boxing',
-  other: {
-    'image': 'https://www.txmxboxing.com/riseofachampion/rsvp/opengraph-image.png',
-  },
   openGraph: {
-    title: 'RSVP - Rise of a Champion | December 3rd, San Antonio',
+    title: 'RSVP - Rise of a Champion | San Antonio, TX',
     description: 'Confirm your attendance for this exclusive invitation-only celebration of San Antonio\'s boxing legends. Filmed live for the nationally distributed Rise of a Champion series. One night. Invitation only.',
     url: 'https://www.txmxboxing.com/riseofachampion/rsvp',
     siteName: 'TXMX Boxing',
-    images: [
-      {
-        url: 'https://www.txmxboxing.com/riseofachampion/rsvp/opengraph-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'RSVP - Rise of a Champion | December 3rd, San Antonio',
-        type: 'image/png',
-      },
-    ],
     locale: 'en_US',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'RSVP - Rise of a Champion | December 3rd, San Antonio',
+    title: 'RSVP - Rise of a Champion | San Antonio, TX',
     description: 'Confirm your attendance for this exclusive celebration of San Antonio\'s boxing legends. One night. Invitation only. Filmed live.',
-    images: ['https://www.txmxboxing.com/riseofachampion/rsvp/opengraph-image.png'],
     creator: '@txmx',
   },
   robots: {

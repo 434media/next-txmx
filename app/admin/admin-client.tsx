@@ -112,7 +112,7 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
       <div className="flex">
         {/* Sidebar */}
         <aside
-          className={`fixed lg:sticky top-16 z-40 h-[calc(100vh-4rem)] w-56 bg-black border-r border-white/[0.06] flex-shrink-0 overflow-y-auto transition-transform duration-200 ease-in-out ${
+          className={`fixed lg:sticky top-16 z-40 h-[calc(100vh-4rem)] w-56 bg-black border-r border-white/6 shrink-0 overflow-y-auto transition-transform duration-200 ease-in-out ${
             sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
           }`}
         >
@@ -137,11 +137,11 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
                       onClick={() => handleNav(item.key)}
                       className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-left transition-colors duration-150 group ${
                         isActive
-                          ? 'bg-white/[0.08] text-white'
-                          : 'text-white/50 hover:bg-white/[0.04] hover:text-white/80'
+                          ? 'bg-white/8 text-white'
+                          : 'text-white/50 hover:bg-white/4 hover:text-white/80'
                       }`}
                     >
-                      <span className="text-sm leading-none w-5 text-center flex-shrink-0">{item.icon}</span>
+                      <span className="text-sm leading-none w-5 text-center shrink-0">{item.icon}</span>
                       <span className="text-[13px] font-medium tracking-wide leading-none flex-1">
                         {item.label}
                       </span>
@@ -149,7 +149,7 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
                         <span className={`text-[10px] font-semibold tabular-nums leading-none px-1.5 py-0.5 rounded ${
                           isActive
                             ? 'bg-[#FFB800]/20 text-[#FFB800]'
-                            : 'bg-white/[0.06] text-white/30 group-hover:text-white/50'
+                            : 'bg-white/6 text-white/30 group-hover:text-white/50'
                         }`}>
                           {count}
                         </span>

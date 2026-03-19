@@ -1,7 +1,16 @@
+import type { Metadata } from 'next'
 import { getFighters } from '../actions/fighters'
 import { getVenues } from '../actions/venues'
 import { getEventPromoters } from '../actions/events'
 import AdminClient from './admin-client'
+
+export const metadata: Metadata = {
+  title: 'Admin Dashboard',
+  robots: {
+    index: false,
+    follow: false,
+  },
+}
 
 export const dynamic = 'force-dynamic'
 

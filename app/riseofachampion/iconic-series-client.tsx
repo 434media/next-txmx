@@ -29,7 +29,7 @@ export default function IconicSeriesClient() {
             {/* Unified Responsive Layout */}
             <div className="flex flex-col items-center justify-center">
               {/* Presenters Text Above Logo */}
-              <p className="text-white/70 text-xs md:text-sm tracking-[0.3em] mb-2 md:mb-2 font-light uppercase text-center">
+              <p className="text-white/50 text-xs md:text-sm tracking-widest mb-2 font-semibold uppercase text-center leading-relaxed">
                 ICONTALKS x TXMX Boxing Present
               </p>
               
@@ -61,25 +61,19 @@ export default function IconicSeriesClient() {
             <div className="text-center -mt-20 md:-mt-32 space-y-6 md:space-y-8">
               {/* Event Title */}
               <div className="space-y-2 md:space-y-3">
-                <h1 className="text-4xl md:text-5xl lg:text-7xl xl:text-8xl font-bold text-white/90 tracking-wide leading-tight">
+                <h1 className="text-2xl md:text-3xl lg:text-5xl xl:text-6xl font-semibold text-white/90 tracking-widest leading-relaxed uppercase">
                   A HISTORIC CELEBRATION
                 </h1>
               </div>
 
               {/* Event Description */}
-              <div className="text-sm md:text-base lg:text-lg xl:text-xl text-white/90 max-w-4xl mx-auto leading-relaxed space-y-4 md:space-y-6 px-2 md:px-4">
-                <p className="leading-relaxed tracking-tight md:tracking-wide">
+              <div className="text-xs md:text-base lg:text-lg text-white/60 max-w-3xl mx-auto leading-relaxed space-y-4 px-2 md:px-4">
+                <p className="leading-relaxed tracking-wide">
                   This invitation-only experience honored four of the biggest names in the sport — all from San Antonio — as they were celebrated in their hometown and captured live for the nationally distributed series <span className="text-[#FFB800] font-semibold italic">Rise of a Champion</span>, powered by TXMX Boxing and produced by ICON Media x 434 Media.
                 </p>
-                <p className="leading-relaxed tracking-tight md:tracking-wide">
+                <p className="leading-relaxed tracking-wide">
                   The event brought together a curated room of athletes, entertainers, and industry leaders to celebrate greatness and build meaningful connections.
                 </p>
-                <a 
-                  href="/riseofachampion/gallery"
-                  className="block text-2xl md:text-4xl lg:text-5xl font-bold text-center text-[#FFB800] hover:text-[#FFB800]/80 mt-6 md:mt-8 tracking-wide transition-colors"
-                >
-                  VIEW EVENT GALLERY
-                </a>
               </div>
             </div>
           </div>
@@ -90,12 +84,12 @@ export default function IconicSeriesClient() {
           <div className="max-w-4xl mx-auto">
             {/* Invitation Header */}
             <div className="text-center mb-12 md:mb-16">
-              <p className="text-white/60 text-sm md:text-base max-w-2xl mx-auto leading-relaxed tracking-wide font-light mb-2">
+              <p className="text-white/40 text-xs md:text-sm max-w-2xl mx-auto leading-relaxed tracking-widest font-semibold mb-2 uppercase">
                 Celebrating San Antonio's Finest
               </p>
               <div className="flex items-center justify-center gap-4 md:gap-6 mb-2">
                 <div className="h-px bg-[#FFB800]/40 w-12 md:w-24"></div>
-                <h2 className="text-2xl md:text-3xl text-[#FFB800] tracking-[0.35em] font-bold uppercase">
+                <h2 className="text-sm md:text-lg text-[#FFB800] tracking-widest font-semibold uppercase">
                   HONOREES
                 </h2>
                 <div className="h-px bg-[#FFB800]/40 w-12 md:w-24"></div>
@@ -106,39 +100,39 @@ export default function IconicSeriesClient() {
             {/* Honorees List */}
             <div className="space-y-10 md:space-y-14">
               {/* Visionary Icon Awards - First Group */}
-              <div className="text-left md:text-center border-b border-white/10 pb-10">
-                <h3 className="text-[#FFB800] text-2xl md:text-4xl tracking-wide mb-5 md:mb-7 italic font-bold" style={{ fontFamily: '"Lucida Calligraphy", cursive, serif' }}>
+              <div className="text-center border-b border-white/10 pb-10">
+                <h3 className="text-[#FFB800] text-base md:text-2xl tracking-widest mb-4 md:mb-5 italic font-semibold" style={{ fontFamily: '"Lucida Calligraphy", cursive, serif' }}>
                   Visionary Icon Awards
                 </h3>
-                <div className="space-y-2 md:space-y-3">
-                  <p className="text-white text-lg md:text-2xl font-normal leading-tight">
+                <div className="space-y-2">
+                  <p className="text-white/80 text-sm md:text-lg font-normal leading-relaxed">
                     • Selina Barrios
                   </p>
-                  <p className="text-white text-lg md:text-2xl font-normal leading-tight">
+                  <p className="text-white/80 text-sm md:text-lg font-normal leading-relaxed">
                     • Joshua "The Professor" Franco
                   </p>
-                  <p className="text-white text-lg md:text-2xl font-normal leading-tight">
+                  <p className="text-white/80 text-sm md:text-lg font-normal leading-relaxed">
                     • Jesse "Bam" Rodriguez
                   </p>
                 </div>
               </div>
 
               {/* Humanitarian Icon Award */}
-              <div className="text-left md:text-center border-b border-white/10 pb-10">
-                <h3 className="text-[#FFB800] text-2xl md:text-4xl tracking-wide mb-5 md:mb-7 italic font-bold" style={{ fontFamily: '"Lucida Calligraphy", cursive, serif' }}>
+              <div className="text-center border-b border-white/10 pb-10">
+                <h3 className="text-[#FFB800] text-base md:text-2xl tracking-widest mb-4 md:mb-5 italic font-semibold" style={{ fontFamily: '"Lucida Calligraphy", cursive, serif' }}>
                   Humanitarian Icon Award
                 </h3>
-                <p className="text-white text-lg md:text-2xl font-normal leading-tight">
+                <p className="text-white/80 text-sm md:text-lg font-normal leading-relaxed">
                   • Sam Watson
                 </p>
               </div>
 
               {/* Icon Award */}
-              <div className="text-left md:text-center pb-8">
-                <h3 className="text-[#FFB800] text-2xl md:text-4xl tracking-wide mb-5 md:mb-7 italic font-bold" style={{ fontFamily: '"Lucida Calligraphy", cursive, serif' }}>
+              <div className="text-center pb-8">
+                <h3 className="text-[#FFB800] text-base md:text-2xl tracking-widest mb-4 md:mb-5 italic font-semibold" style={{ fontFamily: '"Lucida Calligraphy", cursive, serif' }}>
                   Icon Award
                 </h3>
-                <p className="text-white text-lg md:text-2xl font-normal leading-tight">
+                <p className="text-white/80 text-sm md:text-lg font-normal leading-relaxed">
                   • Jesse James Leija
                 </p>
               </div>
@@ -176,15 +170,15 @@ export default function IconicSeriesClient() {
                 
                 {/* Content */}
                 <div className="relative z-10">
-                  <h3 className="text-3xl md:text-4xl font-bold text-[#FFB800] mb-4">
+                  <h3 className="text-sm md:text-lg font-semibold text-[#FFB800] mb-3 tracking-widest uppercase leading-relaxed">
                     Relive the Moments
                   </h3>
-                  <p className="text-white/80 text-lg mb-8 leading-relaxed">
+                  <p className="text-white/60 text-xs md:text-base mb-6 leading-relaxed tracking-wide">
                     Browse exclusive photos from the Rise of a Champion celebration, featuring red carpet arrivals, championship moments, live performances, and the unforgettable reception.
                   </p>
                   <a 
                     href="/riseofachampion/gallery"
-                    className="inline-block bg-[#FFB800] text-black hover:bg-[#FFB800]/90 font-bold py-4 px-8 rounded-sm transition-all text-lg"
+                    className="inline-block bg-[#FFB800] text-black hover:bg-[#FFB800]/90 font-semibold py-3 px-6 rounded-md transition-all text-xs md:text-sm tracking-widest uppercase"
                   >
                     View Event Gallery →
                   </a>
