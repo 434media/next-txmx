@@ -59,6 +59,12 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
             >
               SHOP FOUNDERS TEE
             </a>
+            <a
+              href="/admin"
+              className="text-white/50 text-sm font-bold tracking-widest hover:text-white/80 hover:underline decoration-2 underline-offset-4 transition-all duration-300"
+            >
+              ADMIN
+            </a>
 
             {/* @TXMXBOXING Dropdown */}
             <div ref={dropdownRef} className="relative">
