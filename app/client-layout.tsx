@@ -3,6 +3,7 @@
 import type React from "react"
 import { Geist, Geist_Mono } from "next/font/google"
 import { useState } from "react"
+import { usePathname } from "next/navigation"
 import Navbar from "../components/navbar"
 import SlideOutModal from "../components/slide-out-modal"
 import GlobalStyles from "../components/global-styles"
@@ -29,6 +30,8 @@ export default function ClientLayout({
   children: React.ReactNode
 }>) {
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const pathname = usePathname()
+  const isAdmin = pathname?.startsWith('/admin')
 
   const openModal = () => setIsModalOpen(true)
   const closeModal = () => setIsModalOpen(false)
@@ -107,7 +110,7 @@ export default function ClientLayout({
         <GlobalStyles />
         <Navbar onMenuClick={openModal} />
         {children}        
-        <Footer />
+        {!isAdmin && <Footer />}
         
         {/* Universal Slide Out Modal */}
         <SlideOutModal isOpen={isModalOpen} onClose={closeModal} />

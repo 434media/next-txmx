@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import type { Fighter } from '../../lib/types/fighter'
+import { useAdminAuth } from './admin-auth-gate'
 import AddFighterForm from './add-fighter-form'
 import FighterList from './fighter-list'
 import TDLRImport from './tdlr-import'
@@ -49,6 +50,7 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
   const [promoterDocs, setPromoterDocs] = useState<PromoterData[]>(initialPromoterDocs)
   const [activeTab, setActiveTab] = useState<Tab>('list')
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const { user, signOut: handleSignOut } = useAdminAuth()
 
   const handleFighterAdded = (fighter: Fighter) => {
     setFighters(prev => [...prev, fighter].sort((a, b) => a.lastName.localeCompare(b.lastName)))
@@ -162,7 +164,8 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
             </h1>
           </div>
 
-          <nav className="px-2 pb-8">
+          <nav className="px-2 pb-8 flex flex-col h-[calc(100%-3.5rem)]">
+            <div className="flex-1">
             {NAV_SECTIONS.map(section => (
               <div key={section.label} className="mb-5">
                 <p className="px-3 mb-1.5 text-[10px] font-semibold text-gray-300 tracking-[0.2em] leading-relaxed">
@@ -199,6 +202,27 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
                 })}
               </div>
             ))}
+            </div>
+
+            {/* Sign Out */}
+            <div className="border-t border-gray-200 pt-4">
+              {user && (
+                <p className="px-3 mb-2 text-[10px] text-gray-300 tracking-wide truncate" title={user.email || ''}>
+                  {user.email}
+                </p>
+              )}
+              <button
+                onClick={handleSignOut}
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-left text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors duration-150"
+              >
+                <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+                </svg>
+                <span className="text-[13px] font-medium tracking-wide leading-none">
+                  Sign Out
+                </span>
+              </button>
+            </div>
           </nav>
         </aside>
 
