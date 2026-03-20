@@ -1,0 +1,23 @@
+
+📋 184 events already in Firestore
+📁 199 JSON files found in /Users/jessebubble/Downloads/next-txmx/tdlr-downloads
+
+  ⚠ 03-29-25-43507-tmb-san-antonio.json: no eventNumber, skipping
+  ⚠ 06-14-25-43543-Elite-Fighting-Amarillo.json: no eventNumber, skipping
+  ⚠ 07-03-25-43544-biyu-houston.json: no eventNumber, skipping
+  ⚠ 07-11-25-43553-tcl-2-dallas.json: no eventNumber, skipping
+  ⚠ 09-13-25-20260007-paradigm-sugarland.json: no eventNumber, skipping
+  → 2023-12-15 | KO ENTERTAINMENT |  (Event #43331)... ✓ 5 bouts, 1 new fighters
+  → 2024-12-15 | TMB | SAN ANTONIO (Event #43475)... ✓ 10 bouts, 3 new fighters
+  → 2023-12-16 |  |  (Event #6323)... ✓ 9 bouts, 12 new fighters
+  → 2024-12-13 | RED OWL | HOUSTON (Event #43466)... ✓ 8 bouts, 5 new fighters
+  → 2026-02-21 | Tx Combat Sports | Houston (Event #20260093)... ✓ 7 bouts, 3 new fighters
+  → 2023-12-01 | THURGOOD MARSHALL | HOUSTON (Event #43323)... ✓ 10 bouts, 7 new fighters
+  →  | Black Gloves |  (Event #43408)... ✓ 6 bouts, 4 new fighters
+  → 2024-07-06 | TMB | FLORESVILLE (Event #43411)... ✓ 10 bouts, 1 new fighters
+  → 2023-07-13 |  | FORT WORTH (Event #43259)... ✓ 5 bouts, 4 new fighters
+  → 2023-08-12 | FORCE TRAIN | HOUSTON (Event #43272)... ✓ 6 bouts, 3 new fighters
+
+══════════════════════════════════════════════════
+✅ Imported: 10 events (76 bouts, 43 new fighters)
+⏭  Skipped:  189 (already imported or no event number)
