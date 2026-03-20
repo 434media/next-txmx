@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { importTDLREvent } from '../actions/tdlr-import'
 
 interface TDLRFighter {
@@ -42,7 +42,22 @@ interface ImportResult {
   errors: string[]
 }
 
-export default function TDLRImport() {
+type BatchItemStatus = 'pending' | 'parsing' | 'parsed' | 'saving' | 'done' | 'error'
+
+interface BatchItem {
+  file: File
+  status: BatchItemStatus
+  event?: TDLREvent
+  result?: ImportResult
+  error?: string
+}
+
+interface TDLRImportProps {
+  onImportComplete?: () => void
+}
+
+export default function TDLRImport({ onImportComplete }: TDLRImportProps) {
+  // Single-file mode state
   const [event, setEvent] = useState<TDLREvent | null>(null)
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -50,6 +65,11 @@ export default function TDLRImport() {
   const [fileName, setFileName] = useState('')
   const [importResult, setImportResult] = useState<ImportResult | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
+
+  // Batch mode state
+  const [batchItems, setBatchItems] = useState<BatchItem[]>([])
+  const [batchRunning, setBatchRunning] = useState(false)
+  const batchFileRef = useRef<HTMLInputElement>(null)
 
   const handleUpload = async (file: File) => {
     setLoading(true)
@@ -80,11 +100,17 @@ export default function TDLRImport() {
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault()
-    const file = e.dataTransfer.files[0]
-    if (file?.type === 'application/pdf') {
-      handleUpload(file)
+    const files = Array.from(e.dataTransfer.files).filter(
+      (f) => f.type === 'application/pdf'
+    )
+    if (files.length === 0) {
+      setError('Please upload PDF files')
+      return
+    }
+    if (files.length === 1) {
+      handleUpload(files[0])
     } else {
-      setError('Please upload a PDF file')
+      startBatch(files)
     }
   }
 
@@ -92,6 +118,91 @@ export default function TDLRImport() {
     const file = e.target.files?.[0]
     if (file) handleUpload(file)
   }
+
+  const handleBatchFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []).filter(
+      (f) => f.type === 'application/pdf'
+    )
+    if (files.length > 0) {
+      startBatch(files)
+    }
+  }
+
+  const startBatch = (files: File[]) => {
+    setEvent(null)
+    setImportResult(null)
+    setError('')
+    setBatchItems(
+      files.map((file) => ({ file, status: 'pending' as BatchItemStatus }))
+    )
+  }
+
+  const runBatch = useCallback(async () => {
+    setBatchRunning(true)
+
+    for (let i = 0; i < batchItems.length; i++) {
+      const item = batchItems[i]
+      if (item.status !== 'pending') continue
+
+      // Parse
+      setBatchItems((prev) =>
+        prev.map((it, idx) => (idx === i ? { ...it, status: 'parsing' } : it))
+      )
+
+      let parsedEvent: TDLREvent
+      try {
+        const response = await fetch('/api/tdlr-parse', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/pdf' },
+          body: item.file,
+        })
+        const data = await response.json()
+        if (!response.ok) throw new Error(data.error || 'Failed to parse PDF')
+        parsedEvent = data
+      } catch (err) {
+        setBatchItems((prev) =>
+          prev.map((it, idx) =>
+            idx === i
+              ? { ...it, status: 'error', error: err instanceof Error ? err.message : 'Parse failed' }
+              : it
+          )
+        )
+        continue
+      }
+
+      setBatchItems((prev) =>
+        prev.map((it, idx) =>
+          idx === i ? { ...it, status: 'parsed', event: parsedEvent } : it
+        )
+      )
+
+      // Save
+      setBatchItems((prev) =>
+        prev.map((it, idx) => (idx === i ? { ...it, status: 'saving' } : it))
+      )
+
+      try {
+        const res = await importTDLREvent(parsedEvent)
+        if (!res.success) throw new Error(res.error || 'Import failed')
+        setBatchItems((prev) =>
+          prev.map((it, idx) =>
+            idx === i ? { ...it, status: 'done', result: res.results } : it
+          )
+        )
+      } catch (err) {
+        setBatchItems((prev) =>
+          prev.map((it, idx) =>
+            idx === i
+              ? { ...it, status: 'error', error: err instanceof Error ? err.message : 'Import failed' }
+              : it
+          )
+        )
+      }
+    }
+
+    setBatchRunning(false)
+    onImportComplete?.()
+  }, [batchItems, onImportComplete])
 
   const methodColor = (method: string) => {
     switch (method) {
@@ -107,6 +218,169 @@ export default function TDLRImport() {
     }
   }
 
+  const batchTotals = batchItems.reduce(
+    (acc, item) => {
+      if (item.result) {
+        acc.fightersCreated += item.result.fightersCreated
+        acc.fightersUpdated += item.result.fightersUpdated
+        acc.boutsRecorded += item.result.boutsRecorded
+        acc.errors += item.result.errors.length
+      }
+      return acc
+    },
+    { fightersCreated: 0, fightersUpdated: 0, boutsRecorded: 0, errors: 0 }
+  )
+
+  const batchDone = batchItems.filter((i) => i.status === 'done').length
+  const batchFailed = batchItems.filter((i) => i.status === 'error').length
+  const batchFinished = !batchRunning && batchItems.length > 0 && batchItems.every((i) => i.status === 'done' || i.status === 'error')
+
+  // ─── Batch Mode UI ───
+  if (batchItems.length > 0) {
+    return (
+      <div className="space-y-6">
+        {/* Batch Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-bold text-gray-900 tracking-widest">
+              BATCH IMPORT
+            </h3>
+            <p className="text-gray-400 text-xs tracking-wide mt-1">
+              {batchItems.length} PDF{batchItems.length !== 1 ? 's' : ''} queued
+              {batchRunning && ` — processing ${batchDone + batchFailed + 1} of ${batchItems.length}`}
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            {!batchRunning && !batchFinished && (
+              <button
+                onClick={runBatch}
+                className="bg-[#FFB800] text-black font-bold text-sm tracking-widest px-6 py-3 rounded-lg hover:bg-[#FFB800]/90 transition-colors"
+              >
+                IMPORT ALL
+              </button>
+            )}
+            <button
+              onClick={() => {
+                setBatchItems([])
+                if (batchFileRef.current) batchFileRef.current.value = ''
+              }}
+              disabled={batchRunning}
+              className="text-gray-400 text-xs tracking-widest hover:text-gray-500 transition-colors disabled:opacity-50"
+            >
+              {batchFinished ? '← START OVER' : '← CANCEL'}
+            </button>
+          </div>
+        </div>
+
+        {/* Progress Bar */}
+        {batchRunning && (
+          <div className="w-full bg-gray-100 rounded-full h-2">
+            <div
+              className="bg-[#FFB800] h-2 rounded-full transition-all duration-300"
+              style={{
+                width: `${((batchDone + batchFailed) / batchItems.length) * 100}%`,
+              }}
+            />
+          </div>
+        )}
+
+        {/* Batch Summary (when finished) */}
+        {batchFinished && (
+          <div className="bg-green-50 border border-green-300 rounded-lg p-6 space-y-4">
+            <div className="flex items-center gap-2">
+              <svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              <h4 className="text-green-600 font-bold text-sm tracking-widest">
+                BATCH IMPORT COMPLETE
+              </h4>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
+              <div>
+                <span className="text-gray-400 text-xs tracking-widest block">EVENTS</span>
+                <span className="text-gray-900 font-mono text-lg">{batchDone}</span>
+              </div>
+              <div>
+                <span className="text-gray-400 text-xs tracking-widest block">FIGHTERS CREATED</span>
+                <span className="text-gray-900 font-mono text-lg">{batchTotals.fightersCreated}</span>
+              </div>
+              <div>
+                <span className="text-gray-400 text-xs tracking-widest block">FIGHTERS UPDATED</span>
+                <span className="text-gray-900 font-mono text-lg">{batchTotals.fightersUpdated}</span>
+              </div>
+              <div>
+                <span className="text-gray-400 text-xs tracking-widest block">BOUTS RECORDED</span>
+                <span className="text-gray-900 font-mono text-lg">{batchTotals.boutsRecorded}</span>
+              </div>
+              {batchFailed > 0 && (
+                <div>
+                  <span className="text-red-400 text-xs tracking-widest block">FAILED</span>
+                  <span className="text-red-600 font-mono text-lg">{batchFailed}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* File List */}
+        <div className="space-y-2">
+          {batchItems.map((item, idx) => (
+            <div
+              key={idx}
+              className={`flex items-center justify-between rounded-lg px-4 py-3 text-sm border transition-colors ${
+                item.status === 'done'
+                  ? 'bg-green-50 border-green-200'
+                  : item.status === 'error'
+                  ? 'bg-red-50 border-red-200'
+                  : item.status === 'parsing' || item.status === 'saving'
+                  ? 'bg-amber-50 border-[#FFB800]/30'
+                  : 'bg-gray-50 border-gray-200'
+              }`}
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <span className="text-gray-400 font-mono text-xs w-6 text-right shrink-0">
+                  {idx + 1}
+                </span>
+                <span className="text-gray-700 truncate">{item.file.name}</span>
+              </div>
+              <div className="flex items-center gap-3 shrink-0 ml-4">
+                {item.status === 'pending' && (
+                  <span className="text-gray-400 text-xs tracking-wider">QUEUED</span>
+                )}
+                {item.status === 'parsing' && (
+                  <span className="flex items-center gap-2 text-[#FFB800] text-xs tracking-wider">
+                    <span className="animate-spin w-3 h-3 border-2 border-[#FFB800] border-t-transparent rounded-full" />
+                    PARSING
+                  </span>
+                )}
+                {item.status === 'parsed' && (
+                  <span className="text-blue-600 text-xs tracking-wider">PARSED</span>
+                )}
+                {item.status === 'saving' && (
+                  <span className="flex items-center gap-2 text-[#FFB800] text-xs tracking-wider">
+                    <span className="animate-spin w-3 h-3 border-2 border-[#FFB800] border-t-transparent rounded-full" />
+                    SAVING
+                  </span>
+                )}
+                {item.status === 'done' && item.result && (
+                  <span className="text-green-600 text-xs tracking-wider">
+                    ✓ {item.result.boutsRecorded} bouts
+                  </span>
+                )}
+                {item.status === 'error' && (
+                  <span className="text-red-500 text-xs tracking-wider truncate max-w-48" title={item.error}>
+                    ✗ {item.error}
+                  </span>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  // ─── Single File Mode UI ───
   return (
     <div className="space-y-6">
       {/* Upload Zone */}
@@ -140,13 +414,31 @@ export default function TDLRImport() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m6.75 12l-3-3m0 0l-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
             </svg>
             <p className="text-gray-700 text-sm tracking-wide font-bold">
-              DROP TDLR PDF HERE
+              DROP TDLR PDF(s) HERE
             </p>
             <p className="text-gray-400 text-xs tracking-wide">
-              or click to browse — Texas Dept. of Licensing and Regulation boxing results
+              drop one for preview, or multiple to batch import
             </p>
           </div>
         )}
+      </div>
+
+      {/* Batch Upload Button */}
+      <div className="flex justify-center">
+        <button
+          onClick={() => batchFileRef.current?.click()}
+          className="text-gray-500 text-xs tracking-widest hover:text-gray-700 transition-colors border border-gray-300 rounded-lg px-4 py-2 hover:border-gray-400"
+        >
+          SELECT MULTIPLE PDFs FOR BATCH IMPORT
+        </button>
+        <input
+          ref={batchFileRef}
+          type="file"
+          accept="application/pdf"
+          multiple
+          onChange={handleBatchFileChange}
+          className="hidden"
+        />
       </div>
 
       {/* Error */}
@@ -328,6 +620,7 @@ export default function TDLRImport() {
                       setError(res.error || 'Import failed')
                     } else {
                       setImportResult(res.results)
+                      onImportComplete?.()
                     }
                   } catch (err) {
                     setError(err instanceof Error ? err.message : 'Import failed')
