@@ -12,8 +12,8 @@ interface FighterListProps {
 }
 
 const inputClass =
-  'w-full bg-white/4 border border-white/12 text-white text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800]/60 focus:ring-1 focus:ring-[#FFB800]/20 placeholder:text-white/25 rounded-md'
-const labelClass = 'block text-[10px] font-semibold text-white/40 tracking-[0.15em] mb-1'
+  'w-full bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800] focus:ring-1 focus:ring-[#FFB800]/30 placeholder:text-gray-400 rounded-md'
+const labelClass = 'block text-[10px] font-semibold text-gray-400 tracking-[0.15em] mb-1'
 
 export default function FighterList({ fighters, onDelete, onUpdate }: FighterListProps) {
   const [search, setSearch] = useState('')
@@ -26,6 +26,8 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
   const [editingId, setEditingId] = useState<string | null>(null)
   const [savingId, setSavingId] = useState<string | null>(null)
   const [editData, setEditData] = useState<Partial<Fighter>>({})
+  const [currentPage, setCurrentPage] = useState(1)
+  const perPage = 25
 
   const filtered = fighters
     .filter(f => {
@@ -57,6 +59,10 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
           return 0
       }
     })
+
+  // Pagination
+  const totalPages = Math.ceil(filtered.length / perPage)
+  const paginated = filtered.slice((currentPage - 1) * perPage, currentPage * perPage)
 
   // Collect unique weight classes from current fighters for the filter
   const activeWeightClasses = [...new Set(fighters.map(f => f.weightClass))].sort(
@@ -142,19 +148,19 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
 
   const statusColor = (status: string) => {
     switch (status) {
-      case 'active': return 'text-green-400'
-      case 'inactive': return 'text-yellow-400'
-      case 'retired': return 'text-red-400'
-      default: return 'text-white/50'
+      case 'active': return 'text-green-600'
+      case 'inactive': return 'text-yellow-600'
+      case 'retired': return 'text-red-600'
+      default: return 'text-gray-400'
     }
   }
 
   const regionLabel = (region: string) => {
     switch (region) {
-      case 'TX': return 'bg-blue-500/20 text-blue-400 border-blue-500/30'
-      case 'MX': return 'bg-green-500/20 text-green-400 border-green-500/30'
+      case 'TX': return 'bg-blue-50 text-blue-600 border-blue-200'
+      case 'MX': return 'bg-green-50 text-green-600 border-green-300'
 
-      default: return 'bg-white/10 text-white/60 border-white/20'
+      default: return 'bg-gray-100 text-gray-500 border-gray-300'
     }
   }
 
@@ -162,8 +168,8 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
     return (
       <div className="text-center py-24">
         <div className="text-5xl mb-5">🥊</div>
-        <h2 className="text-lg font-semibold text-white/80 tracking-[0.2em] mb-2">NO FIGHTERS YET</h2>
-        <p className="text-white/35 text-[13px] leading-relaxed tracking-wide">
+        <h2 className="text-lg font-semibold text-gray-700 tracking-[0.2em] mb-2">NO FIGHTERS YET</h2>
+        <p className="text-gray-400 text-[13px] leading-relaxed tracking-wide">
           Add your first fighter to start building the database
         </p>
       </div>
@@ -177,16 +183,16 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
         <div className="flex flex-col sm:flex-row gap-3">
           <input
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={e => { setSearch(e.target.value); setCurrentPage(1) }}
             placeholder="Search by name, nickname, or city..."
-            className="flex-1 bg-white/4 border border-white/12 text-white text-[13px] leading-tight px-4 py-2.5 focus:outline-none focus:border-[#FFB800]/60 focus:ring-1 focus:ring-[#FFB800]/20 placeholder:text-white/25 rounded-md"
+            className="flex-1 bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-4 py-2.5 focus:outline-none focus:border-[#FFB800] focus:ring-1 focus:ring-[#FFB800]/30 placeholder:text-gray-400 rounded-md"
           />
         </div>
         <div className="flex flex-wrap gap-2">
           <select
             value={filterWeight}
-            onChange={e => setFilterWeight(e.target.value)}
-            className="bg-white/4 border border-white/12 text-white text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800]/60 rounded-md"
+            onChange={e => { setFilterWeight(e.target.value); setCurrentPage(1) }}
+            className="bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800] rounded-md"
           >
             <option value="all">All Weight Classes</option>
             {activeWeightClasses.map(wc => (
@@ -195,8 +201,8 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
           </select>
           <select
             value={filterRegion}
-            onChange={e => setFilterRegion(e.target.value)}
-            className="bg-white/4 border border-white/12 text-white text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800]/60 rounded-md"
+            onChange={e => { setFilterRegion(e.target.value); setCurrentPage(1) }}
+            className="bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800] rounded-md"
           >
             <option value="all">All Regions</option>
             <option value="TX">TX</option>
@@ -205,8 +211,8 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
           </select>
           <select
             value={filterStatus}
-            onChange={e => setFilterStatus(e.target.value)}
-            className="bg-white/4 border border-white/12 text-white text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800]/60 rounded-md"
+            onChange={e => { setFilterStatus(e.target.value); setCurrentPage(1) }}
+            className="bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800] rounded-md"
           >
             <option value="all">All Status</option>
             <option value="active">Active</option>
@@ -215,8 +221,8 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
           </select>
           <select
             value={filterSex}
-            onChange={e => setFilterSex(e.target.value)}
-            className="bg-white/4 border border-white/12 text-white text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800]/60 rounded-md"
+            onChange={e => { setFilterSex(e.target.value); setCurrentPage(1) }}
+            className="bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800] rounded-md"
           >
             <option value="all">All Divisions</option>
             <option value="male">Men</option>
@@ -225,7 +231,7 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
           <select
             value={sortBy}
             onChange={e => setSortBy(e.target.value)}
-            className="bg-white/4 border border-white/12 text-white text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800]/60 rounded-md"
+            className="bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800] rounded-md"
           >
             <option value="name">Sort: Name</option>
             <option value="wins">Sort: Most Wins</option>
@@ -236,13 +242,16 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
         </div>
       </div>
 
-      <p className="text-white/30 text-[11px] font-medium tracking-[0.15em]">
+      <p className="text-gray-400 text-[11px] font-medium tracking-[0.15em]">
         {filtered.length} FIGHTER{filtered.length !== 1 ? 'S' : ''}
+        {totalPages > 1 && (
+          <span className="ml-2">• PAGE {currentPage} OF {totalPages}</span>
+        )}
       </p>
 
       {/* Fighter Cards */}
       <div className="grid gap-3">
-        {filtered.map(fighter => {
+        {paginated.map(fighter => {
           const isEditing = editingId === fighter.id
 
           return (
@@ -250,8 +259,8 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
               key={fighter.id}
               className={`border rounded-lg overflow-hidden transition-colors ${
                 isEditing
-                  ? 'border-[#FFB800]/40 bg-[#FFB800]/5'
-                  : 'border-white/10 hover:border-white/20'
+                  ? 'border-amber-300 bg-amber-50/10'
+                  : 'border-gray-200 hover:border-gray-300'
               }`}
             >
               {/* Card Header — clickable to open profile */}
@@ -264,17 +273,17 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
                     startEditing(fighter)
                   }
                 }}
-                className="w-full flex items-center gap-3.5 px-4 py-3.5 text-left hover:bg-white/3 transition-colors"
+                className="w-full flex items-center gap-3.5 px-4 py-3.5 text-left hover:bg-gray-50 transition-colors"
               >
                 {/* Profile Image or Placeholder */}
                 {fighter.profileImageUrl ? (
                   <img
                     src={fighter.profileImageUrl}
                     alt={`${fighter.firstName} ${fighter.lastName}`}
-                    className="w-12 h-12 rounded-full object-cover border-2 border-white/20"
+                    className="w-12 h-12 rounded-full object-cover border-2 border-gray-300"
                   />
                 ) : (
-                  <div className="w-12 h-12 rounded-full bg-white/10 border-2 border-white/20 flex items-center justify-center text-white/40 font-bold">
+                  <div className="w-12 h-12 rounded-full bg-gray-100 border-2 border-gray-300 flex items-center justify-center text-gray-400 font-bold">
                     {fighter.firstName[0]}{fighter.lastName?.[0]}
                   </div>
                 )}
@@ -282,17 +291,17 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
                 {/* Name & Quick Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <h3 className="text-white font-semibold text-[15px] leading-tight tracking-wide truncate">
+                    <h3 className="text-gray-900 font-semibold text-[15px] leading-tight tracking-wide truncate">
                       {fighter.firstName} {fighter.lastName}
                     </h3>
                     {fighter.nickname && (
-                      <span className="text-[#FFB800]/80 text-[11px] font-medium hidden sm:inline">
+                      <span className="text-amber-600 text-[11px] font-medium hidden sm:inline">
                         &quot;{fighter.nickname}&quot;
                       </span>
                     )}
                   </div>
                   <div className="flex items-center gap-2 mt-1 flex-wrap">
-                    <span className="text-white/40 text-[11px] leading-none">{fighter.weightClass}</span>
+                    <span className="text-gray-400 text-[11px] leading-none">{fighter.weightClass}</span>
                     <span className={`text-[10px] leading-none px-1.5 py-0.5 rounded border ${regionLabel(fighter.region)}`}>
                       {fighter.region}
                     </span>
@@ -300,7 +309,7 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
                       {fighter.status.toUpperCase()}
                     </span>
                     {fighter.residence && (
-                      <span className="text-white/30 text-[11px] leading-none hidden sm:inline">
+                      <span className="text-gray-400 text-[11px] leading-none hidden sm:inline">
                         {fighter.residence.city}, {fighter.residence.state}
                       </span>
                     )}
@@ -309,17 +318,17 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
 
                 {/* Record */}
                 <div className="hidden sm:flex items-center gap-1 text-[13px] font-semibold font-mono tabular-nums">
-                  <span className="text-green-400">{fighter.record.wins}</span>
-                  <span className="text-white/20">-</span>
-                  <span className="text-red-400">{fighter.record.losses}</span>
-                  <span className="text-white/20">-</span>
-                  <span className="text-white/50">{fighter.record.draws}</span>
-                  <span className="text-white/20 ml-1 text-[10px]">({fighter.record.knockouts} KO)</span>
+                  <span className="text-green-600">{fighter.record.wins}</span>
+                  <span className="text-gray-300">-</span>
+                  <span className="text-red-600">{fighter.record.losses}</span>
+                  <span className="text-gray-300">-</span>
+                  <span className="text-gray-400">{fighter.record.draws}</span>
+                  <span className="text-gray-300 ml-1 text-[10px]">({fighter.record.knockouts} KO)</span>
                 </div>
 
                 {/* Expand Arrow */}
                 <svg
-                  className={`w-4 h-4 text-white/30 transition-transform duration-200 shrink-0 ${isEditing ? 'rotate-180' : ''}`}
+                  className={`w-4 h-4 text-gray-400 transition-transform duration-200 shrink-0 ${isEditing ? 'rotate-180' : ''}`}
                   fill="none" stroke="currentColor" viewBox="0 0 24 24"
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -328,18 +337,18 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
 
               {/* Expanded Edit Profile */}
               {isEditing && (
-                <div className="border-t border-white/10 p-5 space-y-5">
+                <div className="border-t border-gray-200 p-5 space-y-5">
                   {/* Mobile Record */}
                   <div className="sm:hidden flex items-center gap-2 text-sm font-bold mb-2">
-                    <span className="text-green-400">{fighter.record.wins}W</span>
-                    <span className="text-red-400">{fighter.record.losses}L</span>
-                    <span className="text-white/60">{fighter.record.draws}D</span>
-                    <span className="text-white/30">({fighter.record.knockouts} KO)</span>
+                    <span className="text-green-600">{fighter.record.wins}W</span>
+                    <span className="text-red-600">{fighter.record.losses}L</span>
+                    <span className="text-gray-500">{fighter.record.draws}D</span>
+                    <span className="text-gray-400">({fighter.record.knockouts} KO)</span>
                   </div>
 
                   {/* Identity */}
                   <div>
-                    <h4 className="text-[10px] font-semibold text-[#FFB800]/80 tracking-[0.2em] mb-3">IDENTITY</h4>
+                    <h4 className="text-[10px] font-semibold text-amber-600 tracking-[0.2em] mb-3">IDENTITY</h4>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                       <div>
                         <label className={labelClass}>First Name</label>
@@ -380,7 +389,7 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
 
                   {/* Boxing Details */}
                   <div>
-                    <h4 className="text-[10px] font-semibold text-[#FFB800]/80 tracking-[0.2em] mb-3">BOXING</h4>
+                    <h4 className="text-[10px] font-semibold text-amber-600 tracking-[0.2em] mb-3">BOXING</h4>
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                       <div>
                         <label className={labelClass}>Weight Class</label>
@@ -447,7 +456,7 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
 
                   {/* Record */}
                   <div>
-                    <h4 className="text-[10px] font-semibold text-[#FFB800]/80 tracking-[0.2em] mb-3">RECORD</h4>
+                    <h4 className="text-[10px] font-semibold text-amber-600 tracking-[0.2em] mb-3">RECORD</h4>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                       <div>
                         <label className={labelClass}>Wins</label>
@@ -459,7 +468,7 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
                             ...d,
                             record: { ...d.record!, wins: Number(e.target.value) || 0 }
                           }))}
-                          className={inputClass + ' font-mono text-green-400'}
+                          className={inputClass + ' font-mono text-green-600'}
                         />
                       </div>
                       <div>
@@ -472,7 +481,7 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
                             ...d,
                             record: { ...d.record!, losses: Number(e.target.value) || 0 }
                           }))}
-                          className={inputClass + ' font-mono text-red-400'}
+                          className={inputClass + ' font-mono text-red-600'}
                         />
                       </div>
                       <div>
@@ -506,7 +515,7 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
 
                   {/* Location */}
                   <div>
-                    <h4 className="text-[10px] font-semibold text-[#FFB800]/80 tracking-[0.2em] mb-3">LOCATION</h4>
+                    <h4 className="text-[10px] font-semibold text-amber-600 tracking-[0.2em] mb-3">LOCATION</h4>
                     <div className="grid grid-cols-3 gap-3">
                       <div>
                         <label className={labelClass}>City</label>
@@ -547,7 +556,7 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
 
                   {/* Team */}
                   <div>
-                    <h4 className="text-[10px] font-semibold text-[#FFB800]/80 tracking-[0.2em] mb-3">TEAM</h4>
+                    <h4 className="text-[10px] font-semibold text-amber-600 tracking-[0.2em] mb-3">TEAM</h4>
                     <div className="grid grid-cols-3 gap-3">
                       <div>
                         <label className={labelClass}>Gym</label>
@@ -591,15 +600,15 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
                   {/* Titles (read-only display) */}
                   {fighter.titles && fighter.titles.length > 0 && (
                     <div>
-                      <h4 className="text-[10px] font-semibold text-[#FFB800]/80 tracking-[0.2em] mb-2">TITLES</h4>
+                      <h4 className="text-[10px] font-semibold text-amber-600 tracking-[0.2em] mb-2">TITLES</h4>
                       <div className="flex flex-wrap gap-2">
                         {fighter.titles.map((t, i) => (
                           <span
                             key={i}
                             className={`text-xs px-2 py-1 rounded ${
                               t.current
-                                ? 'bg-[#FFB800]/20 text-[#FFB800] border border-[#FFB800]/30'
-                                : 'bg-white/5 text-white/60 border border-white/10'
+                                ? 'bg-amber-100 text-[#FFB800] border border-amber-300'
+                                : 'bg-gray-50 text-gray-500 border border-gray-200'
                             }`}
                           >
                             🏆 {t.org} {t.title}
@@ -611,17 +620,17 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
 
                   {/* TDLR ID display */}
                   {(fighter as Fighter & { tdlrBoxerId?: string }).tdlrBoxerId && (
-                    <p className="text-white/30 text-xs font-mono">
+                    <p className="text-gray-400 text-xs font-mono">
                       TDLR Boxer ID: {(fighter as Fighter & { tdlrBoxerId?: string }).tdlrBoxerId}
                     </p>
                   )}
 
                   {/* Actions */}
-                  <div className="flex items-center justify-between pt-4 border-t border-white/6">
+                  <div className="flex items-center justify-between pt-4 border-t border-gray-200">
                     <button
                       onClick={() => handleDelete(fighter.id!, `${fighter.firstName} ${fighter.lastName}`)}
                       disabled={deletingId === fighter.id}
-                      className="text-[11px] font-semibold tracking-[0.15em] text-red-400/80 hover:text-red-300 disabled:opacity-50 transition-colors px-3 py-1.5 border border-red-500/15 rounded hover:border-red-500/30"
+                      className="text-[11px] font-semibold tracking-[0.15em] text-red-600 hover:text-red-700 disabled:opacity-50 transition-colors px-3 py-1.5 border border-red-200 rounded hover:border-red-300"
                     >
                       {deletingId === fighter.id ? 'DELETING...' : 'DELETE FIGHTER'}
                     </button>
@@ -629,7 +638,7 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
                     <div className="flex gap-3">
                       <button
                         onClick={() => setEditingId(null)}
-                        className="text-[11px] font-semibold tracking-[0.15em] text-white/40 hover:text-white/70 transition-colors px-3 py-1.5"
+                        className="text-[11px] font-semibold tracking-[0.15em] text-gray-400 hover:text-gray-600 transition-colors px-3 py-1.5"
                       >
                         CANCEL
                       </button>
@@ -648,6 +657,52 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
           )
         })}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+          <button
+            onClick={() => { setCurrentPage(p => Math.max(1, p - 1)); setEditingId(null) }}
+            disabled={currentPage === 1}
+            className="text-[11px] font-semibold tracking-[0.15em] px-4 py-2 border border-gray-200 rounded-md text-gray-500 hover:bg-gray-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            ← PREV
+          </button>
+          <div className="flex items-center gap-1">
+            {Array.from({ length: totalPages }, (_, i) => i + 1)
+              .filter(p => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 2)
+              .reduce<(number | 'ellipsis')[]>((acc, p, i, arr) => {
+                if (i > 0 && p - (arr[i - 1]) > 1) acc.push('ellipsis')
+                acc.push(p)
+                return acc
+              }, [])
+              .map((item, i) =>
+                item === 'ellipsis' ? (
+                  <span key={`e${i}`} className="text-gray-300 text-xs px-1">…</span>
+                ) : (
+                  <button
+                    key={item}
+                    onClick={() => { setCurrentPage(item); setEditingId(null) }}
+                    className={`text-[11px] font-semibold w-8 h-8 rounded-md transition-colors ${
+                      currentPage === item
+                        ? 'bg-[#FFB800] text-black'
+                        : 'text-gray-500 hover:bg-gray-100'
+                    }`}
+                  >
+                    {item}
+                  </button>
+                )
+              )}
+          </div>
+          <button
+            onClick={() => { setCurrentPage(p => Math.min(totalPages, p + 1)); setEditingId(null) }}
+            disabled={currentPage === totalPages}
+            className="text-[11px] font-semibold tracking-[0.15em] px-4 py-2 border border-gray-200 rounded-md text-gray-500 hover:bg-gray-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            NEXT →
+          </button>
+        </div>
+      )}
     </div>
   )
 }

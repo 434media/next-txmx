@@ -9,7 +9,14 @@ export interface VenueData {
   city: string
   state: string
   eventCount: number
+  capacity: string
+  type: string
+  phone: string
+  website: string
+  instagram: string
+  notes: string
   createdAt: string
+  updatedAt: string
 }
 
 export async function getVenues(): Promise<VenueData[]> {
@@ -20,6 +27,26 @@ export async function getVenues(): Promise<VenueData[]> {
 
   return snapshot.docs.map(doc => ({
     id: doc.id,
+    capacity: '',
+    type: '',
+    phone: '',
+    website: '',
+    instagram: '',
+    notes: '',
+    updatedAt: '',
     ...doc.data(),
   })) as VenueData[]
+}
+
+export async function updateVenue(id: string, data: Partial<Omit<VenueData, 'id' | 'createdAt'>>) {
+  await firestore.collection('venues').doc(id).update({
+    ...data,
+    updatedAt: new Date().toISOString(),
+  })
+  return { success: true }
+}
+
+export async function deleteVenue(id: string) {
+  await firestore.collection('venues').doc(id).delete()
+  return { success: true }
 }

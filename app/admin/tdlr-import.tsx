@@ -97,13 +97,13 @@ export default function TDLRImport() {
     switch (method) {
       case 'KO':
       case 'TKO':
-        return 'text-red-400'
+        return 'text-red-600'
       case 'UD':
       case 'SD':
       case 'MD':
-        return 'text-blue-400'
+        return 'text-blue-600'
       default:
-        return 'text-white/70'
+        return 'text-gray-600'
     }
   }
 
@@ -116,8 +116,8 @@ export default function TDLRImport() {
         onClick={() => fileRef.current?.click()}
         className={`border-2 border-dashed rounded-lg p-12 text-center cursor-pointer transition-colors duration-200 ${
           loading
-            ? 'border-[#FFB800]/50 bg-[#FFB800]/5'
-            : 'border-white/20 hover:border-[#FFB800]/50 hover:bg-white/5'
+            ? 'border-[#FFB800]/50 bg-amber-50'
+            : 'border-gray-300 hover:border-[#FFB800]/50 hover:bg-gray-50'
         }`}
       >
         <input
@@ -130,19 +130,19 @@ export default function TDLRImport() {
         {loading ? (
           <div className="space-y-3">
             <div className="animate-spin w-8 h-8 border-2 border-[#FFB800] border-t-transparent rounded-full mx-auto" />
-            <p className="text-white/60 text-sm tracking-wide">
+            <p className="text-gray-500 text-sm tracking-wide">
               Parsing {fileName}...
             </p>
           </div>
         ) : (
           <div className="space-y-3">
-            <svg className="w-12 h-12 text-white/30 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-12 h-12 text-gray-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m6.75 12l-3-3m0 0l-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
             </svg>
-            <p className="text-white/80 text-sm tracking-wide font-bold">
+            <p className="text-gray-700 text-sm tracking-wide font-bold">
               DROP TDLR PDF HERE
             </p>
-            <p className="text-white/40 text-xs tracking-wide">
+            <p className="text-gray-400 text-xs tracking-wide">
               or click to browse — Texas Dept. of Licensing and Regulation boxing results
             </p>
           </div>
@@ -151,8 +151,8 @@ export default function TDLRImport() {
 
       {/* Error */}
       {error && (
-        <div className="bg-red-900/30 border border-red-500/30 rounded-lg p-4">
-          <p className="text-red-400 text-sm">{error}</p>
+        <div className="bg-red-50 border border-red-300 rounded-lg p-4">
+          <p className="text-red-600 text-sm">{error}</p>
         </div>
       )}
 
@@ -160,63 +160,63 @@ export default function TDLRImport() {
       {event && (
         <div className="space-y-6">
           {/* Event Header */}
-          <div className="bg-white/5 border border-white/10 rounded-lg p-6">
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
             <div className="flex items-start justify-between mb-4">
               <div>
-                <h3 className="text-lg font-bold text-white tracking-widest">
+                <h3 className="text-lg font-bold text-gray-900 tracking-widest">
                   {event.venue}
                 </h3>
-                <p className="text-white/60 text-sm tracking-wide">
+                <p className="text-gray-500 text-sm tracking-wide">
                   {event.address}
                 </p>
               </div>
-              <span className="text-[#FFB800] text-xs font-mono tracking-wider bg-[#FFB800]/10 px-3 py-1 rounded">
+              <span className="text-[#FFB800] text-xs font-mono tracking-wider bg-amber-50 px-3 py-1 rounded">
                 EVENT #{event.eventNumber}
               </span>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
               <div>
-                <span className="text-white/40 text-xs tracking-widest block">DATE</span>
-                <span className="text-white font-mono">{event.date}</span>
+                <span className="text-gray-400 text-xs tracking-widest block">DATE</span>
+                <span className="text-gray-900 font-mono">{event.date}</span>
               </div>
               <div>
-                <span className="text-white/40 text-xs tracking-widest block">CITY</span>
-                <span className="text-white">{event.city}</span>
+                <span className="text-gray-400 text-xs tracking-widest block">CITY</span>
+                <span className="text-gray-900">{event.city}</span>
               </div>
               <div>
-                <span className="text-white/40 text-xs tracking-widest block">PROMOTER</span>
-                <span className="text-white">{event.promoter}</span>
+                <span className="text-gray-400 text-xs tracking-widest block">PROMOTER</span>
+                <span className="text-gray-900">{event.promoter}</span>
               </div>
               <div>
-                <span className="text-white/40 text-xs tracking-widest block">BOUTS</span>
-                <span className="text-white font-mono">{event.bouts.length}</span>
+                <span className="text-gray-400 text-xs tracking-widest block">BOUTS</span>
+                <span className="text-gray-900 font-mono">{event.bouts.length}</span>
               </div>
             </div>
           </div>
 
           {/* Bout Cards */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold text-white/40 tracking-widest">
+            <h4 className="text-xs font-bold text-gray-400 tracking-widest">
               FIGHT RESULTS
             </h4>
             {event.bouts.map((bout) => (
               <div
                 key={bout.boutNumber}
-                className="bg-white/5 border border-white/10 rounded-lg p-5 hover:border-white/20 transition-colors"
+                className="bg-gray-50 border border-gray-200 rounded-lg p-5 hover:border-gray-300 transition-colors"
               >
                 {/* Bout Header */}
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <span className="bg-white/10 text-white/60 text-xs font-mono w-7 h-7 rounded flex items-center justify-center">
+                    <span className="bg-gray-100 text-gray-500 text-xs font-mono w-7 h-7 rounded flex items-center justify-center">
                       {bout.boutNumber}
                     </span>
                     {bout.titleFight && (
-                      <span className="text-[#FFB800] text-xs font-bold tracking-widest bg-[#FFB800]/10 px-2 py-0.5 rounded">
+                      <span className="text-[#FFB800] text-xs font-bold tracking-widest bg-amber-50 px-2 py-0.5 rounded">
                         {bout.titleFight.toUpperCase()}
                       </span>
                     )}
                     {bout.weightClass && (
-                      <span className="text-white/40 text-xs tracking-wide capitalize">
+                      <span className="text-gray-400 text-xs tracking-wide capitalize">
                         {bout.weightClass}
                       </span>
                     )}
@@ -225,7 +225,7 @@ export default function TDLRImport() {
                     <span className={`text-xs font-bold tracking-wider ${methodColor(bout.method)}`}>
                       {bout.method}
                     </span>
-                    <span className="text-white/30 text-xs ml-2">
+                    <span className="text-gray-400 text-xs ml-2">
                       {bout.rounds}R • Ref: {bout.referee}
                     </span>
                   </div>
@@ -236,23 +236,23 @@ export default function TDLRImport() {
                   {/* Fighter 1 */}
                   <div className={`rounded-lg p-3 ${
                     bout.result.split(' by ')[0] === bout.fighter1.name.split(' ').pop()
-                      ? 'bg-green-900/20 border border-green-500/20'
-                      : 'bg-white/5'
+                      ? 'bg-green-50 border border-green-200'
+                      : 'bg-gray-50'
                   }`}>
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-white font-bold text-sm tracking-wide">
+                        <p className="text-gray-900 font-bold text-sm tracking-wide">
                           {bout.fighter1.name}
                         </p>
-                        <p className="text-white/40 text-xs">
+                        <p className="text-gray-400 text-xs">
                           {bout.fighter1.city}, {bout.fighter1.state}
                         </p>
                       </div>
-                      <span className="text-white/60 text-xs font-mono">
+                      <span className="text-gray-500 text-xs font-mono">
                         {bout.fighter1.weight} lbs
                       </span>
                     </div>
-                    <p className="text-white/30 text-xs mt-1 font-mono">
+                    <p className="text-gray-400 text-xs mt-1 font-mono">
                       ID: {bout.fighter1.boxerId}
                     </p>
                   </div>
@@ -260,37 +260,37 @@ export default function TDLRImport() {
                   {/* Fighter 2 */}
                   <div className={`rounded-lg p-3 ${
                     bout.result.split(' by ')[0] === bout.fighter2.name.split(' ').pop()
-                      ? 'bg-green-900/20 border border-green-500/20'
-                      : 'bg-white/5'
+                      ? 'bg-green-50 border border-green-200'
+                      : 'bg-gray-50'
                   }`}>
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-white font-bold text-sm tracking-wide">
+                        <p className="text-gray-900 font-bold text-sm tracking-wide">
                           {bout.fighter2.name}
                         </p>
-                        <p className="text-white/40 text-xs">
+                        <p className="text-gray-400 text-xs">
                           {bout.fighter2.city}, {bout.fighter2.state}
                         </p>
                       </div>
-                      <span className="text-white/60 text-xs font-mono">
+                      <span className="text-gray-500 text-xs font-mono">
                         {bout.fighter2.weight} lbs
                       </span>
                     </div>
-                    <p className="text-white/30 text-xs mt-1 font-mono">
+                    <p className="text-gray-400 text-xs mt-1 font-mono">
                       ID: {bout.fighter2.boxerId}
                     </p>
                   </div>
                 </div>
 
                 {/* Result */}
-                <div className="mt-3 pt-3 border-t border-white/5">
-                  <p className="text-white/80 text-sm">
-                    <span className="text-white font-bold">{bout.result}</span>
+                <div className="mt-3 pt-3 border-t border-gray-100">
+                  <p className="text-gray-700 text-sm">
+                    <span className="text-gray-900 font-bold">{bout.result}</span>
                   </p>
                   {bout.scores.length > 0 && (
                     <div className="flex gap-4 mt-1">
                       {bout.scores.map((score, i) => (
-                        <span key={i} className="text-white/40 text-xs font-mono">
+                        <span key={i} className="text-gray-400 text-xs font-mono">
                           {score}
                         </span>
                       ))}
@@ -311,7 +311,7 @@ export default function TDLRImport() {
                 setError('')
                 if (fileRef.current) fileRef.current.value = ''
               }}
-              className="text-white/40 text-xs tracking-widest hover:text-white/60 transition-colors"
+              className="text-gray-400 text-xs tracking-widest hover:text-gray-500 transition-colors"
             >
               ← UPLOAD ANOTHER PDF
             </button>
@@ -352,38 +352,38 @@ export default function TDLRImport() {
 
           {/* Import Results */}
           {importResult && (
-            <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-6 space-y-4">
+            <div className="bg-green-50 border border-green-300 rounded-lg p-6 space-y-4">
               <div className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <h4 className="text-green-400 font-bold text-sm tracking-widest">
+                <h4 className="text-green-600 font-bold text-sm tracking-widest">
                   IMPORT COMPLETE
                 </h4>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                 <div>
-                  <span className="text-white/40 text-xs tracking-widest block">FIGHTERS CREATED</span>
-                  <span className="text-white font-mono text-lg">{importResult.fightersCreated}</span>
+                  <span className="text-gray-400 text-xs tracking-widest block">FIGHTERS CREATED</span>
+                  <span className="text-gray-900 font-mono text-lg">{importResult.fightersCreated}</span>
                 </div>
                 <div>
-                  <span className="text-white/40 text-xs tracking-widest block">FIGHTERS UPDATED</span>
-                  <span className="text-white font-mono text-lg">{importResult.fightersUpdated}</span>
+                  <span className="text-gray-400 text-xs tracking-widest block">FIGHTERS UPDATED</span>
+                  <span className="text-gray-900 font-mono text-lg">{importResult.fightersUpdated}</span>
                 </div>
                 <div>
-                  <span className="text-white/40 text-xs tracking-widest block">BOUTS RECORDED</span>
-                  <span className="text-white font-mono text-lg">{importResult.boutsRecorded}</span>
+                  <span className="text-gray-400 text-xs tracking-widest block">BOUTS RECORDED</span>
+                  <span className="text-gray-900 font-mono text-lg">{importResult.boutsRecorded}</span>
                 </div>
                 <div>
-                  <span className="text-white/40 text-xs tracking-widest block">EVENT ID</span>
-                  <span className="text-white font-mono text-xs break-all">{importResult.eventId}</span>
+                  <span className="text-gray-400 text-xs tracking-widest block">EVENT ID</span>
+                  <span className="text-gray-900 font-mono text-xs break-all">{importResult.eventId}</span>
                 </div>
               </div>
               {importResult.errors.length > 0 && (
-                <div className="border-t border-white/10 pt-3">
-                  <p className="text-red-400 text-xs tracking-widest font-bold mb-2">ERRORS</p>
+                <div className="border-t border-gray-200 pt-3">
+                  <p className="text-red-600 text-xs tracking-widest font-bold mb-2">ERRORS</p>
                   {importResult.errors.map((err, i) => (
-                    <p key={i} className="text-red-400/70 text-xs">{err}</p>
+                    <p key={i} className="text-red-500 text-xs">{err}</p>
                   ))}
                 </div>
               )}

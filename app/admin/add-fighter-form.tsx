@@ -10,9 +10,9 @@ interface AddFighterFormProps {
 }
 
 const inputClass =
-  'w-full bg-white/5 border border-white/20 text-white px-4 py-2.5 text-sm focus:outline-none focus:border-[#FFB800] focus:ring-1 focus:ring-[#FFB800] placeholder:text-white/30 rounded-md'
-const labelClass = 'block text-xs font-bold text-white/70 tracking-wider mb-1.5 uppercase'
-const sectionClass = 'border border-white/10 rounded-lg p-6 space-y-4'
+  'w-full bg-gray-50 border border-gray-300 text-gray-900 px-4 py-2.5 text-sm focus:outline-none focus:border-[#FFB800] focus:ring-1 focus:ring-[#FFB800] placeholder:text-gray-400 rounded-md'
+const labelClass = 'block text-xs font-bold text-gray-600 tracking-wider mb-1.5 uppercase'
+const sectionClass = 'border border-gray-200 rounded-lg p-6 space-y-4'
 const sectionTitleClass = 'text-lg font-bold text-[#FFB800] tracking-widest mb-4 uppercase'
 
 export default function AddFighterForm({ onSuccess }: AddFighterFormProps) {
@@ -174,7 +174,7 @@ export default function AddFighterForm({ onSuccess }: AddFighterFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-8 max-w-4xl">
       {error && (
-        <div className="bg-red-500/10 border border-red-500/50 text-red-400 px-4 py-3 text-sm rounded-md">
+        <div className="bg-red-50 border border-red-300 text-red-600 px-4 py-3 text-sm rounded-md">
           {error}
         </div>
       )}
@@ -258,7 +258,7 @@ export default function AddFighterForm({ onSuccess }: AddFighterFormProps) {
             <option value="OTHER">OTHER — Outside TX/MX</option>
           </select>
         </div>
-        <p className="text-xs text-white/40 tracking-wide uppercase mt-4 mb-2">Birth Place</p>
+        <p className="text-xs text-gray-400 tracking-wide uppercase mt-4 mb-2">Birth Place</p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className={labelClass}>City</label>
@@ -273,7 +273,7 @@ export default function AddFighterForm({ onSuccess }: AddFighterFormProps) {
             <input name="birthCountry" className={inputClass} placeholder="USA" />
           </div>
         </div>
-        <p className="text-xs text-white/40 tracking-wide uppercase mt-4 mb-2">Residence</p>
+        <p className="text-xs text-gray-400 tracking-wide uppercase mt-4 mb-2">Residence</p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className={labelClass}>City</label>
@@ -349,16 +349,16 @@ export default function AddFighterForm({ onSuccess }: AddFighterFormProps) {
           <button
             type="button"
             onClick={addTitle}
-            className="text-xs font-bold tracking-widest text-[#FFB800] hover:text-[#FFB800]/80 transition-colors"
+            className="text-xs font-bold tracking-widest text-[#FFB800] hover:text-amber-600 transition-colors"
           >
             + ADD TITLE
           </button>
         </div>
         {titles.length === 0 && (
-          <p className="text-white/30 text-sm">No titles added</p>
+          <p className="text-gray-400 text-sm">No titles added</p>
         )}
         {titles.map((title, i) => (
-          <div key={i} className="grid grid-cols-1 md:grid-cols-4 gap-3 items-end bg-white/5 p-3 rounded-md">
+          <div key={i} className="grid grid-cols-1 md:grid-cols-4 gap-3 items-end bg-gray-50 p-3 rounded-md">
             <div>
               <label className={labelClass}>Organization</label>
               <select
@@ -381,7 +381,7 @@ export default function AddFighterForm({ onSuccess }: AddFighterFormProps) {
               />
             </div>
             <div className="flex items-center gap-3">
-              <label className="flex items-center gap-2 text-xs text-white/70">
+              <label className="flex items-center gap-2 text-xs text-gray-600">
                 <input
                   type="checkbox"
                   checked={title.current}
@@ -393,7 +393,7 @@ export default function AddFighterForm({ onSuccess }: AddFighterFormProps) {
               <button
                 type="button"
                 onClick={() => removeTitle(i)}
-                className="text-red-400 hover:text-red-300 text-xs font-bold ml-auto"
+                className="text-red-600 hover:text-red-700 text-xs font-bold ml-auto"
               >
                 Remove
               </button>
@@ -432,21 +432,21 @@ export default function AddFighterForm({ onSuccess }: AddFighterFormProps) {
           <div>
             <label className={labelClass}>Instagram Handle</label>
             <div className="flex items-center">
-              <span className="text-white/30 text-sm mr-1">@</span>
+              <span className="text-gray-400 text-sm mr-1">@</span>
               <input name="instagram" className={inputClass} placeholder="bamrodriguez_" />
             </div>
           </div>
           <div>
             <label className={labelClass}>Twitter / X Handle</label>
             <div className="flex items-center">
-              <span className="text-white/30 text-sm mr-1">@</span>
+              <span className="text-gray-400 text-sm mr-1">@</span>
               <input name="twitter" className={inputClass} placeholder="bamrodriguez" />
             </div>
           </div>
           <div>
             <label className={labelClass}>TikTok Handle</label>
             <div className="flex items-center">
-              <span className="text-white/30 text-sm mr-1">@</span>
+              <span className="text-gray-400 text-sm mr-1">@</span>
               <input name="tiktok" className={inputClass} placeholder="" />
             </div>
           </div>
@@ -479,11 +479,11 @@ export default function AddFighterForm({ onSuccess }: AddFighterFormProps) {
             )}
             <div className="flex-1 space-y-2">
               {/* File Upload */}
-              <label className="flex items-center justify-center gap-2 px-4 py-3 bg-white/5 border border-dashed border-white/20 rounded-md cursor-pointer hover:border-[#FFB800]/50 hover:bg-white/8 transition-colors">
-                <svg className="w-5 h-5 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <label className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 border border-dashed border-gray-300 rounded-md cursor-pointer hover:border-[#FFB800]/50 hover:bg-gray-100 transition-colors">
+                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                <span className="text-sm text-white/50">
+                <span className="text-sm text-gray-400">
                   {isUploading ? 'Uploading...' : uploadedImageUrl ? 'Change image' : 'Upload image (JPEG, PNG, WebP)'}
                 </span>
                 <input
@@ -495,10 +495,10 @@ export default function AddFighterForm({ onSuccess }: AddFighterFormProps) {
                 />
               </label>
               {uploadError && (
-                <p className="text-red-400 text-xs">{uploadError}</p>
+                <p className="text-red-600 text-xs">{uploadError}</p>
               )}
               {/* OR paste URL */}
-              <p className="text-white/30 text-xs text-center">— or paste a URL —</p>
+              <p className="text-gray-400 text-xs text-center">— or paste a URL —</p>
               <input name="profileImageUrl" className={inputClass} placeholder="https://storage.googleapis.com/..." />
             </div>
           </div>
@@ -523,7 +523,7 @@ export default function AddFighterForm({ onSuccess }: AddFighterFormProps) {
             type="checkbox"
             className="accent-[#FFB800] w-4 h-4"
           />
-          <span className="text-sm text-white/80 font-medium tracking-wide">Featured on TXMX Boxing</span>
+          <span className="text-sm text-gray-700 font-medium tracking-wide">Featured on TXMX Boxing</span>
         </label>
       </section>
 
