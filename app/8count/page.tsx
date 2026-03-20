@@ -60,7 +60,7 @@ export default function EightCountPage() {
             className="absolute inset-0 md:hidden"
             style={{
               background:
-                "linear-gradient(to right, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 60%, rgba(0,0,0,0.3) 100%)",
+                "linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 25%, rgba(0,0,0,0.1) 40%, transparent 55%)",
             }}
           />
           <div className="relative z-10 max-w-lg">
@@ -87,7 +87,7 @@ export default function EightCountPage() {
         {/* Right Side — Image */}
         <div className="absolute inset-0 md:relative md:w-1/2">
           <Image
-            src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/iconic-series/TXMXDistressedTransparent.png"
+            src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/8count.png"
             alt="The 8 Count"
             fill
             className="object-cover object-center"
@@ -97,7 +97,7 @@ export default function EightCountPage() {
             className="absolute inset-0 hidden md:block"
             style={{
               background:
-                "linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.4) 30%, transparent 60%)",
+                "linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 15%, transparent 35%)",
             }}
           />
         </div>
