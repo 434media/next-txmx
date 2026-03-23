@@ -10,10 +10,10 @@ interface AddFighterFormProps {
 }
 
 const inputClass =
-  'w-full bg-gray-50 border border-gray-300 text-gray-900 px-4 py-2.5 text-sm focus:outline-none focus:border-[#FFB800] focus:ring-1 focus:ring-[#FFB800] placeholder:text-gray-400 rounded-md'
-const labelClass = 'block text-xs font-bold text-gray-600 tracking-wider mb-1.5 uppercase'
+  'w-full bg-gray-50 border border-gray-300 text-gray-900 px-4 py-2.5 text-sm font-medium leading-5 focus:outline-none focus:border-[#FFB800] focus:ring-1 focus:ring-[#FFB800] placeholder:text-gray-400 rounded-md'
+const labelClass = 'block text-[11px] leading-4 font-semibold text-gray-600 tracking-[0.12em] mb-1.5 uppercase'
 const sectionClass = 'border border-gray-200 rounded-lg p-6 space-y-4'
-const sectionTitleClass = 'text-lg font-bold text-[#FFB800] tracking-widest mb-4 uppercase'
+const sectionTitleClass = 'text-lg leading-6 font-semibold text-[#FFB800] tracking-[0.14em] mb-4 uppercase'
 
 export default function AddFighterForm({ onSuccess }: AddFighterFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)

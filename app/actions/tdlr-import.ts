@@ -1,5 +1,6 @@
 'use server'
 
+import { createHash } from 'crypto'
 import { firestore } from '../../lib/firebase-admin'
 
 interface TDLRFighter {
@@ -58,20 +59,91 @@ function determineRegion(state: string): 'TX' | 'MX' | 'OTHER' {
   return 'OTHER'
 }
 
-function determineWinner(
+type WinnerId = 1 | 2 | 0
+type OutcomeKind = 'win' | 'draw' | 'nc' | 'unresolved'
+type SettlementStatus = 'final' | 'pending' | 'void'
+
+interface BoutResolution {
+  winnerId: WinnerId
+  kind: OutcomeKind
+  confidence: 'high' | 'low'
+  winnerToken?: string
+}
+
+function normalizeNameToken(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function normalizeMethod(rawMethod: string, rawResult: string): '' | 'KO' | 'TKO' | 'UD' | 'SD' | 'MD' | 'RTD' | 'DQ' | 'NC' {
+  const value = `${rawMethod || ''} ${rawResult || ''}`.toLowerCase()
+  if (!value.trim()) return ''
+  if (value.includes('no contest') || /\bnc\b/.test(value)) return 'NC'
+  if (value.includes('majority decision') || /\bmd\b/.test(value)) return 'MD'
+  if (value.includes('split decision') || /\bsd\b/.test(value)) return 'SD'
+  if (value.includes('decision') || /\bud\b/.test(value)) return 'UD'
+  if (value.includes('technical knockout') || /\btko\b/.test(value)) return 'TKO'
+  if (value.includes('knockout') || /\bko\b/.test(value)) return 'KO'
+  if (value.includes('retired') || /\brtd\b/.test(value)) return 'RTD'
+  if (value.includes('disqual') || /\bdq\b/.test(value)) return 'DQ'
+  return ''
+}
+
+function determineBoutResolution(
   result: string,
   fighter1: TDLRFighter,
   fighter2: TDLRFighter
-): { winnerId: 1 | 2 | 0 } {
-  const winnerName = result.split(' by ')[0]?.trim()
-  if (!winnerName) return { winnerId: 0 }
+): BoutResolution {
+  const raw = (result || '').trim()
+  const normalized = raw.toLowerCase()
 
-  const f1Last = fighter1.name.split(/\s+/).pop()?.toLowerCase()
-  const f2Last = fighter2.name.split(/\s+/).pop()?.toLowerCase()
+  if (!raw) {
+    return { winnerId: 0, kind: 'unresolved', confidence: 'low' }
+  }
 
-  if (winnerName.toLowerCase() === f1Last) return { winnerId: 1 }
-  if (winnerName.toLowerCase() === f2Last) return { winnerId: 2 }
-  return { winnerId: 0 }
+  if (normalized.includes('draw')) {
+    return { winnerId: 0, kind: 'draw', confidence: 'high' }
+  }
+
+  if (normalized.includes('no contest') || /\bnc\b/.test(normalized)) {
+    return { winnerId: 0, kind: 'nc', confidence: 'high' }
+  }
+
+  const winnerToken = normalizeNameToken(raw.split(/\s+by\s+/i)[0] || '')
+  if (!winnerToken) {
+    return { winnerId: 0, kind: 'unresolved', confidence: 'low' }
+  }
+
+  const f1Full = normalizeNameToken(fighter1.name)
+  const f2Full = normalizeNameToken(fighter2.name)
+  const f1Last = normalizeNameToken(fighter1.name.split(/\s+/).pop() || '')
+  const f2Last = normalizeNameToken(fighter2.name.split(/\s+/).pop() || '')
+
+  if (winnerToken === f1Full || winnerToken === f1Last) {
+    return { winnerId: 1, kind: 'win', confidence: 'high', winnerToken }
+  }
+  if (winnerToken === f2Full || winnerToken === f2Last) {
+    return { winnerId: 2, kind: 'win', confidence: 'high', winnerToken }
+  }
+
+  return { winnerId: 0, kind: 'unresolved', confidence: 'low', winnerToken }
+}
+
+function buildBoutSourceHash(event: TDLREvent, bout: TDLRBout): string {
+  const payload = [
+    event.eventNumber,
+    bout.boutNumber,
+    bout.fighter1.boxerId,
+    bout.fighter2.boxerId,
+    bout.result,
+    bout.method,
+    (bout.scores || []).join('|'),
+  ].join('::')
+
+  return createHash('sha256').update(payload).digest('hex')
 }
 
 function inferWeightClass(weight: number): string {
@@ -135,6 +207,11 @@ export async function importTDLREvent(event: TDLREvent) {
     address: event.address,
     boutCount: event.bouts.length,
     source: 'TDLR',
+    sourceMetadata: {
+      settlementSource: 'TDLR_RESULTS_PDF',
+      parser: 'api/tdlr-parse.py',
+      importedAt: now,
+    },
     createdAt: now,
   })
   results.eventId = eventDoc.id
@@ -164,10 +241,20 @@ export async function importTDLREvent(event: TDLREvent) {
   // 4. Process each bout
   for (const bout of event.bouts) {
     try {
-      const { winnerId } = determineWinner(bout.result, bout.fighter1, bout.fighter2)
+      const resolution = determineBoutResolution(bout.result, bout.fighter1, bout.fighter2)
+      const winnerId = resolution.winnerId
       const weightClass = bout.weightClass
         ? bout.weightClass.charAt(0).toUpperCase() + bout.weightClass.slice(1)
         : inferWeightClass(Math.max(bout.fighter1.weight, bout.fighter2.weight))
+      const normalizedMethod = normalizeMethod(bout.method, bout.result)
+      const settlementStatus: SettlementStatus =
+        resolution.kind === 'unresolved'
+          ? 'pending'
+          : resolution.kind === 'nc'
+            ? 'void'
+            : 'final'
+      const boutKey = `${event.eventNumber}-${String(bout.boutNumber).padStart(2, '0')}`
+      const sourceHash = buildBoutSourceHash(event, bout)
 
       // Process both fighters
       const f1Id = await upsertFighter(bout.fighter1, weightClass, now)
@@ -192,20 +279,44 @@ export async function importTDLREvent(event: TDLREvent) {
       // Add fight records to both fighters
       if (f1Id && f2Id) {
         const f1Result: 'W' | 'L' | 'D' | 'NC' =
-          winnerId === 1 ? 'W' : winnerId === 2 ? 'L' : 'D'
+          resolution.kind === 'draw'
+            ? 'D'
+            : resolution.kind === 'nc' || resolution.kind === 'unresolved'
+              ? 'NC'
+              : winnerId === 1
+                ? 'W'
+                : 'L'
         const f2Result: 'W' | 'L' | 'D' | 'NC' =
-          winnerId === 2 ? 'W' : winnerId === 1 ? 'L' : 'D'
+          resolution.kind === 'draw'
+            ? 'D'
+            : resolution.kind === 'nc' || resolution.kind === 'unresolved'
+              ? 'NC'
+              : winnerId === 2
+                ? 'W'
+                : 'L'
 
         const fightBase = {
+          boutKey,
+          boutNumber: bout.boutNumber,
           date: event.date,
-          method: bout.method as 'KO' | 'TKO' | 'UD' | 'SD' | 'MD' | 'RTD' | 'DQ' | 'NC' | '',
+          method: normalizedMethod,
+          settlementStatus,
+          winnerResolution: resolution.kind,
+          winnerConfidence: resolution.confidence,
+          rawResult: bout.result,
+          rawMethod: bout.method,
           scheduledRounds: bout.rounds,
+          referee: bout.referee,
           weightClass,
           venue: event.venue,
           location: `${event.city}, TX`,
           titleFight: !!bout.titleFight,
           scores: bout.scores,
           eventNumber: event.eventNumber,
+          eventId: eventDoc.id,
+          source: 'TDLR',
+          sourceHash,
+          sourceImportedAt: now,
         }
 
         // Add fight to fighter 1
@@ -213,28 +324,34 @@ export async function importTDLREvent(event: TDLREvent) {
           .collection('fighters')
           .doc(f1Id.id)
           .collection('fights')
-          .add({
+          .doc(boutKey)
+          .set({
             ...fightBase,
             opponent: bout.fighter2.name,
             opponentId: f2Id.id,
             result: f1Result,
-          })
+          }, { merge: true })
 
         // Add fight to fighter 2
         await firestore
           .collection('fighters')
           .doc(f2Id.id)
           .collection('fights')
-          .add({
+          .doc(boutKey)
+          .set({
             ...fightBase,
             opponent: bout.fighter1.name,
             opponentId: f1Id.id,
             result: f2Result,
-          })
+          }, { merge: true })
 
-        // Update win/loss/draw records
-        await updateFighterRecord(f1Id.id, f1Result)
-        await updateFighterRecord(f2Id.id, f2Result)
+        // Update aggregate records only for final W/L/D outcomes.
+        if (settlementStatus === 'final' && (f1Result === 'W' || f1Result === 'L' || f1Result === 'D')) {
+          await updateFighterRecord(f1Id.id, f1Result)
+        }
+        if (settlementStatus === 'final' && (f2Result === 'W' || f2Result === 'L' || f2Result === 'D')) {
+          await updateFighterRecord(f2Id.id, f2Result)
+        }
 
         results.boutsRecorded++
       }
@@ -313,7 +430,7 @@ async function upsertFighter(
   }
 }
 
-async function updateFighterRecord(fighterId: string, result: 'W' | 'L' | 'D' | 'NC') {
+async function updateFighterRecord(fighterId: string, result: 'W' | 'L' | 'D') {
   const docRef = firestore.collection('fighters').doc(fighterId)
   const doc = await docRef.get()
   if (!doc.exists) return

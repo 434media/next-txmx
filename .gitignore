@@ -43,3 +43,6 @@ next-env.d.ts
 
 # TDLR downloaded PDFs
 /tdlr-downloads
+
+# Playwright local browser profile/cache
+/.playwright-boxrec-profile

@@ -15,6 +15,7 @@ import { initializeApp, cert, getApps } from 'firebase-admin/app'
 import { getFirestore } from 'firebase-admin/firestore'
 import { readFileSync, readdirSync } from 'fs'
 import { join, resolve } from 'path'
+import { createHash } from 'crypto'
 
 // Load .env.local manually (no dotenv dependency)
 const envPath = resolve(import.meta.dirname, '..', '.env.local')
@@ -77,14 +78,65 @@ function determineRegion(state) {
   return 'OTHER'
 }
 
-function determineWinner(result, fighter1, fighter2) {
-  const winnerName = result.split(' by ')[0]?.trim()
-  if (!winnerName) return 0
-  const f1Last = fighter1.name.split(/\s+/).pop()?.toLowerCase()
-  const f2Last = fighter2.name.split(/\s+/).pop()?.toLowerCase()
-  if (winnerName.toLowerCase() === f1Last) return 1
-  if (winnerName.toLowerCase() === f2Last) return 2
-  return 0
+function normalizeNameToken(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/[^a-z\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function normalizeMethod(rawMethod, rawResult) {
+  const value = `${rawMethod || ''} ${rawResult || ''}`.toLowerCase()
+  if (!value.trim()) return ''
+  if (value.includes('no contest') || /\bnc\b/.test(value)) return 'NC'
+  if (value.includes('majority decision') || /\bmd\b/.test(value)) return 'MD'
+  if (value.includes('split decision') || /\bsd\b/.test(value)) return 'SD'
+  if (value.includes('decision') || /\bud\b/.test(value)) return 'UD'
+  if (value.includes('technical knockout') || /\btko\b/.test(value)) return 'TKO'
+  if (value.includes('knockout') || /\bko\b/.test(value)) return 'KO'
+  if (value.includes('retired') || /\brtd\b/.test(value)) return 'RTD'
+  if (value.includes('disqual') || /\bdq\b/.test(value)) return 'DQ'
+  return ''
+}
+
+function determineOutcome(result, fighter1, fighter2) {
+  const raw = String(result || '').trim()
+  const normalized = raw.toLowerCase()
+
+  if (!raw) return { winnerId: 0, kind: 'unresolved', confidence: 'low' }
+  if (normalized.includes('draw')) return { winnerId: 0, kind: 'draw', confidence: 'high' }
+  if (normalized.includes('no contest') || /\bnc\b/.test(normalized)) {
+    return { winnerId: 0, kind: 'nc', confidence: 'high' }
+  }
+
+  const winnerToken = normalizeNameToken(raw.split(/\s+by\s+/i)[0] || '')
+  const f1Full = normalizeNameToken(fighter1.name)
+  const f2Full = normalizeNameToken(fighter2.name)
+  const f1Last = normalizeNameToken(fighter1.name.split(/\s+/).pop() || '')
+  const f2Last = normalizeNameToken(fighter2.name.split(/\s+/).pop() || '')
+
+  if (winnerToken && (winnerToken === f1Full || winnerToken === f1Last)) {
+    return { winnerId: 1, kind: 'win', confidence: 'high' }
+  }
+  if (winnerToken && (winnerToken === f2Full || winnerToken === f2Last)) {
+    return { winnerId: 2, kind: 'win', confidence: 'high' }
+  }
+
+  return { winnerId: 0, kind: 'unresolved', confidence: 'low' }
+}
+
+function buildBoutSourceHash(event, bout) {
+  const payload = [
+    event.eventNumber,
+    bout.boutNumber,
+    bout.fighter1.boxerId,
+    bout.fighter2.boxerId,
+    bout.result,
+    bout.method,
+    (bout.scores || []).join('|'),
+  ].join('::')
+  return createHash('sha256').update(payload).digest('hex')
 }
 
 function inferWeightClass(weight) {
@@ -184,6 +236,11 @@ async function importEvent(db, event, dryRun) {
       address: event.address,
       boutCount: event.bouts.length,
       source: 'TDLR',
+      sourceMetadata: {
+        settlementSource: 'TDLR_RESULTS_PDF',
+        parser: 'api/tdlr-parse.py',
+        importedAt: now,
+      },
       createdAt: now,
     })
 
@@ -203,10 +260,20 @@ async function importEvent(db, event, dryRun) {
   // Process bouts
   for (const bout of event.bouts) {
     try {
-      const winnerId = determineWinner(bout.result, bout.fighter1, bout.fighter2)
+      const outcome = determineOutcome(bout.result, bout.fighter1, bout.fighter2)
+      const winnerId = outcome.winnerId
       const weightClass = bout.weightClass
         ? bout.weightClass.charAt(0).toUpperCase() + bout.weightClass.slice(1)
         : inferWeightClass(Math.max(bout.fighter1.weight, bout.fighter2.weight))
+      const settlementStatus =
+        outcome.kind === 'unresolved'
+          ? 'pending'
+          : outcome.kind === 'nc'
+            ? 'void'
+            : 'final'
+      const normalizedMethod = normalizeMethod(bout.method, bout.result)
+      const boutKey = `${event.eventNumber}-${String(bout.boutNumber).padStart(2, '0')}`
+      const sourceHash = buildBoutSourceHash(event, bout)
 
       if (dryRun) {
         stats.boutsRecorded++
@@ -219,30 +286,59 @@ async function importEvent(db, event, dryRun) {
       if (f1.created) stats.fightersCreated++; else stats.fightersUpdated++
       if (f2.created) stats.fightersCreated++; else stats.fightersUpdated++
 
-      const f1Result = winnerId === 1 ? 'W' : winnerId === 2 ? 'L' : 'D'
-      const f2Result = winnerId === 2 ? 'W' : winnerId === 1 ? 'L' : 'D'
+      const f1Result =
+        outcome.kind === 'draw'
+          ? 'D'
+          : outcome.kind === 'nc' || outcome.kind === 'unresolved'
+            ? 'NC'
+            : winnerId === 1
+              ? 'W'
+              : 'L'
+      const f2Result =
+        outcome.kind === 'draw'
+          ? 'D'
+          : outcome.kind === 'nc' || outcome.kind === 'unresolved'
+            ? 'NC'
+            : winnerId === 2
+              ? 'W'
+              : 'L'
 
       const fightBase = {
+        boutKey,
+        boutNumber: bout.boutNumber,
         date: event.date,
-        method: bout.method,
+        method: normalizedMethod,
+        settlementStatus,
+        winnerResolution: outcome.kind,
+        winnerConfidence: outcome.confidence,
+        rawResult: bout.result,
+        rawMethod: bout.method,
         scheduledRounds: bout.rounds,
+        referee: bout.referee,
         weightClass,
         venue: event.venue,
         location: `${event.city}, TX`,
         titleFight: !!bout.titleFight,
         scores: bout.scores,
         eventNumber: event.eventNumber,
+        source: 'TDLR',
+        sourceHash,
+        sourceImportedAt: now,
       }
 
-      await db.collection('fighters').doc(f1.id).collection('fights').add({
+      await db.collection('fighters').doc(f1.id).collection('fights').doc(boutKey).set({
         ...fightBase, opponent: bout.fighter2.name, opponentId: f2.id, result: f1Result,
-      })
-      await db.collection('fighters').doc(f2.id).collection('fights').add({
+      }, { merge: true })
+      await db.collection('fighters').doc(f2.id).collection('fights').doc(boutKey).set({
         ...fightBase, opponent: bout.fighter1.name, opponentId: f1.id, result: f2Result,
-      })
+      }, { merge: true })
 
-      await updateFighterRecord(db, f1.id, f1Result)
-      await updateFighterRecord(db, f2.id, f2Result)
+      if (settlementStatus === 'final' && (f1Result === 'W' || f1Result === 'L' || f1Result === 'D')) {
+        await updateFighterRecord(db, f1.id, f1Result)
+      }
+      if (settlementStatus === 'final' && (f2Result === 'W' || f2Result === 'L' || f2Result === 'D')) {
+        await updateFighterRecord(db, f2.id, f2Result)
+      }
 
       stats.boutsRecorded++
     } catch (err) {

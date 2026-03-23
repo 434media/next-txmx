@@ -12,8 +12,8 @@ interface FighterListProps {
 }
 
 const inputClass =
-  'w-full bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800] focus:ring-1 focus:ring-[#FFB800]/30 placeholder:text-gray-400 rounded-md'
-const labelClass = 'block text-[10px] font-semibold text-gray-400 tracking-[0.15em] mb-1'
+  'w-full bg-gray-50 border border-gray-200 text-gray-900 text-[13px] font-medium leading-5 px-3 py-2 focus:outline-none focus:border-[#FFB800] focus:ring-1 focus:ring-[#FFB800]/30 placeholder:text-gray-400 rounded-md'
+const labelClass = 'block text-[11px] leading-4 font-semibold text-gray-500 tracking-[0.12em] mb-1'
 
 export default function FighterList({ fighters, onDelete, onUpdate }: FighterListProps) {
   const [search, setSearch] = useState('')
@@ -26,6 +26,8 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
   const [editingId, setEditingId] = useState<string | null>(null)
   const [savingId, setSavingId] = useState<string | null>(null)
   const [editData, setEditData] = useState<Partial<Fighter>>({})
+  const [isUploadingImage, setIsUploadingImage] = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
   const perPage = 25
 
@@ -86,6 +88,7 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
 
   const startEditing = (fighter: Fighter) => {
     setEditingId(fighter.id!)
+    setUploadError(null)
     setEditData({
       firstName: fighter.firstName,
       lastName: fighter.lastName,
@@ -102,7 +105,44 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
       trainer: fighter.trainer || '',
       promoter: fighter.promoter || '',
       bio: fighter.bio || '',
+      profileImageUrl: fighter.profileImageUrl || '',
+      social: {
+        instagram: fighter.social?.instagram || '',
+        twitter: fighter.social?.twitter || '',
+        tiktok: fighter.social?.tiktok || '',
+        youtube: fighter.social?.youtube || '',
+        website: fighter.social?.website || '',
+      },
     })
+  }
+
+  const handleImageUpload = async (file: File) => {
+    if (!editingId) return
+
+    setUploadError(null)
+    setIsUploadingImage(true)
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error || 'Failed to upload image')
+      }
+
+      const data = await res.json()
+      setEditData(d => ({ ...d, profileImageUrl: data.url }))
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : 'Failed to upload image')
+    } finally {
+      setIsUploadingImage(false)
+    }
   }
 
   const handleSave = async () => {
@@ -129,6 +169,22 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
       if (!updatePayload.trainer) delete updatePayload.trainer
       if (!updatePayload.promoter) delete updatePayload.promoter
       if (!updatePayload.bio) delete updatePayload.bio
+      if (!updatePayload.profileImageUrl) delete updatePayload.profileImageUrl
+      if (updatePayload.social) {
+        const social = {
+          instagram: updatePayload.social.instagram?.trim() || undefined,
+          twitter: updatePayload.social.twitter?.trim() || undefined,
+          tiktok: updatePayload.social.tiktok?.trim() || undefined,
+          youtube: updatePayload.social.youtube?.trim() || undefined,
+          website: updatePayload.social.website?.trim() || undefined,
+        }
+
+        if (!social.instagram && !social.twitter && !social.tiktok && !social.youtube && !social.website) {
+          delete updatePayload.social
+        } else {
+          updatePayload.social = social
+        }
+      }
       if (updatePayload.residence && !updatePayload.residence.city) delete updatePayload.residence
 
       await updateFighter(editingId, updatePayload)
@@ -346,9 +402,64 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
                     <span className="text-gray-400">({fighter.record.knockouts} KO)</span>
                   </div>
 
+                  {/* Profile Picture */}
+                  <div>
+                    <h4 className="text-[11px] leading-4 font-semibold text-amber-600 tracking-[0.16em] mb-3">PROFILE PICTURE</h4>
+                    <div className="flex items-start gap-4">
+                      <div className="relative group w-20 h-20">
+                        {editData.profileImageUrl ? (
+                          <img
+                            src={editData.profileImageUrl}
+                            alt={`${editData.firstName || fighter.firstName} ${editData.lastName || fighter.lastName}`}
+                            className="w-20 h-20 rounded-full object-cover border-2 border-gray-300"
+                          />
+                        ) : (
+                          <div className="w-20 h-20 rounded-full bg-gray-100 border-2 border-gray-300 flex items-center justify-center text-gray-400 font-bold text-xl">
+                            {(editData.firstName?.[0] || fighter.firstName[0])}{(editData.lastName?.[0] || fighter.lastName?.[0])}
+                          </div>
+                        )}
+
+                        <div className="absolute inset-0 rounded-full bg-black/55 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1">
+                          <label className="text-[10px] font-semibold tracking-widest text-white cursor-pointer hover:text-[#FFB800] transition-colors uppercase">
+                            {isUploadingImage ? 'Uploading...' : editData.profileImageUrl ? 'Change' : 'Add'}
+                            <input
+                              type="file"
+                              accept="image/jpeg,image/png,image/webp,image/avif"
+                              disabled={isUploadingImage}
+                              onChange={e => {
+                                const file = e.target.files?.[0]
+                                if (file) void handleImageUpload(file)
+                                e.currentTarget.value = ''
+                              }}
+                              className="hidden"
+                            />
+                          </label>
+
+                          {editData.profileImageUrl && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setUploadError(null)
+                                setEditData(d => ({ ...d, profileImageUrl: '' }))
+                              }}
+                              className="text-[10px] font-semibold tracking-widest text-red-200 hover:text-red-100 transition-colors uppercase"
+                            >
+                              Delete
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="pt-1">
+                        <p className="text-[11px] text-gray-500 tracking-wide">Hover image to add, change, or delete.</p>
+                        {uploadError && <p className="text-red-600 text-xs mt-1">{uploadError}</p>}
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Identity */}
                   <div>
-                    <h4 className="text-[10px] font-semibold text-amber-600 tracking-[0.2em] mb-3">IDENTITY</h4>
+                    <h4 className="text-[11px] leading-4 font-semibold text-amber-600 tracking-[0.16em] mb-3">IDENTITY</h4>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                       <div>
                         <label className={labelClass}>First Name</label>
@@ -389,7 +500,7 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
 
                   {/* Boxing Details */}
                   <div>
-                    <h4 className="text-[10px] font-semibold text-amber-600 tracking-[0.2em] mb-3">BOXING</h4>
+                    <h4 className="text-[11px] leading-4 font-semibold text-amber-600 tracking-[0.16em] mb-3">BOXING</h4>
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                       <div>
                         <label className={labelClass}>Weight Class</label>
@@ -456,7 +567,7 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
 
                   {/* Record */}
                   <div>
-                    <h4 className="text-[10px] font-semibold text-amber-600 tracking-[0.2em] mb-3">RECORD</h4>
+                    <h4 className="text-[11px] leading-4 font-semibold text-amber-600 tracking-[0.16em] mb-3">RECORD</h4>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                       <div>
                         <label className={labelClass}>Wins</label>
@@ -515,7 +626,7 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
 
                   {/* Location */}
                   <div>
-                    <h4 className="text-[10px] font-semibold text-amber-600 tracking-[0.2em] mb-3">LOCATION</h4>
+                    <h4 className="text-[11px] leading-4 font-semibold text-amber-600 tracking-[0.16em] mb-3">LOCATION</h4>
                     <div className="grid grid-cols-3 gap-3">
                       <div>
                         <label className={labelClass}>City</label>
@@ -556,7 +667,7 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
 
                   {/* Team */}
                   <div>
-                    <h4 className="text-[10px] font-semibold text-amber-600 tracking-[0.2em] mb-3">TEAM</h4>
+                    <h4 className="text-[11px] leading-4 font-semibold text-amber-600 tracking-[0.16em] mb-3">TEAM</h4>
                     <div className="grid grid-cols-3 gap-3">
                       <div>
                         <label className={labelClass}>Gym</label>
@@ -585,6 +696,82 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
                     </div>
                   </div>
 
+                  {/* Social */}
+                  <div>
+                    <h4 className="text-[11px] leading-4 font-semibold text-amber-600 tracking-[0.16em] mb-3">SOCIAL</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div>
+                        <label className={labelClass}>Instagram</label>
+                        <div className="flex items-center">
+                          <span className="text-gray-400 text-sm mr-1">@</span>
+                          <input
+                            value={editData.social?.instagram || ''}
+                            onChange={e => setEditData(d => ({
+                              ...d,
+                              social: { ...d.social, instagram: e.target.value },
+                            }))}
+                            className={inputClass}
+                            placeholder="fighterhandle"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className={labelClass}>Twitter / X</label>
+                        <div className="flex items-center">
+                          <span className="text-gray-400 text-sm mr-1">@</span>
+                          <input
+                            value={editData.social?.twitter || ''}
+                            onChange={e => setEditData(d => ({
+                              ...d,
+                              social: { ...d.social, twitter: e.target.value },
+                            }))}
+                            className={inputClass}
+                            placeholder="fighterhandle"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className={labelClass}>TikTok</label>
+                        <div className="flex items-center">
+                          <span className="text-gray-400 text-sm mr-1">@</span>
+                          <input
+                            value={editData.social?.tiktok || ''}
+                            onChange={e => setEditData(d => ({
+                              ...d,
+                              social: { ...d.social, tiktok: e.target.value },
+                            }))}
+                            className={inputClass}
+                            placeholder="fighterhandle"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className={labelClass}>YouTube</label>
+                        <input
+                          value={editData.social?.youtube || ''}
+                          onChange={e => setEditData(d => ({
+                            ...d,
+                            social: { ...d.social, youtube: e.target.value },
+                          }))}
+                          className={inputClass}
+                          placeholder="https://youtube.com/@..."
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className={labelClass}>Website</label>
+                        <input
+                          value={editData.social?.website || ''}
+                          onChange={e => setEditData(d => ({
+                            ...d,
+                            social: { ...d.social, website: e.target.value },
+                          }))}
+                          className={inputClass}
+                          placeholder="https://..."
+                        />
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Bio */}
                   <div>
                     <label className={labelClass}>Bio</label>
@@ -600,7 +787,7 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
                   {/* Titles (read-only display) */}
                   {fighter.titles && fighter.titles.length > 0 && (
                     <div>
-                      <h4 className="text-[10px] font-semibold text-amber-600 tracking-[0.2em] mb-2">TITLES</h4>
+                      <h4 className="text-[11px] leading-4 font-semibold text-amber-600 tracking-[0.16em] mb-2">TITLES</h4>
                       <div className="flex flex-wrap gap-2">
                         {fighter.titles.map((t, i) => (
                           <span
@@ -644,10 +831,10 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
                       </button>
                       <button
                         onClick={handleSave}
-                        disabled={savingId === fighter.id}
+                        disabled={savingId === fighter.id || isUploadingImage}
                         className="text-[11px] font-semibold tracking-[0.15em] bg-[#FFB800] text-black px-5 py-1.5 rounded hover:bg-[#FFB800]/90 disabled:opacity-50 transition-colors"
                       >
-                        {savingId === fighter.id ? 'SAVING...' : 'SAVE CHANGES'}
+                        {isUploadingImage ? 'UPLOADING IMAGE...' : savingId === fighter.id ? 'SAVING...' : 'SAVE CHANGES'}
                       </button>
                     </div>
                   </div>
