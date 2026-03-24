@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { getFighters } from '../actions/fighters'
 import { getVenues } from '../actions/venues'
-import { getEventPromoters, getPromoters } from '../actions/events'
+import { getEventPromoters, getPromoters, getEvents } from '../actions/events'
 import { getGyms } from '../actions/gyms'
 import AdminClient from './admin-client'
 
@@ -17,15 +17,16 @@ export const dynamic = 'force-dynamic'
 
 export default async function AdminPage() {
   try {
-    const [fighters, venues, eventPromoters, promoterDocs, gyms] = await Promise.all([
+    const [fighters, venues, eventPromoters, promoterDocs, gyms, events] = await Promise.all([
       getFighters(),
       getVenues(),
       getEventPromoters(),
       getPromoters(),
       getGyms(),
+      getEvents(),
     ])
 
-    return <AdminClient initialFighters={fighters} initialVenues={venues} eventPromoters={eventPromoters} initialPromoterDocs={promoterDocs} initialGyms={gyms} />
+    return <AdminClient initialFighters={fighters} initialVenues={venues} eventPromoters={eventPromoters} initialPromoterDocs={promoterDocs} initialGyms={gyms} initialEvents={events} />
   } catch (error) {
     console.error('Admin page error:', error)
     const message = error instanceof Error ? error.message : 'Unknown error'

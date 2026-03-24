@@ -4,19 +4,27 @@ import Image from "next/image"
 import Link from "next/link"
 import { Menu } from "lucide-react"
 import { useState, useRef, useEffect } from "react"
+import { useAuth } from "../lib/auth-context"
 
 interface NavbarProps {
   onMenuClick: () => void
+  onAuthClick: () => void
 }
 
-export default function Navbar({ onMenuClick }: NavbarProps) {
+export default function Navbar({ onMenuClick, onAuthClick }: NavbarProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const userMenuRef = useRef<HTMLDivElement>(null)
+  const { user, profile, loading, signOut } = useAuth()
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false)
+      }
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setIsUserMenuOpen(false)
       }
     }
     document.addEventListener("mousedown", handleClickOutside)
@@ -47,10 +55,28 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
           {/* Desktop Navigation Links - Hidden on mobile */}
           <div className="hidden md:flex items-center space-x-8">
             <Link
+              href="/fighters"
+              className="text-white text-xs font-semibold tracking-widest leading-relaxed hover:text-white/80 hover:underline decoration-2 underline-offset-4 transition-all duration-300"
+            >
+              FIGHTERS
+            </Link>
+            <Link
+              href="/events"
+              className="text-white text-xs font-semibold tracking-widest leading-relaxed hover:text-white/80 hover:underline decoration-2 underline-offset-4 transition-all duration-300"
+            >
+              EVENTS
+            </Link>
+            <Link
               href="/scorecard"
               className="text-white text-xs font-semibold tracking-widest leading-relaxed hover:text-white/80 hover:underline decoration-2 underline-offset-4 transition-all duration-300"
             >
               SCORECARD
+            </Link>
+            <Link
+              href="/leaderboard"
+              className="text-white text-xs font-semibold tracking-widest leading-relaxed hover:text-white/80 hover:underline decoration-2 underline-offset-4 transition-all duration-300"
+            >
+              LEADERBOARD
             </Link>
             <Link
               href="/8count"
@@ -142,6 +168,64 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
                 </div>
               )}
             </div>
+
+            {/* Auth */}
+            {!loading && (
+              user ? (
+                <div ref={userMenuRef} className="relative">
+                  <button
+                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                    className="flex items-center gap-2 text-white text-xs font-semibold tracking-widest hover:text-white/80 transition-all duration-300"
+                  >
+                    {profile?.subscriptionStatus === "active" && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                    )}
+                    {user.displayName?.split(" ")[0] || "ACCOUNT"}
+                  </button>
+                  {isUserMenuOpen && (
+                    <div className="absolute right-0 mt-3 w-56 bg-black/95 backdrop-blur-sm border border-white/20 rounded-md shadow-2xl">
+                      <div className="px-4 py-3 border-b border-white/10">
+                        <p className="text-white text-xs font-semibold truncate">{user.email}</p>
+                        {profile?.subscriptionStatus === "active" && (
+                          <p className="text-amber-500 text-[10px] font-semibold tracking-wider mt-1">BLACK CARD</p>
+                        )}
+                      </div>
+                      {profile && (
+                        <div className="px-4 py-3 border-b border-white/10 grid grid-cols-3 gap-2">
+                          <div className="text-center">
+                            <p className="text-blue-400 text-xs font-bold tabular-nums">{profile.skillPoints}</p>
+                            <p className="text-white/30 text-[9px]">SP</p>
+                          </div>
+                          <div className="text-center">
+                            <p className="text-emerald-400 text-xs font-bold tabular-nums">{profile.txCredits}</p>
+                            <p className="text-white/30 text-[9px]">TC</p>
+                          </div>
+                          <div className="text-center">
+                            <p className="text-purple-400 text-xs font-bold tabular-nums">{profile.loyaltyPoints}</p>
+                            <p className="text-white/30 text-[9px]">LP</p>
+                          </div>
+                        </div>
+                      )}
+                      <div className="py-1">
+                        <button
+                          onClick={() => { signOut(); setIsUserMenuOpen(false) }}
+                          className="w-full text-left px-4 py-3 text-white/60 text-xs font-medium hover:bg-white/10 transition-colors"
+                        >
+                          Sign Out
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <button
+                  onClick={onAuthClick}
+                  className="text-white text-xs font-semibold tracking-widest leading-relaxed hover:text-white/80 transition-all duration-300 border border-white/20 px-4 py-1.5 rounded-full hover:border-white/40"
+                >
+                  SIGN IN
+                </button>
+              )
+            )}
           </div>
 
           {/* Mobile Menu Button - Equal padding with logo */}

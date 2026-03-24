@@ -9,8 +9,10 @@ import TDLRImport from './tdlr-import'
 import VenueList from './venue-list'
 import GymList from './gym-list'
 import PromoterList from './promoter-list'
+import PropManager from './prop-manager'
+import EventList from './event-list'
 import type { VenueData } from '../actions/venues'
-import type { EventPromoter, PromoterData } from '../actions/events'
+import type { EventPromoter, PromoterData, TXMXEvent } from '../actions/events'
 import type { GymData } from '../actions/gyms'
 import { getFighters } from '../actions/fighters'
 import { getVenues } from '../actions/venues'
@@ -23,9 +25,10 @@ interface AdminClientProps {
   eventPromoters: EventPromoter[]
   initialPromoterDocs: PromoterData[]
   initialGyms: GymData[]
+  initialEvents: TXMXEvent[]
 }
 
-type Tab = 'list' | 'add' | 'venues' | 'gyms' | 'promoters' | 'tdlr'
+type Tab = 'list' | 'add' | 'venues' | 'gyms' | 'promoters' | 'events' | 'props' | 'tdlr'
 
 const NAV_SECTIONS = [
   {
@@ -35,23 +38,26 @@ const NAV_SECTIONS = [
       { key: 'venues' as Tab, label: 'Venues', icon: '🏟️' },
       { key: 'gyms' as Tab, label: 'Gyms', icon: '🏋️' },
       { key: 'promoters' as Tab, label: 'Promoters', icon: '🎤' },
+      { key: 'events' as Tab, label: 'Events', icon: '📅' },
     ],
   },
   {
     label: 'ACTIONS',
     items: [
       { key: 'add' as Tab, label: 'Add Fighter', icon: '+' },
+      { key: 'props' as Tab, label: 'Props', icon: '🎯' },
       { key: 'tdlr' as Tab, label: 'Import TDLR', icon: '📄' },
     ],
   },
 ]
 
-export default function AdminClient({ initialFighters, initialVenues, eventPromoters: initialEventPromoters, initialPromoterDocs, initialGyms }: AdminClientProps) {
+export default function AdminClient({ initialFighters, initialVenues, eventPromoters: initialEventPromoters, initialPromoterDocs, initialGyms, initialEvents }: AdminClientProps) {
   const [fighters, setFighters] = useState<Fighter[]>(initialFighters)
   const [venues, setVenues] = useState<VenueData[]>(initialVenues)
   const [promoters, setPromoters] = useState<EventPromoter[]>(initialEventPromoters)
   const [promoterDocs, setPromoterDocs] = useState<PromoterData[]>(initialPromoterDocs)
   const [gymDocs, setGymDocs] = useState<GymData[]>(initialGyms)
+  const [eventDocs, setEventDocs] = useState<TXMXEvent[]>(initialEvents)
   const [activeTab, setActiveTab] = useState<Tab>('list')
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const { user, signOut: handleSignOut } = useAdminAuth()
@@ -118,6 +124,18 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
     setGymDocs(prev => prev.filter(g => g.id !== id))
   }
 
+  const handleEventAdded = (event: TXMXEvent) => {
+    setEventDocs(prev => [event, ...prev])
+  }
+
+  const handleEventUpdated = (updated: TXMXEvent) => {
+    setEventDocs(prev => prev.map(e => e.id === updated.id ? updated : e))
+  }
+
+  const handleEventDeleted = (id: string) => {
+    setEventDocs(prev => prev.filter(e => e.id !== id))
+  }
+
   const counts: Record<Tab, number> = {
     list: fighters.length,
     venues: venues.length,
@@ -126,6 +144,8 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
       ...fighters.map(f => f.promoter).filter(Boolean),
       ...promoters.map(p => p.name),
     ]).size,
+    events: eventDocs.length,
+    props: 0,
     add: 0,
     tdlr: 0,
   }
@@ -135,6 +155,8 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
     venues: 'VENUES',
     gyms: 'GYMS',
     promoters: 'PROMOTERS',
+    events: 'EVENTS',
+    props: 'PROP PICKS',
     add: 'ADD FIGHTER',
     tdlr: 'IMPORT TDLR',
   }
@@ -266,6 +288,10 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
               <GymList fighters={fighters} gymDocs={gymDocs} onAdd={handleGymAdded} onUpdate={handleGymUpdated} onDelete={handleGymDeleted} />
             ) : activeTab === 'promoters' ? (
               <PromoterList fighters={fighters} eventPromoters={promoters} promoterDocs={promoterDocs} onUpdate={handlePromoterDocUpdated} onDelete={handlePromoterDocDeleted} />
+            ) : activeTab === 'events' ? (
+              <EventList events={eventDocs} fighters={fighters} onAdd={handleEventAdded} onUpdate={handleEventUpdated} onDelete={handleEventDeleted} />
+            ) : activeTab === 'props' ? (
+              <PropManager events={initialEvents} />
             ) : (
               <TDLRImport onImportComplete={handleImportComplete} />
             )}

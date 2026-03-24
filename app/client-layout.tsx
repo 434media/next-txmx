@@ -6,7 +6,9 @@ import { GeistPixelSquare, GeistPixelGrid, GeistPixelCircle, GeistPixelTriangle,
 import { useState } from "react"
 import { usePathname } from "next/navigation"
 import Navbar from "../components/navbar"
+import AuthModal from "../components/auth-modal"
 import SlideOutModal from "../components/slide-out-modal"
+import { AuthProvider } from "../lib/auth-context"
 import GlobalStyles from "../components/global-styles"
 import "./globals.css"
 import Footer from "../components/footer"
@@ -44,6 +46,7 @@ export default function ClientLayout({
   children: React.ReactNode
 }>) {
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const pathname = usePathname()
   const isAdmin = pathname?.startsWith('/admin')
 
@@ -121,13 +124,18 @@ export default function ClientLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} ${bebasNeue.variable} ${orbitron.variable} ${GeistPixelSquare.variable} ${GeistPixelGrid.variable} ${GeistPixelCircle.variable} ${GeistPixelTriangle.variable} ${GeistPixelLine.variable} antialiased bg-black text-white`} style={{ overflowY: 'auto', height: 'auto', minHeight: '100vh' }}>
         <Analytics />
 
-        <GlobalStyles />
-        <Navbar onMenuClick={openModal} />
-        {children}        
-        {!isAdmin && <Footer />}
-        
-        {/* Universal Slide Out Modal */}
-        <SlideOutModal isOpen={isModalOpen} onClose={closeModal} />
+        <AuthProvider>
+          <GlobalStyles />
+          <Navbar onMenuClick={openModal} onAuthClick={() => setIsAuthModalOpen(true)} />
+          {children}        
+          {!isAdmin && <Footer />}
+          
+          {/* Auth Modal */}
+          <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+          
+          {/* Universal Slide Out Modal */}
+          <SlideOutModal isOpen={isModalOpen} onClose={closeModal} />
+        </AuthProvider>
       </body>
     </html>
   )
