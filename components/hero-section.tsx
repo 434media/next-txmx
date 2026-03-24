@@ -1,191 +1,69 @@
 "use client"
 
-import { useRef, useEffect, useState } from "react"
-import { gsap } from "gsap"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import TXMXNewsletter from "./txmx-newsletter"
 
 export default function HeroSection() {
-  const heroRef = useRef<HTMLDivElement>(null)
-  const logoRef = useRef<HTMLDivElement>(null)
-  const videoRef = useRef<HTMLVideoElement>(null)
   const [showTXMXNewsletter, setShowTXMXNewsletter] = useState(false)
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Immediate video presentation
-      gsap.set(videoRef.current, {
-        opacity: 1,
-        scale: 1,
-      })
-
-      // Immediate logo presentation
-      gsap.set(logoRef.current, {
-        opacity: 1,
-        scale: 1,
-        y: 0,
-      })
-
-      // Simple, subtle logo breathing animation
-      gsap.to(logoRef.current, {
-        y: -6,
-        duration: 3,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
-      })
-
-      // TXMX Newsletter entrance sequence after delay
-      const txmxNewsletterTimer = setTimeout(() => {
-        setShowTXMXNewsletter(true)
-      }, 4000) // Show TXMX newsletter after 4 seconds
-
-      // Simple logo hover enhancement
-      const handleLogoHover = () => {
-        gsap.to(logoRef.current, {
-          scale: 1.02,
-          duration: 0.3,
-          ease: "power2.out",
-        })
-      }
-
-      const handleLogoLeave = () => {
-        gsap.to(logoRef.current, {
-          scale: 1,
-          duration: 0.3,
-          ease: "power2.out",
-        })
-      }
-
-      // Simple scroll fade for logo - optimized with throttling
-      let scrollTimeout: NodeJS.Timeout
-      const handleScroll = () => {
-        // Throttle scroll events for better performance
-        if (scrollTimeout) return
-        
-        scrollTimeout = setTimeout(() => {
-          const scrollY = window.scrollY
-          const scrollPercent = Math.min(scrollY / (window.innerHeight * 0.8), 1)
-
-          // Fade logo on scroll with GPU acceleration
-          gsap.to(logoRef.current, {
-            opacity: 1 - scrollPercent,
-            y: scrollPercent * -50,
-            duration: 0,
-            ease: "none",
-            force3D: true,
-            overwrite: "auto",
-          })
-          
-          scrollTimeout = null as any
-        }, 16) // ~60fps
-      }
-
-      // Add event listeners with passive flag for better scroll performance
-      window.addEventListener("scroll", handleScroll, { passive: true })
-
-      if (logoRef.current) {
-        logoRef.current.addEventListener("mouseenter", handleLogoHover)
-        logoRef.current.addEventListener("mouseleave", handleLogoLeave)
-      }
-
-      return () => {
-        clearTimeout(txmxNewsletterTimer)
-        window.removeEventListener("scroll", handleScroll)
-        if (logoRef.current) {
-          logoRef.current.removeEventListener("mouseenter", handleLogoHover)
-          logoRef.current.removeEventListener("mouseleave", handleLogoLeave)
-        }
-      }
-    }, heroRef)
-
-    return () => ctx.revert()
+    const timer = setTimeout(() => setShowTXMXNewsletter(true), 4000)
+    return () => clearTimeout(timer)
   }, [])
 
-  const handleTXMXNewsletterClose = () => {
-    setShowTXMXNewsletter(false)
-  }
-
   return (
-    <section ref={heroRef} className="relative h-screen flex items-center justify-center overflow-hidden">
-      {/* Hero Video - The Star */}
+    <section className="relative h-dvh flex items-center justify-center overflow-hidden">
+      {/* Hero Video */}
       <video
-        ref={videoRef}
         autoPlay
         muted
         loop
         playsInline
         preload="metadata"
         className="absolute inset-0 w-full h-full object-cover"
-        style={{
-          objectPosition: "center center",
-        }}
+        style={{ objectPosition: "center center" }}
       >
         <source src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/TXMX%20Hero%20Banner.mp4" type="video/mp4" />
         <track kind="captions" />
       </video>
 
-      {/* Minimal Overlay for Logo Readability */}
+      {/* Overlay for Logo Readability */}
       <div
         className="absolute inset-0"
         style={{
           background: `
-            radial-gradient(circle at center, 
-              rgba(0,0,0,0.1) 0%, 
-              rgba(0,0,0,0.3) 70%, 
+            linear-gradient(to bottom,
+              rgba(0,0,0,0.4) 0%,
+              rgba(0,0,0,0.15) 40%,
+              rgba(0,0,0,0.15) 60%,
               rgba(0,0,0,0.5) 100%
             )
           `,
         }}
       />
 
-      {/* TXMX Logo Overlay - Minimal & Clean */}
-      <div ref={logoRef} className="relative z-10 flex items-center justify-center px-4 cursor-pointer">
+      {/* TXMX Logo Overlay */}
+      <div className="relative z-10 flex items-center justify-center px-4 animate-float">
         <div className="relative">
-          {/* Minimal Shadow for Depth */}
+          {/* Soft shadow behind logo */}
           <div
-            className="absolute inset-0 blur-xl opacity-60"
+            className="absolute inset-0 blur-2xl opacity-50"
             style={{
-              background: `
-                radial-gradient(ellipse at center, 
-                  rgba(0,0,0,0.4) 0%, 
-                  rgba(0,0,0,0.2) 50%, 
-                  transparent 80%
-                )
-              `,
-              transform: "scale(1.1) translateY(8px)",
+              background: "radial-gradient(ellipse at center, rgba(0,0,0,0.5) 0%, transparent 70%)",
+              transform: "scale(1.3) translateY(10px)",
             }}
           />
 
-          {/* Subtle Glow for Logo Enhancement */}
-          <div
-            className="absolute inset-0 blur-2xl opacity-40"
-            style={{
-              background: `
-                radial-gradient(ellipse at center, 
-                  rgba(255,255,255,0.15) 0%, 
-                  rgba(255,255,255,0.08) 40%, 
-                  transparent 70%
-                )
-              `,
-              transform: "scale(1.2)",
-            }}
-          />
-
-          {/* Clean Logo Presentation */}
+          {/* Logo */}
           <Image
             src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/TXMXBack.svg"
             alt="TXMX Boxing"
             width={600}
             height={300}
-            className="relative w-[280px] h-[140px] sm:w-[360px] sm:h-[180px] md:w-[480px] md:h-60 lg:w-[600px] lg:h-[300px] object-contain"
+            className="relative w-60 h-[120px] sm:w-[320px] sm:h-40 md:w-[420px] md:h-[210px] lg:w-[520px] lg:h-[260px] object-contain"
             style={{
-              filter: `
-                brightness(1.1) 
-                contrast(1.05) 
-                drop-shadow(0 4px 20px rgba(0,0,0,0.3))
-                drop-shadow(0 0 40px rgba(255,255,255,0.2))
-              `,
+              filter: "drop-shadow(0 4px 24px rgba(0,0,0,0.4))",
             }}
             priority
             loading="eager"
@@ -194,65 +72,27 @@ export default function HeroSection() {
       </div>
 
       {/* TXMX Newsletter Modal */}
-      <TXMXNewsletter showModal={showTXMXNewsletter} onClose={handleTXMXNewsletterClose} />
+      <TXMXNewsletter showModal={showTXMXNewsletter} onClose={() => setShowTXMXNewsletter(false)} />
 
-      {/* Enhanced CSS for Performance */}
       <style jsx>{`
-        /* Hardware acceleration for smooth performance */
-        video {
-          will-change: auto;
-          transform: translateZ(0);
+        @keyframes float {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-6px); }
+        }
+        .animate-float {
+          animation: float 3s ease-in-out infinite;
         }
 
-        /* Logo optimization */
-        img {
-          will-change: transform;
-          transform: translateZ(0);
-        }
-
-        /* High refresh rate display optimization */
-        @media (min-resolution: 120dpi) {
-          video {
-            image-rendering: optimizeQuality;
-          }
-        }
-
-        /* Reduced motion support */
         @media (prefers-reduced-motion: reduce) {
-          * {
-            animation-duration: 0.01ms !important;
-            animation-iteration-count: 1 !important;
-            transition-duration: 0.01ms !important;
+          .animate-float {
+            animation: none;
           }
         }
 
-        /* High contrast mode support */
-        @media (prefers-contrast: high) {
-          img {
-            filter: brightness(1.2) contrast(1.3) !important;
-          }
-        }
-
-        /* Focus styles for accessibility */
-        [tabindex]:focus-visible {
-          outline: 2px solid rgba(255, 255, 255, 0.8);
-          outline-offset: 4px;
-        }
-
-        /* Mobile optimizations */
         @media (max-width: 768px) {
           video {
             object-position: center center;
-            height: 100vh;
             height: 100dvh;
-          }
-        }
-
-        /* iOS Safari specific optimizations */
-        @supports (-webkit-touch-callout: none) {
-          video {
-            -webkit-transform: translateZ(0);
-            -webkit-backface-visibility: hidden;
           }
         }
       `}</style>

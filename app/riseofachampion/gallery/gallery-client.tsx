@@ -137,7 +137,7 @@ export default function GalleryClient() {
             {/* Back Link */}
             <Link
               href="/riseofachampion"
-              className="inline-flex items-center gap-2 text-white/60 hover:text-[#FFB800] text-sm mb-8 transition-colors relative z-30"
+              className="inline-flex items-center gap-2 text-white/60 hover:text-[#FFB800] text-xs font-semibold tracking-widest mb-8 transition-colors relative z-30 leading-relaxed uppercase"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -158,12 +158,12 @@ export default function GalleryClient() {
             </div>
 
             {/* Title */}
-            <h1 className="-mt-14 md:-mt-20 text-4xl md:text-5xl font-bold text-white mb-3 text-center">
+            <h1 className="-mt-14 md:-mt-20 text-2xl md:text-4xl font-semibold text-white mb-3 text-center tracking-widest leading-relaxed uppercase">
               EVENT GALLERY
             </h1>
 
             {/* Description */}
-            <p className="text-white/70 text-center mb-3">
+            <p className="text-white/50 text-xs md:text-sm text-center mb-3 leading-relaxed tracking-wide">
               Relive the moments from our celebration of San Antonio's boxing legends.
             </p>
             
@@ -172,22 +172,22 @@ export default function GalleryClient() {
               <div className="bg-[#FFB800]/10 border border-[#FFB800]/30 rounded-lg p-6 mb-10">
                 <div className="flex items-center justify-center gap-3">
                   <div className="w-5 h-5 border-2 border-[#FFB800] border-t-transparent rounded-full animate-spin"></div>
-                  <p className="text-[#FFB800] font-semibold">Connecting to Google Drive...</p>
+                  <p className="text-[#FFB800] font-semibold text-xs tracking-widest leading-relaxed uppercase">Connecting to Google Drive...</p>
                 </div>
               </div>
             )}
 
             {/* Error State */}
             {fetchError && !isLoading && (
-              <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-6 mb-10">
+              <div className="bg-red-500/10 border border-red-500/30 rounded-md p-6 mb-10">
                 <div className="flex items-start gap-3">
-                  <svg className="w-6 h-6 text-red-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-red-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <div className="flex-1">
-                    <h3 className="text-red-400 font-semibold mb-1">Unable to Load Gallery</h3>
-                    <p className="text-red-300/80 text-sm mb-3">{fetchError}</p>
-                    <p className="text-red-300/60 text-xs">
+                    <h3 className="text-red-400 font-semibold text-xs tracking-widest uppercase mb-1 leading-relaxed">Unable to Load Gallery</h3>
+                    <p className="text-red-300/80 text-xs leading-relaxed tracking-wide mb-3">{fetchError}</p>
+                    <p className="text-red-300/50 text-xs leading-relaxed tracking-wide">
                       The gallery images are stored in Google Drive. Please ensure environment variables are configured in Vercel:
                       <br />
                       • GOOGLE_SERVICE_ACCOUNT_EMAIL
@@ -202,16 +202,16 @@ export default function GalleryClient() {
             )}
 
             {!isLoading && !fetchError && (
-              <p className="text-[#FFB800] text-center mb-10 font-semibold">
+              <p className="text-[#FFB800] text-center mb-10 font-semibold text-xs tracking-widest leading-relaxed uppercase">
                 {images.length} exclusive photos • Free access
               </p>
             )}
 
             {/* Unlock Form */}
-            <div className="bg-white/5 border border-white/10 rounded-lg p-6 md:p-8 mb-12">
+            <div className="bg-white/5 border border-white/10 rounded-md p-6 md:p-8 mb-12">
               <div className="text-center mb-6">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#FFB800]/10 flex items-center justify-center">
-                  <svg className="w-8 h-8 text-[#FFB800]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-[#FFB800]/10 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-[#FFB800]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -220,8 +220,8 @@ export default function GalleryClient() {
                     />
                   </svg>
                 </div>
-                <h2 className="text-2xl font-bold text-white mb-2">Unlock Gallery</h2>
-                <p className="text-white/60 text-sm">
+                <h2 className="text-sm md:text-lg font-semibold text-white mb-2 tracking-widest uppercase leading-relaxed">Unlock Gallery</h2>
+                <p className="text-white/50 text-xs leading-relaxed tracking-wide">
                   Enter your info below to view and download photos
                 </p>
               </div>
@@ -237,7 +237,7 @@ export default function GalleryClient() {
             {/* Back Link */}
             <Link
               href="/riseofachampion"
-              className="inline-flex items-center gap-2 text-white/60 hover:text-[#FFB800] text-sm mb-8 transition-colors"
+              className="inline-flex items-center gap-2 text-white/60 hover:text-[#FFB800] text-xs font-semibold tracking-widest mb-8 transition-colors leading-relaxed uppercase"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -247,11 +247,11 @@ export default function GalleryClient() {
 
             {/* Success Message */}
             <div className="text-center mb-8">
-              <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/30 px-4 py-2 rounded-sm mb-4">
-                <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/30 px-4 py-2 rounded-md mb-4">
+                <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span className="text-green-400 text-sm font-semibold">Gallery Unlocked</span>
+                <span className="text-green-400 text-xs font-semibold tracking-widest uppercase leading-relaxed">Gallery Unlocked</span>
               </div>
               
               {/* Logo */}
@@ -265,7 +265,7 @@ export default function GalleryClient() {
                 />
               </div>
               
-              <p className="-mt-10 text-white/60">Click any photo to view full size</p>
+              <p className="-mt-10 text-white/40 text-xs tracking-wide leading-relaxed">Click any photo to view full size</p>
             </div>
 
             {/* Category Filter */}
@@ -275,10 +275,10 @@ export default function GalleryClient() {
                   <button
                     key={cat.id}
                     onClick={() => setSelectedCategory(cat.id)}
-                    className={`px-4 py-2 rounded-sm text-sm font-semibold transition-all ${
+                    className={`px-4 py-2 rounded-md text-xs font-semibold tracking-widest uppercase leading-relaxed transition-all ${
                       selectedCategory === cat.id
                         ? "bg-[#FFB800] text-black"
-                        : "bg-white/5 text-white/70 hover:bg-white/10 hover:text-white"
+                        : "bg-white/5 text-white/50 hover:bg-white/10 hover:text-white"
                     }`}
                   >
                     {cat.label} ({cat.count})
@@ -289,12 +289,12 @@ export default function GalleryClient() {
 
             {/* Loading State */}
             {isLoading && (
-              <div className="bg-[#FFB800]/10 border border-[#FFB800]/30 rounded-lg p-8 mb-10">
+              <div className="bg-[#FFB800]/10 border border-[#FFB800]/30 rounded-md p-8 mb-10">
                 <div className="flex flex-col items-center justify-center gap-4">
-                  <div className="w-12 h-12 border-3 border-[#FFB800] border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-10 h-10 border-2 border-[#FFB800] border-t-transparent rounded-full animate-spin"></div>
                   <div className="text-center">
-                    <p className="text-[#FFB800] font-semibold text-lg mb-1">Connecting to Google Drive...</p>
-                    <p className="text-white/60 text-sm">Loading your exclusive event photos</p>
+                    <p className="text-[#FFB800] font-semibold text-xs tracking-widest uppercase mb-1 leading-relaxed">Connecting to Google Drive...</p>
+                    <p className="text-white/40 text-xs leading-relaxed tracking-wide">Loading your exclusive event photos</p>
                   </div>
                 </div>
               </div>
@@ -302,21 +302,21 @@ export default function GalleryClient() {
 
             {/* Error State */}
             {fetchError && !isLoading && (
-              <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-8 mb-10">
+              <div className="bg-red-500/10 border border-red-500/30 rounded-md p-8 mb-10">
                 <div className="flex flex-col items-start gap-4">
                   <div className="flex items-start gap-3 w-full">
-                    <svg className="w-8 h-8 text-red-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-6 h-6 text-red-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <div className="flex-1">
-                      <h3 className="text-red-400 font-bold text-lg mb-2">Unable to Load Gallery Images</h3>
-                      <p className="text-red-300/90 mb-3">{fetchError}</p>
-                      <div className="bg-red-500/10 border border-red-500/20 rounded p-4 mb-4">
-                        <p className="text-red-300/80 text-sm font-semibold mb-2">Configuration Required:</p>
-                        <p className="text-red-300/60 text-xs mb-3">
+                      <h3 className="text-red-400 font-semibold text-xs tracking-widest uppercase mb-2 leading-relaxed">Unable to Load Gallery Images</h3>
+                      <p className="text-red-300/80 text-xs leading-relaxed tracking-wide mb-3">{fetchError}</p>
+                      <div className="bg-red-500/10 border border-red-500/20 rounded-md p-4 mb-4">
+                        <p className="text-red-300/70 text-xs font-semibold tracking-widest uppercase mb-2 leading-relaxed">Configuration Required:</p>
+                        <p className="text-red-300/50 text-xs leading-relaxed tracking-wide mb-3">
                           The gallery images are stored in Google Drive. Please configure these environment variables in Vercel:
                         </p>
-                        <ul className="text-red-300/70 text-xs space-y-1 font-mono">
+                        <ul className="text-red-300/60 text-xs space-y-1 font-mono leading-relaxed">
                           <li>• GOOGLE_SERVICE_ACCOUNT_EMAIL</li>
                           <li>• GOOGLE_PRIVATE_KEY</li>
                           <li>• GOOGLE_DRIVE_FOLDER_ID</li>
@@ -324,7 +324,7 @@ export default function GalleryClient() {
                       </div>
                       <button
                         onClick={() => window.location.reload()}
-                        className="inline-flex items-center gap-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300 px-4 py-2 rounded text-sm font-semibold transition-colors"
+                        className="inline-flex items-center gap-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300 px-4 py-2 rounded-md text-xs font-semibold tracking-widest uppercase transition-colors leading-relaxed"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -340,7 +340,7 @@ export default function GalleryClient() {
             {/* Photo Count */}
             {!isLoading && !fetchError && (
               <div className="text-center mb-6">
-                <p className="text-white/50 text-sm">
+                <p className="text-white/40 text-xs tracking-wide leading-relaxed">
                   Showing {filteredImages.length} {filteredImages.length === 1 ? 'photo' : 'photos'}
                 </p>
               </div>
@@ -348,12 +348,12 @@ export default function GalleryClient() {
 
             {/* Photo Grid */}
             {!isLoading && !fetchError && images.length > 0 && (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-12">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3 mb-12">
               {filteredImages.map((image, index) => (
                 <button
                   key={image.id}
                   onClick={() => handleImageClick(image)}
-                  className="aspect-square bg-white/5 rounded-lg overflow-hidden group relative focus:outline-none focus:ring-2 focus:ring-[#FFB800]"
+                  className="aspect-square bg-white/5 rounded-md overflow-hidden group relative focus:outline-none focus:ring-2 focus:ring-[#FFB800]"
                 >
                   {/* Loading skeleton */}
                   {imageLoadingStates[image.id] !== false && (
@@ -400,7 +400,7 @@ export default function GalleryClient() {
 
             {/* Footer */}
             <div className="text-center border-t border-white/10 pt-8">
-              <p className="text-white/40 text-xs md:text-sm mb-6 uppercase tracking-[0.2em] font-light">Presented by</p>
+              <p className="text-white/30 text-xs tracking-widest font-semibold uppercase leading-relaxed mb-6">Presented by</p>
               <div className="flex items-center justify-center gap-8 flex-wrap">
                 <Image
                   src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/iconic-series/flyers-63-434.png"

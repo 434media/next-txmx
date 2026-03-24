@@ -1,14 +1,9 @@
 "use client"
 
-import type React from "react"
-import { useRef, useEffect, useState } from "react"
-import { gsap } from "gsap"
-import { InstagramIcon } from "../components/icons/instagram-icon"
-import { ShopifyIcon } from "../components/icons/shopify-icon"
-import { MailIcon } from "../components/icons/mail-icon"
+import { useState, useEffect } from "react"
+import Link from "next/link"
 import { XIcon } from "../components/icons/x-icon"
 import { ArrowLeftIcon } from "../components/icons/arrow-left-icon"
-import { ExternalLinkIcon } from "../components/icons/external-link-icon"
 import { Newsletter } from "./newsletter"
 import Image from "next/image"
 
@@ -20,332 +15,184 @@ interface SlideOutModalProps {
 type ModalState = "main" | "contact"
 
 export default function SlideOutModal({ isOpen, onClose }: SlideOutModalProps) {
-  const modalRef = useRef<HTMLDivElement>(null)
-  const modalContentRef = useRef<HTMLDivElement>(null)
-  const overlayRef = useRef<HTMLDivElement>(null)
-  const mainContentRef = useRef<HTMLDivElement>(null)
-  const contactContentRef = useRef<HTMLDivElement>(null)
-
   const [modalState, setModalState] = useState<ModalState>("main")
+  const [isVisible, setIsVisible] = useState(false)
+  const [isAnimating, setIsAnimating] = useState(false)
+  const [socialOpen, setSocialOpen] = useState(false)
 
   useEffect(() => {
     if (isOpen) {
-      // Reset state
       setModalState("main")
-
-      // Enhanced entrance animation with spring-like timing
-      const tl = gsap.timeline()
-
-      gsap.set(modalRef.current, { display: "flex" })
-
-      tl.fromTo(overlayRef.current, { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" })
-        .fromTo(
-          modalContentRef.current,
-          { x: "100%", scale: 0.95 },
-          { x: "0%", scale: 1, duration: 0.7, ease: "back.out(1.2)" },
-          "-=0.3",
-        )
-        .fromTo(
-          ".modal-element",
-          { y: 40, opacity: 0, scale: 0.9 },
-          { y: 0, opacity: 1, scale: 1, duration: 0.5, stagger: 0.1, ease: "back.out(1.4)" },
-          "-=0.4",
-        )
-    } else {
-      // Enhanced exit animation
-      const tl = gsap.timeline()
-
-      tl.to(".modal-element", {
-        y: -20,
-        opacity: 0,
-        scale: 0.95,
-        duration: 0.3,
-        stagger: 0.05,
-        ease: "power2.in",
+      setIsVisible(true)
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setIsAnimating(true))
       })
-        .to(
-          modalContentRef.current,
-          {
-            x: "100%",
-            scale: 0.95,
-            duration: 0.5,
-            ease: "power3.in",
-          },
-          "-=0.2",
-        )
-        .to(
-          overlayRef.current,
-          {
-            opacity: 0,
-            duration: 0.3,
-            ease: "power2.in",
-          },
-          "-=0.3",
-        )
-        .set(modalRef.current, { display: "none" })
+    } else {
+      setIsAnimating(false)
+      const timeout = setTimeout(() => setIsVisible(false), 350)
+      return () => clearTimeout(timeout)
     }
   }, [isOpen])
 
-  const handleContactClick = () => {
-    if (!mainContentRef.current) return
+  const handleContactClick = () => setModalState("contact")
+  const handleBackClick = () => setModalState("main")
 
-    const tl = gsap.timeline()
-
-    tl.to(".modal-element", {
-      x: -50,
-      opacity: 0,
-      scale: 0.9,
-      duration: 0.4,
-      stagger: 0.05,
-      ease: "power2.in",
-    })
-      .call(() => setModalState("contact"))
-      .call(() => {
-        if (contactContentRef.current) {
-          gsap.fromTo(
-            contactContentRef.current,
-            { x: 50, opacity: 0, scale: 0.9 },
-            { x: 0, opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.3)" },
-          )
-
-          const formElements = document.querySelectorAll(".form-element")
-          if (formElements.length > 0) {
-            gsap.fromTo(
-              formElements,
-              { y: 30, opacity: 0, scale: 0.9 },
-              { y: 0, opacity: 1, scale: 1, duration: 0.4, stagger: 0.1, ease: "back.out(1.4)", delay: 0.2 },
-            )
-          }
-        }
-      })
-  }
-
-  const handleBackClick = () => {
-    if (!contactContentRef.current) return
-
-    const tl = gsap.timeline()
-
-    tl.to(".form-element", {
-      x: 50,
-      opacity: 0,
-      scale: 0.9,
-      duration: 0.3,
-      stagger: 0.05,
-      ease: "power2.in",
-    })
-      .call(() => {
-        setModalState("main")
-      })
-      .call(() => {
-        if (mainContentRef.current) {
-          gsap.fromTo(
-            mainContentRef.current,
-            { x: -50, opacity: 0, scale: 0.9 },
-            { x: 0, opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.3)" },
-          )
-
-          const modalElements = document.querySelectorAll(".modal-element")
-          if (modalElements.length > 0) {
-            gsap.fromTo(
-              modalElements,
-              { y: 20, opacity: 0, scale: 0.95 },
-              { y: 0, opacity: 1, scale: 1, duration: 0.4, stagger: 0.08, ease: "back.out(1.4)", delay: 0.2 },
-            )
-          }
-        }
-      })
-  }
-
-  const handleNewsletterSuccess = () => {
-    const formElements = document.querySelectorAll(".form-element")
-    if (formElements.length > 0) {
-      gsap.to(formElements, {
-        scale: 1.05,
-        duration: 0.3,
-        yoyo: true,
-        repeat: 1,
-        ease: "back.out(1.7)",
-      })
-    }
-  }
-
-  // Enhanced hover handlers with spring animations
-  const handleItemHover = (e: React.MouseEvent) => {
-    gsap.to(e.currentTarget, {
-      scale: 1.05,
-      y: -4,
-      duration: 0.4,
-      ease: "back.out(1.7)",
-    })
-  }
-
-  const handleItemLeave = (e: React.MouseEvent) => {
-    gsap.to(e.currentTarget, {
-      scale: 1,
-      y: 0,
-      duration: 0.4,
-      ease: "back.out(1.7)",
-    })
-  }
+  if (!isVisible) return null
 
   return (
-    <div ref={modalRef} className="fixed inset-0 z-50 hidden">
-      {/* Enhanced Overlay */}
-      <div ref={overlayRef} className="absolute inset-0 backdrop-blur-md bg-black/80" onClick={onClose} />
-
-      {/* Modal Content - Black Background Design */}
+    <div className="fixed inset-0 z-50">
+      {/* Overlay */}
       <div
-        ref={modalContentRef}
-        className="absolute right-0 top-0 h-full w-full max-w-md overflow-y-auto bg-black border-l-4 border-white"
-        style={{
-          boxShadow: "-20px 0 60px rgba(255,255,255,0.1)",
-        }}
+        className={`absolute inset-0 backdrop-blur-sm bg-black/70 transition-opacity duration-300 ${isAnimating ? "opacity-100" : "opacity-0"}`}
+        onClick={onClose}
+      />
+
+      {/* Modal Content */}
+      <div
+        className={`absolute right-0 top-0 h-full w-full max-w-sm overflow-y-auto bg-black border-l border-white/20 transition-transform duration-350 ease-out ${isAnimating ? "translate-x-0" : "translate-x-full"}`}
       >
         {/* Main Content */}
         {modalState === "main" && (
-          <div ref={mainContentRef} className="flex flex-col h-full p-8 text-white">
-            {/* Header - Close Button */}
-            <div className="modal-element flex justify-end mb-8">
+          <div className="flex flex-col h-full px-6 py-8 text-white">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-10">
+              <Image
+                src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/TXMXBack.svg"
+                alt="TXMX Boxing Logo"
+                width={100}
+                height={50}
+                className="brightness-0 invert"
+                priority
+              />
               <button
                 onClick={onClose}
-                className="p-3 bg-white text-black hover:bg-gray-200 transition-colors"
+                className="p-2 text-white/60 hover:text-white transition-colors"
                 aria-label="Close menu"
               >
                 <XIcon className="w-5 h-5" />
               </button>
             </div>
 
-            {/* TXMX Logo with Streamlined Presentation */}
-            <div className="modal-element text-center mb-8">
-              <div className="flex justify-center mb-4">
-                <Image
-                  src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/TXMXBack.svg"
-                  alt="TXMX Boxing Logo"
-                  width={140}
-                  height={70}
-                  className="brightness-0 invert"
-                  priority
-                />
-              </div>
-              <p className="text-lg font-bold text-white">Made from blood, sweat, and tears</p>
-            </div>
-
-            {/* Typography-Focused Link Buttons */}
-            <div className="flex-1 flex flex-col justify-center space-y-6 max-w-xs mx-auto w-full">
-              {/* Rise of a Champion Link */}
-              <a
+            {/* Navigation Links */}
+            <div className="flex-1 flex flex-col justify-center space-y-4 w-full">
+              {/* Scorecard */}
+              <Link
+                href="/scorecard"
+                className="group block py-4 border-b border-white/10 hover:-translate-y-0.5 transition-transform duration-200"
+                onClick={onClose}
+              >
+                <div className="text-white text-sm font-semibold tracking-widest leading-relaxed group-hover:text-white/70 transition-colors">SCORECARD</div>
+                <div className="text-white/30 text-xs font-medium tracking-wide leading-relaxed mt-0.5">Fighter & Event Data</div>
+              </Link>
+              {/* 8 Count */}
+              <Link
+                href="/8count"
+                className="group block py-4 border-b border-white/10 hover:-translate-y-0.5 transition-transform duration-200"
+                onClick={onClose}
+              >
+                <div className="text-white text-sm font-semibold tracking-widest leading-relaxed group-hover:text-white/70 transition-colors">THE 8 COUNT</div>
+                <div className="text-white/30 text-xs font-medium tracking-wide leading-relaxed mt-0.5">A Feed for Fight Fans</div>
+              </Link>
+              {/* Rise of a Champion */}
+              <Link
                 href="/riseofachampion"
-                className="modal-element group relative block"
-                onMouseEnter={handleItemHover}
-                onMouseLeave={handleItemLeave}
+                className="group block py-4 border-b border-white/10 hover:-translate-y-0.5 transition-transform duration-200"
+                onClick={onClose}
               >
-                <div className="relative p-6 bg-black border-2 border-white hover:bg-white hover:border-white transition-colors">
-                  <div className="text-center">
-                    <div className="text-white group-hover:text-black font-bold text-xl tracking-wider transition-colors mb-1">RISE OF A CHAMPION</div>
-                    <div className="text-gray-400 group-hover:text-gray-800 text-sm font-medium tracking-wide transition-colors">Relive the Moments</div>
-                  </div>
-                </div>
-              </a>
+                <div className="text-white text-sm font-semibold tracking-widest leading-relaxed group-hover:text-white/70 transition-colors">RISE OF A CHAMPION</div>
+                <div className="text-white/30 text-xs font-medium tracking-wide leading-relaxed mt-0.5">Relive the Moments</div>
+              </Link>
 
-              {/* Instagram Link */}
-              <a
-                href="https://www.instagram.com/txmxboxing/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="modal-element group relative block"
-                onMouseEnter={handleItemHover}
-                onMouseLeave={handleItemLeave}
-              >
-                <div className="relative p-6 bg-black border-2 border-white hover:bg-white hover:border-white transition-colors">
-                  <div className="text-center">
-                    <div className="text-white group-hover:text-black font-bold text-xl tracking-wider transition-colors mb-1">INSTAGRAM</div>
-                    <div className="text-gray-400 group-hover:text-gray-800 text-sm font-medium tracking-wide transition-colors">@txmxboxing</div>
+              {/* @TXMXBOXING Dropdown */}
+              <div className="border-b border-white/10">
+                <button
+                  onClick={() => setSocialOpen(!socialOpen)}
+                  className="group flex items-center justify-between w-full py-4 hover:-translate-y-0.5 transition-transform duration-200"
+                >
+                  <div>
+                    <div className="text-white text-sm font-semibold tracking-widest leading-relaxed group-hover:text-white/70 transition-colors">@TXMXBOXING</div>
+                    <div className="text-white/30 text-xs font-medium tracking-wide leading-relaxed mt-0.5">Social Links</div>
                   </div>
-                </div>
-              </a>
+                  <svg
+                    className={`w-3 h-3 text-white/60 transition-transform duration-200 ${socialOpen ? "rotate-180" : ""}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
 
-              {/* YouTube Link */}
-              <a
-                href="https://www.youtube.com/@txmxboxing/shorts"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="modal-element group relative block"
-                onMouseEnter={handleItemHover}
-                onMouseLeave={handleItemLeave}
-              >
-                <div className="relative p-6 bg-black border-2 border-white hover:bg-white hover:border-white transition-colors">
-                  <div className="text-center">
-                    <div className="text-white group-hover:text-black font-bold text-xl tracking-wider transition-colors mb-1">YOUTUBE</div>
-                    <div className="text-gray-400 group-hover:text-gray-800 text-sm font-medium tracking-wide transition-colors">@txmxboxing</div>
+                {socialOpen && (
+                  <div className="pb-3 space-y-1">
+                    <a
+                      href="https://www.instagram.com/txmxboxing/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 px-4 py-3 rounded-md hover:bg-white/10 transition-colors duration-200 group"
+                    >
+                      <svg className="w-4 h-4 text-white/60 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                      </svg>
+                      <div>
+                        <p className="text-white text-xs font-semibold tracking-wide leading-relaxed">INSTAGRAM</p>
+                        <p className="text-white/40 text-[11px] font-medium tracking-wide leading-relaxed">@txmxboxing</p>
+                      </div>
+                    </a>
+                    <a
+                      href="https://www.youtube.com/@txmxboxing/shorts"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 px-4 py-3 rounded-md hover:bg-white/10 transition-colors duration-200 group"
+                    >
+                      <svg className="w-4 h-4 text-white/60 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                      </svg>
+                      <div>
+                        <p className="text-white text-xs font-semibold tracking-wide leading-relaxed">YOUTUBE</p>
+                        <p className="text-white/40 text-[11px] font-medium tracking-wide leading-relaxed">@txmxboxing</p>
+                      </div>
+                    </a>
+                    <a
+                      href="https://www.tiktok.com/@txmxboxing"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 px-4 py-3 rounded-md hover:bg-white/10 transition-colors duration-200 group"
+                    >
+                      <svg className="w-4 h-4 text-white/60 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.75a8.18 8.18 0 0 0 4.76 1.52V6.84a4.84 4.84 0 0 1-1-.15z" />
+                      </svg>
+                      <div>
+                        <p className="text-white text-xs font-semibold tracking-wide leading-relaxed">TIKTOK</p>
+                        <p className="text-white/40 text-[11px] font-medium tracking-wide leading-relaxed">@txmxboxing</p>
+                      </div>
+                    </a>
                   </div>
-                </div>
-              </a>
+                )}
+              </div>
 
-              {/* TikTok Link */}
-              <a
-                href="https://www.tiktok.com/@txmxboxing"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="modal-element group relative block"
-                onMouseEnter={handleItemHover}
-                onMouseLeave={handleItemLeave}
-              >
-                <div className="relative p-6 bg-black border-2 border-white hover:bg-white hover:border-white transition-colors">
-                  <div className="text-center">
-                    <div className="text-white group-hover:text-black font-bold text-xl tracking-wider transition-colors mb-1">TIKTOK</div>
-                    <div className="text-gray-400 group-hover:text-gray-800 text-sm font-medium tracking-wide transition-colors">@txmxboxing</div>
-                  </div>
-                </div>
-              </a>
-
-              {/* Shopify Link */}
+              {/* Shop */}
               <a
                 href="https://434media.com/shop"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="modal-element group relative block"
-                onMouseEnter={handleItemHover}
-                onMouseLeave={handleItemLeave}
+                className="group block py-4 hover:-translate-y-0.5 transition-transform duration-200"
               >
-                <div className="relative p-6 bg-black border-2 border-white hover:bg-white hover:border-white transition-colors">
-                  <div className="text-center">
-                    <div className="text-white group-hover:text-black font-bold text-xl tracking-wider transition-colors mb-1">SHOP TXMX BOXING</div>
-                    <div className="text-gray-400 group-hover:text-gray-800 text-sm font-medium tracking-wide transition-colors">Founders Tee Now Available</div>
-                  </div>
-                </div>
+                <div className="text-white text-sm font-semibold tracking-widest leading-relaxed group-hover:text-white/70 transition-colors">SHOP FOUNDERS TEE</div>
+                <div className="text-white/30 text-xs font-medium tracking-wide leading-relaxed mt-0.5">434media.com</div>
               </a>
-
-              {/* Contact Button */}
-              <button
-                onClick={handleContactClick}
-                className="modal-element group relative block w-full text-left"
-                onMouseEnter={handleItemHover}
-                onMouseLeave={handleItemLeave}
-              >
-                <div className="relative p-6 bg-black border-2 border-white hover:bg-white hover:border-white transition-colors">
-                  <div className="text-center">
-                    <div className="text-white group-hover:text-black font-bold text-xl tracking-wider transition-colors mb-1">JOIN THE 8 COUNT</div>
-                    <div className="text-gray-400 group-hover:text-gray-800 text-sm font-medium tracking-wide transition-colors">A FEED FOR FIGHT FANS</div>
-                  </div>
-                </div>
-              </button>
-            </div>
-
-            {/* Footer Message */}
-            <div className="modal-element text-center mt-8 pt-6 border-t-2 border-white">
-              <p className="text-sm text-gray-400 font-medium tracking-wide">TXMX BOXING</p>
             </div>
           </div>
         )}
 
         {/* Contact Content */}
         {modalState === "contact" && (
-          <div ref={contactContentRef} className="flex flex-col h-full p-8 text-white">
+          <div className="flex flex-col h-full px-6 py-8 text-white">
             {/* Header - Back Button */}
-            <div className="flex justify-start mb-8">
+            <div className="flex justify-start mb-10">
               <button
                 onClick={handleBackClick}
-                className="p-3 bg-white text-black hover:bg-gray-200 transition-colors"
+                className="p-2 text-white/60 hover:text-white transition-colors"
                 aria-label="Go back"
               >
                 <ArrowLeftIcon className="w-5 h-5" />
@@ -354,7 +201,7 @@ export default function SlideOutModal({ isOpen, onClose }: SlideOutModalProps) {
 
             {/* Newsletter Form - Centered */}
             <div className="flex-1 flex flex-col justify-center space-y-6 max-w-xs mx-auto w-full">
-              <Newsletter onSuccess={handleNewsletterSuccess} className="form-element" slideoutModal={true} />
+              <Newsletter className="form-element" slideoutModal={true} />
             </div>
           </div>
         )}

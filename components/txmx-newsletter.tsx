@@ -96,19 +96,19 @@ export default function TXMXNewsletter({ showModal, onClose }: TXMXNewsletterPro
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.95, opacity: 0, y: 20 }}
           transition={{ type: "spring", damping: 25, stiffness: 300 }}
-          className="relative w-full max-w-4xl bg-black border-2 border-white shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
+          className="relative w-full max-w-4xl bg-black border border-white/20 rounded-md shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Close Button */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 z-20 p-2 bg-black border-2 border-white text-white hover:bg-white hover:text-black transition-all duration-500 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black"
+            className="absolute top-4 right-4 z-20 p-2 text-white/60 hover:text-white transition-colors duration-300 focus:outline-none"
             aria-label="Close newsletter signup"
           >
             <X className="h-4 w-4" />
           </button>
 
-          <div className="flex flex-col lg:flex-row min-h-[600px]">
+          <div className="flex flex-col lg:flex-row min-h-[480px]">
             {/* Left Side - Image */}
             <div className="lg:w-1/2 relative overflow-hidden">
               <div className="absolute inset-0 bg-linear-to-r from-transparent to-black/20 z-10" />
@@ -122,15 +122,15 @@ export default function TXMXNewsletter({ showModal, onClose }: TXMXNewsletterPro
             </div>
 
             {/* Right Side - Newsletter Form */}
-            <div className="lg:w-1/2 p-8 lg:p-12 flex flex-col justify-center relative overflow-hidden">
+            <div className="lg:w-1/2 p-6 lg:p-10 flex flex-col justify-center relative overflow-hidden">
               <div className="relative z-10">
                 {/* Header with Logo */}
-                <div className="text-center mb-8">
+                <div className="text-center mb-6">
                   <motion.div
                     initial={{ y: -20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.1 }}
-                    className="mb-6"
+                    className="mb-4"
                   >
                     <div className="flex justify-center">
                       {/* TXMX Logo - Using text fallback if SVG doesn't load */}
@@ -138,8 +138,8 @@ export default function TXMXNewsletter({ showModal, onClose }: TXMXNewsletterPro
                         <Image
                           src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/TXMXBack.svg"
                           alt="TXMX Boxing Logo"
-                          width={160}
-                          height={80}
+                          width={120}
+                          height={60}
                           className="filter brightness-0 invert"
                           priority
                           onError={(e) => {
@@ -151,7 +151,7 @@ export default function TXMXNewsletter({ showModal, onClose }: TXMXNewsletterPro
                           }}
                         />
                         {/* Text fallback */}
-                        <div className="hidden text-4xl lg:text-5xl font-black text-white tracking-wider uppercase">
+                        <div className="hidden text-2xl lg:text-3xl font-semibold text-white tracking-widest uppercase">
                           TXMX BOXING
                         </div>
                       </div>
@@ -162,9 +162,9 @@ export default function TXMXNewsletter({ showModal, onClose }: TXMXNewsletterPro
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.2 }}
-                    className="mb-6"
+                    className="mb-4"
                   >
-                    <h2 className="text-2xl lg:text-3xl font-black text-white tracking-wider uppercase">
+                    <h2 className="w-50 mx-auto text-sm lg:text-base font-semibold text-white tracking-widest uppercase leading-relaxed">
                       Made from Blood, Sweat, and Tears
                     </h2>
                   </motion.div>
@@ -175,8 +175,8 @@ export default function TXMXNewsletter({ showModal, onClose }: TXMXNewsletterPro
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.3 }}
                   >
-                    <p className="text-lg text-white leading-relaxed font-bold tracking-wide">
-                      Get exclusive drops, and access to <strong>The 8 Count: A Feed for Fight Fans</strong>
+                    <p className="text-xs text-white/60 leading-relaxed font-semibold tracking-wide">
+                      Get exclusive drops, and access to <strong className="block">The 8 Count: A Feed for Fight Fans</strong>
                     </p>
                   </motion.div>
                 </div>
@@ -191,7 +191,7 @@ export default function TXMXNewsletter({ showModal, onClose }: TXMXNewsletterPro
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -20 }}
                       onSubmit={handleSubmit}
-                      className="space-y-6"
+                      className="space-y-4"
                       aria-label="TXMX Newsletter subscription form"
                     >
                       <div className="relative">
@@ -207,7 +207,7 @@ export default function TXMXNewsletter({ showModal, onClose }: TXMXNewsletterPro
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           placeholder="ENTER YOUR EMAIL"
-                          className="w-full px-6 py-4 border-2 border-white bg-transparent text-white placeholder-white/70 focus:outline-none focus:border-white transition-all duration-500 text-lg font-bold tracking-wider uppercase"
+                          className="w-full px-4 py-3 border border-white/20 rounded-md bg-transparent text-white placeholder-white/40 focus:outline-none focus:border-white/60 transition-all duration-300 text-xs font-semibold tracking-widest uppercase leading-relaxed"
                           aria-describedby={error ? "newsletter-error" : undefined}
                           disabled={isSubmitting}
                           autoComplete="email"
@@ -218,7 +218,7 @@ export default function TXMXNewsletter({ showModal, onClose }: TXMXNewsletterPro
                         <button
                           type="submit"
                           disabled={isSubmitting}
-                          className="relative w-full bg-transparent border-2 border-white text-white py-4 px-8 font-black text-xl tracking-wider uppercase transition-colors duration-500 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black active:scale-[0.98] transform hover:bg-white hover:text-black"
+                          className="relative w-full bg-transparent border border-white/20 rounded-md text-white py-3 px-6 font-semibold text-xs tracking-widest uppercase transition-colors duration-300 disabled:opacity-50 focus:outline-none active:scale-[0.98] transform hover:bg-white hover:text-black"
                           aria-label="Join TXMX newsletter"
                         >
                           <motion.div
@@ -236,7 +236,7 @@ export default function TXMXNewsletter({ showModal, onClose }: TXMXNewsletterPro
                           initial={{ opacity: 0, y: -10 }}
                           animate={{ opacity: 1, y: 0 }}
                           id="newsletter-error"
-                          className="text-red-400 text-sm text-center font-bold bg-red-900/20 border border-red-400 p-3 tracking-wide uppercase"
+                          className="text-red-400 text-xs text-center font-semibold bg-red-900/20 border border-red-400/30 rounded-md p-3 tracking-wide uppercase leading-relaxed"
                           role="alert"
                         >
                           {error}
@@ -254,19 +254,19 @@ export default function TXMXNewsletter({ showModal, onClose }: TXMXNewsletterPro
                       aria-live="polite"
                     >
                       <div className="mb-4">
-                        <div className="w-16 h-16 bg-transparent border-2 border-white flex items-center justify-center mx-auto mb-4">
+                        <div className="w-12 h-12 bg-transparent border border-white/20 rounded-md flex items-center justify-center mx-auto mb-4">
                           <motion.div
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
                             transition={{ delay: 0.2, type: "spring", damping: 20, stiffness: 300 }}
                           >
-                            <CheckIcon className="h-8 w-8 text-white" />
+                            <CheckIcon className="h-5 w-5 text-white" />
                           </motion.div>
                         </div>
-                        <h3 className="text-xl lg:text-2xl font-black text-white mb-3 tracking-wider uppercase">
+                        <h3 className="text-sm font-semibold text-white mb-2 tracking-widest uppercase leading-relaxed">
                           SOMOS BOXEO
                         </h3>
-                        <p className="text-white text-base leading-relaxed font-bold tracking-wide">
+                        <p className="text-white/60 text-xs leading-relaxed font-semibold tracking-wide">
                           Exclusive drops and insider access.
                         </p>
                       </div>

@@ -4,30 +4,63 @@ import ClientLayout from "./client-layout"
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.txmxboxing.com'),
-  title: 'TXMX Boxing',
-  description: 'TXMX Boxing is a dynamic media platform designed to connect brands with a passionate fight fan audience. By celebrating the rich cultural heritage of Texas and Mexico, TXMX Boxing offers unique opportunities for brands to authentically engage with a community that is deeply rooted in both sport and culture.',
+  title: {
+    default: 'TXMX Boxing | Boxing Media Platform',
+    template: '%s | TXMX Boxing',
+  },
+  description: 'TXMX Boxing is a dynamic media platform connecting brands with passionate fight fans. Celebrating the rich cultural heritage of Texas and Mexico through exclusive boxing events, sponsorship opportunities, and champion storytelling.',
+  keywords: [
+    'TXMX Boxing',
+    'Texas boxing',
+    'Mexico boxing',
+    'boxing media platform',
+    'fight fan audience',
+    'boxing sponsorship',
+    'San Antonio boxing',
+    'boxing events',
+    'brand partnerships',
+    'combat sports media',
+    'The 8 Count',
+    'boxing scorecard',
+    'fighter records',
+    'boxing news feed',
+  ],
+  authors: [{ name: 'TXMX Boxing' }],
+  creator: 'TXMX Boxing',
+  publisher: 'TXMX Boxing',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
   openGraph: {
-    title: 'TXMX Boxing',
-    description: 'TXMX Boxing is a dynamic media platform designed to connect brands with a passionate fight fan audience.',
+    title: 'TXMX Boxing | Boxing Media Platform',
+    description: 'Connecting brands with passionate fight fans. Exclusive boxing events, sponsorship opportunities, and champion storytelling celebrating Texas and Mexico heritage.',
     url: 'https://www.txmxboxing.com',
     siteName: 'TXMX Boxing',
     locale: 'en_US',
     type: 'website',
-    images: [
-      {
-        url: 'https://www.txmxboxing.com/opengraph-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'TXMX Boxing',
-      },
-    ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'TXMX Boxing',
-    description: 'TXMX Boxing - Connecting brands with passionate fight fans.',
+    title: 'TXMX Boxing | Boxing Media Platform',
+    description: 'Connecting brands with passionate fight fans through exclusive boxing events and champion storytelling.',
     creator: '@txmx',
-    images: ['https://www.txmxboxing.com/opengraph-image.png'],
+    site: '@txmx',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  alternates: {
+    canonical: 'https://www.txmxboxing.com',
   },
 }
 

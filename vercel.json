@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/tdlr-boxing",
+      "schedule": "0 12 * * *"
+    }
+  ]
+}

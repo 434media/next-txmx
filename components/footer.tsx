@@ -7,12 +7,18 @@ export default function Footer() {
     <footer className="relative bg-black/40 backdrop-blur-md border-t border-white/10">
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="flex flex-row items-center justify-between gap-4">
-          {/* Copyright - Left aligned on all screens */}
+          {/* Copyright */}
           <div className="flex items-center">
-            <p className="text-white/80 text-xs font-medium tracking-wide text-center sm:text-left">
-              © {currentYear} <span className="text-white font-bold tracking-widest">434 MEDIA</span>
-              {" | "}
-              <span className="text-white font-bold tracking-widest">TXMX BOXING</span>
+            <p className="text-white/50 text-xs font-medium tracking-wide leading-relaxed">
+              © {currentYear}{" "}
+              <a
+                href="https://434media.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white/70 font-semibold tracking-widest hover:text-white transition-colors duration-200"
+              >
+                434 MEDIA
+              </a>
             </p>
           </div>
 

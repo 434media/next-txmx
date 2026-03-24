@@ -1,23 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { google } from 'googleapis'
-
-// Initialize Google Auth
-const getAuth = () => {
-  const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL
-  const privateKey = process.env.GOOGLE_PRIVATE_KEY
-
-  if (!email || !privateKey) {
-    throw new Error('Missing Google service account credentials')
-  }
-
-  return new google.auth.GoogleAuth({
-    credentials: {
-      client_email: email,
-      private_key: privateKey.replace(/\\n/g, '\n'),
-    },
-    scopes: ['https://www.googleapis.com/auth/drive.readonly'],
-  })
-}
+import { getAuth, isValidDriveFileId } from '@/lib/google-drive'
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
@@ -25,6 +8,10 @@ export async function GET(request: NextRequest) {
 
   if (!fileId) {
     return NextResponse.json({ error: 'File ID is required' }, { status: 400 })
+  }
+
+  if (!isValidDriveFileId(fileId)) {
+    return NextResponse.json({ error: 'Invalid file ID' }, { status: 400 })
   }
 
   try {

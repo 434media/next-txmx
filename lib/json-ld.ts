@@ -101,6 +101,15 @@ export function generateBreadcrumbJsonLd(pageName: string) {
               item: 'https://www.txmxboxing.com/riseofachampion/rsvp',
             },
           ]
+        : pageName === 'Gallery'
+        ? [
+            {
+              '@type': 'ListItem',
+              position: 3,
+              name: 'Gallery',
+              item: 'https://www.txmxboxing.com/riseofachampion/gallery',
+            },
+          ]
         : []),
     ],
   }
