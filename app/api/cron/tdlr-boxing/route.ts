@@ -106,24 +106,18 @@ export async function GET(request: NextRequest) {
 
         const pdfBuffer = await pdfResponse.arrayBuffer()
 
-        // Parse via the existing TDLR parse endpoint (self-call)
-        const origin = request.nextUrl.origin
-        const parseResponse = await fetch(`${origin}/api/tdlr-parse`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/pdf' },
-          body: Buffer.from(pdfBuffer),
-        })
-
-        if (!parseResponse.ok) {
-          const parseError = await parseResponse.json()
-          results.errors.push(`${filename}: Parse error - ${parseError.error}`)
+        // Parse directly via shared utility (no HTTP self-call)
+        const { parseTDLRPdf } = await import('../../../../lib/tdlr-parser')
+        let parsedEvent
+        try {
+          parsedEvent = parseTDLRPdf(Buffer.from(pdfBuffer))
+        } catch (parseErr) {
+          results.errors.push(`${filename}: Parse error - ${parseErr instanceof Error ? parseErr.message : 'Unknown'}`)
           continue
         }
 
-        const parsedEvent = await parseResponse.json()
-
-        if (parsedEvent.error) {
-          results.errors.push(`${filename}: ${parsedEvent.error}`)
+        if ((parsedEvent as { error?: string }).error) {
+          results.errors.push(`${filename}: ${(parsedEvent as { error: string }).error}`)
           continue
         }
 

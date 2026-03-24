@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { execSync } from 'child_process'
-import { writeFileSync, unlinkSync } from 'fs'
-import { join } from 'path'
-import { tmpdir } from 'os'
-import { randomUUID } from 'crypto'
+import { parseTDLRPdf } from '../../../lib/tdlr-parser'
 
 export async function POST(request: NextRequest) {
   const contentType = request.headers.get('content-type') || ''
@@ -37,47 +33,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'File too large (max 10MB)' }, { status: 400 })
   }
 
-  const tmpPath = join(tmpdir(), `tdlr-${randomUUID()}.pdf`)
-  writeFileSync(tmpPath, pdfBuffer)
-
   try {
-    const scriptPath = join(process.cwd(), 'scripts', 'tdlr-extract.py')
-    const result = execSync(`python3 "${scriptPath}" "${tmpPath}"`, {
-      encoding: 'utf-8',
-      timeout: 30000,
-      maxBuffer: 1024 * 1024,
-    })
-
-    const parsed = JSON.parse(result)
-
-    if (parsed.error) {
-      return NextResponse.json({ error: parsed.error }, { status: 500 })
-    }
-
+    const parsed = parseTDLRPdf(pdfBuffer)
     return NextResponse.json(parsed)
   } catch (error: unknown) {
     console.error('TDLR parse error:', error)
-
-    // execSync attaches stdout/stderr to the error object on non-zero exit
-    const execError = error as { stdout?: string; stderr?: string; message?: string }
-    if (execError.stdout) {
-      try {
-        const parsed = JSON.parse(execError.stdout)
-        if (parsed.error) {
-          return NextResponse.json({ error: parsed.error }, { status: 500 })
-        }
-      } catch {
-        // stdout wasn't valid JSON
-      }
-    }
-
-    const detail = execError.stderr?.trim() || execError.message || 'Failed to parse PDF'
+    const detail = error instanceof Error ? error.message : 'Failed to parse PDF'
     return NextResponse.json({ error: detail }, { status: 500 })
-  } finally {
-    try {
-      unlinkSync(tmpPath)
-    } catch {
-      // ignore cleanup errors
-    }
   }
 }
