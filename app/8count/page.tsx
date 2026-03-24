@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import EightCountVideo from "./eightcount-video"
 
 export const metadata: Metadata = {
   title: "The 8 Count | A Feed for Fight Fans",
@@ -84,25 +85,7 @@ export default function EightCountPage() {
         </div>
 
         {/* Right Side — Video */}
-        <div className="absolute inset-0 md:relative md:w-1/2 bg-black">
-          <video
-            src="https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2FBruno%20Eddie%20Reel.mp4?alt=media"
-            preload="metadata"
-            autoPlay
-            loop
-            muted
-            playsInline
-            disablePictureInPicture
-            className="w-full h-full object-cover object-center"
-          />
-          <div
-            className="absolute inset-0 hidden md:block"
-            style={{
-              background:
-                "linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 15%, transparent 35%)",
-            }}
-          />
-        </div>
+        <EightCountVideo />
       </section>
     </main>
   )

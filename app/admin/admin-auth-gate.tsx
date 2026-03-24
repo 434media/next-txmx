@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { onAuthStateChanged, signInWithPopup, signOut, type User } from 'firebase/auth'
+import { onAuthStateChanged, signInWithPopup, signInWithEmailAndPassword, signOut, type User } from 'firebase/auth'
 import { auth, googleProvider } from '../../lib/firebase-client'
 
 interface AdminAuthGateProps {
@@ -13,19 +13,14 @@ export default function AdminAuthGate({ children }: AdminAuthGateProps) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [signingIn, setSigningIn] = useState(false)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        const email = firebaseUser.email || ''
-        if (email.endsWith('@434media.com')) {
-          setUser(firebaseUser)
-          setError('')
-        } else {
-          await signOut(auth)
-          setUser(null)
-          setError('Access restricted to 434media.com workspace accounts.')
-        }
+        setUser(firebaseUser)
+        setError('')
       } else {
         setUser(null)
       }
@@ -34,20 +29,28 @@ export default function AdminAuthGate({ children }: AdminAuthGateProps) {
     return () => unsubscribe()
   }, [])
 
-  const handleSignIn = async () => {
+  const handleGoogleSignIn = async () => {
     setSigningIn(true)
     setError('')
     try {
-      const result = await signInWithPopup(auth, googleProvider)
-      const email = result.user.email || ''
-      if (!email.endsWith('@434media.com')) {
-        await signOut(auth)
-        setError('Access restricted to 434media.com workspace accounts.')
-      }
+      await signInWithPopup(auth, googleProvider)
     } catch (err) {
       if (err instanceof Error && !err.message.includes('popup-closed')) {
         setError('Sign-in failed. Please try again.')
       }
+    } finally {
+      setSigningIn(false)
+    }
+  }
+
+  const handleEmailSignIn = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setSigningIn(true)
+    setError('')
+    try {
+      await signInWithEmailAndPassword(auth, email, password)
+    } catch {
+      setError('Invalid email or password.')
     } finally {
       setSigningIn(false)
     }
@@ -66,7 +69,7 @@ export default function AdminAuthGate({ children }: AdminAuthGateProps) {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center pt-16">
+      <div className="min-h-screen bg-white flex items-center justify-center pt-16 admin-selection-fix">
         <div className="max-w-sm w-full px-8">
           <div className="text-center space-y-6">
             <div>
@@ -80,7 +83,7 @@ export default function AdminAuthGate({ children }: AdminAuthGateProps) {
             </div>
 
             <p className="text-gray-400 text-sm leading-relaxed tracking-tight">
-              Sign in with your 434media.com Google Workspace account to access the admin dashboard.
+              Sign in to access the admin dashboard.
             </p>
 
             {error && (
@@ -89,8 +92,47 @@ export default function AdminAuthGate({ children }: AdminAuthGateProps) {
               </div>
             )}
 
+            <form onSubmit={handleEmailSignIn} className="space-y-3">
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full px-4 py-3 rounded-lg border border-gray-200 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#FFB800] focus:ring-1 focus:ring-[#FFB800]/30 transition-colors"
+              />
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full px-4 py-3 rounded-lg border border-gray-200 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#FFB800] focus:ring-1 focus:ring-[#FFB800]/30 transition-colors"
+              />
+              <button
+                type="submit"
+                disabled={signingIn}
+                className="w-full bg-[#FFB800] text-white font-medium text-sm tracking-wide px-6 py-3 rounded-lg hover:bg-[#E5A600] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {signingIn ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+                    Signing in...
+                  </span>
+                ) : (
+                  'Sign In'
+                )}
+              </button>
+            </form>
+
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-px bg-gray-200" />
+              <span className="text-gray-300 text-[10px] tracking-wider">OR</span>
+              <div className="flex-1 h-px bg-gray-200" />
+            </div>
+
             <button
-              onClick={handleSignIn}
+              onClick={handleGoogleSignIn}
               disabled={signingIn}
               className="w-full flex items-center justify-center gap-3 bg-gray-900 text-white font-medium text-sm tracking-wide px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -125,7 +167,7 @@ export default function AdminAuthGate({ children }: AdminAuthGateProps) {
             </button>
 
             <p className="text-gray-300 text-[10px] tracking-wider">
-              434MEDIA.COM ACCOUNTS ONLY
+              AUTHORIZED ACCOUNTS ONLY
             </p>
           </div>
         </div>
@@ -141,11 +183,7 @@ export function useAdminAuth() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      if (firebaseUser?.email?.endsWith('@434media.com')) {
-        setUser(firebaseUser)
-      } else {
-        setUser(null)
-      }
+      setUser(firebaseUser)
     })
     return () => unsubscribe()
   }, [])

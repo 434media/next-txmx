@@ -1,32 +1,13 @@
 "use client"
 
-import { useRef, useState, useEffect } from "react"
+import { useRef, useState } from "react"
 
 const VIDEO_SRC =
   "https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2FEthan%20Edit%20Nov%208th.MP4?alt=media"
 
 export default function ScorecardVideo() {
   const videoRef = useRef<HTMLVideoElement>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
   const [muted, setMuted] = useState(true)
-  const [isVisible, setIsVisible] = useState(false)
-
-  useEffect(() => {
-    const el = containerRef.current
-    if (!el) return
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true)
-          observer.disconnect()
-        }
-      },
-      { rootMargin: "200px" }
-    )
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [])
 
   const toggleAudio = () => {
     if (videoRef.current) {
@@ -36,20 +17,18 @@ export default function ScorecardVideo() {
   }
 
   return (
-    <div ref={containerRef} className="absolute inset-0 md:relative md:w-1/2 bg-black">
-      {isVisible && (
-        <video
-          ref={videoRef}
-          src={VIDEO_SRC}
-          preload="metadata"
-          autoPlay
-          loop
-          muted
-          playsInline
-          disablePictureInPicture
-          className="w-full h-full object-cover object-center"
-        />
-      )}
+    <div className="absolute inset-0 md:relative md:w-1/2 bg-black">
+      <video
+        ref={videoRef}
+        src={VIDEO_SRC}
+        preload="metadata"
+        autoPlay
+        loop
+        muted
+        playsInline
+        disablePictureInPicture
+        className="w-full h-full object-cover object-center"
+      />
       <div
         className="absolute inset-0 hidden md:block pointer-events-none"
         style={{
