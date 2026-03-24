@@ -1,7 +1,8 @@
 "use client"
 
 import type React from "react"
-import { Geist, Geist_Mono } from "next/font/google"
+import { Geist, Geist_Mono, Bebas_Neue, Orbitron } from "next/font/google"
+import { GeistPixelSquare, GeistPixelGrid, GeistPixelCircle, GeistPixelTriangle, GeistPixelLine } from 'geist/font/pixel';
 import { useState } from "react"
 import { usePathname } from "next/navigation"
 import Navbar from "../components/navbar"
@@ -20,6 +21,19 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
+  subsets: ["latin"],
+  display: "swap",
+})
+
+const bebasNeue = Bebas_Neue({
+  variable: "--font-bebas-neue",
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+})
+
+const orbitron = Orbitron({
+  variable: "--font-orbitron",
   subsets: ["latin"],
   display: "swap",
 })
@@ -104,7 +118,7 @@ export default function ClientLayout({
         {/* Verification */}
         <meta name="google-site-verification" content="your-google-verification-code" />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black text-white`} style={{ overflowY: 'auto', height: 'auto', minHeight: '100vh' }}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${bebasNeue.variable} ${orbitron.variable} ${GeistPixelSquare.variable} ${GeistPixelGrid.variable} ${GeistPixelCircle.variable} ${GeistPixelTriangle.variable} ${GeistPixelLine.variable} antialiased bg-black text-white`} style={{ overflowY: 'auto', height: 'auto', minHeight: '100vh' }}>
         <Analytics />
 
         <GlobalStyles />

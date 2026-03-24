@@ -1,5 +1,4 @@
 import type { Metadata } from "next"
-import Image from "next/image"
 
 export const metadata: Metadata = {
   title: "The 8 Count | A Feed for Fight Fans",
@@ -67,7 +66,7 @@ export default function EightCountPage() {
             <p className="text-white/40 text-xs font-semibold tracking-[0.3em] leading-relaxed uppercase mb-4">
               TXMX Boxing
             </p>
-            <h1 className="text-white text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight mb-6">
+            <h1 className="text-white text-5xl sm:text-6xl lg:text-7xl font-bold tracking-wide leading-none mb-6 font-(family-name:--font-bebas-neue) uppercase">
               The 8 Count
             </h1>
             <p className="text-white/60 text-sm sm:text-base font-medium leading-relaxed max-w-md mb-8">
@@ -84,14 +83,15 @@ export default function EightCountPage() {
           </div>
         </div>
 
-        {/* Right Side — Image */}
+        {/* Right Side — Video */}
         <div className="absolute inset-0 md:relative md:w-1/2">
-          <Image
-            src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/8count.png"
-            alt="The 8 Count"
-            fill
-            className="object-cover object-center"
-            priority
+          <video
+            src="https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2FBruno%20Eddie%20Reel.mp4?alt=media"
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover object-center"
           />
           <div
             className="absolute inset-0 hidden md:block"

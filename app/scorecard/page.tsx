@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import Image from "next/image"
+import ScorecardVideo from "./scorecard-video"
 
 export const metadata: Metadata = {
   title: "Scorecard | Fighter & Event Data",
@@ -67,13 +67,12 @@ export default function ScorecardPage() {
             <p className="text-white/40 text-xs font-semibold tracking-[0.3em] leading-relaxed uppercase mb-4">
               TXMX Boxing
             </p>
-            <h1 className="text-white text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight mb-6">
+            <h1 className="text-white text-5xl sm:text-6xl lg:text-7xl font-bold tracking-wide leading-none mb-6 uppercase">
               Scorecard
             </h1>
             <p className="text-white/60 text-sm sm:text-base font-medium leading-relaxed max-w-md mb-8">
-              Fighter records, event results, and the data behind every bout.
-              All the numbers from the TXMX Boxing universe — organized and
-              searchable.
+              Your league pass to the action. Pick winners, stack points, and
+              climb the leaderboard — a new way to experience TXMX Boxing.
             </p>
             <div className="flex items-center gap-3">
               <span className="inline-block w-8 h-px bg-white/20" />
@@ -84,32 +83,8 @@ export default function ScorecardPage() {
           </div>
         </div>
 
-        {/* Right Side — Image */}
-        <div className="absolute inset-0 md:relative md:w-1/2">
-          {/* Mobile image */}
-          <Image
-            src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/scorecard-mobile.png"
-            alt="Scorecard"
-            fill
-            className="object-cover object-center md:hidden"
-            priority
-          />
-          {/* Desktop image */}
-          <Image
-            src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/scorecard.png"
-            alt="Scorecard"
-            fill
-            className="object-cover object-center hidden md:block"
-            priority
-          />
-          <div
-            className="absolute inset-0 hidden md:block"
-            style={{
-              background:
-                "linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 15%, transparent 35%)",
-            }}
-          />
-        </div>
+        {/* Right Side — Video */}
+        <ScorecardVideo />
       </section>
     </main>
   )
