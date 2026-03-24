@@ -11,15 +11,18 @@ import GymList from './gym-list'
 import PromoterList from './promoter-list'
 import type { VenueData } from '../actions/venues'
 import type { EventPromoter, PromoterData } from '../actions/events'
+import type { GymData } from '../actions/gyms'
 import { getFighters } from '../actions/fighters'
 import { getVenues } from '../actions/venues'
 import { getEventPromoters, getPromoters } from '../actions/events'
+import { getGyms } from '../actions/gyms'
 
 interface AdminClientProps {
   initialFighters: Fighter[]
   initialVenues: VenueData[]
   eventPromoters: EventPromoter[]
   initialPromoterDocs: PromoterData[]
+  initialGyms: GymData[]
 }
 
 type Tab = 'list' | 'add' | 'venues' | 'gyms' | 'promoters' | 'tdlr'
@@ -43,11 +46,12 @@ const NAV_SECTIONS = [
   },
 ]
 
-export default function AdminClient({ initialFighters, initialVenues, eventPromoters: initialEventPromoters, initialPromoterDocs }: AdminClientProps) {
+export default function AdminClient({ initialFighters, initialVenues, eventPromoters: initialEventPromoters, initialPromoterDocs, initialGyms }: AdminClientProps) {
   const [fighters, setFighters] = useState<Fighter[]>(initialFighters)
   const [venues, setVenues] = useState<VenueData[]>(initialVenues)
   const [promoters, setPromoters] = useState<EventPromoter[]>(initialEventPromoters)
   const [promoterDocs, setPromoterDocs] = useState<PromoterData[]>(initialPromoterDocs)
+  const [gymDocs, setGymDocs] = useState<GymData[]>(initialGyms)
   const [activeTab, setActiveTab] = useState<Tab>('list')
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const { user, signOut: handleSignOut } = useAdminAuth()
@@ -68,16 +72,18 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
   }
 
   const handleImportComplete = useCallback(async () => {
-    const [newFighters, newVenues, newPromoters, newPromoterDocs] = await Promise.all([
+    const [newFighters, newVenues, newPromoters, newPromoterDocs, newGyms] = await Promise.all([
       getFighters(),
       getVenues(),
       getEventPromoters(),
       getPromoters(),
+      getGyms(),
     ])
     setFighters(newFighters)
     setVenues(newVenues)
     setPromoters(newPromoters)
     setPromoterDocs(newPromoterDocs)
+    setGymDocs(newGyms)
   }, [])
 
   const handleVenueUpdated = (updated: VenueData) => {
@@ -100,10 +106,22 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
     setPromoterDocs(prev => prev.filter(p => p.id !== id))
   }
 
+  const handleGymAdded = (gym: GymData) => {
+    setGymDocs(prev => [...prev, gym].sort((a, b) => a.name.localeCompare(b.name)))
+  }
+
+  const handleGymUpdated = (updated: GymData) => {
+    setGymDocs(prev => prev.map(g => g.id === updated.id ? updated : g))
+  }
+
+  const handleGymDeleted = (id: string) => {
+    setGymDocs(prev => prev.filter(g => g.id !== id))
+  }
+
   const counts: Record<Tab, number> = {
     list: fighters.length,
     venues: venues.length,
-    gyms: new Set(fighters.map(f => f.gym).filter(Boolean)).size,
+    gyms: gymDocs.length,
     promoters: new Set([
       ...fighters.map(f => f.promoter).filter(Boolean),
       ...promoters.map(p => p.name),
@@ -127,7 +145,7 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
   }
 
   return (
-    <div className="min-h-screen bg-white pt-16">
+    <div className="min-h-screen bg-white pt-16 admin-selection-fix">
       {/* Mobile header bar */}
       <div className="lg:hidden fixed top-16 left-0 right-0 z-30 bg-white/95 backdrop-blur border-b border-gray-200 px-4 py-3 flex items-center justify-between">
         <button
@@ -239,13 +257,13 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
 
             {/* Content */}
             {activeTab === 'list' ? (
-              <FighterList fighters={fighters} onDelete={handleFighterDeleted} onUpdate={handleFighterUpdated} />
+              <FighterList fighters={fighters} onDelete={handleFighterDeleted} onUpdate={handleFighterUpdated} gymNames={gymDocs.map(g => g.name).sort()} />
             ) : activeTab === 'add' ? (
-              <AddFighterForm onSuccess={handleFighterAdded} />
+              <AddFighterForm onSuccess={handleFighterAdded} existingGyms={gymDocs.map(g => g.name).sort()} />
             ) : activeTab === 'venues' ? (
               <VenueList venues={venues} onUpdate={handleVenueUpdated} onDelete={handleVenueDeleted} />
             ) : activeTab === 'gyms' ? (
-              <GymList fighters={fighters} />
+              <GymList fighters={fighters} gymDocs={gymDocs} onAdd={handleGymAdded} onUpdate={handleGymUpdated} onDelete={handleGymDeleted} />
             ) : activeTab === 'promoters' ? (
               <PromoterList fighters={fighters} eventPromoters={promoters} promoterDocs={promoterDocs} onUpdate={handlePromoterDocUpdated} onDelete={handlePromoterDocDeleted} />
             ) : (

@@ -7,6 +7,7 @@ import type { Fighter, FighterTitle } from '../../lib/types/fighter'
 
 interface AddFighterFormProps {
   onSuccess: (fighter: Fighter) => void
+  existingGyms?: string[]
 }
 
 const inputClass =
@@ -15,7 +16,49 @@ const labelClass = 'block text-[11px] leading-4 font-semibold text-gray-600 trac
 const sectionClass = 'border border-gray-200 rounded-lg p-6 space-y-4'
 const sectionTitleClass = 'text-lg leading-6 font-semibold text-[#FFB800] tracking-[0.14em] mb-4 uppercase'
 
-export default function AddFighterForm({ onSuccess }: AddFighterFormProps) {
+function GymComboboxAdd({ existingGyms, inputClass: cls }: { existingGyms: string[]; inputClass: string }) {
+  const [value, setValue] = useState('')
+  const [open, setOpen] = useState(false)
+
+  const filtered = value
+    ? existingGyms.filter(g => g.toLowerCase().includes(value.toLowerCase()))
+    : existingGyms
+
+  return (
+    <div className="relative">
+      <input
+        name="gym"
+        value={value}
+        onChange={e => { setValue(e.target.value); setOpen(true) }}
+        onFocus={() => setOpen(true)}
+        onBlur={() => setTimeout(() => setOpen(false), 150)}
+        className={cls}
+        placeholder="Select or type a gym"
+        autoComplete="off"
+      />
+      {open && filtered.length > 0 && (
+        <ul className="absolute z-50 left-0 right-0 top-full mt-1 max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-md shadow-lg">
+          {filtered.map(gym => (
+            <li key={gym}>
+              <button
+                type="button"
+                onMouseDown={e => e.preventDefault()}
+                onClick={() => { setValue(gym); setOpen(false) }}
+                className={`w-full text-left px-3 py-2 text-[13px] hover:bg-amber-50 transition-colors ${
+                  gym === value ? 'bg-amber-50 text-amber-700 font-semibold' : 'text-gray-700'
+                }`}
+              >
+                {gym}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
+
+export default function AddFighterForm({ onSuccess, existingGyms = [] }: AddFighterFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [titles, setTitles] = useState<FighterTitle[]>([])
@@ -408,7 +451,7 @@ export default function AddFighterForm({ onSuccess }: AddFighterFormProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className={labelClass}>Gym</label>
-            <input name="gym" className={inputClass} placeholder="Robert Garcia Boxing Academy" />
+            <GymComboboxAdd existingGyms={existingGyms} inputClass={inputClass} />
           </div>
           <div>
             <label className={labelClass}>Trainer</label>

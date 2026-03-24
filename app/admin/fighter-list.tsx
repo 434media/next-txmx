@@ -9,13 +9,59 @@ interface FighterListProps {
   fighters: Fighter[]
   onDelete: (id: string) => void
   onUpdate: (updated: Fighter) => void
+  gymNames?: string[]
+}
+
+function GymCombobox({ value, onChange, gymNames, className }: { value: string; onChange: (v: string) => void; gymNames: string[]; className: string }) {
+  const [open, setOpen] = useState(false)
+  const [filter, setFilter] = useState('')
+
+  const filtered = filter
+    ? gymNames.filter(g => g.toLowerCase().includes(filter.toLowerCase()))
+    : gymNames
+
+  return (
+    <div className="relative">
+      <input
+        value={value}
+        onChange={e => {
+          onChange(e.target.value)
+          setFilter(e.target.value)
+          setOpen(true)
+        }}
+        onFocus={() => { setFilter(value); setOpen(true) }}
+        onBlur={() => setTimeout(() => setOpen(false), 150)}
+        className={className}
+        placeholder="Select or type a gym"
+        autoComplete="off"
+      />
+      {open && filtered.length > 0 && (
+        <ul className="absolute z-50 left-0 right-0 top-full mt-1 max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-md shadow-lg">
+          {filtered.map(gym => (
+            <li key={gym}>
+              <button
+                type="button"
+                onMouseDown={e => e.preventDefault()}
+                onClick={() => { onChange(gym); setOpen(false) }}
+                className={`w-full text-left px-3 py-2 text-[13px] hover:bg-amber-50 transition-colors ${
+                  gym === value ? 'bg-amber-50 text-amber-700 font-semibold' : 'text-gray-700'
+                }`}
+              >
+                {gym}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
 }
 
 const inputClass =
   'w-full bg-gray-50 border border-gray-200 text-gray-900 text-[13px] font-medium leading-5 px-3 py-2 focus:outline-none focus:border-[#FFB800] focus:ring-1 focus:ring-[#FFB800]/30 placeholder:text-gray-400 rounded-md'
 const labelClass = 'block text-[11px] leading-4 font-semibold text-gray-500 tracking-[0.12em] mb-1'
 
-export default function FighterList({ fighters, onDelete, onUpdate }: FighterListProps) {
+export default function FighterList({ fighters, onDelete, onUpdate, gymNames = [] }: FighterListProps) {
   const [search, setSearch] = useState('')
   const [filterRegion, setFilterRegion] = useState<string>('all')
   const [filterStatus, setFilterStatus] = useState<string>('all')
@@ -671,9 +717,10 @@ export default function FighterList({ fighters, onDelete, onUpdate }: FighterLis
                     <div className="grid grid-cols-3 gap-3">
                       <div>
                         <label className={labelClass}>Gym</label>
-                        <input
+                        <GymCombobox
                           value={editData.gym || ''}
-                          onChange={e => setEditData(d => ({ ...d, gym: e.target.value }))}
+                          onChange={v => setEditData(d => ({ ...d, gym: v }))}
+                          gymNames={gymNames}
                           className={inputClass}
                         />
                       </div>
