@@ -84,13 +84,15 @@ export default function EightCountPage() {
         </div>
 
         {/* Right Side — Video */}
-        <div className="absolute inset-0 md:relative md:w-1/2">
+        <div className="absolute inset-0 md:relative md:w-1/2 bg-black">
           <video
             src="https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2FBruno%20Eddie%20Reel.mp4?alt=media"
+            preload="metadata"
             autoPlay
             loop
             muted
             playsInline
+            disablePictureInPicture
             className="w-full h-full object-cover object-center"
           />
           <div
