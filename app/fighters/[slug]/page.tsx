@@ -3,13 +3,10 @@ import { notFound } from "next/navigation"
 import { getFighterBySlug, getFighters, getFighterFights } from "../../actions/fighters"
 import FighterProfileClient from "./fighter-profile-client"
 
+export const dynamic = 'force-dynamic'
+
 interface FighterPageProps {
   params: Promise<{ slug: string }>
-}
-
-export async function generateStaticParams() {
-  const fighters = await getFighters()
-  return fighters.map((f) => ({ slug: f.slug }))
 }
 
 export async function generateMetadata({

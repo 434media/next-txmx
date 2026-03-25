@@ -4,6 +4,8 @@ import { useRef, useState } from "react"
 
 const VIDEO_SRC =
   "https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2Fethanedit2.mp4?alt=media"
+const POSTER_SRC =
+  "https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2Fscorecard-poster.png?alt=media"
 
 export default function ScorecardVideo() {
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -21,6 +23,7 @@ export default function ScorecardVideo() {
       <video
         ref={videoRef}
         src={VIDEO_SRC}
+        poster={POSTER_SRC}
         preload="metadata"
         autoPlay
         loop
