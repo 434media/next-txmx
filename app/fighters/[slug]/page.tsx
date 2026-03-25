@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
-import { getFighterBySlug, getFighters } from "../../actions/fighters"
+import { getFighterBySlug, getFighters, getFighterFights } from "../../actions/fighters"
 import FighterProfileClient from "./fighter-profile-client"
 
 interface FighterPageProps {
@@ -61,5 +61,7 @@ export default async function FighterPage({ params }: FighterPageProps) {
     notFound()
   }
 
-  return <FighterProfileClient fighter={fighter} />
+  const fights = fighter.id ? await getFighterFights(fighter.id) : []
+
+  return <FighterProfileClient fighter={fighter} fights={fights} />
 }

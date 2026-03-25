@@ -71,7 +71,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       />
 
       {/* Modal */}
-      <div className="relative z-10 w-full max-w-sm mx-4 bg-zinc-950 border border-white/10 rounded-2xl p-8">
+      <div className="relative z-10 w-full max-w-sm mx-4 bg-black border border-white/10 p-8">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-white/30 hover:text-white/60 transition-colors"
@@ -82,67 +82,80 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           </svg>
         </button>
 
-        <div className="text-center mb-6">
-          <p className="text-white/30 text-[10px] font-semibold tracking-[0.3em] mb-2">
-            TXMX BOXING
-          </p>
-          <h2 className="text-white text-xl font-bold tracking-wide">
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <span className="inline-block w-1.5 h-1.5 bg-amber-500" />
+            <p className="text-amber-500 text-[10px] font-bold tracking-[0.25em] uppercase">
+              TXMX BOXING
+            </p>
+            <span className="inline-block w-1.5 h-1.5 bg-amber-500" />
+          </div>
+          <h2 className="text-white text-2xl font-black tracking-tight uppercase">
             {mode === "sign-in" ? "Welcome Back" : "Join TXMX"}
           </h2>
+          <p className="text-white/40 text-xs font-medium tracking-wide mt-2">
+            {mode === "sign-in" ? "Sign in to your account" : "Create your free account"}
+          </p>
         </div>
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-4">
+          <div className="bg-red-500/10 border border-red-500/20 p-3 mb-4">
             <p className="text-red-400 text-xs text-center">{error}</p>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-3 mb-4">
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-white/20 transition-colors"
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={6}
-            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-white/20 transition-colors"
-          />
+        <form onSubmit={handleSubmit} className="space-y-3 mb-5">
+          <div>
+            <label className="text-white/30 text-[9px] font-semibold tracking-widest uppercase mb-1.5 block">Email</label>
+            <input
+              type="email"
+              placeholder="you@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full bg-white/5 border border-white/10 px-4 py-3 text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-amber-500/40 transition-colors"
+            />
+          </div>
+          <div>
+            <label className="text-white/30 text-[9px] font-semibold tracking-widest uppercase mb-1.5 block">Password</label>
+            <input
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+              className="w-full bg-white/5 border border-white/10 px-4 py-3 text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-amber-500/40 transition-colors"
+            />
+          </div>
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-white text-black font-semibold text-sm tracking-wide px-6 py-3 rounded-lg hover:bg-white/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-amber-500 text-black font-semibold text-[11px] tracking-widest uppercase px-6 py-3 hover:bg-amber-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
                 <span className="animate-spin w-4 h-4 border-2 border-black border-t-transparent rounded-full" />
-                {mode === "sign-in" ? "Signing in..." : "Creating account..."}
+                {mode === "sign-in" ? "SIGNING IN..." : "CREATING ACCOUNT..."}
               </span>
             ) : mode === "sign-in" ? (
-              "Sign In"
+              "SIGN IN"
             ) : (
-              "Create Account"
+              "CREATE ACCOUNT"
             )}
           </button>
         </form>
 
-        <div className="flex items-center gap-3 mb-4">
-          <div className="flex-1 h-px bg-white/10" />
-          <span className="text-white/20 text-[10px] tracking-wider">OR</span>
-          <div className="flex-1 h-px bg-white/10" />
+        <div className="flex items-center gap-3 mb-5">
+          <div className="flex-1 h-px bg-white/5" />
+          <span className="text-white/20 text-[9px] font-semibold tracking-widest">OR</span>
+          <div className="flex-1 h-px bg-white/5" />
         </div>
 
         <button
           onClick={handleGoogle}
           disabled={loading}
-          className="w-full flex items-center justify-center gap-3 bg-white/5 border border-white/10 text-white font-medium text-sm tracking-wide px-6 py-3 rounded-lg hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full flex items-center justify-center gap-3 bg-white/5 border border-white/10 text-white font-semibold text-[11px] tracking-widest uppercase px-6 py-3 hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <svg className="w-4 h-4" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
@@ -153,13 +166,13 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           Continue with Google
         </button>
 
-        <p className="text-center mt-5">
+        <p className="text-center mt-6">
           <button
             onClick={() => {
               setMode(mode === "sign-in" ? "sign-up" : "sign-in")
               setError("")
             }}
-            className="text-white/30 text-xs hover:text-white/60 transition-colors"
+            className="text-white/30 text-[11px] font-medium tracking-wide hover:text-white/60 transition-colors"
           >
             {mode === "sign-in"
               ? "Don't have an account? Sign up"

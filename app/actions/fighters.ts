@@ -1,7 +1,7 @@
 'use server'
 
 import { firestore } from '../../lib/firebase-admin'
-import type { Fighter } from '../../lib/types/fighter'
+import type { Fighter, FightRecord } from '../../lib/types/fighter'
 
 function generateSlug(firstName: string, lastName: string): string {
   return `${firstName}-${lastName}`
@@ -80,4 +80,18 @@ export async function getFighterBySlug(slug: string): Promise<Fighter | null> {
 
   const doc = snapshot.docs[0]
   return { id: doc.id, ...doc.data() } as Fighter
+}
+
+export async function getFighterFights(fighterId: string): Promise<FightRecord[]> {
+  const snapshot = await firestore
+    .collection('fighters')
+    .doc(fighterId)
+    .collection('fights')
+    .orderBy('date', 'desc')
+    .get()
+
+  return snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+  })) as FightRecord[]
 }

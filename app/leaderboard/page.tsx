@@ -15,6 +15,12 @@ export const metadata: Metadata = {
     locale: "en_US",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Leaderboard | TXMX Boxing",
+    description:
+      "Top-ranked TXMX fans. Climb the ranks through skill-based predictions.",
+  },
   alternates: {
     canonical: "https://www.txmxboxing.com/leaderboard",
   },

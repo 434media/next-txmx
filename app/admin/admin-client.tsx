@@ -11,6 +11,9 @@ import GymList from './gym-list'
 import PromoterList from './promoter-list'
 import PropManager from './prop-manager'
 import EventList from './event-list'
+import PollManager from './poll-manager'
+import EconomyGovernor from './economy-governor'
+import NotificationSender from './notification-sender'
 import type { VenueData } from '../actions/venues'
 import type { EventPromoter, PromoterData, TXMXEvent } from '../actions/events'
 import type { GymData } from '../actions/gyms'
@@ -28,7 +31,7 @@ interface AdminClientProps {
   initialEvents: TXMXEvent[]
 }
 
-type Tab = 'list' | 'add' | 'venues' | 'gyms' | 'promoters' | 'events' | 'props' | 'tdlr'
+type Tab = 'list' | 'add' | 'venues' | 'gyms' | 'promoters' | 'events' | 'props' | 'polls' | 'economy' | 'notifications' | 'tdlr'
 
 const NAV_SECTIONS = [
   {
@@ -46,6 +49,9 @@ const NAV_SECTIONS = [
     items: [
       { key: 'add' as Tab, label: 'Add Fighter', icon: '+' },
       { key: 'props' as Tab, label: 'Props', icon: '🎯' },
+      { key: 'polls' as Tab, label: 'Polls', icon: '📊' },
+      { key: 'economy' as Tab, label: 'Economy', icon: '⚙️' },
+      { key: 'notifications' as Tab, label: 'Notify', icon: '🔔' },
       { key: 'tdlr' as Tab, label: 'Import TDLR', icon: '📄' },
     ],
   },
@@ -146,6 +152,9 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
     ]).size,
     events: eventDocs.length,
     props: 0,
+    polls: 0,
+    economy: 0,
+    notifications: 0,
     add: 0,
     tdlr: 0,
   }
@@ -157,6 +166,9 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
     promoters: 'PROMOTERS',
     events: 'EVENTS',
     props: 'PROP PICKS',
+    polls: 'FAN POLLS',
+    economy: 'ECONOMY GOVERNOR',
+    notifications: 'PUSH NOTIFICATIONS',
     add: 'ADD FIGHTER',
     tdlr: 'IMPORT TDLR',
   }
@@ -292,6 +304,12 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
               <EventList events={eventDocs} fighters={fighters} onAdd={handleEventAdded} onUpdate={handleEventUpdated} onDelete={handleEventDeleted} />
             ) : activeTab === 'props' ? (
               <PropManager events={initialEvents} />
+            ) : activeTab === 'polls' ? (
+              <PollManager />
+            ) : activeTab === 'economy' ? (
+              <EconomyGovernor />
+            ) : activeTab === 'notifications' ? (
+              <NotificationSender />
             ) : (
               <TDLRImport onImportComplete={handleImportComplete} />
             )}

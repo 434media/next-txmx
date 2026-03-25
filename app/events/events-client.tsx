@@ -3,6 +3,8 @@
 import { useState, useMemo, useCallback } from "react"
 import type { TXMXEvent, EventBout } from "../actions/events"
 import { getEventBouts } from "../actions/events"
+import ShareButton from "../../components/share-button"
+import CalendarReminder from "../../components/calendar-reminder"
 
 const PER_PAGE = 20
 
@@ -34,6 +36,7 @@ function getRelativeLabel(dateStr: string): "upcoming" | "past" | "today" {
 export default function EventsClient({ events }: EventsClientProps) {
   const [search, setSearch] = useState("")
   const [cityFilter, setCityFilter] = useState("all")
+  const [promoterFilter, setPromoterFilter] = useState("all")
   const [tab, setTab] = useState<"all" | "upcoming" | "past">("all")
   const [page, setPage] = useState(1)
   const [expandedId, setExpandedId] = useState<string | null>(null)
@@ -43,6 +46,11 @@ export default function EventsClient({ events }: EventsClientProps) {
   const cities = useMemo(() => {
     const c = new Set(events.map((e) => e.city).filter(Boolean))
     return Array.from(c).sort()
+  }, [events])
+
+  const promoters = useMemo(() => {
+    const p = new Set(events.map((e) => e.promoter).filter(Boolean))
+    return Array.from(p).sort()
   }, [events])
 
   const filtered = useMemo(() => {
@@ -56,6 +64,7 @@ export default function EventsClient({ events }: EventsClientProps) {
         if (!match) return false
       }
       if (cityFilter !== "all" && e.city !== cityFilter) return false
+      if (promoterFilter !== "all" && e.promoter !== promoterFilter) return false
       if (tab === "upcoming") {
         const rel = getRelativeLabel(e.date)
         return rel === "upcoming" || rel === "today"
@@ -63,7 +72,7 @@ export default function EventsClient({ events }: EventsClientProps) {
       if (tab === "past") return getRelativeLabel(e.date) === "past"
       return true
     })
-  }, [events, search, cityFilter, tab])
+  }, [events, search, cityFilter, promoterFilter, tab])
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE))
   const safePage = Math.min(page, totalPages)
@@ -167,6 +176,18 @@ export default function EventsClient({ events }: EventsClientProps) {
             </option>
           ))}
         </select>
+        <select
+          value={promoterFilter}
+          onChange={(e) => handleFilterChange(setPromoterFilter, e.target.value)}
+          className="bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white/80 text-sm font-medium leading-6 focus:outline-none focus:border-white/25 transition-colors appearance-none cursor-pointer"
+        >
+          <option value="all">All Promoters</option>
+          {promoters.map((p) => (
+            <option key={p} value={p}>
+              {p}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Results count */}
@@ -191,6 +212,7 @@ export default function EventsClient({ events }: EventsClientProps) {
             onClick={() => {
               setSearch("")
               setCityFilter("all")
+              setPromoterFilter("all")
               setTab("all")
               setPage(1)
             }}
@@ -296,6 +318,21 @@ export default function EventsClient({ events }: EventsClientProps) {
                         <p className="text-white/25 text-xs font-medium leading-5 tabular-nums">
                           TDLR #{event.eventNumber}
                         </p>
+                      )}
+                      <ShareButton
+                        url={`https://www.txmxboxing.com/events`}
+                        title={`${event.promoter} — ${formatDate(event.date)} | TXMX Boxing`}
+                        text={`${event.promoter} at ${event.venue}, ${event.city} — ${formatDate(event.date)}`}
+                        variant="compact"
+                      />
+                      {rel !== "past" && (
+                        <CalendarReminder
+                          title={`${event.promoter} — TXMX Boxing`}
+                          date={event.date}
+                          venue={event.venue}
+                          address={event.address}
+                          city={event.city}
+                        />
                       )}
                     </div>
 

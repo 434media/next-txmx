@@ -15,6 +15,12 @@ export const metadata: Metadata = {
     locale: "en_US",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Gym Pledge | TXMX Boxing",
+    description:
+      "Choose your gym. Earn LP when your fighters win. The franchise system for Texas boxing.",
+  },
   alternates: {
     canonical: "https://www.txmxboxing.com/pledge",
   },

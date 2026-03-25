@@ -15,6 +15,12 @@ export const metadata: Metadata = {
     locale: "en_US",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Prop Picks | TXMX Boxing",
+    description:
+      "Predict bout outcomes. Earn Skill Points. Climb the ranks.",
+  },
   alternates: {
     canonical: "https://www.txmxboxing.com/picks",
   },

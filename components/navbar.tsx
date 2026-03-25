@@ -5,10 +5,18 @@ import Link from "next/link"
 import { Menu } from "lucide-react"
 import { useState, useRef, useEffect } from "react"
 import { useAuth } from "../lib/auth-context"
+import NotificationBell from "./notification-bell"
 
 interface NavbarProps {
   onMenuClick: () => void
   onAuthClick: () => void
+}
+
+function getRankForSP(sp: number) {
+  if (sp >= 100000) return "Hall of Fame"
+  if (sp >= 25000) return "Champion"
+  if (sp >= 5000) return "Contender"
+  return "Rookie"
 }
 
 export default function Navbar({ onMenuClick, onAuthClick }: NavbarProps) {
@@ -55,28 +63,10 @@ export default function Navbar({ onMenuClick, onAuthClick }: NavbarProps) {
           {/* Desktop Navigation Links - Hidden on mobile */}
           <div className="hidden md:flex items-center space-x-8">
             <Link
-              href="/fighters"
-              className="text-white text-xs font-semibold tracking-widest leading-relaxed hover:text-white/80 hover:underline decoration-2 underline-offset-4 transition-all duration-300"
-            >
-              FIGHTERS
-            </Link>
-            <Link
-              href="/events"
-              className="text-white text-xs font-semibold tracking-widest leading-relaxed hover:text-white/80 hover:underline decoration-2 underline-offset-4 transition-all duration-300"
-            >
-              EVENTS
-            </Link>
-            <Link
               href="/scorecard"
               className="text-white text-xs font-semibold tracking-widest leading-relaxed hover:text-white/80 hover:underline decoration-2 underline-offset-4 transition-all duration-300"
             >
               SCORECARD
-            </Link>
-            <Link
-              href="/leaderboard"
-              className="text-white text-xs font-semibold tracking-widest leading-relaxed hover:text-white/80 hover:underline decoration-2 underline-offset-4 transition-all duration-300"
-            >
-              LEADERBOARD
             </Link>
             <Link
               href="/8count"
@@ -175,56 +165,97 @@ export default function Navbar({ onMenuClick, onAuthClick }: NavbarProps) {
                 <div ref={userMenuRef} className="relative">
                   <button
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                    className="flex items-center gap-2 text-white text-xs font-semibold tracking-widest hover:text-white/80 transition-all duration-300"
+                    className="flex items-center gap-2 text-white/60 text-[11px] font-semibold tracking-widest uppercase hover:text-white transition-colors"
                   >
                     {profile?.subscriptionStatus === "active" && (
                       <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                     )}
-                    {user.displayName?.split(" ")[0] || "ACCOUNT"}
+                    {user.displayName?.split(" ")[0]?.toUpperCase() || "ACCOUNT"}
+                    <svg
+                      className={`w-3 h-3 transition-transform duration-200 ${isUserMenuOpen ? "rotate-180" : ""}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                    </svg>
                   </button>
                   {isUserMenuOpen && (
-                    <div className="absolute right-0 mt-3 w-56 bg-black/95 backdrop-blur-sm border border-white/20 rounded-md shadow-2xl">
-                      <div className="px-4 py-3 border-b border-white/10">
-                        <p className="text-white text-xs font-semibold truncate">{user.email}</p>
-                        {profile?.subscriptionStatus === "active" && (
-                          <p className="text-amber-500 text-[10px] font-semibold tracking-wider mt-1">BLACK CARD</p>
-                        )}
+                    <div className="absolute right-0 mt-3 w-72 bg-black border border-white/10 shadow-2xl overflow-hidden">
+                      {/* User header */}
+                      <div className="px-5 py-4 border-b border-white/5 bg-white/2">
+                        <p className="text-white text-xs font-semibold tracking-wide truncate">{user.displayName || "Account"}</p>
+                        <p className="text-white/40 text-[11px] font-medium tracking-wide mt-0.5 truncate">{user.email}</p>
                       </div>
+
+                      {/* Currency stats */}
                       {profile && (
-                        <div className="px-4 py-3 border-b border-white/10 grid grid-cols-3 gap-2">
+                        <div className="px-5 py-3 border-b border-white/5 grid grid-cols-3 gap-2">
                           <div className="text-center">
                             <p className="text-blue-400 text-xs font-bold tabular-nums">{profile.skillPoints}</p>
-                            <p className="text-white/30 text-[9px]">SP</p>
+                            <p className="text-white/30 text-[9px] tracking-wider">SP</p>
                           </div>
                           <div className="text-center">
                             <p className="text-emerald-400 text-xs font-bold tabular-nums">{profile.txCredits}</p>
-                            <p className="text-white/30 text-[9px]">TC</p>
+                            <p className="text-white/30 text-[9px] tracking-wider">TC</p>
                           </div>
                           <div className="text-center">
                             <p className="text-purple-400 text-xs font-bold tabular-nums">{profile.loyaltyPoints}</p>
-                            <p className="text-white/30 text-[9px]">LP</p>
+                            <p className="text-white/30 text-[9px] tracking-wider">LP</p>
                           </div>
                         </div>
                       )}
-                      <div className="py-1">
-                        <button
-                          onClick={() => { signOut(); setIsUserMenuOpen(false) }}
-                          className="w-full text-left px-4 py-3 text-white/60 text-xs font-medium hover:bg-white/10 transition-colors"
-                        >
-                          Sign Out
-                        </button>
+
+                      {/* Rank */}
+                      {profile && (
+                        <div className="px-5 py-3 border-b border-white/5 flex items-center justify-between">
+                          <p className="text-white/40 text-[11px] font-medium tracking-wider uppercase">Rank</p>
+                          <p className="text-white text-[11px] font-semibold tracking-wider uppercase">{getRankForSP(profile.skillPoints)}</p>
+                        </div>
+                      )}
+
+                      {/* Black Card */}
+                      <div className="border-b border-white/5">
+                        {profile?.subscriptionStatus === "active" ? (
+                          <div className="px-5 py-3 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                              <p className="text-amber-500 text-[11px] font-semibold tracking-wider uppercase">Black Card</p>
+                            </div>
+                            <p className="text-white/30 text-[11px] font-medium tracking-wide">Active</p>
+                          </div>
+                        ) : (
+                          <Link
+                            href="/checkout"
+                            className="flex items-center justify-between px-5 py-3 hover:bg-white/5 transition-colors group"
+                            onClick={() => setIsUserMenuOpen(false)}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="w-1.5 h-1.5 rounded-full bg-white/20 group-hover:bg-amber-500 transition-colors" />
+                              <p className="text-white/60 text-[11px] font-semibold tracking-wider uppercase group-hover:text-white transition-colors">Black Card</p>
+                            </div>
+                            <p className="text-amber-500 text-[11px] font-semibold tracking-wide">$14.99/mo</p>
+                          </Link>
+                        )}
                       </div>
+
+                      {/* Notifications */}
+                      <div className="px-5 py-3 border-b border-white/5 flex items-center justify-between">
+                        <p className="text-white/40 text-[11px] font-medium tracking-wider uppercase">Notifications</p>
+                        <NotificationBell />
+                      </div>
+
+                      {/* Sign out */}
+                      <button
+                        onClick={() => { signOut(); setIsUserMenuOpen(false) }}
+                        className="w-full text-left px-5 py-3 text-white/40 text-[11px] font-medium tracking-wider uppercase hover:bg-white/5 hover:text-white/60 transition-colors"
+                      >
+                        Sign Out
+                      </button>
                     </div>
                   )}
                 </div>
-              ) : (
-                <button
-                  onClick={onAuthClick}
-                  className="text-white text-xs font-semibold tracking-widest leading-relaxed hover:text-white/80 transition-all duration-300 border border-white/20 px-4 py-1.5 rounded-full hover:border-white/40"
-                >
-                  SIGN IN
-                </button>
-              )
+              ) : null
             )}
           </div>
 

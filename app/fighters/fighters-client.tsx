@@ -16,6 +16,7 @@ export default function FightersClient({ fighters }: FightersClientProps) {
   const [regionFilter, setRegionFilter] = useState<string>("all")
   const [weightFilter, setWeightFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [gymFilter, setGymFilter] = useState<string>("all")
   const [page, setPage] = useState(1)
 
   const weightClasses = useMemo(() => {
@@ -23,17 +24,23 @@ export default function FightersClient({ fighters }: FightersClientProps) {
     return Array.from(classes).sort()
   }, [fighters])
 
+  const gyms = useMemo(() => {
+    const g = new Set(fighters.map((f) => f.gym).filter(Boolean) as string[])
+    return Array.from(g).sort()
+  }, [fighters])
+
   const filtered = useMemo(() => {
     return fighters.filter((f) => {
-      const name =
-        `${f.firstName} ${f.lastName} ${f.nickname || ""}`.toLowerCase()
-      if (search && !name.includes(search.toLowerCase())) return false
+      const searchText =
+        `${f.firstName} ${f.lastName} ${f.nickname || ""} ${f.gym || ""} ${f.residence?.city || ""} ${f.trainer || ""}`.toLowerCase()
+      if (search && !searchText.includes(search.toLowerCase())) return false
       if (regionFilter !== "all" && f.region !== regionFilter) return false
       if (weightFilter !== "all" && f.weightClass !== weightFilter) return false
       if (statusFilter !== "all" && f.status !== statusFilter) return false
+      if (gymFilter !== "all" && f.gym !== gymFilter) return false
       return true
     })
-  }, [fighters, search, regionFilter, weightFilter, statusFilter])
+  }, [fighters, search, regionFilter, weightFilter, statusFilter, gymFilter])
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE))
   const safePage = Math.min(page, totalPages)
@@ -71,7 +78,7 @@ export default function FightersClient({ fighters }: FightersClientProps) {
           </svg>
           <input
             type="text"
-            placeholder="Search by name..."
+            placeholder="Search by name, gym, city, or trainer..."
             value={search}
             onChange={(e) => {
               setSearch(e.target.value)
@@ -112,6 +119,20 @@ export default function FightersClient({ fighters }: FightersClientProps) {
           <option value="inactive">Inactive</option>
           <option value="retired">Retired</option>
         </select>
+        {gyms.length > 0 && (
+          <select
+            value={gymFilter}
+            onChange={(e) => handleFilterChange(setGymFilter, e.target.value)}
+            className="bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white/80 text-sm font-medium leading-6 focus:outline-none focus:border-white/25 transition-colors appearance-none cursor-pointer"
+          >
+            <option value="all">All Gyms</option>
+            {gyms.map((g) => (
+              <option key={g} value={g}>
+                {g}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       {/* Results count + pagination info */}
@@ -138,6 +159,7 @@ export default function FightersClient({ fighters }: FightersClientProps) {
               setRegionFilter("all")
               setWeightFilter("all")
               setStatusFilter("all")
+              setGymFilter("all")
               setPage(1)
             }}
             className="mt-3 text-white/60 text-xs font-semibold tracking-wider uppercase hover:text-white transition-colors"
@@ -221,6 +243,11 @@ export default function FightersClient({ fighters }: FightersClientProps) {
                 {fighter.weightClass && (
                   <p className="text-white/35 text-xs font-medium leading-5 mt-1.5">
                     {fighter.weightClass}
+                  </p>
+                )}
+                {fighter.gym && (
+                  <p className="text-white/30 text-[11px] font-medium leading-5 mt-1 truncate">
+                    {fighter.gym}
                   </p>
                 )}
               </div>

@@ -1,6 +1,8 @@
 import type { Metadata } from "next"
+import Link from "next/link"
 import ScorecardVideo from "./scorecard-video"
 import ScorecardCta from "./scorecard-cta"
+import BlackCardCta from "./blackcard-cta"
 
 export const metadata: Metadata = {
   title: "Scorecard | Pick Winners. Stack Points. Climb the Ranks.",
@@ -55,34 +57,10 @@ export const metadata: Metadata = {
 }
 
 const RANKS = [
-  {
-    name: "Rookie",
-    threshold: "0 SP",
-    color: "from-zinc-600 to-zinc-800",
-    border: "border-zinc-600",
-    glow: "",
-  },
-  {
-    name: "Contender",
-    threshold: "5,000 SP",
-    color: "from-blue-600 to-blue-800",
-    border: "border-blue-500",
-    glow: "shadow-blue-500/20",
-  },
-  {
-    name: "Champion",
-    threshold: "25,000 SP",
-    color: "from-amber-500 to-amber-700",
-    border: "border-amber-500",
-    glow: "shadow-amber-500/30",
-  },
-  {
-    name: "Hall of Fame",
-    threshold: "100,000+ SP",
-    color: "from-purple-500 to-pink-600",
-    border: "border-purple-400",
-    glow: "shadow-purple-500/40",
-  },
+  { name: "Rookie", threshold: "0 SP" },
+  { name: "Contender", threshold: "5,000 SP" },
+  { name: "Champion", threshold: "25,000 SP" },
+  { name: "Hall of Fame", threshold: "100,000+ SP" },
 ]
 
 const SP_ACTIONS = [
@@ -118,426 +96,494 @@ export default function ScorecardPage() {
             }}
           />
           <div className="relative z-10 max-w-lg">
-            <p className="text-white/40 text-xs font-semibold tracking-[0.3em] leading-relaxed uppercase mb-4">
+            <p className="text-amber-500 text-xs font-bold tracking-[0.3em] leading-relaxed uppercase mb-4">
               TXMX Boxing
             </p>
-            <h1 className="text-white text-5xl sm:text-6xl lg:text-7xl font-bold tracking-wide leading-none mb-6 uppercase">
-              Scorecard
+            <h1 className="text-white text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[0.9] mb-6 uppercase">
+              This isn&apos;t a{" "}
+              <span className="text-white/30">spectator sport</span>
             </h1>
-            <p className="text-white/60 text-sm sm:text-base font-medium leading-relaxed max-w-md mb-4">
-              The legal way to have skin in the game. Pick winners, earn
-              TX-Credits, climb the leaderboard, and unlock real rewards — all
-              through skill, not chance.
+            <p className="text-white/60 text-sm sm:text-base font-semibold leading-7 max-w-md mb-4">
+              Pick fighters. Call rounds. Stack points. The Scorecard rewards
+              the fans who actually study the game — not the ones who guess.
             </p>
-            <p className="text-white/30 text-xs font-medium leading-relaxed max-w-md mb-8">
+            <p className="text-white/30 text-xs font-semibold leading-relaxed max-w-md mb-8">
               $14.99/mo &middot; Zero app store tax &middot; 100% web
             </p>
-            <div className="flex items-center gap-3">
-              <span className="inline-block w-8 h-px bg-white/20" />
-              <p className="text-white/30 text-xs font-medium tracking-widest leading-relaxed uppercase">
-                Launching 2026
-              </p>
-            </div>
+            <ScorecardCta />
           </div>
         </div>
         <ScorecardVideo />
+        {/* Bottom fade overlay */}
+        <div className="absolute bottom-0 left-0 right-0 h-40 z-20 pointer-events-none bg-linear-to-b from-transparent to-black" />
       </section>
 
-      {/* The Thesis */}
-      <section className="relative py-24 sm:py-32 px-8 sm:px-12 lg:px-20 border-t border-white/5">
-        <div className="max-w-5xl mx-auto">
-          <p className="text-white/30 text-xs font-semibold tracking-[0.3em] uppercase mb-6">
-            The Opportunity
-          </p>
-          <h2 className="text-white text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight mb-8 max-w-3xl">
-            Sports betting is illegal in Texas.{" "}
-            <span className="text-white/40">We built something better.</span>
-          </h2>
-          <p className="text-white/50 text-base sm:text-lg leading-relaxed max-w-2xl mb-12">
-            TXMX captures the &ldquo;Gambling Vacuum&rdquo; through a legal,
-            skill-based engagement platform and NIL-sponsorship engine — giving
-            Texas boxing fans a way to compete, earn, and rep their gym without
-            crossing a legal line.
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {[
-              {
-                label: "Zero App Store Tax",
-                desc: "100% of your $14.99/mo stays in the TXMX ecosystem. No middlemen.",
-              },
-              {
-                label: "SEO-Powered",
-                desc: "Every Texas fighter and gym gets a unique, indexable URL to capture fan search traffic.",
-              },
-              {
-                label: "Real-Time Updates",
-                desc: "No review periods. New props, results, and features deploy instantly to all users.",
-              },
-            ].map((item) => (
-              <div
-                key={item.label}
-                className="border border-white/10 rounded-lg p-6 bg-white/2"
-              >
-                <p className="text-white text-sm font-semibold mb-2">
-                  {item.label}
-                </p>
-                <p className="text-white/40 text-sm leading-relaxed">
-                  {item.desc}
+      {/* Feature Hub */}
+      <section className="relative py-24 overflow-hidden">
+        {/* Noise texture overlay */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-[0.03]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")`,
+            backgroundRepeat: "repeat",
+          }}
+        />
+
+        {/* Fighters — Split Layout */}
+        <div className="relative border-t border-b border-white/10">
+          <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2">
+            <div className="flex flex-col justify-center px-8 sm:px-12 lg:px-20 py-16 lg:py-24 order-2 lg:order-1">
+              <div className="flex items-center gap-2 mb-6">
+                <span className="inline-block w-2 h-2 bg-amber-500" />
+                <p className="text-amber-500/80 text-[10px] font-bold tracking-[0.25em] uppercase">
+                  Live Database
                 </p>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Product Funnel */}
-      <section className="relative py-24 sm:py-32 px-8 sm:px-12 lg:px-20 border-t border-white/5">
-        <div className="max-w-5xl mx-auto">
-          <p className="text-white/30 text-xs font-semibold tracking-[0.3em] uppercase mb-6">
-            The Platform
-          </p>
-          <h2 className="text-white text-3xl sm:text-4xl font-bold leading-tight mb-16">
-            Two layers. One ecosystem.
-          </h2>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Public Layer */}
-            <div className="border border-white/10 rounded-xl p-8 bg-white/2">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-2 h-2 rounded-full bg-green-500" />
-                <p className="text-white/60 text-xs font-semibold tracking-[0.2em] uppercase">
-                  Public — Free
-                </p>
-              </div>
-              <h3 className="text-white text-xl font-bold mb-4">
-                The Data Layer
+              <h3 className="text-white text-4xl sm:text-5xl font-black uppercase tracking-tight leading-none mb-5">
+                Fighters
               </h3>
-              <p className="text-white/40 text-sm leading-relaxed mb-6">
-                The hook. SEO-optimized pages that capture organic search
-                traffic and convert visitors into subscribers.
+              <p className="text-white/60 text-sm font-semibold leading-7 max-w-sm mb-8">
+                Every TDLR-licensed boxer in Texas. Records, stats, fight
+                history — the most complete database in the state.
               </p>
-              <ul className="space-y-3">
-                {[
-                  "Fighter Directory — searchable index of TDLR-licensed boxers",
-                  "The Pulse Feed — interactive polls on the homepage",
-                  "Live Schedule — curated calendar with Web Push reminders",
-                ].map((item) => (
-                  <li
-                    key={item}
-                    className="flex items-start gap-3 text-white/50 text-sm"
-                  >
-                    <span className="text-green-500 mt-0.5 shrink-0">&#9654;</span>
-                    {item}
-                  </li>
-                ))}
-              </ul>
+              <Link
+                href="/fighters"
+                className="group inline-flex items-center gap-3 text-white text-xs font-bold tracking-[0.2em] uppercase hover:text-white/60 transition-colors w-fit"
+              >
+                <span className="inline-block w-8 h-px bg-white group-hover:w-12 transition-all duration-300" />
+                Browse Roster
+                <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                </svg>
+              </Link>
             </div>
-
-            {/* Black Card */}
-            <div className="border border-amber-500/30 rounded-xl p-8 bg-amber-500/3 relative overflow-hidden">
+            <div className="relative min-h-[360px] lg:min-h-[480px] order-1 lg:order-2 border-b lg:border-b-0 lg:border-l border-white/10">
               <div
-                className="absolute inset-0 opacity-5"
+                className="absolute inset-0 bg-zinc-900"
                 style={{
-                  background:
-                    "radial-gradient(ellipse at top right, rgba(245,158,11,0.4), transparent 70%)",
+                  backgroundImage:
+                    "url(https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2Fjune15th-9.jpg?alt=media)",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
                 }}
               />
-              <div className="relative z-10">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-2 h-2 rounded-full bg-amber-500" />
-                  <p className="text-amber-500/60 text-xs font-semibold tracking-[0.2em] uppercase">
-                    Black Card — $14.99/mo
+              {/* Gritty overlay on image */}
+              <div
+                className="absolute inset-0 hidden lg:block"
+                style={{
+                  background:
+                    "linear-gradient(to right, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 40%, rgba(0,0,0,0.1) 100%)",
+                }}
+              />
+              <div
+                className="absolute inset-0 lg:hidden"
+                style={{
+                  background:
+                    "linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.1) 70%, transparent 100%)",
+                }}
+              />
+              <div
+                className="absolute inset-0 opacity-[0.06] mix-blend-overlay pointer-events-none"
+                style={{
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")`,
+                  backgroundRepeat: "repeat",
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Events — Split Layout (reversed) */}
+        <div className="relative border-b border-white/10">
+          <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2">
+            <div className="relative min-h-[360px] lg:min-h-[480px] border-b lg:border-b-0 lg:border-r border-white/10">
+              <div
+                className="absolute inset-0 bg-zinc-900"
+                style={{
+                  backgroundImage:
+                    "url(https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2Ffeb28-29.jpg?alt=media)",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
+              />
+              <div
+                className="absolute inset-0 hidden lg:block"
+                style={{
+                  background:
+                    "linear-gradient(to left, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 40%, rgba(0,0,0,0.1) 100%)",
+                }}
+              />
+              <div
+                className="absolute inset-0 lg:hidden"
+                style={{
+                  background:
+                    "linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.1) 70%, transparent 100%)",
+                }}
+              />
+              <div
+                className="absolute inset-0 opacity-[0.06] mix-blend-overlay pointer-events-none"
+                style={{
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")`,
+                  backgroundRepeat: "repeat",
+                }}
+              />
+            </div>
+            <div className="flex flex-col justify-center px-8 sm:px-12 lg:px-20 py-16 lg:py-24">
+              <div className="flex items-center gap-2 mb-6">
+                <span className="inline-block w-2 h-2 bg-amber-500" />
+                <p className="text-amber-500/80 text-[10px] font-bold tracking-[0.25em] uppercase">
+                  Schedule
+                </p>
+              </div>
+              <h3 className="text-white text-4xl sm:text-5xl font-black uppercase tracking-tight leading-none mb-5">
+                Events
+              </h3>
+              <p className="text-white/60 text-sm font-semibold leading-7 max-w-sm mb-8">
+                Upcoming bouts, past results, and push notifications so you
+                never miss a main event.
+              </p>
+              <Link
+                href="/events"
+                className="group inline-flex items-center gap-3 text-white text-xs font-bold tracking-[0.2em] uppercase hover:text-white/60 transition-colors w-fit"
+              >
+                <span className="inline-block w-8 h-px bg-white group-hover:w-12 transition-all duration-300" />
+                View Schedule
+                <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                </svg>
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Predictions, Rankings, Community, Head to Head */}
+        <div className="border-b border-white/10">
+          <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-px bg-white/10">
+            {/* Predictions */}
+            <Link
+              href="/picks"
+              className="group relative bg-black px-8 sm:px-12 lg:p-10 py-12 lg:py-10 flex flex-col justify-between lg:min-h-[280px] hover:bg-zinc-950 transition-colors duration-300"
+            >
+              <div>
+                <div className="flex items-center gap-2 mb-5 lg:mb-4">
+                  <span className="inline-block w-2 h-2 bg-amber-500 lg:hidden" />
+                  <p className="text-amber-500/80 lg:text-amber-500/70 text-[10px] font-bold tracking-[0.25em] uppercase">
+                    Predictions
                   </p>
                 </div>
-                <h3 className="text-white text-xl font-bold mb-4">
-                  The Subscription Portal
+                <h3 className="text-white text-3xl lg:text-xl font-black uppercase tracking-tight leading-none lg:leading-tight mb-4 lg:mb-3 group-hover:text-amber-500 transition-colors">
+                  Prop Picks
                 </h3>
-                <p className="text-white/40 text-sm leading-relaxed mb-6">
-                  Powered by Stripe. Premium UI theme, persistent TC &amp; SP
-                  balances, and access to the full economy.
+                <p className="text-white/60 lg:text-white/50 text-sm font-semibold leading-7 lg:leading-6 max-w-sm">
+                  Over/Under, method of victory, round calls — put your boxing
+                  IQ on the line.
                 </p>
-                <ul className="space-y-3">
-                  {[
-                    "Prop Picks — predict bout outcomes for Skill Points",
-                    "The Pledge — choose your Gym Franchise for the 16-week season",
-                    "Rewards Store — spend TX-Credits on real merch and access",
-                    "Leaderboard — compete for rank and status-gated rewards",
-                  ].map((item) => (
-                    <li
-                      key={item}
-                      className="flex items-start gap-3 text-white/50 text-sm"
-                    >
-                      <span className="text-amber-500 mt-0.5 shrink-0">&#9654;</span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
               </div>
-            </div>
+              <div className="flex items-center gap-3 lg:gap-2 text-white/40 group-hover:text-amber-500 transition-colors mt-8 lg:mt-6">
+                <span className="inline-block w-8 h-px bg-white lg:hidden group-hover:w-12 transition-all duration-300" />
+                <span className="text-xs lg:text-[10px] font-bold tracking-[0.2em] uppercase">
+                  Make Picks
+                </span>
+                <svg className="w-4 h-4 lg:w-3 lg:h-3 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                </svg>
+              </div>
+            </Link>
+
+            {/* Rankings */}
+            <Link
+              href="/leaderboard"
+              className="group relative bg-black px-8 sm:px-12 lg:p-10 py-12 lg:py-10 flex flex-col justify-between lg:min-h-[280px] hover:bg-zinc-950 transition-colors duration-300"
+            >
+              <div>
+                <div className="flex items-center gap-2 mb-5 lg:mb-4">
+                  <span className="inline-block w-2 h-2 bg-amber-500 lg:hidden" />
+                  <p className="text-amber-500/80 lg:text-amber-500/70 text-[10px] font-bold tracking-[0.25em] uppercase">
+                    Rankings
+                  </p>
+                </div>
+                <h3 className="text-white text-3xl lg:text-xl font-black uppercase tracking-tight leading-none lg:leading-tight mb-4 lg:mb-3 group-hover:text-amber-500 transition-colors">
+                  Leaderboard
+                </h3>
+                <p className="text-white/60 lg:text-white/50 text-sm font-semibold leading-7 lg:leading-6 max-w-sm">
+                  See who&apos;s stacking Skill Points. Compete for rank and
+                  status-gated rewards.
+                </p>
+              </div>
+              <div className="flex items-center gap-3 lg:gap-2 text-white/40 group-hover:text-amber-500 transition-colors mt-8 lg:mt-6">
+                <span className="inline-block w-8 h-px bg-white lg:hidden group-hover:w-12 transition-all duration-300" />
+                <span className="text-xs lg:text-[10px] font-bold tracking-[0.2em] uppercase">
+                  View Rankings
+                </span>
+                <svg className="w-4 h-4 lg:w-3 lg:h-3 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                </svg>
+              </div>
+            </Link>
+
+            {/* Community */}
+            <Link
+              href="/polls"
+              className="group relative bg-black px-8 sm:px-12 lg:p-10 py-12 lg:py-10 flex flex-col justify-between lg:min-h-[280px] hover:bg-zinc-950 transition-colors duration-300"
+            >
+              <div>
+                <div className="flex items-center gap-2 mb-5 lg:mb-4">
+                  <span className="inline-block w-2 h-2 bg-amber-500 lg:hidden" />
+                  <p className="text-amber-500/80 lg:text-amber-500/70 text-[10px] font-bold tracking-[0.25em] uppercase">
+                    Community
+                  </p>
+                </div>
+                <h3 className="text-white text-3xl lg:text-xl font-black uppercase tracking-tight leading-none lg:leading-tight mb-4 lg:mb-3 group-hover:text-amber-500 transition-colors">
+                  Fan Polls
+                </h3>
+                <p className="text-white/60 lg:text-white/50 text-sm font-semibold leading-7 lg:leading-6 max-w-sm">
+                  Vote on live matchups and trending questions. Every poll earns
+                  you TX-Credits.
+                </p>
+              </div>
+              <div className="flex items-center gap-3 lg:gap-2 text-white/40 group-hover:text-amber-500 transition-colors mt-8 lg:mt-6">
+                <span className="inline-block w-8 h-px bg-white lg:hidden group-hover:w-12 transition-all duration-300" />
+                <span className="text-xs lg:text-[10px] font-bold tracking-[0.2em] uppercase">
+                  Cast Vote
+                </span>
+                <svg className="w-4 h-4 lg:w-3 lg:h-3 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                </svg>
+              </div>
+            </Link>
+
+            {/* Head to Head */}
+            <Link
+              href="/compare"
+              className="group relative bg-black px-8 sm:px-12 lg:p-10 py-12 lg:py-10 flex flex-col justify-between lg:min-h-[280px] hover:bg-zinc-950 transition-colors duration-300"
+            >
+              <div>
+                <div className="flex items-center gap-2 mb-5 lg:mb-4">
+                  <span className="inline-block w-2 h-2 bg-amber-500 lg:hidden" />
+                  <p className="text-amber-500/80 lg:text-amber-500/70 text-[10px] font-bold tracking-[0.25em] uppercase">
+                    Head to Head
+                  </p>
+                </div>
+                <h3 className="text-white text-3xl lg:text-xl font-black uppercase tracking-tight leading-none lg:leading-tight mb-4 lg:mb-3 group-hover:text-amber-500 transition-colors">
+                  Compare
+                </h3>
+                <p className="text-white/60 lg:text-white/50 text-sm font-semibold leading-7 lg:leading-6 max-w-sm">
+                  Stack any two fighters side-by-side. Records, win streaks, KO
+                  rates — all visualized.
+                </p>
+              </div>
+              <div className="flex items-center gap-3 lg:gap-2 text-white/40 group-hover:text-amber-500 transition-colors mt-8 lg:mt-6">
+                <span className="inline-block w-8 h-px bg-white lg:hidden group-hover:w-12 transition-all duration-300" />
+                <span className="text-xs lg:text-[10px] font-bold tracking-[0.2em] uppercase">
+                  Compare
+                </span>
+                <svg className="w-4 h-4 lg:w-3 lg:h-3 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                </svg>
+              </div>
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* The Economy */}
-      <section className="relative py-24 sm:py-32 px-8 sm:px-12 lg:px-20 border-t border-white/5">
-        <div className="max-w-5xl mx-auto">
-          <p className="text-white/30 text-xs font-semibold tracking-[0.3em] uppercase mb-6">
-            The Economy
-          </p>
-          <h2 className="text-white text-3xl sm:text-4xl font-bold leading-tight mb-4">
-            Three currencies. One ledger.
-          </h2>
-          <p className="text-white/40 text-sm mb-16 max-w-xl">
-            100 TX-Credits = $1.00 USD in redemption value. Target 3:1
-            value-to-cost ratio for sustainable engagement.
-          </p>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Skill Points */}
-            <div className="border border-white/10 rounded-xl overflow-hidden">
-              <div className="bg-linear-to-r from-blue-600/20 to-blue-800/10 px-6 py-4 border-b border-white/5">
-                <p className="text-blue-400 text-xs font-semibold tracking-[0.2em] uppercase">
-                  Skill Points (SP)
-                </p>
-                <p className="text-white/30 text-xs mt-1">
-                  Non-spendable &middot; Determines Rank
-                </p>
-              </div>
-              <div className="p-6 space-y-3">
-                {SP_ACTIONS.map((row) => (
-                  <div key={row.action} className="flex justify-between items-center">
-                    <span className="text-white/50 text-sm">{row.action}</span>
-                    <span className="text-blue-400 text-sm font-semibold tabular-nums">
-                      {row.points}
-                    </span>
-                  </div>
-                ))}
-              </div>
+      {/* Black Card Highlight */}
+      <section className="-mt-10 relative border-t border-white/5 overflow-hidden">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2">
+          <div className="flex flex-col justify-center px-8 sm:px-12 lg:px-20 py-20 lg:py-28 order-2 lg:order-1">
+            <div className="flex items-center gap-3 mb-6">
+              <span className="inline-block w-2 h-2 bg-amber-500" />
+              <p className="text-amber-500 text-[10px] font-bold tracking-[0.25em] uppercase">
+                Black Card — $14.99/mo
+              </p>
             </div>
-
-            {/* TX-Credits */}
-            <div className="border border-white/10 rounded-xl overflow-hidden">
-              <div className="bg-linear-to-r from-emerald-600/20 to-emerald-800/10 px-6 py-4 border-b border-white/5">
-                <p className="text-emerald-400 text-xs font-semibold tracking-[0.2em] uppercase">
-                  TX-Credits (TC)
-                </p>
-                <p className="text-white/30 text-xs mt-1">
-                  Spendable &middot; Rewards Store currency
-                </p>
-              </div>
-              <div className="p-6 space-y-3">
-                {TC_ACTIONS.map((row) => (
-                  <div key={row.action} className="flex justify-between items-center">
-                    <span className="text-white/50 text-sm">{row.action}</span>
-                    <span className="text-emerald-400 text-sm font-semibold tabular-nums">
-                      {row.points}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Loyalty Points */}
-            <div className="border border-white/10 rounded-xl overflow-hidden">
-              <div className="bg-linear-to-r from-purple-600/20 to-purple-800/10 px-6 py-4 border-b border-white/5">
-                <p className="text-purple-400 text-xs font-semibold tracking-[0.2em] uppercase">
-                  Loyalty Points (LP)
-                </p>
-                <p className="text-white/30 text-xs mt-1">
-                  Gym Tribe &middot; Season standings
-                </p>
-              </div>
-              <div className="p-6 space-y-3">
-                {LP_ACTIONS.map((row) => (
-                  <div key={row.action} className="flex justify-between items-center">
-                    <span className="text-white/50 text-sm">{row.action}</span>
-                    <span className="text-purple-400 text-sm font-semibold tabular-nums">
-                      {row.points}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <h3 className="text-white text-3xl sm:text-4xl font-black leading-[0.95] mb-5 uppercase tracking-tight">
+              Unlock the full economy.
+            </h3>
+            <p className="text-white/60 text-sm font-semibold leading-7 mb-8 max-w-md">
+              Prop Picks, The Pledge, Rewards Store, and full Leaderboard
+              access. Powered by Stripe — zero app store tax.
+            </p>
+            <ul className="space-y-3 mb-10">
+              {[
+                "Predict bout outcomes for Skill Points",
+                "Choose your Gym Franchise for the 16-week season",
+                "Spend TX-Credits on real merch and access",
+                "Compete for rank and status-gated rewards",
+              ].map((item) => (
+                <li
+                  key={item}
+                  className="flex items-start gap-3 text-white/50 text-sm font-semibold"
+                >
+                  <span className="text-amber-500 mt-0.5 shrink-0">&#9654;</span>
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <BlackCardCta />
+          </div>
+          <div className="relative min-h-[400px] lg:min-h-[560px] order-1 lg:order-2 border-t lg:border-t-0 lg:border-l border-white/10">
+            <div
+              className="absolute inset-0 bg-zinc-900"
+              style={{
+                backgroundImage:
+                  "url(https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2FDay2-21.jpg?alt=media)",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }}
+            />
+            <div
+              className="absolute inset-0 hidden lg:block"
+              style={{
+                background:
+                  "linear-gradient(to right, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.05) 100%)",
+              }}
+            />
+            <div
+              className="absolute inset-0 lg:hidden"
+              style={{
+                background:
+                  "linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.1) 70%, transparent 100%)",
+              }}
+            />
+            <div
+              className="absolute inset-0 opacity-[0.06] mix-blend-overlay pointer-events-none"
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")`,
+                backgroundRepeat: "repeat",
+              }}
+            />
           </div>
         </div>
       </section>
 
-      {/* Rank Progression */}
-      <section className="relative py-24 sm:py-32 px-8 sm:px-12 lg:px-20 border-t border-white/5">
-        <div className="max-w-5xl mx-auto">
-          <p className="text-white/30 text-xs font-semibold tracking-[0.3em] uppercase mb-6">
-            Progression
-          </p>
-          <h2 className="text-white text-3xl sm:text-4xl font-bold leading-tight mb-16">
-            Climb the ranks. Unlock rewards.
-          </h2>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            {RANKS.map((rank, i) => (
-              <div
-                key={rank.name}
-                className={`relative border ${rank.border} rounded-xl p-6 bg-linear-to-b ${rank.color} bg-opacity-10 ${rank.glow} shadow-lg`}
-                style={{
-                  background: `linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0.9))`,
-                }}
-              >
-                <div
-                  className={`absolute inset-0 rounded-xl bg-linear-to-b ${rank.color} opacity-10`}
-                />
-                <div className="relative z-10">
-                  <p className="text-white/30 text-xs font-semibold tracking-wider uppercase mb-3">
+      {/* Economy + Progression */}
+      <section className="relative border-t border-white/5 overflow-hidden">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2">
+          {/* Video */}
+          <div className="relative hidden lg:block lg:min-h-[600px] lg:border-r border-white/10">
+            <video
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover"
+              src="https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2FTXMX%20Ethan%20Commerical.mp4?alt=media"
+            />
+            <div
+              className="absolute inset-0 hidden lg:block"
+              style={{
+                background:
+                  "linear-gradient(to left, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 40%, rgba(0,0,0,0.1) 100%)",
+              }}
+            />
+            <div
+              className="absolute inset-0 lg:hidden"
+              style={{
+                background:
+                  "linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.1) 70%, transparent 100%)",
+              }}
+            />
+            <div
+              className="absolute inset-0 opacity-[0.06] mix-blend-overlay pointer-events-none"
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")`,
+                backgroundRepeat: "repeat",
+              }}
+            />
+          </div>
+
+          {/* Economy Content */}
+          <div className="flex flex-col justify-center px-8 sm:px-12 lg:px-16 py-16 lg:py-20">
+            <div className="flex items-center gap-2 mb-6">
+              <span className="inline-block w-2 h-2 bg-amber-500" />
+              <p className="text-amber-500/80 text-[10px] font-bold tracking-[0.25em] uppercase">
+                The Economy
+              </p>
+            </div>
+            <h3 className="text-white text-3xl sm:text-4xl font-black uppercase tracking-tight leading-[0.95] mb-4">
+              Earn it. Spend it. Climb.
+            </h3>
+            <p className="text-white/60 text-sm font-semibold leading-7 mb-10 max-w-md">
+              Three currencies reward knowledge, loyalty, and consistency.
+              Stack points to rank up. Spend credits in the rewards store.
+            </p>
+
+            {/* Currencies */}
+            <div className="space-y-0 border-t border-white/10 mb-10">
+              <div className="flex items-center justify-between py-4 border-b border-white/10">
+                <div>
+                  <p className="text-white text-sm font-black tracking-wide uppercase">
+                    Skill Points
+                  </p>
+                  <p className="text-white/30 text-xs font-semibold mt-0.5">
+                    Non-spendable &middot; Determines Rank
+                  </p>
+                </div>
+                <span className="text-white/20 text-xs font-bold tracking-wider">SP</span>
+              </div>
+              <div className="flex items-center justify-between py-4 border-b border-white/10">
+                <div>
+                  <p className="text-white text-sm font-black tracking-wide uppercase">
+                    TX-Credits
+                  </p>
+                  <p className="text-white/30 text-xs font-semibold mt-0.5">
+                    Spendable &middot; 100 TC = $1.00 USD
+                  </p>
+                </div>
+                <span className="text-white/20 text-xs font-bold tracking-wider">TC</span>
+              </div>
+              <div className="flex items-center justify-between py-4 border-b border-white/10">
+                <div>
+                  <p className="text-white text-sm font-black tracking-wide uppercase">
+                    Loyalty Points
+                  </p>
+                  <p className="text-white/30 text-xs font-semibold mt-0.5">
+                    Gym Tribe &middot; Season standings
+                  </p>
+                </div>
+                <span className="text-white/20 text-xs font-bold tracking-wider">LP</span>
+              </div>
+            </div>
+
+            {/* Rank Tiers */}
+            <p className="text-amber-500/70 text-[10px] font-bold tracking-[0.25em] uppercase mb-4">
+              Rank Progression
+            </p>
+            <div className="grid grid-cols-2 gap-px bg-white/10">
+              {RANKS.map((rank, i) => (
+                <div key={rank.name} className="relative bg-black p-4 sm:p-5">
+                  <p className="text-amber-500/50 text-[10px] font-bold tracking-[0.2em] uppercase mb-2">
                     Tier {i + 1}
                   </p>
-                  <p className="text-white text-lg sm:text-xl font-bold mb-2">
+                  <p className="text-white text-sm sm:text-base font-black uppercase tracking-tight leading-none mb-1">
                     {rank.name}
                   </p>
-                  <p className="text-white/40 text-xs font-medium tabular-nums">
+                  <p className="text-white/40 text-[11px] font-bold tabular-nums tracking-wider">
                     {rank.threshold}
                   </p>
+                  <div className="absolute bottom-0 left-0 right-0 h-px bg-white/10" />
+                  <div
+                    className="absolute bottom-0 left-0 h-px"
+                    style={{ width: `${25 * (i + 1)}%`, background: "#f59e0b", opacity: 0.3 + i * 0.15 }}
+                  />
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Technical Architecture */}
-      <section className="relative py-24 sm:py-32 px-8 sm:px-12 lg:px-20 border-t border-white/5">
-        <div className="max-w-5xl mx-auto">
-          <p className="text-white/30 text-xs font-semibold tracking-[0.3em] uppercase mb-6">
-            Under the Hood
-          </p>
-          <h2 className="text-white text-3xl sm:text-4xl font-bold leading-tight mb-16">
-            Built for speed, built for Texas.
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              {
-                title: "Triple-Ledger Database",
-                desc: "Three distinct, immutable point balances per user — Skill Points (Rank), Loyalty Points (Gym), TX-Credits (Wallet).",
-              },
-              {
-                title: "TDLR Ingest Engine",
-                desc: "Automated scraper for tdlr.texas.gov — event schedules, fighter licensing, and official results synced in real-time.",
-              },
-              {
-                title: "Web Push Notifications",
-                desc: "Browser notifications for 'Main Event Starting' to drive users back to the site during live bouts.",
-              },
-              {
-                title: "Admin Dashboard",
-                desc: "Prop creator for Over/Under and custom bout questions. Economy governor to adjust TC rewards and prevent point inflation.",
-              },
-              {
-                title: "Stripe Billing",
-                desc: "Webhook-driven subscription management. Black Card features unlock instantly — no page refresh required.",
-              },
-              {
-                title: "Status-Gated Rewards",
-                desc: "TC-priced storefront with SP rank validation. Fulfillment via dropshipping APIs and automated NIL access.",
-              },
-            ].map((item) => (
-              <div
-                key={item.title}
-                className="border border-white/5 rounded-lg p-6 bg-white/1 hover:bg-white/3 transition-colors"
-              >
-                <p className="text-white text-sm font-semibold mb-2">
-                  {item.title}
-                </p>
-                <p className="text-white/30 text-sm leading-relaxed">
-                  {item.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Roadmap */}
-      <section className="relative py-24 sm:py-32 px-8 sm:px-12 lg:px-20 border-t border-white/5">
-        <div className="max-w-5xl mx-auto">
-          <p className="text-white/30 text-xs font-semibold tracking-[0.3em] uppercase mb-6">
-            Roadmap
-          </p>
-          <h2 className="text-white text-3xl sm:text-4xl font-bold leading-tight mb-16">
-            Two sprints to MVP.
-          </h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="border border-white/10 rounded-xl p-8">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/50 text-xs font-bold">
-                  1
-                </div>
-                <div>
-                  <p className="text-white text-sm font-semibold">
-                    The Foundation
-                  </p>
-                  <p className="text-white/30 text-xs">Days 1–14</p>
-                </div>
-              </div>
-              <ul className="space-y-2">
-                {[
-                  "Database schema & triple-ledger architecture",
-                  "TDLR scraper — automated event & fighter sync",
-                  "Responsive Fighter Profile UI (SEO optimized)",
-                  "User authentication & session management",
-                ].map((item) => (
-                  <li
-                    key={item}
-                    className="text-white/40 text-sm flex items-start gap-2"
-                  >
-                    <span className="text-white/20 mt-0.5 shrink-0">—</span>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="border border-white/10 rounded-xl p-8">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/50 text-xs font-bold">
-                  2
-                </div>
-                <div>
-                  <p className="text-white text-sm font-semibold">
-                    The Economy
-                  </p>
-                  <p className="text-white/30 text-xs">Days 15–28</p>
-                </div>
-              </div>
-              <ul className="space-y-2">
-                {[
-                  "Stripe integration & Black Card subscription flow",
-                  "Admin CMS — Prop/Poll creator & economy governor",
-                  "Points ledger — SP, TC, LP tracking & display",
-                  "Rewards storefront with status gating",
-                ].map((item) => (
-                  <li
-                    key={item}
-                    className="text-white/40 text-sm flex items-start gap-2"
-                  >
-                    <span className="text-white/20 mt-0.5 shrink-0">—</span>
-                    {item}
-                  </li>
-                ))}
-              </ul>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="relative py-24 sm:py-32 px-8 sm:px-12 lg:px-20 border-t border-white/5">
-        <div className="max-w-3xl mx-auto text-center">
-          <p className="text-white/30 text-xs font-semibold tracking-[0.3em] uppercase mb-6">
-            Stay in the Loop
+      {/* Closing */}
+      <section className="relative border-t border-white/5">
+        <div className="max-w-6xl mx-auto px-8 sm:px-12 lg:px-20 py-32 md:py-40 lg:py-52 text-center">
+          <p className="text-amber-500 text-[10px] font-bold tracking-[0.3em] uppercase mb-6">
+            TXMX Boxing
           </p>
-          <h2 className="text-white text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight mb-6">
-            The future of Texas boxing is skill-based.
+          <h2 className="text-white text-5xl sm:text-7xl lg:text-8xl font-black uppercase tracking-tight leading-[1.10]">
+            Levantamos
+            <br />
+            <span className="text-white/20">Los Puños</span>
           </h2>
-          <p className="text-white/40 text-sm sm:text-base leading-relaxed mb-8 max-w-lg mx-auto">
-            No luck. No chance. Just knowledge. TXMX Scorecard rewards the fans
-            who study the game.
-          </p>
-          <ScorecardCta />
         </div>
       </section>
     </main>

@@ -6,19 +6,23 @@ import { XIcon } from "../components/icons/x-icon"
 import { ArrowLeftIcon } from "../components/icons/arrow-left-icon"
 import { Newsletter } from "./newsletter"
 import Image from "next/image"
+import { useAuth } from "../lib/auth-context"
+import NotificationBell from "./notification-bell"
 
 interface SlideOutModalProps {
   isOpen: boolean
   onClose: () => void
+  onAuthClick: () => void
 }
 
 type ModalState = "main" | "contact"
 
-export default function SlideOutModal({ isOpen, onClose }: SlideOutModalProps) {
+export default function SlideOutModal({ isOpen, onClose, onAuthClick }: SlideOutModalProps) {
   const [modalState, setModalState] = useState<ModalState>("main")
   const [isVisible, setIsVisible] = useState(false)
   const [isAnimating, setIsAnimating] = useState(false)
   const [socialOpen, setSocialOpen] = useState(false)
+  const { user, profile, signOut } = useAuth()
 
   useEffect(() => {
     if (isOpen) {
@@ -49,11 +53,11 @@ export default function SlideOutModal({ isOpen, onClose }: SlideOutModalProps) {
 
       {/* Modal Content */}
       <div
-        className={`absolute right-0 top-0 h-full w-full max-w-sm overflow-y-auto bg-black border-l border-white/20 transition-transform duration-350 ease-out ${isAnimating ? "translate-x-0" : "translate-x-full"}`}
+        className={`absolute inset-0 overflow-y-auto bg-black transition-transform duration-350 ease-out ${isAnimating ? "translate-x-0" : "translate-x-full"}`}
       >
         {/* Main Content */}
         {modalState === "main" && (
-          <div className="flex flex-col h-full px-6 py-8 text-white">
+          <div className="flex flex-col min-h-full px-6 py-8 text-white">
             {/* Header */}
             <div className="flex items-center justify-between mb-10">
               <Image
@@ -74,7 +78,7 @@ export default function SlideOutModal({ isOpen, onClose }: SlideOutModalProps) {
             </div>
 
             {/* Navigation Links */}
-            <div className="flex-1 flex flex-col justify-center space-y-4 w-full">
+            <div className="flex flex-col space-y-4 w-full">
               {/* Scorecard */}
               <Link
                 href="/scorecard"
@@ -176,11 +180,86 @@ export default function SlideOutModal({ isOpen, onClose }: SlideOutModalProps) {
                 href="https://434media.com/shop"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group block py-4 hover:-translate-y-0.5 transition-transform duration-200"
+                className="group block py-4 border-b border-white/10 hover:-translate-y-0.5 transition-transform duration-200"
               >
                 <div className="text-white text-sm font-semibold tracking-widest leading-relaxed group-hover:text-white/70 transition-colors">SHOP FOUNDERS TEE</div>
                 <div className="text-white/30 text-xs font-medium tracking-wide leading-relaxed mt-0.5">434media.com</div>
               </a>
+
+              {/* Auth Section */}
+              {user ? (
+                <div className="py-4 space-y-4">
+                  {/* User info */}
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-white text-sm font-semibold tracking-widest">{user.displayName?.split(" ")[0]?.toUpperCase() || "ACCOUNT"}</p>
+                      <p className="text-white/30 text-xs font-medium tracking-wide mt-0.5">{user.email}</p>
+                    </div>
+                    {profile?.subscriptionStatus === "active" && (
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                        <span className="text-amber-500 text-[11px] font-semibold tracking-wider uppercase">Black Card</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Currency stats */}
+                  {profile && (
+                    <div className="grid grid-cols-3 gap-2 py-3 border-t border-b border-white/5">
+                      <div className="text-center">
+                        <p className="text-blue-400 text-xs font-bold tabular-nums">{profile.skillPoints}</p>
+                        <p className="text-white/30 text-[9px] tracking-wider">SP</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-emerald-400 text-xs font-bold tabular-nums">{profile.txCredits}</p>
+                        <p className="text-white/30 text-[9px] tracking-wider">TC</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-purple-400 text-xs font-bold tabular-nums">{profile.loyaltyPoints}</p>
+                        <p className="text-white/30 text-[9px] tracking-wider">LP</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Black Card CTA (non-subscribers) */}
+                  {profile?.subscriptionStatus !== "active" && (
+                    <Link
+                      href="/checkout"
+                      className="flex items-center justify-between py-3 group"
+                      onClick={onClose}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-white/20 group-hover:bg-amber-500 transition-colors" />
+                        <p className="text-white/60 text-[11px] font-semibold tracking-wider uppercase group-hover:text-white transition-colors">Get the Black Card</p>
+                      </div>
+                      <p className="text-amber-500 text-[11px] font-semibold tracking-wide">$14.99/mo</p>
+                    </Link>
+                  )}
+
+                  {/* Notifications */}
+                  <div className="flex items-center justify-between py-3 border-t border-white/5">
+                    <p className="text-white/40 text-[11px] font-medium tracking-wider uppercase">Notifications</p>
+                    <NotificationBell />
+                  </div>
+
+                  {/* Sign out */}
+                  <button
+                    onClick={() => { signOut(); onClose() }}
+                    className="w-full text-left text-white/40 text-[11px] font-medium tracking-wider uppercase hover:text-white/60 transition-colors py-3 border-t border-white/5"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
+                <div className="py-6">
+                  <button
+                    onClick={onAuthClick}
+                    className="w-full text-center text-black text-[11px] font-semibold tracking-widest uppercase bg-amber-500 hover:bg-amber-400 px-5 py-3 transition-colors"
+                  >
+                    SIGN IN
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}

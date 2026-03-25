@@ -3,7 +3,7 @@
 import { useRef, useState } from "react"
 
 const VIDEO_SRC =
-  "https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2FEthan%20Edit%20Nov%208th.MP4?alt=media"
+  "https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2Fethanedit2.mp4?alt=media"
 
 export default function ScorecardVideo() {
   const videoRef = useRef<HTMLVideoElement>(null)

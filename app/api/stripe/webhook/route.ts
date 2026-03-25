@@ -2,8 +2,10 @@ import { NextRequest, NextResponse } from "next/server"
 import { stripe } from "../../../../lib/stripe"
 import {
   getUserByStripeCustomerId,
+  getUserByUid,
   updateUserSubscription,
 } from "../../../actions/users"
+import { sendSubscriptionConfirmation } from "../../../actions/email"
 import type Stripe from "stripe"
 
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!
@@ -35,6 +37,19 @@ export async function POST(request: NextRequest) {
             stripeCustomerId: session.customer as string,
             stripeSubscriptionId: session.subscription as string,
           })
+
+          // Send confirmation email via Resend
+          try {
+            const subscribedUser = await getUserByUid(session.metadata.firebaseUid)
+            if (subscribedUser?.email) {
+              await sendSubscriptionConfirmation(
+                subscribedUser.email,
+                subscribedUser.displayName
+              )
+            }
+          } catch (emailErr) {
+            console.error("Confirmation email failed:", emailErr)
+          }
         }
         break
       }
@@ -49,7 +64,17 @@ export async function POST(request: NextRequest) {
           if (user) {
             await updateUserSubscription(user.uid, {
               subscriptionStatus: "active",
+              stripeSubscriptionId: subId,
             })
+
+            // Send confirmation email on first successful payment
+            if (user.subscriptionStatus !== "active" && user.email) {
+              try {
+                await sendSubscriptionConfirmation(user.email, user.displayName)
+              } catch (emailErr) {
+                console.error("Confirmation email failed:", emailErr)
+              }
+            }
           }
         }
         break

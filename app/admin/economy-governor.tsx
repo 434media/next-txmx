@@ -1,0 +1,180 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import type { EconomyConfig, EconomySnapshot } from "../actions/economy"
+import { getEconomyConfig, updateEconomyConfig, getEconomySnapshot } from "../actions/economy"
+
+function formatNumber(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`
+  return n.toLocaleString()
+}
+
+export default function EconomyGovernor() {
+  const [config, setConfig] = useState<EconomyConfig | null>(null)
+  const [snapshot, setSnapshot] = useState<EconomySnapshot | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const [cfg, snap] = await Promise.all([getEconomyConfig(), getEconomySnapshot()])
+        setConfig(cfg)
+        setSnapshot(snap)
+      } catch {
+        // silent
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
+  }, [])
+
+  const handleSave = async () => {
+    if (!config) return
+    setSaving(true)
+    try {
+      await updateEconomyConfig(config)
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2000)
+    } catch {
+      // silent
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const updateField = (field: keyof EconomyConfig, value: number) => {
+    if (!config) return
+    setConfig({ ...config, [field]: value })
+    setSaved(false)
+  }
+
+  if (loading) {
+    return <p className="text-gray-400 text-sm animate-pulse">Loading economy data...</p>
+  }
+
+  return (
+    <div className="space-y-8">
+      {/* Economy Health Dashboard */}
+      {snapshot && (
+        <div>
+          <h3 className="text-sm font-bold text-gray-500 tracking-wider uppercase mb-4">Economy Health</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            <MetricCard label="Total Users" value={formatNumber(snapshot.totalUsers)} color="text-blue-600" />
+            <MetricCard label="Active Subscribers" value={formatNumber(snapshot.activeSubscribers)} color="text-amber-600" />
+            <MetricCard label="TC In Circulation" value={formatNumber(snapshot.totalTCInCirculation)} color="text-emerald-600" />
+            <MetricCard label="TC Earned (Lifetime)" value={formatNumber(snapshot.totalTCEarned)} color="text-emerald-600" />
+            <MetricCard label="TC Spent (Lifetime)" value={formatNumber(snapshot.totalTCSpent)} color="text-red-600" />
+            <MetricCard label="SP Awarded (Total)" value={formatNumber(snapshot.totalSPAwarded)} color="text-blue-600" />
+          </div>
+          <p className="text-gray-400 text-[11px] mt-2">
+            Snapshot: {new Date(snapshot.snapshotAt).toLocaleString()}
+          </p>
+        </div>
+      )}
+
+      {/* Rate Configuration */}
+      {config && (
+        <div>
+          <h3 className="text-sm font-bold text-gray-500 tracking-wider uppercase mb-4">TC Reward Rates</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            <RateInput label="Social Share Reward" value={config.shareReward} unit="TC" onChange={(v) => updateField("shareReward", v)} />
+            <RateInput label="Poll Vote Reward" value={config.pollVoteReward} unit="TC" onChange={(v) => updateField("pollVoteReward", v)} />
+            <RateInput label="Daily Login Reward" value={config.dailyLoginReward} unit="TC" onChange={(v) => updateField("dailyLoginReward", v)} />
+            <RateInput label="Correct Prediction" value={config.correctPredictionReward} unit="TC" onChange={(v) => updateField("correctPredictionReward", v)} />
+          </div>
+
+          <h3 className="text-sm font-bold text-gray-500 tracking-wider uppercase mb-4">SP Ranges</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            <div className="border border-gray-200 rounded-xl p-4 bg-gray-50">
+              <p className="text-xs font-semibold text-gray-500 mb-2">Match Winner SP</p>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  value={config.matchWinnerSPMin}
+                  onChange={(e) => updateField("matchWinnerSPMin", Number(e.target.value))}
+                  className="w-24 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-500"
+                />
+                <span className="text-gray-400 text-sm">to</span>
+                <input
+                  type="number"
+                  value={config.matchWinnerSPMax}
+                  onChange={(e) => updateField("matchWinnerSPMax", Number(e.target.value))}
+                  className="w-24 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-500"
+                />
+                <span className="text-gray-400 text-xs font-medium">SP</span>
+              </div>
+            </div>
+            <div className="border border-gray-200 rounded-xl p-4 bg-gray-50">
+              <p className="text-xs font-semibold text-gray-500 mb-2">Prop Pick SP</p>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  value={config.propPickSPMin}
+                  onChange={(e) => updateField("propPickSPMin", Number(e.target.value))}
+                  className="w-24 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-500"
+                />
+                <span className="text-gray-400 text-sm">to</span>
+                <input
+                  type="number"
+                  value={config.propPickSPMax}
+                  onChange={(e) => updateField("propPickSPMax", Number(e.target.value))}
+                  className="w-24 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-500"
+                />
+                <span className="text-gray-400 text-xs font-medium">SP</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="bg-amber-500 text-white text-sm font-semibold px-6 py-2.5 rounded-lg hover:bg-amber-600 transition-colors disabled:opacity-50"
+            >
+              {saving ? "Saving..." : "Save Rates"}
+            </button>
+            {saved && (
+              <span className="text-emerald-600 text-sm font-medium">Saved!</span>
+            )}
+            {config.updatedAt && (
+              <span className="text-gray-400 text-xs">
+                Last updated: {new Date(config.updatedAt).toLocaleString()}
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function MetricCard({ label, value, color }: { label: string; value: string; color: string }) {
+  return (
+    <div className="border border-gray-200 rounded-xl p-4 bg-white">
+      <p className="text-[11px] font-semibold text-gray-400 tracking-wider uppercase mb-1">{label}</p>
+      <p className={`text-2xl font-bold tabular-nums ${color}`}>{value}</p>
+    </div>
+  )
+}
+
+function RateInput({ label, value, unit, onChange }: { label: string; value: number; unit: string; onChange: (v: number) => void }) {
+  return (
+    <div className="border border-gray-200 rounded-xl p-4 bg-gray-50">
+      <label className="block text-xs font-semibold text-gray-500 mb-2">{label}</label>
+      <div className="flex items-center gap-2">
+        <input
+          type="number"
+          value={value}
+          onChange={(e) => onChange(Number(e.target.value))}
+          min={0}
+          className="w-24 border border-gray-200 rounded-lg px-3 py-2 text-sm font-semibold focus:outline-none focus:border-amber-500"
+        />
+        <span className="text-gray-400 text-xs font-medium">{unit}</span>
+      </div>
+    </div>
+  )
+}

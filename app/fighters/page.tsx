@@ -15,6 +15,12 @@ export const metadata: Metadata = {
     locale: "en_US",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Fighter Directory | TXMX Boxing",
+    description:
+      "Searchable directory of TDLR-licensed boxers. Records, stats, and profiles.",
+  },
   alternates: {
     canonical: "https://www.txmxboxing.com/fighters",
   },
