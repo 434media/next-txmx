@@ -3,13 +3,16 @@
 import type React from "react"
 import { Geist, Geist_Mono, Bebas_Neue, Orbitron } from "next/font/google"
 import { GeistPixelSquare, GeistPixelGrid, GeistPixelCircle, GeistPixelTriangle, GeistPixelLine } from 'geist/font/pixel';
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
 import Navbar from "../components/navbar"
+import AuthModal from "../components/auth-modal"
 import SlideOutModal from "../components/slide-out-modal"
+import { AuthProvider } from "../lib/auth-context"
 import GlobalStyles from "../components/global-styles"
 import "./globals.css"
 import Footer from "../components/footer"
+import DailyLoginReward from "../components/daily-login-reward"
 import { Analytics } from "@vercel/analytics/next"
 import Script from "next/script"
 
@@ -44,7 +47,15 @@ export default function ClientLayout({
   children: React.ReactNode
 }>) {
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const pathname = usePathname()
+
+  // Register service worker for PWA + push notifications
+  useEffect(() => {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js").catch(() => {})
+    }
+  }, [])
   const isAdmin = pathname?.startsWith('/admin')
 
   const openModal = () => setIsModalOpen(true)
@@ -121,13 +132,21 @@ export default function ClientLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} ${bebasNeue.variable} ${orbitron.variable} ${GeistPixelSquare.variable} ${GeistPixelGrid.variable} ${GeistPixelCircle.variable} ${GeistPixelTriangle.variable} ${GeistPixelLine.variable} antialiased bg-black text-white`} style={{ overflowY: 'auto', height: 'auto', minHeight: '100vh' }}>
         <Analytics />
 
-        <GlobalStyles />
-        <Navbar onMenuClick={openModal} />
-        {children}        
-        {!isAdmin && <Footer />}
-        
-        {/* Universal Slide Out Modal */}
-        <SlideOutModal isOpen={isModalOpen} onClose={closeModal} />
+        <AuthProvider>
+          <GlobalStyles />
+          <Navbar onMenuClick={openModal} onAuthClick={() => setIsAuthModalOpen(true)} />
+          {children}        
+          {!isAdmin && <Footer />}
+          
+          {/* Auth Modal */}
+          <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+          
+          {/* Universal Slide Out Modal */}
+          <SlideOutModal isOpen={isModalOpen} onClose={closeModal} onAuthClick={() => { closeModal(); setIsAuthModalOpen(true) }} />
+          
+          {/* Daily Login Reward */}
+          <DailyLoginReward />
+        </AuthProvider>
       </body>
     </html>
   )

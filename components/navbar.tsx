@@ -4,19 +4,35 @@ import Image from "next/image"
 import Link from "next/link"
 import { Menu } from "lucide-react"
 import { useState, useRef, useEffect } from "react"
+import { useAuth } from "../lib/auth-context"
+import NotificationBell from "./notification-bell"
 
 interface NavbarProps {
   onMenuClick: () => void
+  onAuthClick: () => void
 }
 
-export default function Navbar({ onMenuClick }: NavbarProps) {
+function getRankForSP(sp: number) {
+  if (sp >= 100000) return "Hall of Fame"
+  if (sp >= 25000) return "Champion"
+  if (sp >= 5000) return "Contender"
+  return "Rookie"
+}
+
+export default function Navbar({ onMenuClick, onAuthClick }: NavbarProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const userMenuRef = useRef<HTMLDivElement>(null)
+  const { user, profile, loading, signOut } = useAuth()
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false)
+      }
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setIsUserMenuOpen(false)
       }
     }
     document.addEventListener("mousedown", handleClickOutside)
@@ -142,6 +158,105 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
                 </div>
               )}
             </div>
+
+            {/* Auth */}
+            {!loading && (
+              user ? (
+                <div ref={userMenuRef} className="relative">
+                  <button
+                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                    className="flex items-center gap-2 text-white/60 text-[11px] font-semibold tracking-widest uppercase hover:text-white transition-colors"
+                  >
+                    {profile?.subscriptionStatus === "active" && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                    )}
+                    {user.displayName?.split(" ")[0]?.toUpperCase() || "ACCOUNT"}
+                    <svg
+                      className={`w-3 h-3 transition-transform duration-200 ${isUserMenuOpen ? "rotate-180" : ""}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {isUserMenuOpen && (
+                    <div className="absolute right-0 mt-3 w-72 bg-black border border-white/10 shadow-2xl overflow-hidden">
+                      {/* User header */}
+                      <div className="px-5 py-4 border-b border-white/5 bg-white/2">
+                        <p className="text-white text-xs font-semibold tracking-wide truncate">{user.displayName || "Account"}</p>
+                        <p className="text-white/40 text-[11px] font-medium tracking-wide mt-0.5 truncate">{user.email}</p>
+                      </div>
+
+                      {/* Currency stats */}
+                      {profile && (
+                        <div className="px-5 py-3 border-b border-white/5 grid grid-cols-3 gap-2">
+                          <div className="text-center">
+                            <p className="text-blue-400 text-xs font-bold tabular-nums">{profile.skillPoints}</p>
+                            <p className="text-white/30 text-[9px] tracking-wider">SP</p>
+                          </div>
+                          <div className="text-center">
+                            <p className="text-emerald-400 text-xs font-bold tabular-nums">{profile.txCredits}</p>
+                            <p className="text-white/30 text-[9px] tracking-wider">TC</p>
+                          </div>
+                          <div className="text-center">
+                            <p className="text-purple-400 text-xs font-bold tabular-nums">{profile.loyaltyPoints}</p>
+                            <p className="text-white/30 text-[9px] tracking-wider">LP</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Rank */}
+                      {profile && (
+                        <div className="px-5 py-3 border-b border-white/5 flex items-center justify-between">
+                          <p className="text-white/40 text-[11px] font-medium tracking-wider uppercase">Rank</p>
+                          <p className="text-white text-[11px] font-semibold tracking-wider uppercase">{getRankForSP(profile.skillPoints)}</p>
+                        </div>
+                      )}
+
+                      {/* Black Card */}
+                      <div className="border-b border-white/5">
+                        {profile?.subscriptionStatus === "active" ? (
+                          <div className="px-5 py-3 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                              <p className="text-amber-500 text-[11px] font-semibold tracking-wider uppercase">Black Card</p>
+                            </div>
+                            <p className="text-white/30 text-[11px] font-medium tracking-wide">Active</p>
+                          </div>
+                        ) : (
+                          <Link
+                            href="/checkout"
+                            className="flex items-center justify-between px-5 py-3 hover:bg-white/5 transition-colors group"
+                            onClick={() => setIsUserMenuOpen(false)}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="w-1.5 h-1.5 rounded-full bg-white/20 group-hover:bg-amber-500 transition-colors" />
+                              <p className="text-white/60 text-[11px] font-semibold tracking-wider uppercase group-hover:text-white transition-colors">Black Card</p>
+                            </div>
+                            <p className="text-amber-500 text-[11px] font-semibold tracking-wide">$14.99/mo</p>
+                          </Link>
+                        )}
+                      </div>
+
+                      {/* Notifications */}
+                      <div className="px-5 py-3 border-b border-white/5 flex items-center justify-between">
+                        <p className="text-white/40 text-[11px] font-medium tracking-wider uppercase">Notifications</p>
+                        <NotificationBell />
+                      </div>
+
+                      {/* Sign out */}
+                      <button
+                        onClick={() => { signOut(); setIsUserMenuOpen(false) }}
+                        className="w-full text-left px-5 py-3 text-white/40 text-[11px] font-medium tracking-wider uppercase hover:bg-white/5 hover:text-white/60 transition-colors"
+                      >
+                        Sign Out
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : null
+            )}
           </div>
 
           {/* Mobile Menu Button - Equal padding with logo */}
