@@ -22,14 +22,20 @@ export default function FighterProfileClient({
       <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12">
         {/* Breadcrumb */}
         <nav className="mb-8">
-          <ol className="flex items-center gap-2 text-xs font-medium text-white/50">
+          <ol className="flex items-center gap-2 text-[11px] font-semibold tracking-widest uppercase text-white/30">
+            <li>
+              <Link href="/scorecard" className="hover:text-white/60 transition-colors">
+                Scorecard
+              </Link>
+            </li>
+            <li className="text-white/10">/</li>
             <li>
               <Link href="/fighters" className="hover:text-white/60 transition-colors">
                 Fighters
               </Link>
             </li>
-            <li>/</li>
-            <li className="text-white/60">{name}</li>
+            <li className="text-white/10">/</li>
+            <li className="text-white/50">{name}</li>
           </ol>
         </nav>
 

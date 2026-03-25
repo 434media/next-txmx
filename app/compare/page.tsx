@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import Link from "next/link"
 import { getFighters } from "../actions/fighters"
 import CompareClient from "./compare-client"
 
@@ -32,6 +33,13 @@ export default async function ComparePage() {
   return (
     <main className="relative min-h-screen bg-black font-sans pt-24 pb-16">
       <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-12">
+        <Link
+          href="/scorecard"
+          className="inline-flex items-center gap-2 text-white/30 text-[11px] font-semibold tracking-widest uppercase hover:text-white/60 transition-colors mb-8 group"
+        >
+          <svg className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+          Scorecard
+        </Link>
         <div className="mb-10">
           <p className="text-white/50 text-xs font-semibold tracking-[0.3em] uppercase mb-4">
             TXMX Boxing
