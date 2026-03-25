@@ -14,6 +14,7 @@ import EventList from './event-list'
 import PollManager from './poll-manager'
 import EconomyGovernor from './economy-governor'
 import NotificationSender from './notification-sender'
+import EightCountManager from './eight-count-manager'
 import type { VenueData } from '../actions/venues'
 import type { EventPromoter, PromoterData, TXMXEvent } from '../actions/events'
 import type { GymData } from '../actions/gyms'
@@ -31,7 +32,7 @@ interface AdminClientProps {
   initialEvents: TXMXEvent[]
 }
 
-type Tab = 'list' | 'add' | 'venues' | 'gyms' | 'promoters' | 'events' | 'props' | 'polls' | 'economy' | 'notifications' | 'tdlr'
+type Tab = 'list' | 'add' | 'venues' | 'gyms' | 'promoters' | 'events' | 'props' | 'polls' | 'economy' | 'notifications' | 'tdlr' | 'eightcount'
 
 const NAV_SECTIONS = [
   {
@@ -42,6 +43,12 @@ const NAV_SECTIONS = [
       { key: 'gyms' as Tab, label: 'Gyms', icon: '🏋️' },
       { key: 'promoters' as Tab, label: 'Promoters', icon: '🎤' },
       { key: 'events' as Tab, label: 'Events', icon: '📅' },
+    ],
+  },
+  {
+    label: 'CONTENT',
+    items: [
+      { key: 'eightcount' as Tab, label: '8 Count', icon: '📰' },
     ],
   },
   {
@@ -157,6 +164,7 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
     notifications: 0,
     add: 0,
     tdlr: 0,
+    eightcount: 0,
   }
 
   const pageTitle: Record<Tab, string> = {
@@ -165,6 +173,7 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
     gyms: 'GYMS',
     promoters: 'PROMOTERS',
     events: 'EVENTS',
+    eightcount: 'THE 8 COUNT',
     props: 'PROP PICKS',
     polls: 'FAN POLLS',
     economy: 'ECONOMY GOVERNOR',
@@ -304,6 +313,8 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
               <EventList events={eventDocs} fighters={fighters} onAdd={handleEventAdded} onUpdate={handleEventUpdated} onDelete={handleEventDeleted} />
             ) : activeTab === 'props' ? (
               <PropManager events={initialEvents} />
+            ) : activeTab === 'eightcount' ? (
+              <EightCountManager />
             ) : activeTab === 'polls' ? (
               <PollManager />
             ) : activeTab === 'economy' ? (

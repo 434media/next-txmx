@@ -23,6 +23,14 @@ export default function EightCountVideo() {
             "linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 15%, transparent 35%)",
         }}
       />
+      {/* Bottom gradient for hero-to-feed transition */}
+      <div
+        className="absolute inset-x-0 bottom-0 h-32 pointer-events-none"
+        style={{
+          background:
+            "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 40%, transparent 100%)",
+        }}
+      />
     </div>
   )
 }
