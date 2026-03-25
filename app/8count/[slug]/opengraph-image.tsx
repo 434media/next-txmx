@@ -1,7 +1,6 @@
 import { ImageResponse } from 'next/og'
 import { getEightCountPostBySlug } from '../../actions/eight-count'
 
-export const runtime = 'edge'
 export const alt = 'The 8 Count — TXMX Boxing'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
