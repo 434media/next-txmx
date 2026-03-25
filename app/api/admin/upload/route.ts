@@ -3,20 +3,39 @@ import { getStorage } from 'firebase-admin/storage'
 import { getApps } from 'firebase-admin/app'
 import '../../../../lib/firebase-admin'
 
+const ALLOWED_MIME_PREFIXES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif']
+const ALLOWED_EXTENSIONS: Record<string, string> = {
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  webp: 'image/webp',
+  avif: 'image/avif',
+}
+
+function resolveContentType(file: File): string | null {
+  // Use MIME type if the browser provides a valid one
+  const mime = file.type?.split(';')[0]?.trim().toLowerCase()
+  if (mime && ALLOWED_MIME_PREFIXES.includes(mime)) return mime
+
+  // Fall back to file extension
+  const ext = file.name?.split('.').pop()?.toLowerCase() || ''
+  return ALLOWED_EXTENSIONS[ext] || null
+}
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData()
     const file = formData.get('file') as File | null
 
-    if (!file) {
+    if (!file || file.size === 0) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
     }
 
-    // Validate file type
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/avif']
-    if (!allowedTypes.includes(file.type)) {
+    // Validate file type using MIME type or extension fallback
+    const contentType = resolveContentType(file)
+    if (!contentType) {
       return NextResponse.json(
-        { error: 'Invalid file type. Allowed: JPEG, PNG, WebP, AVIF' },
+        { error: `Invalid file type "${file.type || 'unknown'}". Allowed: JPEG, PNG, WebP, AVIF` },
         { status: 400 }
       )
     }
@@ -45,7 +64,7 @@ export async function POST(request: NextRequest) {
     const fileRef = bucket.file(safeName)
     await fileRef.save(buffer, {
       metadata: {
-        contentType: file.type,
+        contentType,
         cacheControl: 'public, max-age=31536000',
       },
     })
