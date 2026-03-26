@@ -57,6 +57,7 @@ export default function ClientLayout({
     }
   }, [])
   const isAdmin = pathname?.startsWith('/admin')
+  const isFanos = pathname === '/fanos'
 
   const openModal = () => setIsModalOpen(true)
   const closeModal = () => setIsModalOpen(false)
@@ -134,9 +135,9 @@ export default function ClientLayout({
 
         <AuthProvider>
           <GlobalStyles />
-          <Navbar onMenuClick={openModal} onAuthClick={() => setIsAuthModalOpen(true)} />
+          {!isFanos && <Navbar onMenuClick={openModal} onAuthClick={() => setIsAuthModalOpen(true)} />}
           {children}        
-          {!isAdmin && <Footer />}
+          {!isAdmin && !isFanos && <Footer />}
           
           {/* Auth Modal */}
           <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
