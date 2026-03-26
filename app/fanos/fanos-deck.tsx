@@ -670,9 +670,9 @@ function SlideWhyBoxing() {
           transition={{ delay: 0.7 }}
           className="text-center mt-6 md:mt-10 text-white/40 text-[10px] md:text-xs font-bold leading-relaxed"
         >
-          High-intensity data per event ×{" "}
-          <span className="text-[#ff3b5c] font-black">deep tribal identity</span>
-          {" "}= the perfect engagement substrate
+          High-Intensity Data Per Event ×{" "}
+          <span className="text-[#ff3b5c] font-black">Deep Tribal Identity</span>
+          {" "}= The Perfect Engagement Substrate
         </motion.p>
       </div>
     </Slide>
