@@ -300,7 +300,16 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
 
             {/* Content */}
             {activeTab === 'list' ? (
-              <FighterList fighters={fighters} onDelete={handleFighterDeleted} onUpdate={handleFighterUpdated} gymNames={gymDocs.map(g => g.name).sort()} />
+              <div className="space-y-6">
+                <button
+                  onClick={() => setActiveTab('add')}
+                  className="inline-flex items-center gap-2 bg-[#FFB800] hover:bg-amber-500 text-black text-[13px] font-bold tracking-[0.12em] uppercase px-5 py-2.5 rounded-md transition-colors"
+                >
+                  <span className="text-lg leading-none">+</span>
+                  Add Fighter
+                </button>
+                <FighterList fighters={fighters} onDelete={handleFighterDeleted} onUpdate={handleFighterUpdated} gymNames={gymDocs.map(g => g.name).sort()} />
+              </div>
             ) : activeTab === 'add' ? (
               <AddFighterForm onSuccess={handleFighterAdded} existingGyms={gymDocs.map(g => g.name).sort()} />
             ) : activeTab === 'venues' ? (

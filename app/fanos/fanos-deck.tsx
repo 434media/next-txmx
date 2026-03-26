@@ -1772,7 +1772,7 @@ function SlideSnapshot() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.5 }}
-          className="max-w-2xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-4"
+          className="max-w-2xl mx-auto grid grid-cols-2 sm:grid-cols-3 gap-4"
         >
           {[
             { val: "25K", label: "Fans", color: "#00d4ff" },
