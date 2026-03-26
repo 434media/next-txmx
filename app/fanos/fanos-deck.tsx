@@ -7,30 +7,38 @@ import DeckNav, { useDeckNavigation } from "./deck-nav"
 import { Building2, User, Swords, Eye, Zap, Trophy, CreditCard, Clapperboard } from "lucide-react"
 
 const VIDEO_SRC =
-  "https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2Fethanedit2.mp4?alt=media"
+  "https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2FBam%20Intro.mp4?alt=media"
 const VIDEO_2_SRC =
   "https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2FTXMX%20Ethan%20Commerical.mp4?alt=media"
-const POSTER_SRC =
-  "https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2Ffeb28-29.jpg?alt=media"
 const LOGO_SRC =
   "https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/TXMXBack.svg"
+const FIGHTER_SRC =
+  "https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2Fbam-Fightnight.jpg?alt=media"
+const FIGHTER_2_SRC =
+  "https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2Fbam-crowd.jpg?alt=media"
+const FIGHTER_3_SRC =
+  "https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2Fbam-fight2.jpg?alt=media"
+const FIGHTER_4_SRC =
+  "https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2Ffeb28-29.jpg?alt=media"
 
 const SLIDE_LABELS = [
   "Title",
-  "Problem",
-  "Weakness",
+  "The Problem",
+  "Structural Weakness",
   "Market Gap",
-  "Timing",
-  "Advantage",
-  "Product",
-  "Black Card",
-  "Flywheel",
-  "Revenue",
-  "Economics",
-  "Texas",
-  "Expansion",
-  "Snapshot",
-  "Close",
+  "The Solution",
+  "The Product",
+  "The Membership",
+  "The Ecosystem",
+  "Competitive Landscape",
+  "Why Now",
+  "Why Boxing",
+  "Why Texas",
+  "The Revenue Engine",
+  "The Unit Economics",
+  "The Scale",
+  "The Numbers",
+  "End Slide",
 ]
 
 /* ── Slide wrapper ────────────────────────────────────────────── */
@@ -38,7 +46,7 @@ function Slide({ id, children, className = "" }: { id: number; children: React.R
   return (
     <section
       id={`slide-${id}`}
-      className={`min-h-dvh snap-start relative flex items-center justify-center overflow-hidden ${className}`}
+      className={`w-full h-dvh shrink-0 md:h-auto md:min-h-dvh md:shrink snap-start relative flex items-start md:items-center justify-center overflow-y-auto md:overflow-hidden py-16 md:py-0 ${className}`}
     >
       {children}
     </section>
@@ -52,8 +60,8 @@ function SlideTitle() {
   return (
     <Slide id={0}>
       <video
-        src={VIDEO_2_SRC}
-        poster={POSTER_SRC}
+        src={VIDEO_SRC}
+        poster={FIGHTER_SRC}
         autoPlay
         loop
         muted
@@ -68,24 +76,13 @@ function SlideTitle() {
       />
 
       <div className="relative z-10 text-center px-8 max-w-4xl">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-          <Image
-            src={LOGO_SRC}
-            alt="TXMX Boxing"
-            width={120}
-            height={60}
-            className="mx-auto mb-8 filter brightness-0 invert"
-            priority
-          />
-        </motion.div>
-
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.7 }}
           className="text-white text-6xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-[1.05] mb-6 uppercase"
         >
-          The Operating System for <span className="text-[#00d4ff]">Fandom.</span>
+          <span className="text-[#00d4ff]">FanOS:</span> Own the Action
         </motion.h1>
 
         <motion.p
@@ -94,7 +91,7 @@ function SlideTitle() {
           transition={{ delay: 0.6 }}
           className="text-white/50 text-base sm:text-lg font-bold mb-12 max-w-xl mx-auto"
         >
-          Own The Action
+          The Future of Fandom
         </motion.p>
 
         <motion.div
@@ -392,11 +389,302 @@ function SlideMarketGap() {
 }
 
 /* ════════════════════════════════════════════════════════════════
-   SLIDE 4 — TIMING / WEDGE: WHY NOW
+   SLIDE 4 — THE SOLUTION: ALWAYS-ON 16-WEEK SEASONS
+   ════════════════════════════════════════════════════════════════ */
+function SlideSolution() {
+  const pillars = [
+    {
+      num: "01",
+      title: "Prediction Platform",
+      desc: "Legal, skill-based Ticket and sweepstakes system.",
+      color: "#00d4ff",
+    },
+    {
+      num: "02",
+      title: "League Infrastructure",
+      desc: "A 16-week seasonal Gym vs. Gym competition.",
+      color: "#f5a623",
+    },
+    {
+      num: "03",
+      title: "Media Engine",
+      desc: "High-production docuseries (The Blueprint) building emotional equity before the fight.",
+      color: "#ff3b5c",
+    },
+  ]
+
+  const phases = [
+    {
+      weeks: "Weeks 1–4",
+      name: "The Pledge",
+      color: "#00d4ff",
+      items: [
+        "Fans subscribe ($14.99/mo) and Pledge to a Gym.",
+        "Launch of The Blueprint high-production docuseries.",
+      ],
+    },
+    {
+      weeks: "Weeks 5–12",
+      name: "The Grind",
+      color: "#ff3b5c",
+      items: [
+        "Bi-weekly live events and raw sparring streams.",
+        "Prediction markets focus on Gym Efficiency micro-markets (e.g., Round 1 KO rates).",
+      ],
+    },
+    {
+      weeks: "Weeks 13–16",
+      name: "The Post-Season",
+      color: "#f5a623",
+      items: [
+        "The Championship events.",
+        "Fans redeem earned TC (Tickets) for exclusive merch drops and real-world gym experiences.",
+      ],
+    },
+  ]
+
+  return (
+    <Slide id={4}>
+      <img
+        src={FIGHTER_4_SRC}
+        alt=""
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+      <div className="absolute inset-0 bg-black/80" />
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-8">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-10 md:mb-14"
+        >
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <span className="w-2 h-2 bg-[#00d4ff]" />
+            <span className="text-[#00d4ff]/80 text-[10px] font-bold tracking-[0.25em] uppercase">The Solution</span>
+          </div>
+          <h2 className="text-white text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight leading-[1.1] mb-3 md:mb-4">
+            Always On. <span className="text-[#00d4ff] block">3 Seasons. 48 Weeks.</span>
+          </h2>
+          <p className="text-white/60 text-xs sm:text-sm font-bold max-w-lg mx-auto leading-relaxed">
+            A 16-week media season converts isolated events into tribal narratives.
+          </p>
+        </motion.div>
+
+        {/* Three Pillars */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 max-w-4xl mx-auto mb-10 md:mb-14">
+          {pillars.map((p, i) => (
+            <motion.div
+              key={p.title}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.12 }}
+              className="border border-white/10 p-4 md:p-6"
+              style={{ background: `${p.color}06` }}
+            >
+              <span className="text-[10px] font-bold tracking-wider" style={{ color: p.color }}>
+                {p.num}
+              </span>
+              <h3 className="text-white text-base md:text-lg font-black uppercase tracking-tight leading-snug md:leading-tight mt-2 mb-2">
+                {p.title}
+              </h3>
+              <p className="text-white/60 text-[11px] md:text-xs font-bold leading-snug md:leading-relaxed">
+                {p.desc}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Season Timeline */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.3 }}
+          className="max-w-4xl mx-auto"
+        >
+          {/* Timeline bar */}
+          <div className="flex gap-0 mb-4 md:mb-6">
+            {phases.map((phase) => (
+              <div
+                key={phase.name}
+                className="flex-1 py-2 md:py-2.5 text-center border border-white/10"
+                style={{ background: `${phase.color}10`, borderBottom: `2px solid ${phase.color}` }}
+              >
+                <p className="text-[8px] md:text-[10px] font-bold tracking-wider uppercase" style={{ color: phase.color }}>
+                  {phase.weeks}
+                </p>
+                <p className="text-white text-[10px] md:text-sm font-black uppercase tracking-tight leading-tight mt-0.5">
+                  {phase.name}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* Phase details */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
+            {phases.map((phase, i) => (
+              <motion.div
+                key={phase.name}
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.5 + i * 0.1 }}
+                className="flex flex-col gap-1.5 md:gap-2"
+              >
+                {phase.items.map((item) => (
+                  <p key={item} className="text-white/50 text-[10px] md:text-[11px] font-bold leading-snug md:leading-relaxed">
+                    <span style={{ color: phase.color }}>▸</span> {item}
+                  </p>
+                ))}
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Produced by tag */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.8 }}
+          className="text-center mt-6 md:mt-10 text-[9px] md:text-[10px] font-bold tracking-widest uppercase"
+        >
+          <span className="text-white/30">Produced by </span>
+          <a
+            href="https://434media.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#f5a623] hover:text-[#f5a623]/80 transition-colors"
+          >
+            434 Media
+          </a>
+        </motion.p>
+      </div>
+    </Slide>
+  )
+}
+
+/* ════════════════════════════════════════════════════════════════
+   SLIDE 5 — WHY BOXING: THE HIGH-INTENSITY CATALYST
+   ════════════════════════════════════════════════════════════════ */
+function SlideWhyBoxing() {
+  return (
+    <Slide id={10}>
+      <img
+        src={FIGHTER_3_SRC}
+        alt=""
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+      <div className="absolute inset-0 bg-black/85" />
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-8">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-10 md:mb-14"
+        >
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <span className="w-2 h-2 bg-[#ff3b5c]" />
+            <span className="text-[#ff3b5c]/80 text-[10px] font-bold tracking-[0.25em] uppercase">Why Boxing</span>
+          </div>
+          <h2 className="text-white text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight leading-[1.1] mb-3 md:mb-4">
+            The High-Intensity <span className="text-[#ff3b5c]">Catalyst</span>
+          </h2>
+        </motion.div>
+
+        {/* Two cards: The Asset + The Renaissance */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 max-w-4xl mx-auto mb-10 md:mb-14">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="border border-[#ff3b5c]/20 p-5 md:p-8"
+            style={{ background: "rgba(255,59,92,0.04)" }}
+          >
+            <h3 className="text-[#ff3b5c] text-lg md:text-xl font-black uppercase tracking-tight leading-snug mb-3">
+              The Asset
+            </h3>
+            <p className="text-white/60 text-[11px] md:text-sm font-bold leading-relaxed">
+              Boxing is the ultimate High-Intensity, Low-Frequency sport. It commands a massive global footprint and possesses a deep-rooted, pre-existing gym culture.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.25 }}
+            className="border border-[#00d4ff]/20 p-5 md:p-8"
+            style={{ background: "rgba(0,212,255,0.04)" }}
+          >
+            <h3 className="text-[#00d4ff] text-lg md:text-xl font-black uppercase tracking-tight leading-snug mb-3">
+              The Renaissance
+            </h3>
+            <p className="text-white/60 text-[11px] md:text-sm font-bold leading-relaxed">
+              It completely lacks the technological layer required to sustain user activity between events. It is a high-value asset class perfectly primed for a tech-enabled renaissance.
+            </p>
+          </motion.div>
+        </div>
+
+        {/* Data metrics */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.4 }}
+          className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-white/10 max-w-3xl mx-auto"
+        >
+          {[
+            { label: "Impact Velocity", color: "#ff3b5c" },
+            { label: "Fighter Engagement", color: "#f5a623" },
+            { label: "Round Duration", color: "#00d4ff" },
+            { label: "Energy Expenditure", color: "#00ff88" },
+          ].map((metric, i) => (
+            <motion.div
+              key={metric.label}
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.5 + i * 0.08 }}
+              className="bg-black px-3 py-4 md:px-4 md:py-5 text-center"
+            >
+              <div
+                className="w-2 h-2 rounded-full mx-auto mb-2"
+                style={{ background: metric.color, boxShadow: `0 0 8px ${metric.color}40` }}
+              />
+              <p className="text-white/50 text-[9px] md:text-[10px] font-bold tracking-wider uppercase leading-tight">
+                {metric.label}
+              </p>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.7 }}
+          className="text-center mt-6 md:mt-10 text-white/40 text-[10px] md:text-xs font-bold leading-relaxed"
+        >
+          High-intensity data per event ×{" "}
+          <span className="text-[#ff3b5c] font-black">deep tribal identity</span>
+          {" "}= the perfect engagement substrate
+        </motion.p>
+      </div>
+    </Slide>
+  )
+}
+
+/* ════════════════════════════════════════════════════════════════
+   SLIDE 6 — TIMING / WEDGE: WHY NOW
    ════════════════════════════════════════════════════════════════ */
 function SlideTiming() {
   return (
-    <Slide id={4}>
+    <Slide id={9}>
       <div className="relative z-10 w-full max-w-5xl mx-auto px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -430,7 +718,7 @@ function SlideTiming() {
               title: "Prediction Markets",
               status: "Complex",
               color: "#f5a623",
-              items: ["SEC gray area", "Real-money contracts", "Niche user base", "No fan identity"],
+              items: ["SEC gray area", "Regulatory Burden", "Niche user base", "No fan identity"],
               icon: "~",
             },
             {
@@ -483,25 +771,36 @@ function SlideTiming() {
    SLIDE 5 — COMPETITIVE ADVANTAGE
    ════════════════════════════════════════════════════════════════ */
 function SlideAdvantage() {
-  const features = [
-    "State-verified data",
-    "Legal TX operations",
-    "Vertical ownership",
-    "Skill-based predictions",
-    "Fan ranking system",
-    "NIL pool funding",
-    "Membership economy",
-    "Gym tribal system",
-  ]
+  const columns = ["2026 Reality", "Focus", "Vertical Ownership", "Legal Status in TX"]
   const competitors = [
-    { name: "Zuffa / UFC", checks: [false, false, true, false, false, false, false, false] },
-    { name: "DraftKings", checks: [false, false, false, false, false, false, false, false] },
-    { name: "Polymarket", checks: [false, false, false, true, false, false, false, false] },
-    { name: "FanOS", checks: [true, true, true, true, true, true, true, true] },
+    {
+      name: "DraftKings / FanDuel",
+      values: ["Blocked", "Generalist", "Platform only", "ILLEGAL"],
+      highlight: false,
+      colors: ["#ff3b5c", "rgba(255,255,255,0.5)", "rgba(255,255,255,0.3)", "#ff3b5c"],
+    },
+    {
+      name: "Zuffa / Polymarket",
+      values: ["Under Federal Fire", "Individual", "Platform only", "ILLEGAL"],
+      highlight: false,
+      colors: ["#ff3b5c", "rgba(255,255,255,0.5)", "rgba(255,255,255,0.3)", "#ff3b5c"],
+    },
+    {
+      name: "PFL",
+      values: ["Seasonal", "Individual", "Promoter only", "Legal"],
+      highlight: false,
+      colors: ["#f5a623", "rgba(255,255,255,0.5)", "rgba(255,255,255,0.3)", "#f5a623"],
+    },
+    {
+      name: "TXMX",
+      values: ["Dominating the Vacuum", "Gym Tribes", "Promoter + Platform + Compliance", "100% LEGAL & VERIFIED"],
+      highlight: true,
+      colors: ["#00d4ff", "#00d4ff", "#00d4ff", "#00ff88"],
+    },
   ]
 
   return (
-    <Slide id={5}>
+    <Slide id={8}>
       <div className="relative z-10 w-full max-w-5xl mx-auto px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -512,7 +811,7 @@ function SlideAdvantage() {
           <div className="flex items-center justify-center gap-2 mb-4">
             <span className="w-2 h-2 bg-[#00d4ff]" />
             <span className="text-[#00d4ff]/80 text-[10px] font-bold tracking-[0.25em] uppercase">
-              Engagement Layer
+              The Competitive Landscape
             </span>
           </div>
           <h2 className="text-white text-5xl sm:text-6xl font-black uppercase tracking-tight leading-[1.05]">
@@ -527,84 +826,47 @@ function SlideAdvantage() {
           transition={{ delay: 0.2 }}
           className="overflow-x-auto"
         >
-          <table className="w-full max-w-3xl mx-auto text-sm">
+          <table className="w-full max-w-4xl mx-auto text-[10px] md:text-sm">
             <thead>
               <tr>
-                <th className="text-left text-white/30 text-[10px] font-bold tracking-wider uppercase py-3 px-3">
-                  Feature
+                <th className="text-left text-white/30 text-[8px] md:text-[10px] font-bold tracking-wider uppercase py-2 px-1.5 md:py-3 md:px-3">
+                  Competitor
                 </th>
-                {competitors.map((c) => (
+                {columns.map((col) => (
                   <th
-                    key={c.name}
-                    className={`text-center py-3 px-3 text-[10px] font-bold tracking-wider uppercase ${
-                      c.name === "FanOS"
-                        ? "text-[#00d4ff] bg-[#00d4ff]/4 border-x border-t border-[#00d4ff]/15"
-                        : "text-white/30"
-                    }`}
+                    key={col}
+                    className="text-center text-white/30 text-[8px] md:text-[10px] font-bold tracking-wider uppercase py-2 px-1.5 md:py-3 md:px-3"
                   >
-                    {c.name}
+                    {col}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {features.map((feature, fi) => (
+              {competitors.map((comp, ci) => (
                 <motion.tr
-                  key={feature}
+                  key={comp.name}
                   initial={{ opacity: 0, x: -10 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: 0.3 + fi * 0.04 }}
-                  className="border-t border-white/5"
+                  transition={{ delay: 0.3 + ci * 0.08 }}
+                  className={`border-t ${comp.highlight ? "border-[#00d4ff]/20 bg-[#00d4ff]/4" : "border-white/5"}`}
                 >
-                  <td className="text-white/60 font-bold py-3 px-3 leading-snug">{feature}</td>
-                  {competitors.map((c) => (
+                  <td className={`py-2 px-1.5 md:py-3 md:px-3 font-semibold md:font-bold leading-tight md:leading-snug text-[10px] md:text-sm ${comp.highlight ? "text-[#00d4ff]" : "text-white/60"}`}>
+                    {comp.name}
+                  </td>
+                  {comp.values.map((val, vi) => (
                     <td
-                      key={c.name}
-                      className={`text-center py-3 px-3 ${
-                        c.name === "FanOS" ? "bg-[#00d4ff]/4 border-x border-[#00d4ff]/15" : ""
-                      }`}
+                      key={vi}
+                      className="text-center py-2 px-1.5 md:py-3 md:px-3 text-[9px] md:text-xs font-semibold md:font-bold leading-tight md:leading-snug"
+                      style={{ color: comp.colors[vi] }}
                     >
-                      {c.checks[fi] ? (
-                        <span className={c.name === "FanOS" ? "text-[#00ff88] text-lg font-black" : "text-[#00ff88]/50 text-base"}>
-                          ✓
-                        </span>
-                      ) : (
-                        <span className="text-white/8 text-base">—</span>
-                      )}
+                      {val}
                     </td>
                   ))}
                 </motion.tr>
               ))}
             </tbody>
-            <tfoot>
-              <tr className="border-t-2 border-white/10">
-                <td className="text-white/30 text-[10px] font-bold tracking-wider uppercase py-3 px-3">
-                  Score
-                </td>
-                {competitors.map((c) => {
-                  const score = c.checks.filter(Boolean).length
-                  return (
-                    <td
-                      key={c.name}
-                      className={`text-center py-3 px-3 ${
-                        c.name === "FanOS"
-                          ? "bg-[#00d4ff]/4 border-x border-b border-[#00d4ff]/15"
-                          : ""
-                      }`}
-                    >
-                      <span
-                        className={`text-lg font-black ${
-                          c.name === "FanOS" ? "text-[#00d4ff]" : "text-white/20"
-                        }`}
-                      >
-                        {score}/{features.length}
-                      </span>
-                    </td>
-                  )
-                })}
-              </tr>
-            </tfoot>
           </table>
         </motion.div>
       </div>
@@ -617,9 +879,9 @@ function SlideAdvantage() {
    ════════════════════════════════════════════════════════════════ */
 function SlideProduct() {
   return (
-    <Slide id={6}>
+    <Slide id={5}>
       <img
-        src={POSTER_SRC}
+        src={FIGHTER_SRC}
         alt=""
         className="absolute inset-0 w-full h-full object-cover"
       />
@@ -733,7 +995,7 @@ function SlideBlackCard() {
   }
 
   return (
-    <Slide id={7}>
+    <Slide id={6}>
       <div className="relative z-10 w-full max-w-5xl mx-auto px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -870,7 +1132,7 @@ function SlideFlywheel() {
   ]
 
   return (
-    <Slide id={8}>
+    <Slide id={7}>
       <div ref={ref} className="relative z-10 w-full max-w-5xl mx-auto px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -880,7 +1142,7 @@ function SlideFlywheel() {
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <span className="w-2 h-2 bg-[#00d4ff]" />
-            <span className="text-[#00d4ff]/80 text-[10px] font-bold tracking-[0.25em] uppercase">The Engine</span>
+            <span className="text-[#00d4ff]/80 text-[10px] font-bold tracking-[0.25em] uppercase">The Ecosystem</span>
           </div>
           <h2 className="text-white text-5xl sm:text-6xl font-black uppercase tracking-tight leading-[1.05]">
             Self-Sustaining <span className="text-[#00d4ff]">Flywheel</span>
@@ -1019,7 +1281,7 @@ function SlideRevenue() {
   const cy = 140
 
   return (
-    <Slide id={9}>
+    <Slide id={12}>
       <div className="relative z-10 w-full max-w-5xl mx-auto px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -1188,7 +1450,7 @@ function SlideEconomics() {
   const maxVal = 5.0
 
   return (
-    <Slide id={10}>
+    <Slide id={13}>
       <div className="relative z-10 w-full max-w-5xl mx-auto px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -1274,95 +1536,11 @@ function SlideEconomics() {
 }
 
 /* ════════════════════════════════════════════════════════════════
-   SLIDE 11 — TEXAS MARKET
-   ════════════════════════════════════════════════════════════════ */
-function SlideTexas() {
-  return (
-    <Slide id={11}>
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-14"
-        >
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <span className="w-2 h-2 bg-amber-500" />
-            <span className="text-amber-500/80 text-[10px] font-bold tracking-[0.25em] uppercase">Why Texas</span>
-          </div>
-          <h2 className="text-white text-5xl sm:text-6xl font-black uppercase tracking-tight leading-[1.05] mb-4">
-            <span className="text-amber-500">$500M+</span> Locked Market
-          </h2>
-          <p className="text-white/50 text-sm font-bold max-w-lg mx-auto leading-relaxed">
-            Texas is the largest combat sports licensing market in the U.S. — sports betting
-            remains strictly illegal following failed 2025 legislation. Texans are desperate for legal gamification.
-          </p>
-        </motion.div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-4xl mx-auto items-center">
-          {/* Stats */}
-          <div className="flex flex-col gap-4">
-            {[
-              { stat: "TDLR", label: "State-verified fight data — no competitor has this", color: "#00d4ff" },
-              { stat: "#1", label: "Combat sports licensing market in the U.S.", color: "#f5a623" },
-              { stat: "0", label: "Legal sportsbooks — failed 2025 legislation", color: "#ff3b5c" },
-              { stat: "30M+", label: "Population — 2nd largest state", color: "#00ff88" },
-            ].map((item, i) => (
-              <motion.div
-                key={item.label}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="flex items-center gap-4 border border-white/5 bg-white/2 p-4"
-              >
-                <span
-                  className="text-3xl font-black shrink-0 min-w-[70px] text-right"
-                  style={{ color: item.color }}
-                >
-                  {item.stat}
-                </span>
-                <p className="text-white/50 text-sm font-bold leading-snug">{item.label}</p>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* TX visual */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.3 }}
-            className="flex items-center justify-center"
-          >
-            <div className="relative w-full max-w-[360px] mx-auto">
-              <img src="/texas.png" alt="Texas" className="w-full h-auto object-contain" />
-            </div>
-          </motion.div>
-        </div>
-
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.6 }}
-          className="text-center mt-10 text-white/40 text-sm font-bold leading-relaxed"
-        >
-          Exclusive TDLR data pipeline +{" "}
-          <span className="text-amber-500 font-black">zero legal competition</span>
-          {" "}= first-mover lock
-        </motion.p>
-      </div>
-    </Slide>
-  )
-}
-
-/* ════════════════════════════════════════════════════════════════
-   SLIDE 12 — EXPANSION: 3-PHASE PIPELINE
+   SLIDE 11 — EXPANSION: 3-PHASE PIPELINE
    ════════════════════════════════════════════════════════════════ */
 function SlideExpansion() {
   return (
-    <Slide id={12}>
+    <Slide id={14}>
       <div className="relative z-10 w-full max-w-5xl mx-auto px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -1372,10 +1550,10 @@ function SlideExpansion() {
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <span className="w-2 h-2 bg-[#00d4ff]" />
-            <span className="text-[#00d4ff]/80 text-[10px] font-bold tracking-[0.25em] uppercase">Go-to-Market</span>
+            <span className="text-[#00d4ff]/80 text-[10px] font-bold tracking-[0.25em] uppercase">The Scale</span>
           </div>
           <h2 className="text-white text-5xl sm:text-6xl font-black uppercase tracking-tight leading-[1.05] mb-4">
-            Texas First. <span className="text-white/30">Then Everywhere.</span>
+            TODAY TEXAS. <span className="text-white/30 block">TOMORROW WORLD.</span>
           </h2>
         </motion.div>
 
@@ -1386,7 +1564,7 @@ function SlideExpansion() {
               title: "Texas Pilot",
               timeline: "Year 1",
               color: "#00d4ff",
-              items: ["25,000 fans onboarded", "50 gyms in tribal system", "TDLR data integration", "Black Card launch"],
+              items: ["Data Ingest", "50 Gyms in Tribal System", "25k Fans Onboarded", "Black Card Launch"],
               active: true,
             },
             {
@@ -1442,11 +1620,94 @@ function SlideExpansion() {
 }
 
 /* ════════════════════════════════════════════════════════════════
+   SLIDE 12 — TEXAS MARKET
+   ════════════════════════════════════════════════════════════════ */
+function SlideTexas() {
+  return (
+    <Slide id={11}>
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-14"
+        >
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <span className="w-2 h-2 bg-amber-500" />
+            <span className="text-amber-500/80 text-[10px] font-bold tracking-[0.25em] uppercase">Why Texas</span>
+          </div>
+          <h2 className="text-white text-5xl sm:text-6xl font-black uppercase tracking-tight leading-[1.05] mb-4">
+            <span className="text-amber-500">$500M+</span> Locked Market
+          </h2>
+          <p className="text-white/50 text-sm font-bold max-w-lg mx-auto leading-relaxed">
+            Texas is the largest combat sports licensing market in the U.S. — sports betting
+            remains strictly illegal following failed 2025 legislation. Texans are desperate for legal gamification.
+          </p>
+        </motion.div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-4xl mx-auto items-center">
+          {/* Stats */}
+          <div className="flex flex-col gap-4">
+            {[
+              { stat: "#1", label: "Combat sports licensing market in the U.S.", color: "#f5a623" },
+              { stat: "0", label: "Legal sportsbooks — failed 2025 legislation", color: "#ff3b5c" },
+              { stat: "30M+", label: "Population — 2nd largest state", color: "#00ff88" },
+            ].map((item, i) => (
+              <motion.div
+                key={item.label}
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="flex items-center gap-4 border border-white/5 bg-white/2 p-4"
+              >
+                <span
+                  className="text-3xl font-black shrink-0 min-w-[70px] text-right"
+                  style={{ color: item.color }}
+                >
+                  {item.stat}
+                </span>
+                <p className="text-white/50 text-sm font-bold leading-snug">{item.label}</p>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* TX visual */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+            className="flex items-center justify-center"
+          >
+            <div className="relative w-full max-w-[360px] mx-auto">
+              <img src="/texas.png" alt="Texas" className="w-full h-auto object-contain" />
+            </div>
+          </motion.div>
+        </div>
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.6 }}
+          className="text-center mt-10 text-white/40 text-sm font-bold leading-relaxed"
+        >
+          Exclusive TDLR data pipeline +{" "}
+          <span className="text-amber-500 font-black">Zero legal competition</span>
+          {" "}= First-mover lock
+        </motion.p>
+      </div>
+    </Slide>
+  )
+}
+
+/* ════════════════════════════════════════════════════════════════
    SLIDE 13 — FINANCIAL SNAPSHOT
    ════════════════════════════════════════════════════════════════ */
 function SlideSnapshot() {
   return (
-    <Slide id={13}>
+    <Slide id={15}>
       <div className="relative z-10 w-full max-w-5xl mx-auto px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -1514,10 +1775,9 @@ function SlideSnapshot() {
           className="max-w-2xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-4"
         >
           {[
-            { val: "25K", label: "Day 1 Fans", color: "#00d4ff" },
+            { val: "25K", label: "Fans", color: "#00d4ff" },
             { val: "50+", label: "Gym Partners", color: "#f5a623" },
             { val: "100%", label: "Web — No App Tax", color: "#00ff88" },
-            { val: "TDLR", label: "State Data Lock", color: "#1a6bff" },
           ].map((item) => (
             <div key={item.label} className="text-center">
               <p className="text-xl font-black" style={{ color: item.color }}>
@@ -1537,7 +1797,7 @@ function SlideSnapshot() {
    ════════════════════════════════════════════════════════════════ */
 function SlideClose() {
   return (
-    <Slide id={14}>
+    <Slide id={16}>
       <video
         src={VIDEO_2_SRC}
         autoPlay
@@ -1609,12 +1869,12 @@ function SlideClose() {
    MAIN DECK COMPONENT
    ════════════════════════════════════════════════════════════════ */
 export default function FanosDeck() {
-  const { currentSlide, navigateTo, containerRef } = useDeckNavigation(15)
+  const { currentSlide, navigateTo, containerRef } = useDeckNavigation(17)
 
   return (
-    <main ref={containerRef} className="h-dvh overflow-y-auto snap-y snap-mandatory bg-black">
+    <main ref={containerRef} className="h-dvh flex flex-row overflow-x-auto snap-x snap-mandatory md:block md:overflow-x-hidden md:overflow-y-auto md:snap-y bg-black">
       <DeckNav
-        totalSlides={15}
+        totalSlides={17}
         currentSlide={currentSlide}
         onNavigate={navigateTo}
         slideLabels={SLIDE_LABELS}
@@ -1624,14 +1884,16 @@ export default function FanosDeck() {
       <SlideProblem />
       <SlideWeakness />
       <SlideMarketGap />
-      <SlideTiming />
-      <SlideAdvantage />
+      <SlideSolution />
       <SlideProduct />
       <SlideBlackCard />
       <SlideFlywheel />
+      <SlideAdvantage />
+      <SlideTiming />
+      <SlideWhyBoxing />
+      <SlideTexas />
       <SlideRevenue />
       <SlideEconomics />
-      <SlideTexas />
       <SlideExpansion />
       <SlideSnapshot />
       <SlideClose />

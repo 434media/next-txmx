@@ -29,9 +29,9 @@ export default function DeckNav({ totalSlides, currentSlide, onNavigate, slideLa
         </span>
       </div>
 
-      {/* Dot navigation — right edge */}
+      {/* Dot navigation — bottom on mobile, right edge on desktop */}
       <div
-        className="fixed right-6 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-2 items-end"
+        className="fixed bottom-6 left-1/2 -translate-x-1/2 md:bottom-auto md:left-auto md:translate-x-0 md:right-6 md:top-1/2 md:-translate-y-1/2 z-50 flex flex-row md:flex-col gap-2 items-center md:items-end"
         onMouseEnter={() => setShowLabels(true)}
         onMouseLeave={() => setShowLabels(false)}
       >
@@ -48,7 +48,7 @@ export default function DeckNav({ totalSlides, currentSlide, onNavigate, slideLa
                   initial={{ opacity: 0, x: 4 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 4 }}
-                  className="text-[9px] font-bold tracking-wider text-white/30 uppercase whitespace-nowrap"
+                  className="hidden md:block text-[9px] font-bold tracking-wider text-white/30 uppercase whitespace-nowrap"
                 >
                   {slideLabels[i]}
                 </motion.span>
@@ -73,9 +73,10 @@ export default function DeckNav({ totalSlides, currentSlide, onNavigate, slideLa
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 text-white/15 text-[10px] font-semibold tracking-wider"
+            className="fixed bottom-14 md:bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 text-white/15 text-[10px] font-semibold tracking-wider"
           >
-            <span>SCROLL OR ↓ TO NAVIGATE</span>
+            <span className="md:hidden">SWIPE OR → TO NAVIGATE</span>
+            <span className="hidden md:inline">SCROLL OR ↓ TO NAVIGATE</span>
           </motion.div>
         )}
       </AnimatePresence>
