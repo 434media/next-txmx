@@ -146,7 +146,7 @@ export default function ClientLayout({
           <SlideOutModal isOpen={isModalOpen} onClose={closeModal} onAuthClick={() => { closeModal(); setIsAuthModalOpen(true) }} />
           
           {/* Daily Login Reward */}
-          <DailyLoginReward />
+          {!isFanos && <DailyLoginReward />}
         </AuthProvider>
       </body>
     </html>

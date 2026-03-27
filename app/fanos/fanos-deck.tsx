@@ -82,36 +82,17 @@ function SlideTitle() {
           transition={{ delay: 0.4, duration: 0.7 }}
           className="text-white text-6xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-[1.05] mb-6 uppercase"
         >
-          <span className="text-[#00d4ff]">FanOS:</span> Own the Action
+          The Future of Fandom
         </motion.h1>
 
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="text-white/50 text-base sm:text-lg font-bold mb-12 max-w-xl mx-auto"
+          className="text-white/50 text-base sm:text-2xl font-bold mb-12 max-w-xl mx-auto"
         >
-          The Future of Fandom
+          <span className="text-[#00d4ff]">FanOS</span>: Own the Action
         </motion.p>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8 }}
-          className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-white/10 max-w-2xl mx-auto"
-        >
-          {[
-            { label: "Year 1 Revenue", value: "$6.065M" },
-            { label: "Blended Margins", value: "~75%" },
-            { label: "State Verified", value: "TX Pilot" },
-            { label: "Expansion", value: "3 Phases" },
-          ].map((stat) => (
-            <div key={stat.label} className="bg-black px-4 py-4 text-center">
-              <p className="text-white text-xl sm:text-2xl font-black">{stat.value}</p>
-              <p className="text-white/30 text-[9px] font-bold tracking-wider uppercase mt-1">{stat.label}</p>
-            </div>
-          ))}
-        </motion.div>
       </div>
     </Slide>
   )
@@ -395,8 +376,8 @@ function SlideSolution() {
   const pillars = [
     {
       num: "01",
-      title: "Prediction Platform",
-      desc: "Legal, skill-based Ticket and sweepstakes system.",
+      title: "Media Engine",
+      desc: "Premium social content and docuseries Rise of a Champion to build awareness and emotional equity.",
       color: "#00d4ff",
     },
     {
@@ -407,8 +388,8 @@ function SlideSolution() {
     },
     {
       num: "03",
-      title: "Media Engine",
-      desc: "High-production docuseries (The Blueprint) building emotional equity before the fight.",
+      title: "Prediction Platform",
+      desc: "Legal, skill-based Ticket and sweepstakes system.",
       color: "#ff3b5c",
     },
   ]
@@ -420,7 +401,7 @@ function SlideSolution() {
       color: "#00d4ff",
       items: [
         "Fans subscribe ($14.99/mo) and Pledge to a Gym.",
-        "Launch of The Blueprint high-production docuseries.",
+        "Launch of Rise of a Champion Docuseries.",
       ],
     },
     {
@@ -429,7 +410,7 @@ function SlideSolution() {
       color: "#ff3b5c",
       items: [
         "Bi-weekly live events and raw sparring streams.",
-        "Prediction markets focus on Gym Efficiency micro-markets (e.g., Round 1 KO rates).",
+        "Skill based contests activate for members to earn platform credits.",
       ],
     },
     {
@@ -438,7 +419,7 @@ function SlideSolution() {
       color: "#f5a623",
       items: [
         "The Championship events.",
-        "Fans redeem earned TC (Tickets) for exclusive merch drops and real-world gym experiences.",
+        "Fans redeem earned credits for exclusive merch drops and IRL experiences.",
       ],
     },
   ]
@@ -457,7 +438,7 @@ function SlideSolution() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-10 md:mb-14"
+          className="text-center mb-10"
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <span className="w-2 h-2 bg-[#00d4ff]" />
@@ -543,7 +524,7 @@ function SlideSolution() {
           </div>
         </motion.div>
 
-        {/* Produced by tag */}
+        {/* Produced by 434 Media */}
         <motion.p
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -738,8 +719,8 @@ function SlideTiming() {
               className="border p-6"
               style={{ borderColor: `${col.color}30`, background: `${col.color}06` }}
             >
-              <div className="flex items-center justify-between mb-4">
-                <p className="text-white text-lg font-black uppercase tracking-tight">{col.title}</p>
+              <div className="flex items-center justify-between gap-2 mb-4">
+                <p className="text-white text-base md:text-lg font-black uppercase tracking-tighter whitespace-nowrap">{col.title}</p>
                 <span
                   className="text-[10px] font-bold tracking-wider px-2 py-0.5 rounded-full"
                   style={{
@@ -814,9 +795,13 @@ function SlideAdvantage() {
               The Competitive Landscape
             </span>
           </div>
-          <h2 className="text-white text-5xl sm:text-6xl font-black uppercase tracking-tight leading-[1.05]">
-            Owning the <span className="text-[#00d4ff]">Engagement Layer</span>
+          <h2 className="text-white text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight leading-none mb-4">
+            <span className="block">Owning the Vacuum</span>
+            <span className="text-[#00d4ff] block">While Legacy Sleeps</span>
           </h2>
+          <p className="text-white/50 text-xs sm:text-sm font-bold max-w-lg mx-auto leading-relaxed">
+            The biggest platforms are banned, generalist, or event-dependent. TXMX is the only vertically integrated, legally verified operator in Texas.
+          </p>
         </motion.div>
 
         <motion.div
@@ -895,7 +880,7 @@ function SlideProduct() {
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <span className="w-2 h-2 bg-[#00d4ff]" />
-            <span className="text-[#00d4ff]/80 text-[10px] font-bold tracking-[0.25em] uppercase">Product</span>
+            <span className="text-[#00d4ff]/80 text-[10px] font-bold tracking-[0.25em] uppercase">The Fan Journey</span>
           </div>
           <h2 className="text-white text-5xl sm:text-6xl font-black uppercase tracking-tight leading-[1.05] mb-4">
             Behavior → <span className="text-[#00d4ff]">System</span>
@@ -1005,7 +990,7 @@ function SlideBlackCard() {
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <span className="w-2 h-2 bg-amber-500" />
-            <span className="text-amber-500/80 text-[10px] font-bold tracking-[0.25em] uppercase">Membership</span>
+            <span className="text-amber-500/80 text-[10px] font-bold tracking-[0.25em] uppercase">The Membership</span>
           </div>
           <h2 className="text-white text-5xl sm:text-6xl font-black uppercase tracking-tight leading-[1.05] mb-4">
             The{" "}
@@ -1115,14 +1100,21 @@ function SlideBlackCard() {
    ════════════════════════════════════════════════════════════════ */
 function SlideFlywheel() {
   const [active, setActive] = useState(0)
+  const [paused, setPaused] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   const isInView = useInView(ref, { once: true })
 
   useEffect(() => {
-    if (!isInView) return
-    const interval = setInterval(() => setActive((p) => (p + 1) % 4), 2000)
+    if (!isInView || paused) return
+    const interval = setInterval(() => setActive((p) => (p + 1) % 4), 4000)
     return () => clearInterval(interval)
-  }, [isInView])
+  }, [isInView, paused])
+
+  const handleClick = (i: number) => {
+    setActive(i)
+    setPaused(true)
+    setTimeout(() => setPaused(false), 12000)
+  }
 
   const quadrants = [
     { label: "Capital", desc: "Black Card subscriptions ($14.99/mo) fund specific Gym NIL Pools", icon: <CreditCard className="w-6 h-6" />, color: "#00d4ff" },
@@ -1144,9 +1136,13 @@ function SlideFlywheel() {
             <span className="w-2 h-2 bg-[#00d4ff]" />
             <span className="text-[#00d4ff]/80 text-[10px] font-bold tracking-[0.25em] uppercase">The Ecosystem</span>
           </div>
-          <h2 className="text-white text-5xl sm:text-6xl font-black uppercase tracking-tight leading-[1.05]">
-            Self-Sustaining <span className="text-[#00d4ff]">Flywheel</span>
+          <h2 className="text-white text-4xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight leading-none mb-3">
+            <span className="block">Self-Sustaining</span>
+            <span className="text-[#00d4ff] block">Flywheel</span>
           </h2>
+          <p className="text-white/50 text-xs sm:text-sm font-bold max-w-lg mx-auto leading-relaxed">
+            Every dollar in creates better athletes, richer content, and more fans — which funds the next cycle.
+          </p>
         </motion.div>
 
         <div className="flex flex-col lg:flex-row items-center gap-12 max-w-4xl mx-auto">
@@ -1246,7 +1242,7 @@ function SlideFlywheel() {
               {quadrants.map((q, i) => (
                 <button
                   key={q.label}
-                  onClick={() => setActive(i)}
+                  onClick={() => handleClick(i)}
                   className="py-2 text-[9px] font-bold tracking-wider uppercase text-center transition-all border cursor-pointer"
                   style={{
                     borderColor: active === i ? q.color : "rgba(255,255,255,0.05)",
@@ -1693,7 +1689,6 @@ function SlideTexas() {
           transition={{ delay: 0.6 }}
           className="text-center mt-10 text-white/40 text-sm font-bold leading-relaxed"
         >
-          Exclusive TDLR data pipeline +{" "}
           <span className="text-amber-500 font-black">Zero legal competition</span>
           {" "}= First-mover lock
         </motion.p>
@@ -1845,7 +1840,7 @@ function SlideClose() {
         >
           FanOS scales anywhere fans and data exist.
           <br />
-          Skill-based. Fan-owned. Texas-built.
+          Skill-based. Fan-operated. Texas-built.
         </motion.p>
 
         <motion.div
