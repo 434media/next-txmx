@@ -80,18 +80,18 @@ function SlideTitle() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.7 }}
-          className="text-white text-6xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-[1.05] mb-6 uppercase"
+          className="text-white text-6xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-none mb-6 uppercase"
         >
-          The Future of Fandom
+          <span className="block">The Future of Fandom</span>
         </motion.h1>
 
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="text-white/50 text-base sm:text-2xl font-bold mb-12 max-w-xl mx-auto"
+          className="text-white/40 text-base sm:text-xl font-extrabold tracking-wide mb-12 max-w-xl mx-auto uppercase"
         >
-          <span className="text-[#00d4ff]">FanOS</span>: Own the Action
+          <span className="text-[#00d4ff] normal-case">FanOS</span>: Own the Action
         </motion.p>
       </div>
     </Slide>
@@ -295,7 +295,7 @@ function SlideMarketGap() {
             <span className="text-amber-500/80 text-[10px] font-bold tracking-[0.25em] uppercase">Market Gap</span>
           </div>
           <h2 className="text-white text-5xl sm:text-6xl font-black uppercase tracking-tight leading-[1.05] mb-4">
-            A Massive Market <span className="text-[#00d4ff]">Without Continuity</span>
+            A Massive Market <span className="text-[#00d4ff] block">Without Continuity</span>
           </h2>
           <p className="text-white/50 text-sm font-bold max-w-lg mx-auto leading-relaxed">
             Sports engagement spans media, betting, fantasy, and social.
@@ -445,7 +445,8 @@ function SlideSolution() {
             <span className="text-[#00d4ff]/80 text-[10px] font-bold tracking-[0.25em] uppercase">The Solution</span>
           </div>
           <h2 className="text-white text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight leading-[1.1] mb-3 md:mb-4">
-            Always On. <span className="text-[#00d4ff] block">3 Seasons. 48 Weeks.</span>
+            Always On. <span className="text-[#00d4ff]">3 Seasons.</span> 
+
           </h2>
           <p className="text-white/60 text-xs sm:text-sm font-bold max-w-lg mx-auto leading-relaxed">
             A 16-week media season converts isolated events into tribal narratives.
@@ -524,24 +525,32 @@ function SlideSolution() {
           </div>
         </motion.div>
 
-        {/* Produced by 434 Media */}
-        <motion.p
+        {/* Brand attribution */}
+        <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.8 }}
-          className="text-center mt-6 md:mt-10 text-[9px] md:text-[10px] font-bold tracking-widest uppercase"
+          className="flex items-center justify-center gap-4 mt-6 md:mt-10"
         >
-          <span className="text-white/30">Produced by </span>
-          <a
-            href="https://434media.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#f5a623] hover:text-[#f5a623]/80 transition-colors"
-          >
-            434 Media
-          </a>
-        </motion.p>
+          <img
+            src={LOGO_SRC}
+            alt="TXMX"
+            style={{ height: 32, width: 'auto', filter: 'brightness(0) invert(1)', opacity: 0.6 }}
+          />
+          <span className="text-white/15 text-xs">·</span>
+          <span className="text-[9px] md:text-[10px] font-bold tracking-widest uppercase">
+            <span className="text-white/30">Produced by </span>
+            <a
+              href="https://434media.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#f5a623] hover:text-[#f5a623]/80 transition-colors"
+            >
+              434 Media
+            </a>
+          </span>
+        </motion.div>
       </div>
     </Slide>
   )
@@ -1292,7 +1301,7 @@ function SlideRevenue() {
             </span>
           </div>
           <h2 className="text-white text-5xl sm:text-6xl font-black uppercase tracking-tight leading-[1.05]">
-            Multi-Layered <span className="text-[#00ff88]">Revenue Engine</span>
+            Multi-Layered <span className="text-[#00ff88] block">Revenue Engine</span>
           </h2>
         </motion.div>
 

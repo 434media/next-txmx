@@ -23,24 +23,10 @@ export default function DeckNav({ totalSlides, currentSlide, onNavigate, slideLa
       </div>
 
       {/* FanOS logo — top left */}
-      <div className="fixed top-6 left-8 z-50 flex flex-col gap-1">
+      <div className="fixed top-6 left-8 z-50">
         <span className="text-[#00d4ff] text-sm font-black tracking-tight" style={{ textShadow: "0 0 20px rgba(0,212,255,0.3)" }}>
           FanOS
         </span>
-        <AnimatePresence>
-          {currentSlide === 4 && (
-            <motion.img
-              key="txmx-logo"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.5 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/TXMXBack.svg"
-              alt="TXMX"
-              className="h-3 w-auto filter brightness-0 invert"
-            />
-          )}
-        </AnimatePresence>
       </div>
 
       {/* Dot navigation — bottom on mobile, right edge on desktop */}
