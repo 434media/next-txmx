@@ -10,7 +10,17 @@ const VIDEO_SRC =
   "https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2FBam%20Intro.mp4?alt=media"
 const VIDEO_2_SRC =
   "https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2FTXMX%20Ethan%20Commerical.mp4?alt=media"
-const LOGO_SRC =
+const VIDEO_3_SRC =
+  "https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/TXMX%20Hero%20Banner.mp4"
+const VIDEO_4_SRC =
+  "https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2FTXMX%20Shirt%20Shots.mp4?alt=media"
+const VIDEO_5_SRC =
+  "https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2Fwhyboxing.mp4?alt=media"
+const VIDEO_6_SRC =
+  "https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2Fthescale.mp4?alt=media"
+const VIDEO_7_SRC =
+  "https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2Fslide-close.mp4?alt=media"
+  const LOGO_SRC =
   "https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/TXMXBack.svg"
 const FIGHTER_SRC =
   "https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2Fbam-Fightnight.jpg?alt=media"
@@ -20,6 +30,13 @@ const FIGHTER_3_SRC =
   "https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2Fbam-fight2.jpg?alt=media"
 const FIGHTER_4_SRC =
   "https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2Ffeb28-29.jpg?alt=media"
+const FIGHTER_5_SRC =
+  "https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2Fsolution.jpg?alt=media"
+const FIGHTER_6_SRC =
+  "https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2Fslide-product.jpg?alt=media"
+const FIGHTER_7_SRC =
+  "https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2Fwhytexas.jpg?alt=media"
+
 
 const SLIDE_LABELS = [
   "Title",
@@ -60,8 +77,8 @@ function SlideTitle() {
   return (
     <Slide id={0}>
       <video
-        src={VIDEO_SRC}
-        poster={FIGHTER_SRC}
+        src={VIDEO_3_SRC}
+        poster={LOGO_SRC}
         autoPlay
         loop
         muted
@@ -427,7 +444,7 @@ function SlideSolution() {
   return (
     <Slide id={4}>
       <img
-        src={FIGHTER_4_SRC}
+        src={FIGHTER_5_SRC}
         alt=""
         className="absolute inset-0 w-full h-full object-cover"
       />
@@ -562,9 +579,13 @@ function SlideSolution() {
 function SlideWhyBoxing() {
   return (
     <Slide id={10}>
-      <img
-        src={FIGHTER_3_SRC}
-        alt=""
+      <video
+        src={VIDEO_5_SRC}
+        autoPlay
+        loop
+        muted
+        playsInline
+        disablePictureInPicture
         className="absolute inset-0 w-full h-full object-cover"
       />
       <div className="absolute inset-0 bg-black/85" />
@@ -875,7 +896,7 @@ function SlideProduct() {
   return (
     <Slide id={5}>
       <img
-        src={FIGHTER_SRC}
+        src={FIGHTER_6_SRC}
         alt=""
         className="absolute inset-0 w-full h-full object-cover"
       />
@@ -990,6 +1011,21 @@ function SlideBlackCard() {
 
   return (
     <Slide id={6}>
+      <video
+        src={VIDEO_4_SRC}
+        autoPlay
+        loop
+        muted
+        playsInline
+        disablePictureInPicture
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+      <div className="absolute inset-0 bg-black/80" />
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: "radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.6) 100%)" }}
+      />
+
       <div className="relative z-10 w-full max-w-5xl mx-auto px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -1546,6 +1582,17 @@ function SlideEconomics() {
 function SlideExpansion() {
   return (
     <Slide id={14}>
+      <video
+        src={VIDEO_6_SRC}
+        autoPlay
+        loop
+        muted
+        playsInline
+        disablePictureInPicture
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+      <div className="absolute inset-0 bg-black/85" />
+
       <div className="relative z-10 w-full max-w-5xl mx-auto px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -1630,6 +1677,13 @@ function SlideExpansion() {
 function SlideTexas() {
   return (
     <Slide id={11}>
+      <img
+        src={FIGHTER_7_SRC}
+        alt=""
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+      <div className="absolute inset-0 bg-black/85" />
+
       <div className="relative z-10 w-full max-w-5xl mx-auto px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -1803,7 +1857,7 @@ function SlideClose() {
   return (
     <Slide id={16}>
       <video
-        src={VIDEO_2_SRC}
+        src={VIDEO_7_SRC}
         autoPlay
         loop
         muted
@@ -1892,12 +1946,12 @@ export default function FanosDeck() {
       <SlideProduct />
       <SlideBlackCard />
       <SlideFlywheel />
+      <SlideRevenue />
+      <SlideEconomics />
       <SlideAdvantage />
       <SlideTiming />
       <SlideWhyBoxing />
       <SlideTexas />
-      <SlideRevenue />
-      <SlideEconomics />
       <SlideExpansion />
       <SlideSnapshot />
       <SlideClose />
