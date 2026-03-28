@@ -63,7 +63,7 @@ function Slide({ id, children, className = "" }: { id: number; children: React.R
   return (
     <section
       id={`slide-${id}`}
-      className={`w-full h-dvh shrink-0 md:h-auto md:min-h-dvh md:shrink snap-start relative flex items-start md:items-center justify-center overflow-y-auto md:overflow-hidden py-16 md:py-0 ${className}`}
+      className={`w-full min-h-dvh relative flex items-center justify-center overflow-hidden py-16 md:py-0 ${className}`}
     >
       {children}
     </section>
@@ -75,7 +75,7 @@ function Slide({ id, children, className = "" }: { id: number; children: React.R
    ════════════════════════════════════════════════════════════════ */
 function SlideTitle() {
   return (
-    <Slide id={0}>
+    <section id="slide-0" className="relative h-dvh flex items-center justify-center overflow-hidden">
       <video
         src={VIDEO_3_SRC}
         poster={LOGO_SRC}
@@ -85,6 +85,7 @@ function SlideTitle() {
         playsInline
         disablePictureInPicture
         className="absolute inset-0 w-full h-full object-cover"
+        style={{ objectPosition: "center center" }}
       />
       <div className="absolute inset-0 bg-black/70" />
       <div
@@ -92,12 +93,12 @@ function SlideTitle() {
         style={{ background: "radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.5) 100%)" }}
       />
 
-      <div className="relative z-10 text-center px-8 max-w-4xl">
+      <div className="relative z-10 text-center px-6 sm:px-8 max-w-4xl">
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.7 }}
-          className="text-white text-6xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-none mb-6 uppercase"
+          className="text-white text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-[0.95] mb-4 sm:mb-6 uppercase"
         >
           <span className="block">The Future of Fandom</span>
         </motion.h1>
@@ -106,12 +107,12 @@ function SlideTitle() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="text-white/40 text-base sm:text-xl font-extrabold tracking-wide mb-12 max-w-xl mx-auto uppercase"
+          className="text-white/60 text-sm sm:text-xl font-extrabold tracking-wide mb-12 max-w-xl mx-auto uppercase"
         >
           <span className="text-[#00d4ff] normal-case">FanOS</span>: Own the Action
         </motion.p>
       </div>
-    </Slide>
+    </section>
   )
 }
 
@@ -121,21 +122,21 @@ function SlideTitle() {
 function SlideProblem() {
   return (
     <Slide id={1}>
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-8">
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-10 sm:mb-16"
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <span className="w-2 h-2 bg-amber-500" />
             <span className="text-amber-500/80 text-[10px] font-bold tracking-[0.25em] uppercase">The Problem</span>
           </div>
-          <h2 className="text-white text-5xl sm:text-6xl font-black uppercase tracking-tight leading-[1.05] mb-4">
+          <h2 className="text-white text-4xl sm:text-6xl font-black uppercase tracking-tight leading-none mb-4">
             Fandom is <span className="text-white/30">Fragmented</span>
           </h2>
-          <p className="text-white/50 text-sm font-bold max-w-lg mx-auto leading-relaxed">
+          <p className="text-white/60 text-sm font-bold max-w-lg mx-auto leading-relaxed">
             A sea of data, tribal communities, and millions of fans — they exist in isolation.
             Fans engage on fight night, then disappear.
           </p>
@@ -188,14 +189,17 @@ function SlideProblem() {
    SLIDE 2 — STRUCTURAL WEAKNESS: STAR-DEPENDENT & FRAGILE
    ════════════════════════════════════════════════════════════════ */
 function SlideWeakness() {
+  const ref = useRef<HTMLDivElement>(null)
+  const isInView = useInView(ref, { once: true, amount: 0.1 })
+
   return (
     <Slide id={2}>
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-8">
+      <div ref={ref} className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-8 sm:mb-16"
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <span className="w-2 h-2 bg-[#ff3b5c]" />
@@ -203,10 +207,10 @@ function SlideWeakness() {
               Structural Weakness
             </span>
           </div>
-          <h2 className="text-white text-5xl sm:text-6xl font-black uppercase tracking-tight leading-[1.05] mb-4">
+          <h2 className="text-white text-4xl sm:text-6xl font-black uppercase tracking-tight leading-none mb-4">
             Economically <span className="text-white/30">Fragile</span>
           </h2>
-          <p className="text-white/50 text-sm font-bold max-w-lg mx-auto leading-relaxed">
+          <p className="text-white/60 text-sm font-bold max-w-lg mx-auto leading-relaxed">
             The industry relies on individual free-agent stars who fight twice a year.
             When a star retires or loses, the fan leaves. Zero year-round infrastructure to monetize the downtime.
           </p>
@@ -229,8 +233,7 @@ function SlideWeakness() {
               strokeLinecap="round"
               strokeLinejoin="round"
               initial={{ pathLength: 0 }}
-              whileInView={{ pathLength: 1 }}
-              viewport={{ once: true }}
+              animate={isInView ? { pathLength: 1 } : { pathLength: 0 }}
               transition={{ duration: 2, ease: "easeOut" }}
             />
 
@@ -242,8 +245,7 @@ function SlideWeakness() {
               strokeWidth="2"
               strokeDasharray="6,4"
               initial={{ pathLength: 0 }}
-              whileInView={{ pathLength: 1 }}
-              viewport={{ once: true }}
+              animate={isInView ? { pathLength: 1 } : { pathLength: 0 }}
               transition={{ duration: 2, delay: 1.5, ease: "easeOut" }}
             />
 
@@ -270,7 +272,7 @@ function SlideWeakness() {
             {/* Flatline annotation */}
             <text
               x="320" y="148"
-              fill="rgba(255,59,92,0.5)" fontSize="10"
+              fill="rgba(255,59,92,0.7)" fontSize="10"
               textAnchor="middle" fontWeight="700" fontStyle="italic"
             >
               Zero retention
@@ -278,14 +280,14 @@ function SlideWeakness() {
           </svg>
 
           {/* Legend */}
-          <div className="flex items-center justify-center gap-6 mt-6">
+          <div className="flex items-center justify-center gap-6 mt-4 sm:mt-6">
             <div className="flex items-center gap-2">
               <span className="w-4 h-0.5 bg-[#ff3b5c]" />
-              <span className="text-white/30 text-[10px] font-bold tracking-wider uppercase">Current</span>
+              <span className="text-white/50 text-[10px] font-bold tracking-wider uppercase">Current</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="w-4 h-0.5 bg-[#00d4ff] opacity-60" style={{ borderBottom: "2px dashed #00d4ff" }} />
-              <span className="text-white/30 text-[10px] font-bold tracking-wider uppercase">With FanOS</span>
+              <span className="text-white/50 text-[10px] font-bold tracking-wider uppercase">With FanOS</span>
             </div>
           </div>
         </div>
@@ -300,21 +302,21 @@ function SlideWeakness() {
 function SlideMarketGap() {
   return (
     <Slide id={3}>
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-8">
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-10 sm:mb-16"
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <span className="w-2 h-2 bg-amber-500" />
             <span className="text-amber-500/80 text-[10px] font-bold tracking-[0.25em] uppercase">Market Gap</span>
           </div>
-          <h2 className="text-white text-5xl sm:text-6xl font-black uppercase tracking-tight leading-[1.05] mb-4">
+          <h2 className="text-white text-4xl sm:text-6xl font-black uppercase tracking-tight leading-none mb-4">
             A Massive Market <span className="text-[#00d4ff] block">Without Continuity</span>
           </h2>
-          <p className="text-white/50 text-sm font-bold max-w-lg mx-auto leading-relaxed">
+          <p className="text-white/60 text-sm font-bold max-w-lg mx-auto leading-relaxed">
             Sports engagement spans media, betting, fantasy, and social.
             But participation is episodic, not continuous. No infrastructure exists for daily, compounding engagement.
           </p>
@@ -376,7 +378,7 @@ function SlideMarketGap() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 1 }}
-          className="text-center mt-10 text-white/40 text-sm font-bold leading-relaxed"
+          className="text-center mt-8 sm:mt-10 text-white/50 text-sm font-bold leading-relaxed"
         >
           Participation is episodic, not continuous —{" "}
           <span className="text-[#ff3b5c] font-black">no infrastructure for daily compounding engagement</span>
@@ -446,16 +448,16 @@ function SlideSolution() {
       <img
         src={FIGHTER_5_SRC}
         alt=""
-        className="absolute inset-0 w-full h-full object-cover"
+        className="hidden md:block absolute inset-0 w-full h-full object-cover"
       />
-      <div className="absolute inset-0 bg-black/80" />
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-8">
+      <div className="absolute inset-0 bg-black md:bg-black/80" />
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-10"
+          className="text-center mb-8 sm:mb-10"
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <span className="w-2 h-2 bg-[#00d4ff]" />
@@ -586,22 +588,22 @@ function SlideWhyBoxing() {
         muted
         playsInline
         disablePictureInPicture
-        className="absolute inset-0 w-full h-full object-cover"
+        className="hidden md:block absolute inset-0 w-full h-full object-cover"
       />
-      <div className="absolute inset-0 bg-black/85" />
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-8">
+      <div className="absolute inset-0 bg-black md:bg-black/85" />
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-10 md:mb-14"
+          className="text-center mb-8 md:mb-14"
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <span className="w-2 h-2 bg-[#ff3b5c]" />
             <span className="text-[#ff3b5c]/80 text-[10px] font-bold tracking-[0.25em] uppercase">Why Boxing</span>
           </div>
-          <h2 className="text-white text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight leading-[1.1] mb-3 md:mb-4">
+          <h2 className="text-white text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight leading-[1.05] mb-3 md:mb-4">
             The High-Intensity <span className="text-[#ff3b5c]">Catalyst</span>
           </h2>
         </motion.div>
@@ -679,7 +681,7 @@ function SlideWhyBoxing() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.7 }}
-          className="text-center mt-6 md:mt-10 text-white/40 text-[10px] md:text-xs font-bold leading-relaxed"
+          className="text-center mt-6 md:mt-10 text-white/50 text-[10px] md:text-xs font-bold leading-relaxed"
         >
           High-Intensity Data Per Event ×{" "}
           <span className="text-[#ff3b5c] font-black">Deep Tribal Identity</span>
@@ -696,21 +698,21 @@ function SlideWhyBoxing() {
 function SlideTiming() {
   return (
     <Slide id={9}>
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-8">
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-10 sm:mb-16"
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <span className="w-2 h-2 bg-[#00d4ff]" />
             <span className="text-[#00d4ff]/80 text-[10px] font-bold tracking-[0.25em] uppercase">Why Now</span>
           </div>
-          <h2 className="text-white text-5xl sm:text-6xl font-black uppercase tracking-tight leading-[1.05] mb-4">
+          <h2 className="text-white text-4xl sm:text-6xl font-black uppercase tracking-tight leading-none mb-4">
             The Regulatory <span className="text-[#00d4ff]">Wedge</span>
           </h2>
-          <p className="text-white/50 text-sm font-bold max-w-lg mx-auto leading-relaxed">
+          <p className="text-white/60 text-sm font-bold max-w-lg mx-auto leading-relaxed">
             Sports betting is banned in Texas. Prediction markets are complex and unregulated.
             FanOS is skill-based, legal, and rewarded.
           </p>
@@ -812,12 +814,12 @@ function SlideAdvantage() {
 
   return (
     <Slide id={8}>
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-8">
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-12"
+          className="text-center mb-8 sm:mb-12"
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <span className="w-2 h-2 bg-[#00d4ff]" />
@@ -829,7 +831,7 @@ function SlideAdvantage() {
             <span className="block">Owning the Vacuum</span>
             <span className="text-[#00d4ff] block">While Legacy Sleeps</span>
           </h2>
-          <p className="text-white/50 text-xs sm:text-sm font-bold max-w-lg mx-auto leading-relaxed">
+          <p className="text-white/60 text-xs sm:text-sm font-bold max-w-lg mx-auto leading-relaxed">
             The biggest platforms are banned, generalist, or event-dependent. TXMX is the only vertically integrated, legally verified operator in Texas.
           </p>
         </motion.div>
@@ -898,24 +900,24 @@ function SlideProduct() {
       <img
         src={FIGHTER_6_SRC}
         alt=""
-        className="absolute inset-0 w-full h-full object-cover"
+        className="hidden md:block absolute inset-0 w-full h-full object-cover"
       />
-      <div className="absolute inset-0 bg-black/80" />
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-8">
+      <div className="absolute inset-0 bg-black md:bg-black/80" />
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-10 sm:mb-16"
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <span className="w-2 h-2 bg-[#00d4ff]" />
             <span className="text-[#00d4ff]/80 text-[10px] font-bold tracking-[0.25em] uppercase">The Fan Journey</span>
           </div>
-          <h2 className="text-white text-5xl sm:text-6xl font-black uppercase tracking-tight leading-[1.05] mb-4">
+          <h2 className="text-white text-4xl sm:text-6xl font-black uppercase tracking-tight leading-none mb-4">
             Behavior → <span className="text-[#00d4ff]">System</span>
           </h2>
-          <p className="text-white/50 text-sm font-bold max-w-lg mx-auto leading-relaxed">
+          <p className="text-white/60 text-sm font-bold max-w-lg mx-auto leading-relaxed">
             Fans already analyze, predict, and debate daily.
             FanOS structures this raw energy into a system of continuous participation.
           </p>
@@ -983,7 +985,7 @@ function SlideProduct() {
           transition={{ delay: 0.6 }}
           className="text-center mt-10"
         >
-          <p className="text-white/40 text-xs font-bold">
+          <p className="text-white/60 text-xs font-bold">
             Behavioral functionalization via FanOS
           </p>
         </motion.div>
@@ -1018,26 +1020,26 @@ function SlideBlackCard() {
         muted
         playsInline
         disablePictureInPicture
-        className="absolute inset-0 w-full h-full object-cover"
+        className="hidden md:block absolute inset-0 w-full h-full object-cover"
       />
-      <div className="absolute inset-0 bg-black/80" />
+      <div className="absolute inset-0 bg-black md:bg-black/80" />
       <div
-        className="absolute inset-0 pointer-events-none"
+        className="hidden md:block absolute inset-0 pointer-events-none"
         style={{ background: "radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.6) 100%)" }}
       />
 
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-8">
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-12"
+          className="text-center mb-8 sm:mb-12"
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <span className="w-2 h-2 bg-amber-500" />
             <span className="text-amber-500/80 text-[10px] font-bold tracking-[0.25em] uppercase">The Membership</span>
           </div>
-          <h2 className="text-white text-5xl sm:text-6xl font-black uppercase tracking-tight leading-[1.05] mb-4">
+          <h2 className="text-white text-4xl sm:text-6xl font-black uppercase tracking-tight leading-none mb-4">
             The{" "}
             <span
               className="text-transparent bg-clip-text"
@@ -1118,7 +1120,7 @@ function SlideBlackCard() {
                   <p className="text-sm font-black uppercase tracking-wider mb-2" style={{ color: pillar.color }}>{pillar.name}</p>
                   <div className="flex flex-col gap-1.5">
                     {pillar.items.map((item) => (
-                      <p key={item} className="text-white/40 text-[11px] font-semibold leading-4">
+                      <p key={item} className="text-white/60 text-[11px] font-semibold leading-4">
                         <span style={{ color: pillar.color }}>{"\u25B8"}</span> {item}
                       </p>
                     ))}
@@ -1128,7 +1130,7 @@ function SlideBlackCard() {
             </div>
 
             <div className="border border-amber-500/20 bg-amber-500/4 p-3">
-              <p className="text-white/40 text-xs font-bold text-center">
+              <p className="text-white/60 text-xs font-bold text-center">
                 Not just watching the fight {"\u2014"}{" "}
                 <span className="text-amber-500 font-bold">participating in the ecosystem</span>
               </p>
@@ -1170,12 +1172,12 @@ function SlideFlywheel() {
 
   return (
     <Slide id={7}>
-      <div ref={ref} className="relative z-10 w-full max-w-5xl mx-auto px-8">
+      <div ref={ref} className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-14"
+          className="text-center mb-8 sm:mb-14"
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <span className="w-2 h-2 bg-[#00d4ff]" />
@@ -1185,7 +1187,7 @@ function SlideFlywheel() {
             <span className="block">Self-Sustaining</span>
             <span className="text-[#00d4ff] block">Flywheel</span>
           </h2>
-          <p className="text-white/50 text-xs sm:text-sm font-bold max-w-lg mx-auto leading-relaxed">
+          <p className="text-white/60 text-xs sm:text-sm font-bold max-w-lg mx-auto leading-relaxed">
             Every dollar in creates better athletes, richer content, and more fans — which funds the next cycle.
           </p>
         </motion.div>
@@ -1323,12 +1325,12 @@ function SlideRevenue() {
 
   return (
     <Slide id={12}>
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-8">
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-14"
+          className="text-center mb-8 sm:mb-14"
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <span className="w-2 h-2 bg-[#00ff88]" />
@@ -1336,7 +1338,7 @@ function SlideRevenue() {
               Revenue Engine
             </span>
           </div>
-          <h2 className="text-white text-5xl sm:text-6xl font-black uppercase tracking-tight leading-[1.05]">
+          <h2 className="text-white text-4xl sm:text-6xl font-black uppercase tracking-tight leading-none">
             Multi-Layered <span className="text-[#00ff88] block">Revenue Engine</span>
           </h2>
         </motion.div>
@@ -1458,7 +1460,7 @@ function SlideRevenue() {
                     <p className="text-white text-sm font-bold">{layer.name}</p>
                     <p className="text-white font-black text-sm">{layer.amt}</p>
                   </div>
-                  <p className="text-white/30 text-[11px] font-semibold">{layer.desc}</p>
+                  <p className="text-white/50 text-[11px] font-semibold">{layer.desc}</p>
                 </div>
                 <span className="text-[10px] font-bold shrink-0" style={{ color: layer.color }}>
                   {layer.pct}
@@ -1492,12 +1494,12 @@ function SlideEconomics() {
 
   return (
     <Slide id={13}>
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-8">
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-14"
+          className="text-center mb-8 sm:mb-14"
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <span className="w-2 h-2 bg-[#00ff88]" />
@@ -1505,7 +1507,7 @@ function SlideEconomics() {
               Unit Economics
             </span>
           </div>
-          <h2 className="text-white text-5xl sm:text-6xl font-black uppercase tracking-tight leading-[1.05] mb-4">
+          <h2 className="text-white text-4xl sm:text-6xl font-black uppercase tracking-tight leading-none mb-4">
             <span className="text-[#00ff88]">~75%</span> Blended Margin
           </h2>
         </motion.div>
@@ -1539,7 +1541,7 @@ function SlideEconomics() {
           <div className="flex gap-4 sm:gap-8 justify-center mt-3">
             {bars.map((bar) => (
               <div key={bar.label} className="flex-1 max-w-20 text-center">
-                <p className="text-white/40 text-[10px] font-bold tracking-wider uppercase">{bar.label}</p>
+                <p className="text-white/60 text-[10px] font-bold tracking-wider uppercase">{bar.label}</p>
                 <p className="text-[9px] font-bold mt-0.5" style={{ color: bar.color }}>
                   {bar.margin} margin
                 </p>
@@ -1557,17 +1559,17 @@ function SlideEconomics() {
           >
             <div className="text-center">
               <p className="text-white text-3xl font-black">$6.065M</p>
-              <p className="text-white/30 text-[10px] font-bold tracking-wider uppercase">Year 1 Revenue</p>
+              <p className="text-white/50 text-[10px] font-bold tracking-wider uppercase">Year 1 Revenue</p>
             </div>
             <div className="w-px h-10 bg-white/10" />
             <div className="text-center">
               <p className="text-[#00ff88] text-3xl font-black">~75%</p>
-              <p className="text-white/30 text-[10px] font-bold tracking-wider uppercase">Blended Margin</p>
+              <p className="text-white/50 text-[10px] font-bold tracking-wider uppercase">Blended Margin</p>
             </div>
             <div className="w-px h-10 bg-white/10" />
             <div className="text-center">
               <p className="text-amber-500 text-3xl font-black">$4.5M</p>
-              <p className="text-white/30 text-[10px] font-bold tracking-wider uppercase">Gross Profit</p>
+              <p className="text-white/50 text-[10px] font-bold tracking-wider uppercase">Gross Profit</p>
             </div>
           </motion.div>
         </div>
@@ -1589,22 +1591,22 @@ function SlideExpansion() {
         muted
         playsInline
         disablePictureInPicture
-        className="absolute inset-0 w-full h-full object-cover"
+        className="hidden md:block absolute inset-0 w-full h-full object-cover"
       />
-      <div className="absolute inset-0 bg-black/85" />
+      <div className="absolute inset-0 bg-black md:bg-black/85" />
 
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-8">
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-14"
+          className="text-center mb-8 sm:mb-14"
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <span className="w-2 h-2 bg-[#00d4ff]" />
             <span className="text-[#00d4ff]/80 text-[10px] font-bold tracking-[0.25em] uppercase">The Scale</span>
           </div>
-          <h2 className="text-white text-5xl sm:text-6xl font-black uppercase tracking-tight leading-[1.05] mb-4">
+          <h2 className="text-white text-4xl sm:text-6xl font-black uppercase tracking-tight leading-none mb-4">
             TODAY TEXAS. <span className="text-white/30 block">TOMORROW WORLD.</span>
           </h2>
         </motion.div>
@@ -1680,25 +1682,25 @@ function SlideTexas() {
       <img
         src={FIGHTER_7_SRC}
         alt=""
-        className="absolute inset-0 w-full h-full object-cover"
+        className="hidden md:block absolute inset-0 w-full h-full object-cover"
       />
-      <div className="absolute inset-0 bg-black/85" />
+      <div className="absolute inset-0 bg-black md:bg-black/85" />
 
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-8">
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-14"
+          className="text-center mb-8 sm:mb-14"
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <span className="w-2 h-2 bg-amber-500" />
             <span className="text-amber-500/80 text-[10px] font-bold tracking-[0.25em] uppercase">Why Texas</span>
           </div>
-          <h2 className="text-white text-5xl sm:text-6xl font-black uppercase tracking-tight leading-[1.05] mb-4">
+          <h2 className="text-white text-4xl sm:text-6xl font-black uppercase tracking-tight leading-none mb-4">
             <span className="text-amber-500">$500M+</span> Locked Market
           </h2>
-          <p className="text-white/50 text-sm font-bold max-w-lg mx-auto leading-relaxed">
+          <p className="text-white/60 text-sm font-bold max-w-lg mx-auto leading-relaxed">
             Texas is the largest combat sports licensing market in the U.S. — sports betting
             remains strictly illegal following failed 2025 legislation. Texans are desperate for legal gamification.
           </p>
@@ -1726,7 +1728,7 @@ function SlideTexas() {
                 >
                   {item.stat}
                 </span>
-                <p className="text-white/50 text-sm font-bold leading-snug">{item.label}</p>
+                <p className="text-white/60 text-sm font-bold leading-snug">{item.label}</p>
               </motion.div>
             ))}
           </div>
@@ -1750,7 +1752,7 @@ function SlideTexas() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.6 }}
-          className="text-center mt-10 text-white/40 text-sm font-bold leading-relaxed"
+          className="text-center mt-8 sm:mt-10 text-white/50 text-sm font-bold leading-relaxed"
         >
           <span className="text-amber-500 font-black">Zero legal competition</span>
           {" "}= First-mover lock
@@ -1766,18 +1768,18 @@ function SlideTexas() {
 function SlideSnapshot() {
   return (
     <Slide id={15}>
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-8">
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-14"
+          className="text-center mb-8 sm:mb-14"
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <span className="w-2 h-2 bg-amber-500" />
             <span className="text-amber-500/80 text-[10px] font-bold tracking-[0.25em] uppercase">The Numbers</span>
           </div>
-          <h2 className="text-white text-5xl sm:text-6xl font-black uppercase tracking-tight leading-[1.05]">
+          <h2 className="text-white text-4xl sm:text-6xl font-black uppercase tracking-tight leading-none">
             Financial <span className="text-amber-500">Snapshot</span>
           </h2>
         </motion.div>
@@ -1819,7 +1821,7 @@ function SlideSnapshot() {
                 {stat.value}
               </p>
               <p className="text-white text-sm font-bold uppercase tracking-wider mb-2">{stat.label}</p>
-              <p className="text-white/30 text-xs font-bold">{stat.sub}</p>
+              <p className="text-white/50 text-xs font-bold">{stat.sub}</p>
             </motion.div>
           ))}
         </div>
@@ -1841,7 +1843,7 @@ function SlideSnapshot() {
               <p className="text-xl font-black" style={{ color: item.color }}>
                 {item.val}
               </p>
-              <p className="text-white/30 text-[9px] font-bold tracking-wider uppercase mt-0.5">{item.label}</p>
+              <p className="text-white/50 text-[9px] font-bold tracking-wider uppercase mt-0.5">{item.label}</p>
             </div>
           ))}
         </motion.div>
@@ -1855,7 +1857,7 @@ function SlideSnapshot() {
    ════════════════════════════════════════════════════════════════ */
 function SlideClose() {
   return (
-    <Slide id={16}>
+    <section id="slide-16" className="relative h-dvh flex items-center justify-center overflow-hidden">
       <video
         src={VIDEO_7_SRC}
         autoPlay
@@ -1864,10 +1866,11 @@ function SlideClose() {
         playsInline
         disablePictureInPicture
         className="absolute inset-0 w-full h-full object-cover"
+        style={{ objectPosition: "center center" }}
       />
       <div className="absolute inset-0 bg-black/80" />
 
-      <div className="relative z-10 text-center px-8 max-w-4xl">
+      <div className="relative z-10 text-center px-6 sm:px-8 max-w-4xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -1889,8 +1892,7 @@ function SlideClose() {
           transition={{ delay: 0.2, duration: 0.7 }}
           className="text-white text-4xl sm:text-5xl lg:text-7xl font-black tracking-tight leading-[1.05] mb-6 uppercase"
         >
-          Infrastructure for
-          <br />
+          Infrastructure for{' '}
           <span className="text-[#00d4ff]">the Future of Fandom</span>
         </motion.h2>
 
@@ -1899,7 +1901,7 @@ function SlideClose() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.4 }}
-          className="text-white/40 text-base font-bold mb-12 max-w-lg mx-auto leading-relaxed"
+          className="text-white/60 text-base font-bold mb-10 sm:mb-12 max-w-lg mx-auto leading-relaxed"
         >
           FanOS scales anywhere fans and data exist.
           <br />
@@ -1916,10 +1918,10 @@ function SlideClose() {
         >
           <span className="text-[#00d4ff] text-sm font-black tracking-tight">FanOS</span>
           <span className="text-white/20">·</span>
-          <span className="text-white/50 text-sm font-semibold">txmxboxing.com</span>
+          <span className="text-white/60 text-sm font-semibold">txmxboxing.com</span>
         </motion.div>
       </div>
-    </Slide>
+    </section>
   )
 }
 
@@ -1930,7 +1932,7 @@ export default function FanosDeck() {
   const { currentSlide, navigateTo, containerRef } = useDeckNavigation(17)
 
   return (
-    <main ref={containerRef} className="h-dvh flex flex-row overflow-x-auto snap-x snap-mandatory md:block md:overflow-x-hidden md:overflow-y-auto md:snap-y bg-black">
+    <main ref={containerRef} className="bg-black">
       <DeckNav
         totalSlides={17}
         currentSlide={currentSlide}

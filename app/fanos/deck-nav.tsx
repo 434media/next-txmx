@@ -75,7 +75,7 @@ export default function DeckNav({ totalSlides, currentSlide, onNavigate, slideLa
             exit={{ opacity: 0, y: 10 }}
             className="fixed bottom-14 md:bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 text-white/15 text-[10px] font-semibold tracking-wider"
           >
-            <span className="md:hidden">SWIPE OR → TO NAVIGATE</span>
+            <span className="md:hidden">SCROLL OR ↓ TO NAVIGATE</span>
             <span className="hidden md:inline">SCROLL OR ↓ TO NAVIGATE</span>
           </motion.div>
         )}
@@ -115,7 +115,6 @@ export function useDeckNavigation(totalSlides: number) {
 
   // Intersection Observer to track which slide is visible
   useEffect(() => {
-    const root = containerRef.current
     const observers: IntersectionObserver[] = []
     for (let i = 0; i < totalSlides; i++) {
       const el = document.getElementById(`slide-${i}`)
@@ -128,7 +127,7 @@ export function useDeckNavigation(totalSlides: number) {
             }
           })
         },
-        { threshold: 0.5, root: root || undefined }
+        { threshold: 0.5 }
       )
       observer.observe(el)
       observers.push(observer)
