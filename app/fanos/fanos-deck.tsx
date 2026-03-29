@@ -63,7 +63,7 @@ function Slide({ id, children, className = "" }: { id: number; children: React.R
   return (
     <section
       id={`slide-${id}`}
-      className={`w-full min-h-dvh relative flex items-center justify-center overflow-hidden py-16 md:py-0 ${className}`}
+      className={`w-full min-h-dvh relative flex items-center justify-center overflow-hidden ${className}`}
     >
       {children}
     </section>
@@ -75,7 +75,11 @@ function Slide({ id, children, className = "" }: { id: number; children: React.R
    ════════════════════════════════════════════════════════════════ */
 function SlideTitle() {
   return (
-    <section id="slide-0" className="relative h-dvh flex items-center justify-center overflow-hidden">
+    <section
+      id="slide-0"
+      className="relative flex items-center justify-center overflow-hidden"
+      style={{ height: '100dvh', width: '100%', position: 'relative' }}
+    >
       <video
         src={VIDEO_3_SRC}
         poster={LOGO_SRC}
@@ -84,8 +88,8 @@ function SlideTitle() {
         muted
         playsInline
         disablePictureInPicture
-        className="absolute inset-0 w-full h-full object-cover"
-        style={{ objectPosition: "center center" }}
+        className="object-cover"
+        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center center' }}
       />
       <div className="absolute inset-0 bg-black/50" />
       <div
@@ -122,7 +126,7 @@ function SlideTitle() {
 function SlideProblem() {
   return (
     <Slide id={1}>
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8 py-16 md:py-0">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -194,7 +198,7 @@ function SlideWeakness() {
 
   return (
     <Slide id={2}>
-      <div ref={ref} className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
+      <div ref={ref} className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8 py-16 md:py-0">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -302,7 +306,7 @@ function SlideWeakness() {
 function SlideMarketGap() {
   return (
     <Slide id={3}>
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8 py-16 md:py-0">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -449,9 +453,10 @@ function SlideSolution() {
         src={FIGHTER_5_SRC}
         alt=""
         className="absolute inset-0 w-full h-full object-cover"
+        style={{ objectFit: 'cover', objectPosition: 'center center' }}
       />
       <div className="absolute inset-0 bg-black/65" />
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8 py-16 md:py-0">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -583,15 +588,17 @@ function SlideWhyBoxing() {
     <Slide id={10}>
       <video
         src={VIDEO_5_SRC}
+        poster={FIGHTER_SRC}
         autoPlay
         loop
         muted
         playsInline
         disablePictureInPicture
-        className="absolute inset-0 w-full h-full object-cover"
+        className="object-cover"
+        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center center' }}
       />
       <div className="absolute inset-0 bg-black/70" />
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8 py-16 md:py-0">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -698,7 +705,7 @@ function SlideWhyBoxing() {
 function SlideTiming() {
   return (
     <Slide id={9}>
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8 py-16 md:py-0">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -814,7 +821,7 @@ function SlideAdvantage() {
 
   return (
     <Slide id={8}>
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8 py-16 md:py-0">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -901,9 +908,10 @@ function SlideProduct() {
         src={FIGHTER_6_SRC}
         alt=""
         className="absolute inset-0 w-full h-full object-cover"
+        style={{ objectFit: 'cover', objectPosition: 'center center' }}
       />
       <div className="absolute inset-0 bg-black/65" />
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8 py-16 md:py-0">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -1015,12 +1023,14 @@ function SlideBlackCard() {
     <Slide id={6}>
       <video
         src={VIDEO_4_SRC}
+        poster={FIGHTER_4_SRC}
         autoPlay
         loop
         muted
         playsInline
         disablePictureInPicture
-        className="absolute inset-0 w-full h-full object-cover"
+        className="object-cover"
+        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center center' }}
       />
       <div className="absolute inset-0 bg-black/65" />
       <div
@@ -1028,7 +1038,7 @@ function SlideBlackCard() {
         style={{ background: "radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.4) 100%)" }}
       />
 
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8 py-16 md:py-0">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -1172,7 +1182,7 @@ function SlideFlywheel() {
 
   return (
     <Slide id={7}>
-      <div ref={ref} className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
+      <div ref={ref} className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8 py-16 md:py-0">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -1325,7 +1335,7 @@ function SlideRevenue() {
 
   return (
     <Slide id={12}>
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8 py-16 md:py-0">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -1494,7 +1504,7 @@ function SlideEconomics() {
 
   return (
     <Slide id={13}>
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8 py-16 md:py-0">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -1586,16 +1596,18 @@ function SlideExpansion() {
     <Slide id={14}>
       <video
         src={VIDEO_6_SRC}
+        poster={FIGHTER_3_SRC}
         autoPlay
         loop
         muted
         playsInline
         disablePictureInPicture
-        className="absolute inset-0 w-full h-full object-cover"
+        className="object-cover"
+        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center center' }}
       />
       <div className="absolute inset-0 bg-black/70" />
 
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8 py-16 md:py-0">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -1683,10 +1695,11 @@ function SlideTexas() {
         src={FIGHTER_7_SRC}
         alt=""
         className="absolute inset-0 w-full h-full object-cover"
+        style={{ objectFit: 'cover', objectPosition: 'center center' }}
       />
       <div className="absolute inset-0 bg-black/70" />
 
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8 py-16 md:py-0">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -1768,7 +1781,7 @@ function SlideTexas() {
 function SlideSnapshot() {
   return (
     <Slide id={15}>
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8 py-16 md:py-0">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -1857,7 +1870,11 @@ function SlideSnapshot() {
    ════════════════════════════════════════════════════════════════ */
 function SlideClose() {
   return (
-    <section id="slide-16" className="relative h-dvh flex items-center justify-center overflow-hidden">
+    <section
+      id="slide-16"
+      className="relative flex items-center justify-center overflow-hidden"
+      style={{ height: '100dvh', width: '100%', position: 'relative' }}
+    >
       <video
         src={VIDEO_7_SRC}
         autoPlay
@@ -1865,8 +1882,8 @@ function SlideClose() {
         muted
         playsInline
         disablePictureInPicture
-        className="absolute inset-0 w-full h-full object-cover"
-        style={{ objectPosition: "center center" }}
+        className="object-cover"
+        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center center' }}
       />
       <div className="absolute inset-0 bg-black/60" />
 
