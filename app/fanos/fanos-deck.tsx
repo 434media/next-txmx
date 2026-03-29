@@ -87,10 +87,10 @@ function SlideTitle() {
         className="absolute inset-0 w-full h-full object-cover"
         style={{ objectPosition: "center center" }}
       />
-      <div className="absolute inset-0 bg-black/70" />
+      <div className="absolute inset-0 bg-black/50" />
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ background: "radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.5) 100%)" }}
+        style={{ background: "radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.35) 100%)" }}
       />
 
       <div className="relative z-10 text-center px-6 sm:px-8 max-w-4xl">
@@ -448,9 +448,9 @@ function SlideSolution() {
       <img
         src={FIGHTER_5_SRC}
         alt=""
-        className="hidden md:block absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover"
       />
-      <div className="absolute inset-0 bg-black md:bg-black/80" />
+      <div className="absolute inset-0 bg-black/65" />
       <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
         {/* Header */}
         <motion.div
@@ -588,9 +588,9 @@ function SlideWhyBoxing() {
         muted
         playsInline
         disablePictureInPicture
-        className="hidden md:block absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover"
       />
-      <div className="absolute inset-0 bg-black md:bg-black/85" />
+      <div className="absolute inset-0 bg-black/70" />
       <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
         {/* Header */}
         <motion.div
@@ -900,9 +900,9 @@ function SlideProduct() {
       <img
         src={FIGHTER_6_SRC}
         alt=""
-        className="hidden md:block absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover"
       />
-      <div className="absolute inset-0 bg-black md:bg-black/80" />
+      <div className="absolute inset-0 bg-black/65" />
       <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -1020,12 +1020,12 @@ function SlideBlackCard() {
         muted
         playsInline
         disablePictureInPicture
-        className="hidden md:block absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover"
       />
-      <div className="absolute inset-0 bg-black md:bg-black/80" />
+      <div className="absolute inset-0 bg-black/65" />
       <div
-        className="hidden md:block absolute inset-0 pointer-events-none"
-        style={{ background: "radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.6) 100%)" }}
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: "radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.4) 100%)" }}
       />
 
       <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
@@ -1591,9 +1591,9 @@ function SlideExpansion() {
         muted
         playsInline
         disablePictureInPicture
-        className="hidden md:block absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover"
       />
-      <div className="absolute inset-0 bg-black md:bg-black/85" />
+      <div className="absolute inset-0 bg-black/70" />
 
       <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
         <motion.div
@@ -1682,9 +1682,9 @@ function SlideTexas() {
       <img
         src={FIGHTER_7_SRC}
         alt=""
-        className="hidden md:block absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover"
       />
-      <div className="absolute inset-0 bg-black md:bg-black/85" />
+      <div className="absolute inset-0 bg-black/70" />
 
       <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8">
         <motion.div
@@ -1868,7 +1868,7 @@ function SlideClose() {
         className="absolute inset-0 w-full h-full object-cover"
         style={{ objectPosition: "center center" }}
       />
-      <div className="absolute inset-0 bg-black/80" />
+      <div className="absolute inset-0 bg-black/60" />
 
       <div className="relative z-10 text-center px-6 sm:px-8 max-w-4xl">
         <motion.div
