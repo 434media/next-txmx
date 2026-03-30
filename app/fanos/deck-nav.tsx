@@ -3,6 +3,18 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 import { motion, AnimatePresence } from "motion/react"
 
+export function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)")
+    setIsMobile(mq.matches)
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches)
+    mq.addEventListener("change", handler)
+    return () => mq.removeEventListener("change", handler)
+  }, [])
+  return isMobile
+}
+
 interface DeckNavProps {
   totalSlides: number
   currentSlide: number
@@ -75,7 +87,7 @@ export default function DeckNav({ totalSlides, currentSlide, onNavigate, slideLa
             exit={{ opacity: 0, y: 10 }}
             className="fixed bottom-14 md:bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 text-white/15 text-[10px] font-semibold tracking-wider"
           >
-            <span className="md:hidden">SCROLL OR ↓ TO NAVIGATE</span>
+            <span className="md:hidden">SWIPE TO NAVIGATE</span>
             <span className="hidden md:inline">SCROLL OR ↓ TO NAVIGATE</span>
           </motion.div>
         )}
@@ -84,19 +96,22 @@ export default function DeckNav({ totalSlides, currentSlide, onNavigate, slideLa
   )
 }
 
-export function useDeckNavigation(totalSlides: number) {
+export function useDeckNavigation(totalSlides: number, isMobile: boolean) {
   const [currentSlide, setCurrentSlide] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
-  const isScrolling = useRef(false)
 
   const navigateTo = useCallback((index: number) => {
     const clamped = Math.max(0, Math.min(totalSlides - 1, index))
     setCurrentSlide(clamped)
-    const el = document.getElementById(`slide-${clamped}`)
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" })
+    if (isMobile && containerRef.current) {
+      containerRef.current.scrollTo({ left: clamped * window.innerWidth, behavior: "smooth" })
+    } else {
+      const el = document.getElementById(`slide-${clamped}`)
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth" })
+      }
     }
-  }, [totalSlides])
+  }, [totalSlides, isMobile])
 
   // Keyboard navigation
   useEffect(() => {
@@ -113,27 +128,44 @@ export function useDeckNavigation(totalSlides: number) {
     return () => window.removeEventListener("keydown", handleKeyDown)
   }, [currentSlide, navigateTo])
 
-  // Intersection Observer to track which slide is visible
+  // Track current slide — horizontal scroll listener on mobile, IntersectionObserver on desktop
   useEffect(() => {
-    const observers: IntersectionObserver[] = []
-    for (let i = 0; i < totalSlides; i++) {
-      const el = document.getElementById(`slide-${i}`)
-      if (!el) continue
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
-              setCurrentSlide(i)
-            }
+    if (isMobile && containerRef.current) {
+      const container = containerRef.current
+      let ticking = false
+      const onScroll = () => {
+        if (!ticking) {
+          ticking = true
+          requestAnimationFrame(() => {
+            const idx = Math.round(container.scrollLeft / window.innerWidth)
+            setCurrentSlide(Math.max(0, Math.min(totalSlides - 1, idx)))
+            ticking = false
           })
-        },
-        { threshold: 0.5 }
-      )
-      observer.observe(el)
-      observers.push(observer)
+        }
+      }
+      container.addEventListener("scroll", onScroll, { passive: true })
+      return () => container.removeEventListener("scroll", onScroll)
+    } else {
+      const observers: IntersectionObserver[] = []
+      for (let i = 0; i < totalSlides; i++) {
+        const el = document.getElementById(`slide-${i}`)
+        if (!el) continue
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+                setCurrentSlide(i)
+              }
+            })
+          },
+          { threshold: 0.5 }
+        )
+        observer.observe(el)
+        observers.push(observer)
+      }
+      return () => observers.forEach((o) => o.disconnect())
     }
-    return () => observers.forEach((o) => o.disconnect())
-  }, [totalSlides])
+  }, [totalSlides, isMobile])
 
   return { currentSlide, navigateTo, containerRef }
 }

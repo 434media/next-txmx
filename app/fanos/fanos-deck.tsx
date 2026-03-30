@@ -1,10 +1,12 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, createContext, useContext } from "react"
 import { motion, AnimatePresence, useInView, useMotionValue, useTransform } from "motion/react"
 import Image from "next/image"
-import DeckNav, { useDeckNavigation } from "./deck-nav"
+import DeckNav, { useDeckNavigation, useIsMobile } from "./deck-nav"
 import { Building2, User, Swords, Eye, Zap, Trophy, CreditCard, Clapperboard } from "lucide-react"
+
+const MobileContext = createContext(false)
 
 const VIDEO_SRC =
   "https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2FBam%20Intro.mp4?alt=media"
@@ -60,10 +62,24 @@ const SLIDE_LABELS = [
 
 /* ── Slide wrapper ────────────────────────────────────────────── */
 function Slide({ id, children, className = "" }: { id: number; children: React.ReactNode; className?: string }) {
+  const isMobile = useContext(MobileContext)
+
   return (
     <section
       id={`slide-${id}`}
-      className={`w-full min-h-dvh relative flex items-center justify-center overflow-hidden ${className}`}
+      className={`relative flex justify-center overflow-hidden ${isMobile ? 'items-start' : 'items-center'} ${className}`}
+      style={isMobile ? {
+        minWidth: '100vw',
+        width: '100vw',
+        height: '100dvh',
+        overflowY: 'auto',
+        flexShrink: 0,
+        scrollSnapAlign: 'start',
+        WebkitOverflowScrolling: 'touch',
+      } : {
+        width: '100%',
+        minHeight: '100dvh',
+      }}
     >
       {children}
     </section>
@@ -74,11 +90,24 @@ function Slide({ id, children, className = "" }: { id: number; children: React.R
    SLIDE 0 — TITLE
    ════════════════════════════════════════════════════════════════ */
 function SlideTitle() {
+  const isMobile = useContext(MobileContext)
+
   return (
     <section
       id="slide-0"
       className="relative flex items-center justify-center overflow-hidden"
-      style={{ height: '100dvh', width: '100%', position: 'relative' }}
+      style={isMobile ? {
+        minWidth: '100vw',
+        width: '100vw',
+        height: '100dvh',
+        flexShrink: 0,
+        scrollSnapAlign: 'start',
+        position: 'relative',
+      } : {
+        height: '100dvh',
+        width: '100%',
+        position: 'relative',
+      }}
     >
       <video
         src={VIDEO_3_SRC}
@@ -1869,11 +1898,24 @@ function SlideSnapshot() {
    SLIDE 14 — CLOSE
    ════════════════════════════════════════════════════════════════ */
 function SlideClose() {
+  const isMobile = useContext(MobileContext)
+
   return (
     <section
       id="slide-16"
       className="relative flex items-center justify-center overflow-hidden"
-      style={{ height: '100dvh', width: '100%', position: 'relative' }}
+      style={isMobile ? {
+        minWidth: '100vw',
+        width: '100vw',
+        height: '100dvh',
+        flexShrink: 0,
+        scrollSnapAlign: 'start',
+        position: 'relative',
+      } : {
+        height: '100dvh',
+        width: '100%',
+        position: 'relative',
+      }}
     >
       <video
         src={VIDEO_7_SRC}
@@ -1946,34 +1988,50 @@ function SlideClose() {
    MAIN DECK COMPONENT
    ════════════════════════════════════════════════════════════════ */
 export default function FanosDeck() {
-  const { currentSlide, navigateTo, containerRef } = useDeckNavigation(17)
+  const isMobile = useIsMobile()
+  const { currentSlide, navigateTo, containerRef } = useDeckNavigation(17, isMobile)
 
   return (
-    <main ref={containerRef} className="bg-black">
-      <DeckNav
-        totalSlides={17}
-        currentSlide={currentSlide}
-        onNavigate={navigateTo}
-        slideLabels={SLIDE_LABELS}
-      />
+    <MobileContext.Provider value={isMobile}>
+      <main
+        ref={containerRef}
+        className="bg-black"
+        style={isMobile ? {
+          display: 'flex',
+          flexDirection: 'row',
+          overflowX: 'auto',
+          overflowY: 'hidden',
+          scrollSnapType: 'x mandatory',
+          WebkitOverflowScrolling: 'touch',
+          height: '100dvh',
+          width: '100vw',
+        } : undefined}
+      >
+        <DeckNav
+          totalSlides={17}
+          currentSlide={currentSlide}
+          onNavigate={navigateTo}
+          slideLabels={SLIDE_LABELS}
+        />
 
-      <SlideTitle />
-      <SlideProblem />
-      <SlideWeakness />
-      <SlideMarketGap />
-      <SlideSolution />
-      <SlideProduct />
-      <SlideBlackCard />
-      <SlideFlywheel />
-      <SlideRevenue />
-      <SlideEconomics />
-      <SlideAdvantage />
-      <SlideTiming />
-      <SlideWhyBoxing />
-      <SlideTexas />
-      <SlideExpansion />
-      <SlideSnapshot />
-      <SlideClose />
-    </main>
+        <SlideTitle />
+        <SlideProblem />
+        <SlideWeakness />
+        <SlideMarketGap />
+        <SlideSolution />
+        <SlideProduct />
+        <SlideBlackCard />
+        <SlideFlywheel />
+        <SlideRevenue />
+        <SlideEconomics />
+        <SlideAdvantage />
+        <SlideTiming />
+        <SlideWhyBoxing />
+        <SlideTexas />
+        <SlideExpansion />
+        <SlideSnapshot />
+        <SlideClose />
+      </main>
+    </MobileContext.Provider>
   )
 }
