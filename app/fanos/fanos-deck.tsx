@@ -366,10 +366,16 @@ function SlideMarketGap() {
               whileInView={{ scaleY: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: i * 0.1 }}
-              className="w-16 sm:w-20 border border-white/10 rounded-t flex flex-col items-center justify-end pb-3"
-              style={{ height: p.h, transformOrigin: "bottom", background: `${p.color}08` }}
+              className="w-16 sm:w-20 rounded-t flex flex-col items-center justify-end pb-3"
+              style={{
+                height: p.h,
+                transformOrigin: "bottom",
+                background: `${p.color}20`,
+                border: `1px solid ${p.color}40`,
+                boxShadow: `inset 0 0 20px ${p.color}10, 0 0 12px ${p.color}15`,
+              }}
             >
-              <span className="text-xs font-black tracking-wider uppercase" style={{ color: `${p.color}90` }}>{p.label}</span>
+              <span className="text-xs font-black tracking-wider uppercase" style={{ color: p.color }}>{p.label}</span>
             </motion.div>
           ))}
 
@@ -381,8 +387,8 @@ function SlideMarketGap() {
             transition={{ delay: 0.5 }}
             className="w-24 sm:w-32 flex flex-col items-center justify-center gap-2 self-center"
           >
-            <div className="w-16 h-16 rounded-full border-2 border-dashed border-[#00d4ff]/30 flex items-center justify-center animate-pulse">
-              <User className="w-7 h-7 text-[#00d4ff]/40" />
+            <div className="w-16 h-16 rounded-full border-2 border-dashed border-[#00d4ff]/50 flex items-center justify-center animate-pulse">
+              <User className="w-7 h-7 text-[#00d4ff]/60" />
             </div>
             <p className="text-[#00d4ff] text-xs font-black tracking-wider uppercase">The Fan</p>
           </motion.div>
@@ -397,10 +403,16 @@ function SlideMarketGap() {
               whileInView={{ scaleY: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 + i * 0.1 }}
-              className="w-16 sm:w-20 border border-white/10 rounded-t flex flex-col items-center justify-end pb-3"
-              style={{ height: p.h, transformOrigin: "bottom", background: `${p.color}08` }}
+              className="w-16 sm:w-20 rounded-t flex flex-col items-center justify-end pb-3"
+              style={{
+                height: p.h,
+                transformOrigin: "bottom",
+                background: `${p.color}20`,
+                border: `1px solid ${p.color}40`,
+                boxShadow: `inset 0 0 20px ${p.color}10, 0 0 12px ${p.color}15`,
+              }}
             >
-              <span className="text-xs font-black tracking-wider uppercase" style={{ color: `${p.color}90` }}>{p.label}</span>
+              <span className="text-xs font-black tracking-wider uppercase" style={{ color: p.color }}>{p.label}</span>
             </motion.div>
           ))}
         </div>
@@ -1066,12 +1078,12 @@ function SlideBlackCard() {
         style={{ background: "radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.4) 100%)" }}
       />
 
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8 py-16 md:py-0">
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8 py-10 md:py-0">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-8 sm:mb-12"
+          className="text-center mb-4 sm:mb-12"
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <span className="w-2 h-2 bg-amber-500" />
@@ -1088,14 +1100,14 @@ function SlideBlackCard() {
           </h2>
         </motion.div>
 
-        <div className="flex flex-col lg:flex-row items-center gap-12 max-w-4xl mx-auto">
+        <div className="flex flex-col lg:flex-row items-center gap-6 lg:gap-12 max-w-4xl mx-auto">
           {/* 3D Card */}
           <motion.div
             ref={cardRef}
             onMouseMove={handleMouse}
             onMouseLeave={() => { x.set(0); y.set(0) }}
             style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-            className="relative w-[320px] h-[200px] shrink-0 rounded-lg overflow-hidden cursor-default"
+            className="relative w-[280px] h-[175px] sm:w-[320px] sm:h-[200px] shrink-0 rounded-lg overflow-hidden cursor-default"
           >
             <div
               className="absolute inset-0 rounded-lg"
@@ -1127,7 +1139,7 @@ function SlideBlackCard() {
 
           {/* Value Pillars */}
           <div className="flex-1">
-            <div className="grid grid-cols-2 gap-3 mb-6">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-4 sm:mb-6">
               {[
                 {
                   name: "Status",
@@ -1152,13 +1164,13 @@ function SlideBlackCard() {
               ].map((pillar) => (
                 <div
                   key={pillar.name}
-                  className="border border-white/10 p-4"
+                  className="border border-white/10 p-2.5 sm:p-4"
                   style={{ background: `${pillar.color}06` }}
                 >
-                  <p className="text-sm font-black uppercase tracking-wider mb-2" style={{ color: pillar.color }}>{pillar.name}</p>
-                  <div className="flex flex-col gap-1.5">
+                  <p className="text-xs sm:text-sm font-black uppercase tracking-wider mb-1.5 sm:mb-2" style={{ color: pillar.color }}>{pillar.name}</p>
+                  <div className="flex flex-col gap-1">
                     {pillar.items.map((item) => (
-                      <p key={item} className="text-white/60 text-[11px] font-semibold leading-4">
+                      <p key={item} className="text-white/60 text-[10px] sm:text-[11px] font-semibold leading-3.5 sm:leading-4">
                         <span style={{ color: pillar.color }}>{"\u25B8"}</span> {item}
                       </p>
                     ))}
@@ -1167,8 +1179,8 @@ function SlideBlackCard() {
               ))}
             </div>
 
-            <div className="border border-amber-500/20 bg-amber-500/4 p-3">
-              <p className="text-white/60 text-xs font-bold text-center">
+            <div className="border border-amber-500/20 bg-amber-500/4 p-2 sm:p-3">
+              <p className="text-white/60 text-[11px] sm:text-xs font-bold text-center">
                 Not just watching the fight {"\u2014"}{" "}
                 <span className="text-amber-500 font-bold">participating in the ecosystem</span>
               </p>
@@ -1635,18 +1647,18 @@ function SlideExpansion() {
       />
       <div className="absolute inset-0 bg-black/70" />
 
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8 py-16 md:py-0">
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8 py-10 md:py-0">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-8 sm:mb-14"
+          className="text-center mb-6 sm:mb-14"
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <span className="w-2 h-2 bg-[#00d4ff]" />
             <span className="text-[#00d4ff]/80 text-[10px] font-bold tracking-[0.25em] uppercase">The Scale</span>
           </div>
-          <h2 className="text-white text-4xl sm:text-6xl font-black uppercase tracking-tight leading-none mb-4">
+          <h2 className="text-white text-3xl sm:text-6xl font-black uppercase tracking-tight leading-none mb-4">
             TODAY TEXAS. <span className="text-white/30 block">TOMORROW WORLD.</span>
           </h2>
         </motion.div>
@@ -1684,23 +1696,23 @@ function SlideExpansion() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.15 }}
-              className={`border p-6 relative ${phase.active ? "bg-white/3" : ""}`}
+              className={`border p-4 sm:p-6 relative ${phase.active ? "bg-white/3" : ""}`}
               style={{ borderColor: `${phase.color}30` }}
             >
               <div className="absolute top-0 left-0 right-0 h-0.5" style={{ background: phase.color }} />
 
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-2 sm:mb-4">
                 <span className="text-[10px] font-bold tracking-wider" style={{ color: phase.color }}>
                   {phase.phase}
                 </span>
                 <span className="text-white/20 text-[10px] font-semibold">{phase.timeline}</span>
               </div>
 
-              <h3 className="text-white text-xl font-black uppercase tracking-tight mb-4">{phase.title}</h3>
+              <h3 className="text-white text-base sm:text-xl font-black uppercase tracking-tight mb-2 sm:mb-4">{phase.title}</h3>
 
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-1.5 sm:gap-2">
                 {phase.items.map((item) => (
-                  <div key={item} className="flex items-center gap-2 text-xs font-semibold text-white/50">
+                  <div key={item} className="flex items-center gap-2 text-[11px] sm:text-xs font-semibold text-white/50">
                     <span style={{ color: phase.color }}>▸</span> {item}
                   </div>
                 ))}
@@ -1747,9 +1759,9 @@ function SlideTexas() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-4xl mx-auto items-center">
+        <div className="max-w-5xl mx-auto">
           {/* Stats */}
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 max-w-lg mx-auto ">
             {[
               { stat: "#1", label: "Combat sports licensing market in the U.S.", color: "#f5a623" },
               { stat: "0", label: "Legal sportsbooks — failed 2025 legislation", color: "#ff3b5c" },
@@ -1761,31 +1773,18 @@ function SlideTexas() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="flex items-center gap-4 border border-white/5 bg-white/2 p-4"
+                className="flex items-center gap-4 border border-white/5 bg-white/2 p-4 sm:p-5"
               >
                 <span
-                  className="text-3xl font-black shrink-0 min-w-[70px] text-right"
+                  className="text-3xl sm:text-4xl font-black shrink-0 min-w-[70px] text-right"
                   style={{ color: item.color }}
                 >
                   {item.stat}
                 </span>
-                <p className="text-white/60 text-sm font-bold leading-snug">{item.label}</p>
+                <p className="text-white/70 text-sm sm:text-base font-extrabold leading-relaxed">{item.label}</p>
               </motion.div>
             ))}
           </div>
-
-          {/* TX visual */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.3 }}
-            className="flex items-center justify-center"
-          >
-            <div className="relative w-full max-w-[360px] mx-auto">
-              <img src="/texas.png" alt="Texas" className="w-full h-auto object-contain" />
-            </div>
-          </motion.div>
         </div>
 
         <motion.p
