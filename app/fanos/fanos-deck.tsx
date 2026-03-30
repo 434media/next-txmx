@@ -61,7 +61,7 @@ const SLIDE_LABELS = [
 ]
 
 /* ── Slide wrapper ────────────────────────────────────────────── */
-function Slide({ id, children, className = "" }: { id: number; children: React.ReactNode; className?: string }) {
+function Slide({ id, children, className = "", noScroll = false }: { id: number; children: React.ReactNode; className?: string; noScroll?: boolean }) {
   const isMobile = useContext(MobileContext)
 
   return (
@@ -72,10 +72,9 @@ function Slide({ id, children, className = "" }: { id: number; children: React.R
         minWidth: '100vw',
         width: '100vw',
         height: '100dvh',
-        overflowY: 'auto',
+        ...(noScroll ? {} : { overflowY: 'auto' as const, WebkitOverflowScrolling: 'touch' as const }),
         flexShrink: 0,
         scrollSnapAlign: 'start',
-        WebkitOverflowScrolling: 'touch',
       } : {
         width: '100%',
         minHeight: '100dvh',
@@ -614,7 +613,7 @@ function SlideSolution() {
    ════════════════════════════════════════════════════════════════ */
 function SlideWhyBoxing() {
   return (
-    <Slide id={10}>
+    <Slide id={10} noScroll>
       <video
         src={VIDEO_5_SRC}
         poster={FIGHTER_SRC}
@@ -1049,7 +1048,7 @@ function SlideBlackCard() {
   }
 
   return (
-    <Slide id={6}>
+    <Slide id={6} noScroll>
       <video
         src={VIDEO_4_SRC}
         poster={FIGHTER_4_SRC}
@@ -1622,7 +1621,7 @@ function SlideEconomics() {
    ════════════════════════════════════════════════════════════════ */
 function SlideExpansion() {
   return (
-    <Slide id={14}>
+    <Slide id={14} noScroll>
       <video
         src={VIDEO_6_SRC}
         poster={FIGHTER_3_SRC}
