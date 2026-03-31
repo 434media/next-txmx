@@ -625,7 +625,7 @@ function SlideSolution() {
    ════════════════════════════════════════════════════════════════ */
 function SlideWhyBoxing() {
   return (
-    <Slide id={10} noScroll>
+    <Slide id={12} noScroll>
       <video
         src={VIDEO_5_SRC}
         poster={FIGHTER_SRC}
@@ -744,7 +744,7 @@ function SlideWhyBoxing() {
    ════════════════════════════════════════════════════════════════ */
 function SlideTiming() {
   return (
-    <Slide id={9}>
+    <Slide id={11}>
       <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8 py-16 md:py-0">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -860,7 +860,7 @@ function SlideAdvantage() {
   ]
 
   return (
-    <Slide id={8}>
+    <Slide id={10}>
       <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8 py-16 md:py-0">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -1374,7 +1374,7 @@ function SlideRevenue() {
   const cy = 140
 
   return (
-    <Slide id={12}>
+    <Slide id={8}>
       <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8 py-16 md:py-0">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -1543,7 +1543,7 @@ function SlideEconomics() {
   const maxVal = 5.0
 
   return (
-    <Slide id={13}>
+    <Slide id={9}>
       <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-8 py-16 md:py-0">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -1730,7 +1730,7 @@ function SlideExpansion() {
    ════════════════════════════════════════════════════════════════ */
 function SlideTexas() {
   return (
-    <Slide id={11}>
+    <Slide id={13}>
       <img
         src={FIGHTER_7_SRC}
         alt=""
