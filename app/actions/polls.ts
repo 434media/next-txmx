@@ -2,8 +2,10 @@
 
 import { firestore } from '../../lib/firebase-admin'
 import { awardCredits } from './credits'
-
-const POLL_VOTE_TC = 10
+import { checkEarnGuard, recordEarningAction } from './rate-limiter'
+import { getEconomyConfig } from './economy'
+import { incrementQuestProgress } from './quests'
+import { getUserByUid } from './users'
 
 export interface PollOption {
   label: string
@@ -69,6 +71,27 @@ export async function votePoll(
 ): Promise<{ success: boolean; error?: string }> {
   if (!userId || !pollId) return { success: false, error: 'Missing required fields' }
 
+  // Pre-check cooldown and category cap before touching the poll
+  const config = await getEconomyConfig()
+  const user = await getUserByUid(userId)
+  const isBlackCard = user?.subscriptionStatus === 'active'
+  const guard = await checkEarnGuard(userId, {
+    amount: config.pollVoteReward,
+    currency: 'tc',
+    category: 'polls',
+    categoryLimit: config.dailyPollLimit,
+    cooldownAction: 'poll_vote',
+    cooldownMs: config.pollCooldownSeconds * 1000,
+    diminishingAction: 'poll_vote',
+    diminishingFactor: config.diminishingReturnFactor,
+    isBlackCard,
+    subscriberMultiplier: config.subscriberMultiplier,
+  })
+
+  if (!guard.allowed) {
+    return { success: false, error: guard.reason || 'Rate limited' }
+  }
+
   const pollRef = firestore.collection('polls').doc(pollId)
   const voteRef = firestore.collection('users').doc(userId).collection('pollVotes').doc(pollId)
 
@@ -100,10 +123,18 @@ export async function votePoll(
       })
     })
 
-    // Award TC outside transaction (non-critical)
+    // Award TC with diminishing returns and subscriber multiplier applied
+    const tcAmount = guard.finalAmount
     const idempotencyKey = `poll_vote:${userId}:${pollId}`
     try {
-      await awardCredits(userId, POLL_VOTE_TC, 'Fan poll vote', idempotencyKey, { pollId })
+      await awardCredits(userId, tcAmount, 'Fan poll vote', idempotencyKey, { pollId })
+      await recordEarningAction(userId, {
+        tcAmount,
+        category: 'polls',
+        cooldownAction: 'poll_vote',
+        diminishingAction: 'poll_vote',
+      })
+      await incrementQuestProgress(userId, 'poll_vote')
     } catch {
       // TC award failure shouldn't break voting
     }

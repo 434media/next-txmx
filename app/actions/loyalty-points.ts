@@ -1,33 +1,35 @@
 'use server'
 
 import { firestore } from '../../lib/firebase-admin'
-import { checkTCCap, recordEarningAction } from './rate-limiter'
 
-export type CreditTransactionType =
-  | 'award'
-  | 'prediction_settlement'
+export type LPTransactionType =
+  | 'gym_roster_win'
+  | 'fan_multiplier'
   | 'quest_reward'
   | 'redeem'
   | 'adjustment'
   | 'reversal'
+  | 'season_reset'
+  | 'season_reward'
 
 export type TransactionStatus = 'valid' | 'reversed' | 'flagged'
 
-export interface CreditAccount {
+export interface LPAccount {
   userId: string
   balance: number
   lifetimeEarned: number
-  lifetimeSpent: number
+  gymId: string | null
   createdAt: string
   updatedAt: string
 }
 
-export interface CreditTransaction {
+export interface LPTransaction {
   id: string
   userId: string
   amount: number
-  type: CreditTransactionType
-  reason: string
+  type: LPTransactionType
+  source: string
+  referenceId: string | null
   idempotencyKey: string
   balanceBefore: number
   balanceAfter: number
@@ -45,11 +47,12 @@ export interface CreditTransaction {
   createdAt: string
 }
 
-interface CreditTransactionInput {
+export interface LPTransactionInput {
   userId: string
   amount: number
-  type: CreditTransactionType
-  reason: string
+  type: LPTransactionType
+  source: string
+  referenceId?: string | null
   idempotencyKey: string
   campaignId?: string | null
   eventId?: string | null
@@ -61,9 +64,9 @@ interface CreditTransactionInput {
   metadata?: Record<string, string | number | boolean | null>
 }
 
-function assertInput(input: CreditTransactionInput) {
+function assertInput(input: LPTransactionInput) {
   if (!input.userId.trim()) throw new Error('userId is required')
-  if (!input.reason.trim()) throw new Error('reason is required')
+  if (!input.source.trim()) throw new Error('source is required')
   if (!input.idempotencyKey.trim()) throw new Error('idempotencyKey is required')
   if (!Number.isFinite(input.amount) || input.amount === 0) {
     throw new Error('amount must be a non-zero number')
@@ -73,8 +76,8 @@ function assertInput(input: CreditTransactionInput) {
   }
 }
 
-export async function getCreditAccount(userId: string): Promise<CreditAccount> {
-  const ref = firestore.collection('creditAccounts').doc(userId)
+export async function getLPAccount(userId: string): Promise<LPAccount> {
+  const ref = firestore.collection('lpAccounts').doc(userId)
   const snap = await ref.get()
 
   if (!snap.exists) {
@@ -82,27 +85,27 @@ export async function getCreditAccount(userId: string): Promise<CreditAccount> {
       userId,
       balance: 0,
       lifetimeEarned: 0,
-      lifetimeSpent: 0,
+      gymId: null,
       createdAt: '',
       updatedAt: '',
     }
   }
 
-  const data = snap.data() as Partial<CreditAccount>
+  const data = snap.data() as Partial<LPAccount>
   return {
     userId,
     balance: data.balance || 0,
     lifetimeEarned: data.lifetimeEarned || 0,
-    lifetimeSpent: data.lifetimeSpent || 0,
+    gymId: data.gymId || null,
     createdAt: data.createdAt || '',
     updatedAt: data.updatedAt || '',
   }
 }
 
-export async function postCreditTransaction(input: CreditTransactionInput) {
+export async function postLPTransaction(input: LPTransactionInput) {
   assertInput(input)
 
-  const accountRef = firestore.collection('creditAccounts').doc(input.userId)
+  const accountRef = firestore.collection('lpAccounts').doc(input.userId)
   const ledgerRef = accountRef.collection('ledger').doc(input.idempotencyKey)
 
   const result = await firestore.runTransaction(async (tx) => {
@@ -113,7 +116,7 @@ export async function postCreditTransaction(input: CreditTransactionInput) {
     ])
 
     if (existingLedgerSnap.exists) {
-      const existing = existingLedgerSnap.data() as CreditTransaction
+      const existing = existingLedgerSnap.data() as LPTransaction
       return {
         idempotent: true,
         transaction: existing,
@@ -122,25 +125,22 @@ export async function postCreditTransaction(input: CreditTransactionInput) {
     }
 
     const current = accountSnap.exists
-      ? (accountSnap.data() as Partial<CreditAccount>)
+      ? (accountSnap.data() as Partial<LPAccount>)
       : undefined
 
     const balanceBefore = current?.balance || 0
-    const balanceAfter = balanceBefore + input.amount
+    const balanceAfter = Math.max(0, balanceBefore + input.amount)
 
-    if (balanceAfter < 0) {
-      throw new Error('insufficient credits')
-    }
+    const lifetimeEarned =
+      (current?.lifetimeEarned || 0) + (input.amount > 0 ? input.amount : 0)
 
-    const lifetimeEarned = (current?.lifetimeEarned || 0) + (input.amount > 0 ? input.amount : 0)
-    const lifetimeSpent = (current?.lifetimeSpent || 0) + (input.amount < 0 ? Math.abs(input.amount) : 0)
-
-    const transaction: CreditTransaction = {
+    const transaction: LPTransaction = {
       id: ledgerRef.id,
       userId: input.userId,
       amount: input.amount,
       type: input.type,
-      reason: input.reason,
+      source: input.source,
+      referenceId: input.referenceId ?? null,
       idempotencyKey: input.idempotencyKey,
       balanceBefore,
       balanceAfter,
@@ -164,12 +164,19 @@ export async function postCreditTransaction(input: CreditTransactionInput) {
         userId: input.userId,
         balance: balanceAfter,
         lifetimeEarned,
-        lifetimeSpent,
+        gymId: current?.gymId || null,
         createdAt: current?.createdAt || now,
         updatedAt: now,
       },
       { merge: true }
     )
+
+    // Sync cached balance on user doc
+    const userRef = firestore.collection('users').doc(input.userId)
+    tx.update(userRef, {
+      loyaltyPoints: balanceAfter,
+      updatedAt: now,
+    })
 
     return {
       idempotent: false,
@@ -181,82 +188,47 @@ export async function postCreditTransaction(input: CreditTransactionInput) {
   return { success: true, ...result }
 }
 
-export async function awardCredits(userId: string, amount: number, reason: string, idempotencyKey: string, metadata?: Record<string, string | number | boolean | null>) {
-  if (amount <= 0) throw new Error('award amount must be positive')
-
-  // Check earning cap before awarding
-  const capCheck = await checkTCCap(userId, amount)
-  if (!capCheck.allowed) {
-    return { success: false, idempotent: false, balance: 0, capped: true, reason: capCheck.reason }
-  }
-
-  const finalAmount = capCheck.cappedAmount ?? amount
-  const cappedFlag = capCheck.cappedAmount !== null
-
-  const result = await postCreditTransaction({
-    userId,
-    amount: finalAmount,
-    type: 'award',
-    reason,
-    idempotencyKey,
-    cappedFlag,
-    metadata,
-  })
-
-  // Track earning for future cap checks
-  if (!result.idempotent) {
-    try {
-      await recordEarningAction(userId, { tcAmount: finalAmount })
-    } catch {
-      // Tracker failure is non-critical
-    }
-  }
-
-  return result
-}
-
-export async function settlePredictionCredits(
+export async function awardLP(
   userId: string,
   amount: number,
-  predictionId: string,
-  outcome: 'won' | 'lost' | 'void',
-  idempotencyKey: string
+  source: string,
+  idempotencyKey: string,
+  opts?: {
+    type?: LPTransactionType
+    referenceId?: string
+    eventId?: string
+    campaignId?: string
+    questId?: string
+    sourceType?: string
+    multiplierApplied?: number
+    metadata?: Record<string, string | number | boolean | null>
+  }
 ) {
-  return postCreditTransaction({
+  if (amount <= 0) throw new Error('award amount must be positive')
+  return postLPTransaction({
     userId,
     amount,
-    type: 'prediction_settlement',
-    reason: `Prediction ${outcome}`,
+    type: opts?.type ?? 'gym_roster_win',
+    source,
     idempotencyKey,
-    metadata: { predictionId, outcome },
+    referenceId: opts?.referenceId,
+    eventId: opts?.eventId,
+    campaignId: opts?.campaignId,
+    questId: opts?.questId,
+    sourceType: opts?.sourceType,
+    multiplierApplied: opts?.multiplierApplied,
+    metadata: opts?.metadata,
   })
 }
 
-export async function redeemCredits(
-  userId: string,
-  amount: number,
-  rewardId: string,
-  idempotencyKey: string
-) {
-  if (amount <= 0) throw new Error('redeem amount must be positive')
-  return postCreditTransaction({
-    userId,
-    amount: -Math.abs(amount),
-    type: 'redeem',
-    reason: 'Reward redemption',
-    idempotencyKey,
-    metadata: { rewardId },
-  })
-}
-
-export async function getCreditLedger(userId: string, limit = 50): Promise<CreditTransaction[]> {
+export async function getLPLedger(userId: string, limit = 50): Promise<LPTransaction[]> {
   const snap = await firestore
-    .collection('creditAccounts')
+    .collection('lpAccounts')
     .doc(userId)
     .collection('ledger')
     .orderBy('createdAt', 'desc')
     .limit(limit)
     .get()
 
-  return snap.docs.map((doc) => doc.data() as CreditTransaction)
+  return snap.docs.map((doc) => doc.data() as LPTransaction)
 }

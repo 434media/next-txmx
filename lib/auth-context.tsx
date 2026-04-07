@@ -29,6 +29,8 @@ export interface UserProfile {
   skillPoints: number
   txCredits: number
   loyaltyPoints: number
+  isVerified: boolean
+  legacyRank: "rookie" | "contender" | "champion" | "hall_of_fame" | null
 }
 
 interface AuthContextType {
@@ -71,6 +73,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           skillPoints: 0,
           txCredits: 0,
           loyaltyPoints: 0,
+          isVerified: false,
+          legacyRank: null,
         })
       }
     } catch {
@@ -85,6 +89,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         skillPoints: 0,
         txCredits: 0,
         loyaltyPoints: 0,
+        isVerified: false,
+        legacyRank: null,
       })
     }
   }

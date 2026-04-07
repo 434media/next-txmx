@@ -16,17 +16,35 @@ export interface UserRecord {
   txCredits: number
   loyaltyPoints: number
   rank: "rookie" | "contender" | "champion" | "hall_of_fame"
+  /** Permanent rank floor — prevents rank from ever dropping below this */
+  legacyRank: "rookie" | "contender" | "champion" | "hall_of_fame" | null
+  isVerified: boolean
   createdAt: string
   updatedAt: string
 }
 
+const RANK_ORDER: Record<string, number> = {
+  rookie: 0,
+  contender: 1,
+  champion: 2,
+  hall_of_fame: 3,
+}
+
 function computeRank(
-  sp: number
+  sp: number,
+  legacyRank?: string | null
 ): "rookie" | "contender" | "champion" | "hall_of_fame" {
-  if (sp >= 100_000) return "hall_of_fame"
-  if (sp >= 25_000) return "champion"
-  if (sp >= 5_000) return "contender"
-  return "rookie"
+  let spRank: "rookie" | "contender" | "champion" | "hall_of_fame"
+  if (sp >= 100_000) spRank = "hall_of_fame"
+  else if (sp >= 25_000) spRank = "champion"
+  else if (sp >= 5_000) spRank = "contender"
+  else spRank = "rookie"
+
+  // Legacy rank acts as a floor — take whichever is higher
+  if (legacyRank && RANK_ORDER[legacyRank] > RANK_ORDER[spRank]) {
+    return legacyRank as "rookie" | "contender" | "champion" | "hall_of_fame"
+  }
+  return spRank
 }
 
 export async function getOrCreateUser(
@@ -57,6 +75,8 @@ export async function getOrCreateUser(
     txCredits: 0,
     loyaltyPoints: 0,
     rank: "rookie",
+    legacyRank: null,
+    isVerified: false,
     createdAt: now,
     updatedAt: now,
   }
@@ -125,7 +145,7 @@ export async function updateUserPoints(
 
     // Recompute rank if SP changed
     if (field === "skillPoints") {
-      updates.rank = computeRank(newValue)
+      updates.rank = computeRank(newValue, data.legacyRank)
     }
 
     tx.update(ref, updates)
@@ -157,6 +177,69 @@ export async function setGymPledge(uid: string, gymId: string) {
     gymPledgeLockedUntil: lockedUntil.toISOString(),
     updatedAt: new Date().toISOString(),
   })
+}
+
+// ── Verified Accounts ────────────────────────────────────
+
+export async function setUserVerified(uid: string, verified: boolean): Promise<void> {
+  const ref = firestore.collection("users").doc(uid)
+  const snap = await ref.get()
+  if (!snap.exists) throw new Error("User not found")
+  await ref.update({ isVerified: verified, updatedAt: new Date().toISOString() })
+}
+
+// ── Legacy Rank ──────────────────────────────────────────
+
+export async function setUserLegacyRank(
+  uid: string,
+  legacyRank: "rookie" | "contender" | "champion" | "hall_of_fame" | null
+): Promise<void> {
+  const ref = firestore.collection("users").doc(uid)
+  const snap = await ref.get()
+  if (!snap.exists) throw new Error("User not found")
+  const data = snap.data() as UserRecord
+  const newRank = computeRank(data.skillPoints, legacyRank)
+  await ref.update({
+    legacyRank,
+    rank: newRank,
+    updatedAt: new Date().toISOString(),
+  })
+}
+
+export async function getLegacyUsers(): Promise<UserRecord[]> {
+  const snap = await firestore
+    .collection("users")
+    .where("legacyRank", "!=", null)
+    .get()
+  return snap.docs.map(d => d.data() as UserRecord)
+}
+
+export async function searchUsers(query: string, limit = 20): Promise<UserRecord[]> {
+  // Firestore doesn't support full-text search, so fetch recent users and filter client-side
+  const snap = await firestore
+    .collection("users")
+    .orderBy("updatedAt", "desc")
+    .limit(200)
+    .get()
+
+  const q = query.toLowerCase()
+  return snap.docs
+    .map(d => d.data() as UserRecord)
+    .filter(u =>
+      u.displayName?.toLowerCase().includes(q) ||
+      u.email?.toLowerCase().includes(q) ||
+      u.uid.toLowerCase().includes(q)
+    )
+    .slice(0, limit)
+}
+
+export async function getVerifiedUsers(): Promise<UserRecord[]> {
+  const snap = await firestore
+    .collection("users")
+    .where("isVerified", "==", true)
+    .get()
+
+  return snap.docs.map(d => d.data() as UserRecord)
 }
 
 export interface LeaderboardEntry {

@@ -31,6 +31,8 @@ export async function GET(request: NextRequest) {
       txCredits: user.txCredits,
       loyaltyPoints: user.loyaltyPoints,
       rank: user.rank,
+      isVerified: user.isVerified ?? false,
+      legacyRank: user.legacyRank ?? null,
     })
   } catch {
     return NextResponse.json({ error: "Invalid token" }, { status: 401 })

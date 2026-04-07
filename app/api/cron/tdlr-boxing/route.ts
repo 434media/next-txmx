@@ -116,8 +116,8 @@ export async function GET(request: NextRequest) {
           continue
         }
 
-        if ((parsedEvent as { error?: string }).error) {
-          results.errors.push(`${filename}: ${(parsedEvent as { error: string }).error}`)
+        if ((parsedEvent as unknown as { error?: string }).error) {
+          results.errors.push(`${filename}: ${(parsedEvent as unknown as { error: string }).error}`)
           continue
         }
 

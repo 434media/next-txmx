@@ -15,6 +15,14 @@ import PollManager from './poll-manager'
 import EconomyGovernor from './economy-governor'
 import NotificationSender from './notification-sender'
 import EightCountManager from './eight-count-manager'
+import FeatureFlagsManager from './feature-flags'
+import QuestManager from './quest-manager'
+import RewardsManager from './rewards-manager'
+import SeasonManager from './season-manager'
+import CommunityManager from './community-manager'
+import AbuseDashboard from './abuse-dashboard'
+import VerifiedManager from './verified-manager'
+import LegacyRankManager from './legacy-rank-manager'
 import type { VenueData } from '../actions/venues'
 import type { EventPromoter, PromoterData, TXMXEvent } from '../actions/events'
 import type { GymData } from '../actions/gyms'
@@ -32,13 +40,14 @@ interface AdminClientProps {
   initialEvents: TXMXEvent[]
 }
 
-type Tab = 'list' | 'add' | 'venues' | 'gyms' | 'promoters' | 'events' | 'props' | 'polls' | 'economy' | 'notifications' | 'tdlr' | 'eightcount'
+type Tab = 'list' | 'add' | 'venues' | 'gyms' | 'promoters' | 'events' | 'props' | 'polls' | 'economy' | 'notifications' | 'tdlr' | 'eightcount' | 'flags' | 'quests' | 'rewards' | 'seasons' | 'community' | 'abuse' | 'verified' | 'legacy'
 
 const NAV_SECTIONS = [
   {
     label: 'DATABASE',
     items: [
       { key: 'list' as Tab, label: 'Fighters', icon: '🥊' },
+      { key: 'add' as Tab, label: 'Add Fighter', icon: '+' },
       { key: 'venues' as Tab, label: 'Venues', icon: '🏟️' },
       { key: 'gyms' as Tab, label: 'Gyms', icon: '🏋️' },
       { key: 'promoters' as Tab, label: 'Promoters', icon: '🎤' },
@@ -46,19 +55,36 @@ const NAV_SECTIONS = [
     ],
   },
   {
-    label: 'CONTENT',
+    label: 'ENGAGEMENT',
     items: [
-      { key: 'eightcount' as Tab, label: '8 Count', icon: '📰' },
+      { key: 'props' as Tab, label: 'Props', icon: '🎯' },
+      { key: 'polls' as Tab, label: 'Polls', icon: '📊' },
+      { key: 'quests' as Tab, label: 'Quests', icon: '⚔️' },
+      { key: 'rewards' as Tab, label: 'Rewards', icon: '🎁' },
+      { key: 'seasons' as Tab, label: 'Seasons', icon: '🏆' },
+      { key: 'economy' as Tab, label: 'Economy', icon: '⚙️' },
     ],
   },
   {
-    label: 'ACTIONS',
+    label: 'CONTENT',
     items: [
-      { key: 'add' as Tab, label: 'Add Fighter', icon: '+' },
-      { key: 'props' as Tab, label: 'Props', icon: '🎯' },
-      { key: 'polls' as Tab, label: 'Polls', icon: '📊' },
-      { key: 'economy' as Tab, label: 'Economy', icon: '⚙️' },
+      { key: 'eightcount' as Tab, label: '8 Count', icon: '📰' },
+      { key: 'community' as Tab, label: 'Community', icon: '💬' },
       { key: 'notifications' as Tab, label: 'Notify', icon: '🔔' },
+    ],
+  },
+  {
+    label: 'MODERATION',
+    items: [
+      { key: 'abuse' as Tab, label: 'Abuse', icon: '🛡️' },
+      { key: 'flags' as Tab, label: 'Flags', icon: '🚩' },
+      { key: 'verified' as Tab, label: 'Verified', icon: '✓' },
+      { key: 'legacy' as Tab, label: 'Legacy Rank', icon: '👑' },
+    ],
+  },
+  {
+    label: 'TOOLS',
+    items: [
       { key: 'tdlr' as Tab, label: 'Import TDLR', icon: '📄' },
     ],
   },
@@ -165,6 +191,14 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
     add: 0,
     tdlr: 0,
     eightcount: 0,
+    flags: 0,
+    quests: 0,
+    rewards: 0,
+    seasons: 0,
+    community: 0,
+    abuse: 0,
+    verified: 0,
+    legacy: 0,
   }
 
   const pageTitle: Record<Tab, string> = {
@@ -180,6 +214,14 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
     notifications: 'PUSH NOTIFICATIONS',
     add: 'ADD FIGHTER',
     tdlr: 'IMPORT TDLR',
+    flags: 'FEATURE FLAGS',
+    quests: 'QUESTS & BADGES',
+    rewards: 'REWARDS STORE',
+    seasons: 'SEASONS',
+    community: 'COMMUNITY',
+    abuse: 'ABUSE PREVENTION',
+    verified: 'VERIFIED ACCOUNTS',
+    legacy: 'LEGACY RANK',
   }
 
   const handleNav = (key: Tab) => {
@@ -330,6 +372,22 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
               <EconomyGovernor />
             ) : activeTab === 'notifications' ? (
               <NotificationSender />
+            ) : activeTab === 'flags' ? (
+              <FeatureFlagsManager />
+            ) : activeTab === 'quests' ? (
+              <QuestManager />
+            ) : activeTab === 'rewards' ? (
+              <RewardsManager />
+            ) : activeTab === 'seasons' ? (
+              <SeasonManager />
+            ) : activeTab === 'community' ? (
+              <CommunityManager />
+            ) : activeTab === 'abuse' ? (
+              <AbuseDashboard />
+            ) : activeTab === 'verified' ? (
+              <VerifiedManager />
+            ) : activeTab === 'legacy' ? (
+              <LegacyRankManager />
             ) : (
               <TDLRImport onImportComplete={handleImportComplete} />
             )}

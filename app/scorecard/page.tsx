@@ -256,7 +256,7 @@ export default function ScorecardPage() {
           </div>
         </div>
 
-        {/* Predictions, Rankings, Community, Head to Head */}
+        {/* The Game */}
         <div className="border-b border-white/10">
           <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-px bg-white/10">
             {/* Predictions */}
@@ -290,38 +290,7 @@ export default function ScorecardPage() {
               </div>
             </Link>
 
-            {/* Rankings */}
-            <Link
-              href="/leaderboard"
-              className="group relative bg-black px-8 sm:px-12 lg:p-10 py-12 lg:py-10 flex flex-col justify-between lg:min-h-[280px] hover:bg-zinc-950 transition-colors duration-300"
-            >
-              <div>
-                <div className="flex items-center gap-2 mb-5 lg:mb-4">
-                  <span className="inline-block w-2 h-2 bg-amber-500 lg:hidden" />
-                  <p className="text-amber-500/80 lg:text-amber-500/70 text-[10px] font-bold tracking-[0.25em] uppercase">
-                    Rankings
-                  </p>
-                </div>
-                <h3 className="text-white text-3xl lg:text-xl font-black uppercase tracking-tight leading-none lg:leading-tight mb-4 lg:mb-3 group-hover:text-amber-500 transition-colors">
-                  Leaderboard
-                </h3>
-                <p className="text-white/60 lg:text-white/50 text-sm font-semibold leading-7 lg:leading-6 max-w-sm">
-                  See who&apos;s stacking Skill Points. Compete for rank and
-                  status-gated rewards.
-                </p>
-              </div>
-              <div className="flex items-center gap-3 lg:gap-2 text-white/40 group-hover:text-amber-500 transition-colors mt-8 lg:mt-6">
-                <span className="inline-block w-8 h-px bg-white lg:hidden group-hover:w-12 transition-all duration-300" />
-                <span className="text-xs lg:text-[10px] font-bold tracking-[0.2em] uppercase">
-                  View Rankings
-                </span>
-                <svg className="w-4 h-4 lg:w-3 lg:h-3 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                </svg>
-              </div>
-            </Link>
-
-            {/* Community */}
+            {/* Polls */}
             <Link
               href="/polls"
               className="group relative bg-black px-8 sm:px-12 lg:p-10 py-12 lg:py-10 flex flex-col justify-between lg:min-h-[280px] hover:bg-zinc-950 transition-colors duration-300"
@@ -330,7 +299,7 @@ export default function ScorecardPage() {
                 <div className="flex items-center gap-2 mb-5 lg:mb-4">
                   <span className="inline-block w-2 h-2 bg-amber-500 lg:hidden" />
                   <p className="text-amber-500/80 lg:text-amber-500/70 text-[10px] font-bold tracking-[0.25em] uppercase">
-                    Community
+                    Polls
                   </p>
                 </div>
                 <h3 className="text-white text-3xl lg:text-xl font-black uppercase tracking-tight leading-none lg:leading-tight mb-4 lg:mb-3 group-hover:text-amber-500 transition-colors">
@@ -382,12 +351,338 @@ export default function ScorecardPage() {
                 </svg>
               </div>
             </Link>
+
+            {/* Community */}
+            <Link
+              href="/community"
+              className="group relative bg-black px-8 sm:px-12 lg:p-10 py-12 lg:py-10 flex flex-col justify-between lg:min-h-[280px] hover:bg-zinc-950 transition-colors duration-300"
+            >
+              <div>
+                <div className="flex items-center gap-2 mb-5 lg:mb-4">
+                  <span className="inline-block w-2 h-2 bg-amber-500 lg:hidden" />
+                  <p className="text-amber-500/80 lg:text-amber-500/70 text-[10px] font-bold tracking-[0.25em] uppercase">
+                    Community
+                  </p>
+                </div>
+                <h3 className="text-white text-3xl lg:text-xl font-black uppercase tracking-tight leading-none lg:leading-tight mb-4 lg:mb-3 group-hover:text-amber-500 transition-colors">
+                  The Feed
+                </h3>
+                <p className="text-white/60 lg:text-white/50 text-sm font-semibold leading-7 lg:leading-6 max-w-sm">
+                  Share predictions, hype fighters, and connect with fans who
+                  study the game.
+                </p>
+              </div>
+              <div className="flex items-center gap-3 lg:gap-2 text-white/40 group-hover:text-amber-500 transition-colors mt-8 lg:mt-6">
+                <span className="inline-block w-8 h-px bg-white lg:hidden group-hover:w-12 transition-all duration-300" />
+                <span className="text-xs lg:text-[10px] font-bold tracking-[0.2em] uppercase">
+                  Join In
+                </span>
+                <svg className="w-4 h-4 lg:w-3 lg:h-3 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                </svg>
+              </div>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* The Pledge */}
+      <section className="relative border-t border-white/5 overflow-hidden">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2">
+          <div className="relative min-h-[360px] lg:min-h-[480px] border-b lg:border-b-0 lg:border-r border-white/10">
+            <div
+              className="absolute inset-0 bg-zinc-900"
+              style={{
+                backgroundImage:
+                  "url(https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2Fwhytexas.jpg?alt=media)",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }}
+            />
+            <div
+              className="absolute inset-0 hidden lg:block"
+              style={{
+                background:
+                  "linear-gradient(to left, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 40%, rgba(0,0,0,0.1) 100%)",
+              }}
+            />
+            <div
+              className="absolute inset-0 lg:hidden"
+              style={{
+                background:
+                  "linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.1) 70%, transparent 100%)",
+              }}
+            />
+            <div
+              className="absolute inset-0 opacity-[0.06] mix-blend-overlay pointer-events-none"
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")`,
+                backgroundRepeat: "repeat",
+              }}
+            />
+          </div>
+          <div className="flex flex-col justify-center px-8 sm:px-12 lg:px-20 py-16 lg:py-24">
+            <div className="flex items-center gap-2 mb-6">
+              <span className="inline-block w-2 h-2 bg-amber-500" />
+              <p className="text-amber-500/80 text-[10px] font-bold tracking-[0.25em] uppercase">
+                Franchise
+              </p>
+            </div>
+            <h3 className="text-white text-4xl sm:text-5xl font-black uppercase tracking-tight leading-none mb-5">
+              The Pledge
+            </h3>
+            <p className="text-white/60 text-sm font-semibold leading-7 max-w-sm mb-8">
+              Pick a Texas gym. Ride their record for 16 weeks. Earn Loyalty
+              Points when your fighters win — and compete for seasonal rewards.
+            </p>
+            <Link
+              href="/pledge"
+              className="group inline-flex items-center gap-3 text-white text-xs font-bold tracking-[0.2em] uppercase hover:text-white/60 transition-colors w-fit"
+            >
+              <span className="inline-block w-8 h-px bg-white group-hover:w-12 transition-all duration-300" />
+              Choose Your Gym
+              <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+              </svg>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Rewards Store */}
+      <section className="relative border-t border-white/5 overflow-hidden">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2">
+          <div className="flex flex-col justify-center px-8 sm:px-12 lg:px-20 py-16 lg:py-24 order-2 lg:order-1">
+            <div className="flex items-center gap-2 mb-6">
+              <span className="inline-block w-2 h-2 bg-amber-500" />
+              <p className="text-amber-500/80 text-[10px] font-bold tracking-[0.25em] uppercase">
+                Spend Loop
+              </p>
+            </div>
+            <h3 className="text-white text-4xl sm:text-5xl font-black uppercase tracking-tight leading-none mb-5">
+              Rewards Store
+            </h3>
+            <p className="text-white/60 text-sm font-semibold leading-7 max-w-sm mb-8">
+              Spend TX-Credits and Loyalty Points on exclusive rewards — merch,
+              collectibles, premium drops, and status-gated items.
+            </p>
+            <Link
+              href="/rewards"
+              className="group inline-flex items-center gap-3 text-white text-xs font-bold tracking-[0.2em] uppercase hover:text-white/60 transition-colors w-fit"
+            >
+              <span className="inline-block w-8 h-px bg-white group-hover:w-12 transition-all duration-300" />
+              Browse Store
+              <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+              </svg>
+            </Link>
+          </div>
+          <div className="relative min-h-[360px] lg:min-h-[480px] order-1 lg:order-2 border-b lg:border-b-0 lg:border-l border-white/10">
+            <div
+              className="absolute inset-0 bg-zinc-900"
+              style={{
+                backgroundImage:
+                  "url(https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/bam2.jpg?alt=media)",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }}
+            />
+            <div
+              className="absolute inset-0 hidden lg:block"
+              style={{
+                background:
+                  "linear-gradient(to right, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 40%, rgba(0,0,0,0.1) 100%)",
+              }}
+            />
+            <div
+              className="absolute inset-0 lg:hidden"
+              style={{
+                background:
+                  "linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.1) 70%, transparent 100%)",
+              }}
+            />
+            <div
+              className="absolute inset-0 opacity-[0.06] mix-blend-overlay pointer-events-none"
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")`,
+                backgroundRepeat: "repeat",
+              }}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Identity — Fan Card, Locker, Quests */}
+      <section className="relative border-t border-white/5">
+        <div className="border-b border-white/10">
+          <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-px bg-white/10">
+            {/* Fan Card */}
+            <Link
+              href="/fan-card"
+              className="group relative bg-black px-8 sm:px-12 lg:p-10 py-12 lg:py-10 flex flex-col justify-between lg:min-h-[280px] hover:bg-zinc-950 transition-colors duration-300"
+            >
+              <div>
+                <div className="flex items-center gap-2 mb-5 lg:mb-4">
+                  <span className="inline-block w-2 h-2 bg-amber-500 lg:hidden" />
+                  <p className="text-amber-500/80 lg:text-amber-500/70 text-[10px] font-bold tracking-[0.25em] uppercase">
+                    Profile
+                  </p>
+                </div>
+                <h3 className="text-white text-3xl lg:text-xl font-black uppercase tracking-tight leading-none lg:leading-tight mb-4 lg:mb-3 group-hover:text-amber-500 transition-colors">
+                  Fan Card
+                </h3>
+                <p className="text-white/60 lg:text-white/50 text-sm font-semibold leading-7 lg:leading-6 max-w-sm">
+                  Your rank, badges, and stats — one shareable card that proves
+                  you study the game.
+                </p>
+              </div>
+              <div className="flex items-center gap-3 lg:gap-2 text-white/40 group-hover:text-amber-500 transition-colors mt-8 lg:mt-6">
+                <span className="inline-block w-8 h-px bg-white lg:hidden group-hover:w-12 transition-all duration-300" />
+                <span className="text-xs lg:text-[10px] font-bold tracking-[0.2em] uppercase">
+                  View Card
+                </span>
+                <svg className="w-4 h-4 lg:w-3 lg:h-3 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                </svg>
+              </div>
+            </Link>
+
+            {/* Locker */}
+            <Link
+              href="/locker"
+              className="group relative bg-black px-8 sm:px-12 lg:p-10 py-12 lg:py-10 flex flex-col justify-between lg:min-h-[280px] hover:bg-zinc-950 transition-colors duration-300"
+            >
+              <div>
+                <div className="flex items-center gap-2 mb-5 lg:mb-4">
+                  <span className="inline-block w-2 h-2 bg-amber-500 lg:hidden" />
+                  <p className="text-amber-500/80 lg:text-amber-500/70 text-[10px] font-bold tracking-[0.25em] uppercase">
+                    Collectibles
+                  </p>
+                </div>
+                <h3 className="text-white text-3xl lg:text-xl font-black uppercase tracking-tight leading-none lg:leading-tight mb-4 lg:mb-3 group-hover:text-amber-500 transition-colors">
+                  Locker
+                </h3>
+                <p className="text-white/60 lg:text-white/50 text-sm font-semibold leading-7 lg:leading-6 max-w-sm">
+                  Equip avatar frames, titles, card skins, and flair. Customize
+                  how you show up.
+                </p>
+              </div>
+              <div className="flex items-center gap-3 lg:gap-2 text-white/40 group-hover:text-amber-500 transition-colors mt-8 lg:mt-6">
+                <span className="inline-block w-8 h-px bg-white lg:hidden group-hover:w-12 transition-all duration-300" />
+                <span className="text-xs lg:text-[10px] font-bold tracking-[0.2em] uppercase">
+                  Open Locker
+                </span>
+                <svg className="w-4 h-4 lg:w-3 lg:h-3 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                </svg>
+              </div>
+            </Link>
+
+            {/* Quests */}
+            <Link
+              href="/fan-card"
+              className="group relative bg-black px-8 sm:px-12 lg:p-10 py-12 lg:py-10 flex flex-col justify-between lg:min-h-[280px] hover:bg-zinc-950 transition-colors duration-300"
+            >
+              <div>
+                <div className="flex items-center gap-2 mb-5 lg:mb-4">
+                  <span className="inline-block w-2 h-2 bg-amber-500 lg:hidden" />
+                  <p className="text-amber-500/80 lg:text-amber-500/70 text-[10px] font-bold tracking-[0.25em] uppercase">
+                    Challenges
+                  </p>
+                </div>
+                <h3 className="text-white text-3xl lg:text-xl font-black uppercase tracking-tight leading-none lg:leading-tight mb-4 lg:mb-3 group-hover:text-amber-500 transition-colors">
+                  Quests
+                </h3>
+                <p className="text-white/60 lg:text-white/50 text-sm font-semibold leading-7 lg:leading-6 max-w-sm">
+                  Complete challenges to earn badges, TX-Credits, and exclusive
+                  locker items.
+                </p>
+              </div>
+              <div className="flex items-center gap-3 lg:gap-2 text-white/40 group-hover:text-amber-500 transition-colors mt-8 lg:mt-6">
+                <span className="inline-block w-8 h-px bg-white lg:hidden group-hover:w-12 transition-all duration-300" />
+                <span className="text-xs lg:text-[10px] font-bold tracking-[0.2em] uppercase">
+                  View Quests
+                </span>
+                <svg className="w-4 h-4 lg:w-3 lg:h-3 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                </svg>
+              </div>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Compete — Leaderboard & Seasons */}
+      <section className="relative border-t border-white/5">
+        <div className="border-b border-white/10">
+          <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-px bg-white/10">
+            {/* Leaderboard */}
+            <Link
+              href="/leaderboard"
+              className="group relative bg-black px-8 sm:px-12 lg:p-10 py-12 lg:py-10 flex flex-col justify-between lg:min-h-[280px] hover:bg-zinc-950 transition-colors duration-300"
+            >
+              <div>
+                <div className="flex items-center gap-2 mb-5 lg:mb-4">
+                  <span className="inline-block w-2 h-2 bg-amber-500 lg:hidden" />
+                  <p className="text-amber-500/80 lg:text-amber-500/70 text-[10px] font-bold tracking-[0.25em] uppercase">
+                    Rankings
+                  </p>
+                </div>
+                <h3 className="text-white text-3xl lg:text-xl font-black uppercase tracking-tight leading-none lg:leading-tight mb-4 lg:mb-3 group-hover:text-amber-500 transition-colors">
+                  Leaderboard
+                </h3>
+                <p className="text-white/60 lg:text-white/50 text-sm font-semibold leading-7 lg:leading-6 max-w-sm">
+                  See who&apos;s stacking Skill Points. Climb the ranks and
+                  compete for status-gated rewards.
+                </p>
+              </div>
+              <div className="flex items-center gap-3 lg:gap-2 text-white/40 group-hover:text-amber-500 transition-colors mt-8 lg:mt-6">
+                <span className="inline-block w-8 h-px bg-white lg:hidden group-hover:w-12 transition-all duration-300" />
+                <span className="text-xs lg:text-[10px] font-bold tracking-[0.2em] uppercase">
+                  View Rankings
+                </span>
+                <svg className="w-4 h-4 lg:w-3 lg:h-3 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                </svg>
+              </div>
+            </Link>
+
+            {/* Seasons */}
+            <Link
+              href="/seasons"
+              className="group relative bg-black px-8 sm:px-12 lg:p-10 py-12 lg:py-10 flex flex-col justify-between lg:min-h-[280px] hover:bg-zinc-950 transition-colors duration-300"
+            >
+              <div>
+                <div className="flex items-center gap-2 mb-5 lg:mb-4">
+                  <span className="inline-block w-2 h-2 bg-amber-500 lg:hidden" />
+                  <p className="text-amber-500/80 lg:text-amber-500/70 text-[10px] font-bold tracking-[0.25em] uppercase">
+                    Competition
+                  </p>
+                </div>
+                <h3 className="text-white text-3xl lg:text-xl font-black uppercase tracking-tight leading-none lg:leading-tight mb-4 lg:mb-3 group-hover:text-amber-500 transition-colors">
+                  Seasons
+                </h3>
+                <p className="text-white/60 lg:text-white/50 text-sm font-semibold leading-7 lg:leading-6 max-w-sm">
+                  16-week competitive windows with exclusive rewards and
+                  leaderboards for top performers.
+                </p>
+              </div>
+              <div className="flex items-center gap-3 lg:gap-2 text-white/40 group-hover:text-amber-500 transition-colors mt-8 lg:mt-6">
+                <span className="inline-block w-8 h-px bg-white lg:hidden group-hover:w-12 transition-all duration-300" />
+                <span className="text-xs lg:text-[10px] font-bold tracking-[0.2em] uppercase">
+                  View Seasons
+                </span>
+                <svg className="w-4 h-4 lg:w-3 lg:h-3 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                </svg>
+              </div>
+            </Link>
           </div>
         </div>
       </section>
 
       {/* Black Card Highlight */}
-      <section className="-mt-10 relative border-t border-white/5 overflow-hidden">
+      <section className="relative border-t border-white/5 overflow-hidden">
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2">
           <div className="flex flex-col justify-center px-8 sm:px-12 lg:px-20 py-20 lg:py-28 order-2 lg:order-1">
             <div className="flex items-center gap-3 mb-6">
@@ -400,15 +695,17 @@ export default function ScorecardPage() {
               Unlock the full economy.
             </h3>
             <p className="text-white/60 text-sm font-semibold leading-7 mb-8 max-w-md">
-              Prop Picks, The Pledge, Rewards Store, and full Leaderboard
-              access. Powered by Stripe — zero app store tax.
+              The full Scorecard experience — predictions, franchise mode,
+              premium rewards, and seasonal competition. Powered by Stripe.
             </p>
             <ul className="space-y-3 mb-10">
               {[
                 "Predict bout outcomes for Skill Points",
-                "Choose your Gym Franchise for the 16-week season",
-                "Spend TX-Credits on real merch and access",
-                "Compete for rank and status-gated rewards",
+                "Pledge a gym and earn Loyalty Points each season",
+                "Access premium rewards and exclusive collectibles",
+                "Equip locker items, badges, and Fan Card customization",
+                "Compete on seasonal leaderboards",
+                "Join the community feed",
               ].map((item) => (
                 <li
                   key={item}
@@ -549,7 +846,7 @@ export default function ScorecardPage() {
             <p className="text-amber-500/70 text-[10px] font-bold tracking-[0.25em] uppercase mb-4">
               Rank Progression
             </p>
-            <div className="grid grid-cols-2 gap-px bg-white/10">
+            <div className="grid grid-cols-2 gap-px bg-white/10 mb-10">
               {RANKS.map((rank, i) => (
                 <div key={rank.name} className="relative bg-black p-4 sm:p-5">
                   <p className="text-amber-500/50 text-[10px] font-bold tracking-[0.2em] uppercase mb-2">
@@ -566,6 +863,43 @@ export default function ScorecardPage() {
                     className="absolute bottom-0 left-0 h-px"
                     style={{ width: `${25 * (i + 1)}%`, background: "#f59e0b", opacity: 0.3 + i * 0.15 }}
                   />
+                </div>
+              ))}
+            </div>
+
+            {/* Earning Tables */}
+            <p className="text-blue-400/70 text-[10px] font-bold tracking-[0.25em] uppercase mb-3">
+              Earn Skill Points
+            </p>
+            <div className="border-t border-white/10 mb-8">
+              {SP_ACTIONS.map((row) => (
+                <div key={row.action} className="flex items-center justify-between py-2.5 border-b border-white/5">
+                  <p className="text-white/50 text-xs font-semibold">{row.action}</p>
+                  <p className="text-blue-400/80 text-xs font-bold tabular-nums tracking-wider">{row.points}</p>
+                </div>
+              ))}
+            </div>
+
+            <p className="text-emerald-400/70 text-[10px] font-bold tracking-[0.25em] uppercase mb-3">
+              Earn TX-Credits
+            </p>
+            <div className="border-t border-white/10 mb-8">
+              {TC_ACTIONS.map((row) => (
+                <div key={row.action} className="flex items-center justify-between py-2.5 border-b border-white/5">
+                  <p className="text-white/50 text-xs font-semibold">{row.action}</p>
+                  <p className="text-emerald-400/80 text-xs font-bold tabular-nums tracking-wider">{row.points}</p>
+                </div>
+              ))}
+            </div>
+
+            <p className="text-purple-400/70 text-[10px] font-bold tracking-[0.25em] uppercase mb-3">
+              Earn Loyalty Points
+            </p>
+            <div className="border-t border-white/10">
+              {LP_ACTIONS.map((row) => (
+                <div key={row.action} className="flex items-center justify-between py-2.5 border-b border-white/5">
+                  <p className="text-white/50 text-xs font-semibold">{row.action}</p>
+                  <p className="text-purple-400/80 text-xs font-bold tabular-nums tracking-wider">{row.points}</p>
                 </div>
               ))}
             </div>

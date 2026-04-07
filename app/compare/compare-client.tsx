@@ -137,7 +137,7 @@ function FighterPicker({
   }
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className={`relative ${open && query.trim() ? "z-30" : ""}`}>
       <p className="text-white/40 text-[10px] font-semibold tracking-wider uppercase mb-2">
         {label}
       </p>
@@ -149,47 +149,56 @@ function FighterPicker({
           setQuery(e.target.value)
           setOpen(true)
         }}
-        onFocus={() => query.trim() && setOpen(true)}
+        onFocus={() => {
+          if (query.trim()) setOpen(true)
+        }}
         className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm font-medium placeholder:text-white/30 focus:outline-none focus:border-white/25 transition-colors"
       />
-      {open && results.length > 0 && (
-        <ul className="absolute z-20 left-0 right-0 mt-1 bg-neutral-900 border border-white/10 rounded-lg overflow-hidden shadow-xl max-h-72 overflow-y-auto">
-          {results.map((f) => (
-            <li key={f.id}>
-              <button
-                onClick={() => {
-                  onSelect(f)
-                  setQuery("")
-                  setOpen(false)
-                }}
-                className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-white/5 transition-colors"
-              >
-                <div className="relative w-8 h-8 rounded bg-white/5 overflow-hidden shrink-0">
-                  {f.profileImageUrl ? (
-                    <Image
-                      src={f.profileImageUrl}
-                      alt=""
-                      fill
-                      className="object-cover"
-                      sizes="32px"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-white/15 text-xs font-bold">
-                      {f.firstName[0]}{f.lastName[0]}
-                    </div>
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-white text-xs font-semibold truncate uppercase">
-                    {f.firstName} {f.lastName}
-                  </p>
-                  <p className="text-white/40 text-[11px] truncate">
-                    {f.record.wins}-{f.record.losses}-{f.record.draws} &middot; {f.weightClass}
-                  </p>
-                </div>
-              </button>
+      {open && query.trim().length > 0 && (
+        <ul className="absolute z-30 left-0 right-0 mt-1 bg-neutral-900 border border-white/10 rounded-lg overflow-hidden shadow-xl max-h-72 overflow-y-auto">
+          {results.length > 0 ? (
+            results.map((f) => (
+              <li key={f.id}>
+                <button
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => {
+                    onSelect(f)
+                    setQuery("")
+                    setOpen(false)
+                  }}
+                  className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-white/5 transition-colors"
+                >
+                  <div className="relative w-8 h-8 rounded bg-white/5 overflow-hidden shrink-0">
+                    {f.profileImageUrl ? (
+                      <Image
+                        src={f.profileImageUrl}
+                        alt=""
+                        fill
+                        className="object-cover"
+                        sizes="32px"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-white/15 text-xs font-bold">
+                        {f.firstName[0]}{f.lastName[0]}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white text-xs font-semibold truncate uppercase">
+                      {f.firstName} {f.lastName}
+                    </p>
+                    <p className="text-white/40 text-[11px] truncate">
+                      {f.record.wins}-{f.record.losses}-{f.record.draws} &middot; {f.weightClass}
+                    </p>
+                  </div>
+                </button>
+              </li>
+            ))
+          ) : (
+            <li className="px-4 py-3 text-white/30 text-xs">
+              No fighters found for &ldquo;{query}&rdquo;
             </li>
-          ))}
+          )}
         </ul>
       )}
     </div>

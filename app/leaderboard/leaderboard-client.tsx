@@ -1,5 +1,7 @@
 "use client"
 
+import { useAuth } from "@/lib/auth-context"
+import UpsellBanner from "@/components/upsell-banner"
 import type { LeaderboardEntry } from "../actions/users"
 
 const RANK_STYLES: Record<string, { bg: string; text: string; border: string }> = {
@@ -45,6 +47,9 @@ interface LeaderboardClientProps {
 export default function LeaderboardClient({
   entries,
 }: LeaderboardClientProps) {
+  const { profile } = useAuth()
+  const isBlackCard = profile?.subscriptionStatus === 'active'
+
   if (entries.length === 0) {
     return (
       <div className="text-center py-24 border border-white/8 rounded-xl bg-white/2">
@@ -174,6 +179,17 @@ export default function LeaderboardClient({
           })}
         </div>
       </div>
+
+      {/* Soft upsell for free users */}
+      {!isBlackCard && (
+        <div className="mt-6">
+          <UpsellBanner
+            compact
+            headline="Want to climb the ranks?"
+            message="Make Prop Picks to earn Skill Points and compete on the leaderboard."
+          />
+        </div>
+      )}
     </>
   )
 }

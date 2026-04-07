@@ -4,6 +4,7 @@ import { useState } from "react"
 import type { Prop } from "../actions/props"
 import { placePick } from "../actions/props"
 import { useAuth } from "../../lib/auth-context"
+import UpsellBanner from "../../components/upsell-banner"
 
 interface PicksClientProps {
   props: Prop[]
@@ -28,16 +29,10 @@ export default function PicksClient({ props }: PicksClientProps) {
 
   if (!isBlackCard) {
     return (
-      <div className="text-center py-24 border border-amber-500/20 rounded-xl bg-amber-500/3">
-        <div className="w-3 h-3 rounded-full bg-amber-500 mx-auto mb-4" />
-        <p className="text-white text-sm font-semibold leading-6 mb-2">
-          Black Card Required
-        </p>
-        <p className="text-white/40 text-xs leading-5 max-w-sm mx-auto">
-          Prop Picks is a Black Card feature. Subscribe for $14.99/mo to start
-          earning Skill Points through predictions.
-        </p>
-      </div>
+      <UpsellBanner
+        headline="Black Card Required"
+        message="Prop Picks is a Black Card feature. Subscribe for $14.99/mo to start earning Skill Points through predictions."
+      />
     )
   }
 

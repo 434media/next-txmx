@@ -91,13 +91,7 @@ export default function ShareButton({ url, title, text, variant = "default" }: S
   return (
     <div ref={ref} className="relative inline-block">
       <button
-        onClick={() => {
-          if (typeof navigator !== "undefined" && "share" in navigator) {
-            handleNativeShare()
-          } else {
-            setOpen(!open)
-          }
-        }}
+        onClick={() => setOpen(!open)}
         className={
           isCompact
             ? "flex items-center gap-1.5 text-white/50 hover:text-white/70 transition-colors p-1.5"

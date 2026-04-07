@@ -1,6 +1,12 @@
 "use server"
 
 import { firestore } from "../../lib/firebase-admin"
+import { awardSP } from "./skill-points"
+import { awardCredits } from "./credits"
+import { checkCooldown, checkCategoryCap, setCooldown, incrementDailyTracker } from "./rate-limiter"
+import { getEconomyConfig } from "./economy"
+import { incrementQuestProgress } from "./quests"
+import { getUserByUid } from "./users"
 
 export type PropStatus = "open" | "locked" | "settled" | "voided"
 export type PropType = "match_winner" | "method" | "round" | "over_under"
@@ -109,7 +115,24 @@ export async function placePick(
   propId: string,
   userId: string,
   optionId: string
-): Promise<{ success: boolean }> {
+): Promise<{ success: boolean; error?: string }> {
+  // Check cooldown and category cap before creating the pick
+  const config = await getEconomyConfig()
+
+  if (config.predictionCooldownSeconds > 0) {
+    const cdResult = await checkCooldown(userId, 'prediction', config.predictionCooldownSeconds * 1000)
+    if (!cdResult.allowed) {
+      return { success: false, error: cdResult.reason || 'Cooldown active' }
+    }
+  }
+
+  if (config.dailyPredictionLimit > 0) {
+    const catResult = await checkCategoryCap(userId, 'predictions', config.dailyPredictionLimit)
+    if (!catResult.allowed) {
+      return { success: false, error: catResult.reason || 'Daily prediction limit reached' }
+    }
+  }
+
   const propRef = firestore.collection("props").doc(propId)
   const propSnap = await propRef.get()
 
@@ -143,6 +166,17 @@ export async function placePick(
     settled: false,
     won: null,
   })
+
+  // Record cooldown and category usage
+  try {
+    await Promise.all([
+      setCooldown(userId, 'prediction'),
+      incrementDailyTracker(userId, 'predictions', 1),
+      incrementQuestProgress(userId, 'prediction_placed'),
+    ])
+  } catch {
+    // Non-critical
+  }
 
   return { success: true }
 }
@@ -198,18 +232,65 @@ export async function settleProp(propId: string, correctOptionId: string) {
     .get()
 
   const batch = firestore.batch()
+  const winnerUserIds: string[] = []
   for (const pickDoc of picksSnap.docs) {
     const pick = pickDoc.data() as Omit<PropPick, "id">
     const won = pick.optionId === correctOptionId
     batch.update(pickDoc.ref, { settled: true, won })
+    if (won) {
+      winnerUserIds.push(pick.userId)
+    }
   }
   await batch.commit()
+
+  // Award SP and TC to winners via ledgers
+  const config = await getEconomyConfig()
+  for (const winnerId of winnerUserIds) {
+    const spKey = `prop_sp:${propId}:${winnerId}`
+    const tcKey = `prop_tc:${propId}:${winnerId}`
+
+    // Check subscriber status for earning multiplier
+    const winner = await getUserByUid(winnerId)
+    const isBlackCard = winner?.subscriptionStatus === 'active'
+    const subMult = isBlackCard && config.subscriberMultiplier > 1 ? config.subscriberMultiplier : 1
+
+    try {
+      const boostedSP = Math.max(1, Math.floor(prop.spReward * subMult))
+      await awardSP(winnerId, boostedSP, 'prop_pick_win', spKey, {
+        referenceId: propId,
+        eventId: prop.eventId,
+        sourceType: prop.isUnderdog ? 'prop_pick_underdog' : 'prop_pick_standard',
+        multiplierApplied: subMult > 1 ? subMult : undefined,
+      })
+    } catch {
+      // SP award failure is logged but doesn't block settlement
+    }
+
+    try {
+      if (prop.tcReward > 0) {
+        const boostedTC = Math.max(1, Math.floor(prop.tcReward * subMult))
+        await awardCredits(
+          winnerId,
+          boostedTC,
+          `Prop pick win: ${prop.title}`,
+          tcKey,
+          { propId, eventId: prop.eventId, ...(subMult > 1 ? { subscriberMultiplier: subMult } : {}) }
+        )
+      }
+    } catch {
+      // TC award failure is logged but doesn't block settlement
+    }
+
+    try {
+      await incrementQuestProgress(winnerId, 'prediction_won')
+    } catch {
+      // Quest tracking failure is non-critical
+    }
+  }
 
   return {
     success: true,
     totalPicks: picksSnap.size,
-    winners: picksSnap.docs.filter(
-      (d) => (d.data() as Omit<PropPick, "id">).optionId === correctOptionId
-    ).length,
+    winners: winnerUserIds.length,
   }
 }
