@@ -81,7 +81,7 @@ export default function PollManager() {
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
                 placeholder="Who wins this weekend's main event?"
-                className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500"
+                className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 bg-white placeholder:text-gray-400 focus:outline-none focus:border-[#FFB800] focus:ring-1 focus:ring-[#FFB800]/30"
               />
             </div>
 
@@ -99,7 +99,7 @@ export default function PollManager() {
                         setOptions(next)
                       }}
                       placeholder={`Option ${i + 1}`}
-                      className="flex-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500"
+                      className="flex-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 bg-white placeholder:text-gray-400 focus:outline-none focus:border-[#FFB800] focus:ring-1 focus:ring-[#FFB800]/30"
                     />
                     {options.length > 2 && (
                       <button
@@ -128,7 +128,7 @@ export default function PollManager() {
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value as "event" | "fighter" | "general")}
-                  className="border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500"
+                  className="border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 bg-white focus:outline-none focus:border-[#FFB800] focus:ring-1 focus:ring-[#FFB800]/30"
                 >
                   <option value="general">General</option>
                   <option value="event">Event</option>
@@ -141,7 +141,7 @@ export default function PollManager() {
                   type="datetime-local"
                   value={closesAt}
                   onChange={(e) => setClosesAt(e.target.value)}
-                  className="border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500"
+                  className="border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 bg-white focus:outline-none focus:border-[#FFB800] focus:ring-1 focus:ring-[#FFB800]/30"
                 />
               </div>
             </div>
