@@ -170,6 +170,46 @@ export default function ScorecardPage() {
       </section>
 
       {/* ============================================================
+          2b. THIS WEEKEND — Urgency strip
+          ============================================================ */}
+      <section className="relative border-t border-white/10">
+        <div className="max-w-6xl mx-auto px-8 sm:px-12 lg:px-20 py-8 sm:py-10">
+          <div className="relative border border-amber-500/20 rounded-2xl bg-amber-500/3 px-6 sm:px-8 py-6 overflow-hidden">
+            {/* Subtle amber glow */}
+            <div className="absolute -top-12 -left-12 w-40 h-40 bg-amber-500/8 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-12 -right-12 w-40 h-40 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
+            <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+              <div className="flex items-start sm:items-center gap-4">
+                <div className="shrink-0 mt-1 sm:mt-0">
+                  <div className="relative w-2.5 h-2.5">
+                    <div className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-40" />
+                    <div className="relative w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                  </div>
+                </div>
+                <div>
+                  <p className="text-white text-sm sm:text-base font-black uppercase tracking-tight leading-tight mb-1">
+                    Fight cards drop every weekend
+                  </p>
+                  <p className="text-white/50 text-xs font-semibold leading-relaxed">
+                    Browse upcoming matchups, lock in your picks before the bell, and earn points on every correct call.
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/events"
+                className="inline-flex items-center gap-2.5 bg-amber-500 text-black text-xs font-bold tracking-[0.15em] uppercase px-5 py-2.5 rounded-lg hover:bg-amber-400 transition-colors shrink-0 w-fit"
+              >
+                See Upcoming Events
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                </svg>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================================
           3. FREE TO PLAY — Fighters, Events, Polls, Compare
           ============================================================ */}
       <section className="relative py-24 overflow-hidden">
@@ -447,12 +487,51 @@ export default function ScorecardPage() {
               </p>
             </div>
           </div>
+
+          {/* Rank Progression Ladder */}
+          <div className="mt-14 border border-white/10 rounded-2xl p-6 sm:p-8 relative overflow-hidden">
+            <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-64 h-32 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
+            <p className="text-amber-500/70 text-[10px] font-bold tracking-[0.25em] uppercase mb-6 relative">
+              Rank Progression
+            </p>
+            <div className="relative">
+              {/* Track background */}
+              <div className="absolute top-5 left-0 right-0 h-0.5 bg-white/10 rounded-full" />
+              {/* Filled progress (demo: ~35% = early Contender) */}
+              <div className="absolute top-5 left-0 h-0.5 bg-linear-to-r from-amber-500 to-amber-500/40 rounded-full" style={{ width: "35%" }} />
+
+              <div className="grid grid-cols-4 relative">
+                {[
+                  { name: "Rookie", sp: "0", pct: "0%", active: true },
+                  { name: "Contender", sp: "5K", pct: "33%", active: true },
+                  { name: "Champion", sp: "25K", pct: "66%", active: false },
+                  { name: "Hall of Fame", sp: "100K+", pct: "100%", active: false },
+                ].map((rank, i) => (
+                  <div key={rank.name} className={`flex flex-col ${i === 3 ? "items-end" : i === 0 ? "items-start" : "items-center"}`}>
+                    <div
+                      className={`w-2.5 h-2.5 rounded-full border-2 mb-3 ${
+                        rank.active
+                          ? "bg-amber-500 border-amber-500/50"
+                          : "bg-zinc-800 border-white/15"
+                      }`}
+                    />
+                    <p className={`text-sm sm:text-base font-black uppercase tracking-tight leading-none mb-1 ${
+                      rank.active ? "text-white" : "text-white/30"
+                    }`}>
+                      {rank.name}
+                    </p>
+                    <p className={`text-[10px] font-bold tabular-nums tracking-wider ${
+                      rank.active ? "text-amber-500/70" : "text-white/20"
+                    }`}>
+                      {rank.sp} SP
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </section>
-
-      {/* ============================================================
-          5. FREE vs BLACK CARD — Side-by-side comparison
-          ============================================================ */}
       <section className="relative border-t border-white/5 overflow-hidden">
         <div className="max-w-6xl mx-auto px-8 sm:px-12 lg:px-20 py-20 lg:py-28">
           <div className="text-center mb-14">
@@ -601,37 +680,95 @@ export default function ScorecardPage() {
                 </svg>
               </Link>
             </div>
-            <div className="relative min-h-[360px] lg:min-h-[480px] order-1 lg:order-2 border-b lg:border-b-0 lg:border-l border-white/10">
-              <div
-                className="absolute inset-0 bg-zinc-900"
-                style={{
-                  backgroundImage:
-                    "url(https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2FDay2-21.jpg?alt=media)",
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                }}
-              />
-              <div
-                className="absolute inset-0 hidden lg:block"
-                style={{
-                  background:
-                    "linear-gradient(to right, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 40%, rgba(0,0,0,0.1) 100%)",
-                }}
-              />
-              <div
-                className="absolute inset-0 lg:hidden"
-                style={{
-                  background:
-                    "linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.1) 70%, transparent 100%)",
-                }}
-              />
-              <div
-                className="absolute inset-0 opacity-[0.06] mix-blend-overlay pointer-events-none"
-                style={{
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")`,
-                  backgroundRepeat: "repeat",
-                }}
-              />
+            <div className="relative min-h-[360px] lg:min-h-[480px] order-1 lg:order-2 border-b lg:border-b-0 lg:border-l border-white/10 bg-zinc-950 flex items-center justify-center p-6 sm:p-10 lg:p-12">
+              {/* Mock Pick Card UI */}
+              <div className="w-full max-w-sm flex flex-col space-y-3">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="inline-block w-1.5 h-1.5 bg-amber-500 rounded-full" />
+                  <p className="text-amber-500/70 text-[10px] font-bold tracking-[0.25em] uppercase">What picks look like</p>
+                </div>
+                {/* Card 1 — Match Winner (selected state) */}
+                <div className="border border-white/10 rounded-xl p-5 bg-white/2">
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <h4 className="text-white text-sm font-bold leading-snug">
+                      Garcia vs. Morales
+                    </h4>
+                    <span className="text-white/30 text-[10px] font-semibold tracking-wider uppercase shrink-0">
+                      Match Winner
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="text-blue-400 text-xs font-semibold">250 SP</span>
+                    <span className="text-emerald-400 text-xs font-semibold">100 TC</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 mb-4">
+                    <div className="px-3 py-2.5 rounded-lg border border-white/30 bg-white/10 text-white text-sm font-semibold text-center">
+                      Garcia
+                    </div>
+                    <div className="px-3 py-2.5 rounded-lg border border-white/8 bg-white/2 text-white/50 text-sm font-semibold text-center">
+                      Morales
+                    </div>
+                  </div>
+                  <div className="text-[10px] font-bold tracking-wider uppercase px-4 py-2 rounded-lg bg-amber-500/90 text-black text-center">
+                    Lock In Pick
+                  </div>
+                </div>
+
+                {/* Card 2 — Over/Under with Underdog badge */}
+                <div className="border border-white/10 rounded-xl p-5 bg-white/2">
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <h4 className="text-white text-sm font-bold leading-snug">
+                      Reyes vs. Tran — Total Rounds
+                    </h4>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="text-amber-400 text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20">
+                        Underdog
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="text-blue-400 text-xs font-semibold">1,250 SP</span>
+                    <span className="text-emerald-400 text-xs font-semibold">100 TC</span>
+                    <span className="text-amber-400/70 text-xs font-medium">1.25x</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="px-3 py-2.5 rounded-lg border border-white/8 bg-white/2 text-white/50 text-sm font-semibold text-center">
+                      Over 4.5
+                    </div>
+                    <div className="px-3 py-2.5 rounded-lg border border-white/8 bg-white/2 text-white/50 text-sm font-semibold text-center">
+                      Under 4.5
+                    </div>
+                  </div>
+                </div>
+
+                {/* Card 3 — Locked pick (submitted state) */}
+                <div className="border border-emerald-500/20 rounded-xl p-5 bg-emerald-500/3">
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <h4 className="text-white text-sm font-bold leading-snug">
+                      Salazar vs. Kim
+                    </h4>
+                    <span className="text-white/30 text-[10px] font-semibold tracking-wider uppercase shrink-0">
+                      Method
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                    <p className="text-emerald-400 text-sm font-semibold">
+                      Pick locked: <span className="text-white/80">Salazar by KO/TKO</span>
+                    </p>
+                  </div>
+                </div>
+
+                {/* Summary strip */}
+                <div className="flex items-center justify-between px-1 pt-2">
+                  <p className="text-white/30 text-[10px] font-bold tracking-[0.2em] uppercase">
+                    3 picks &middot; 1 locked
+                  </p>
+                  <p className="text-amber-500/50 text-[10px] font-bold tracking-[0.2em] uppercase">
+                    1,750 SP potential
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
