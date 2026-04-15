@@ -1,11 +1,112 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useRef, useEffect, useCallback } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import type { Fighter } from "../../lib/types/fighter"
 
 const PER_PAGE = 24
+
+// ── Reusable filter dropdown ──────────────────────────────────────────
+function FilterDropdown({
+  label,
+  value,
+  options,
+  onChange,
+  searchable = false,
+}: {
+  label: string
+  value: string
+  options: { value: string; label: string }[]
+  onChange: (v: string) => void
+  searchable?: boolean
+}) {
+  const [open, setOpen] = useState(false)
+  const [search, setSearch] = useState("")
+  const ref = useRef<HTMLDivElement>(null)
+
+  const close = useCallback(() => {
+    setOpen(false)
+    setSearch("")
+  }, [])
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) close()
+    }
+    document.addEventListener("mousedown", handleClick)
+    return () => document.removeEventListener("mousedown", handleClick)
+  }, [close])
+
+  const filtered = useMemo(() => {
+    if (!search) return options
+    const q = search.toLowerCase()
+    return options.filter((o) => o.label.toLowerCase().includes(q))
+  }, [options, search])
+
+  const displayLabel =
+    value === "all" ? label : options.find((o) => o.value === value)?.label ?? value
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => { setOpen((o) => !o); setSearch("") }}
+        className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm font-medium leading-6 focus:outline-none focus:border-white/25 transition-colors cursor-pointer min-w-[140px] text-left"
+      >
+        <span className={value === "all" ? "text-white/80" : "text-white truncate max-w-40"}>
+          {displayLabel}
+        </span>
+        <svg className={`w-3.5 h-3.5 text-white/40 shrink-0 ml-auto transition-transform ${open ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+        </svg>
+      </button>
+      {open && (
+        <div className="absolute top-full mt-1 right-0 sm:left-0 w-64 bg-zinc-900 border border-white/10 rounded-lg shadow-2xl z-50 overflow-hidden">
+          {searchable && (
+            <div className="p-2 border-b border-white/10">
+              <input
+                type="text"
+                placeholder={`Search ${label.toLowerCase().replace("all ", "")}...`}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-white text-xs font-medium placeholder:text-white/40 focus:outline-none focus:border-white/25 transition-colors"
+                autoFocus
+              />
+            </div>
+          )}
+          <ul className="max-h-60 overflow-y-auto overscroll-contain py-1">
+            <li>
+              <button
+                type="button"
+                onClick={() => { onChange("all"); close() }}
+                className={`w-full text-left px-3 py-2 text-xs font-medium transition-colors ${value === "all" ? "text-amber-500 bg-amber-500/10" : "text-white/70 hover:bg-white/5 hover:text-white"}`}
+              >
+                {label}
+              </button>
+            </li>
+            {filtered.map((o) => (
+              <li key={o.value}>
+                <button
+                  type="button"
+                  onClick={() => { onChange(o.value); close() }}
+                  className={`w-full text-left px-3 py-2 text-xs font-medium transition-colors truncate ${value === o.value ? "text-amber-500 bg-amber-500/10" : "text-white/70 hover:bg-white/5 hover:text-white"}`}
+                >
+                  {o.label}
+                </button>
+              </li>
+            ))}
+            {searchable && filtered.length === 0 && (
+              <li className="px-3 py-4 text-center text-white/30 text-xs font-medium">
+                No results for &ldquo;{search}&rdquo;
+              </li>
+            )}
+          </ul>
+        </div>
+      )}
+    </div>
+  )
+}
 
 interface FightersClientProps {
   fighters: Fighter[]
@@ -28,6 +129,28 @@ export default function FightersClient({ fighters }: FightersClientProps) {
     const g = new Set(fighters.map((f) => f.gym).filter(Boolean) as string[])
     return Array.from(g).sort()
   }, [fighters])
+
+  const regionOptions = [
+    { value: "TX", label: "Texas" },
+    { value: "MX", label: "Mexico" },
+    { value: "OTHER", label: "Other" },
+  ]
+
+  const weightClassOptions = useMemo(
+    () => weightClasses.map((wc) => ({ value: wc, label: wc })),
+    [weightClasses]
+  )
+
+  const statusOptions = [
+    { value: "active", label: "Active" },
+    { value: "inactive", label: "Inactive" },
+    { value: "retired", label: "Retired" },
+  ]
+
+  const gymOptions = useMemo(
+    () => gyms.map((g) => ({ value: g, label: g })),
+    [gyms]
+  )
 
   const filtered = useMemo(() => {
     return fighters.filter((f) => {
@@ -87,51 +210,33 @@ export default function FightersClient({ fighters }: FightersClientProps) {
             className="w-full bg-white/5 border border-white/10 rounded-lg pl-11 pr-4 py-3 text-white text-sm font-medium leading-6 placeholder:text-white/40 focus:outline-none focus:border-white/25 focus:bg-white/[0.07] transition-colors"
           />
         </div>
-        <select
+        <FilterDropdown
+          label="All Regions"
           value={regionFilter}
-          onChange={(e) => handleFilterChange(setRegionFilter, e.target.value)}
-          className="bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white/80 text-sm font-medium leading-6 focus:outline-none focus:border-white/25 transition-colors appearance-none cursor-pointer"
-        >
-          <option value="all">All Regions</option>
-          <option value="TX">Texas</option>
-          <option value="MX">Mexico</option>
-          <option value="OTHER">Other</option>
-        </select>
-        <select
+          options={regionOptions}
+          onChange={(v) => handleFilterChange(setRegionFilter, v)}
+        />
+        <FilterDropdown
+          label="All Weight Classes"
           value={weightFilter}
-          onChange={(e) => handleFilterChange(setWeightFilter, e.target.value)}
-          className="bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white/80 text-sm font-medium leading-6 focus:outline-none focus:border-white/25 transition-colors appearance-none cursor-pointer"
-        >
-          <option value="all">All Weight Classes</option>
-          {weightClasses.map((wc) => (
-            <option key={wc} value={wc}>
-              {wc}
-            </option>
-          ))}
-        </select>
-        <select
+          options={weightClassOptions}
+          onChange={(v) => handleFilterChange(setWeightFilter, v)}
+          searchable
+        />
+        <FilterDropdown
+          label="All Statuses"
           value={statusFilter}
-          onChange={(e) => handleFilterChange(setStatusFilter, e.target.value)}
-          className="bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white/80 text-sm font-medium leading-6 focus:outline-none focus:border-white/25 transition-colors appearance-none cursor-pointer"
-        >
-          <option value="all">All Statuses</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-          <option value="retired">Retired</option>
-        </select>
+          options={statusOptions}
+          onChange={(v) => handleFilterChange(setStatusFilter, v)}
+        />
         {gyms.length > 0 && (
-          <select
+          <FilterDropdown
+            label="All Gyms"
             value={gymFilter}
-            onChange={(e) => handleFilterChange(setGymFilter, e.target.value)}
-            className="bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white/80 text-sm font-medium leading-6 focus:outline-none focus:border-white/25 transition-colors appearance-none cursor-pointer"
-          >
-            <option value="all">All Gyms</option>
-            {gyms.map((g) => (
-              <option key={g} value={g}>
-                {g}
-              </option>
-            ))}
-          </select>
+            options={gymOptions}
+            onChange={(v) => handleFilterChange(setGymFilter, v)}
+            searchable
+          />
         )}
       </div>
 
