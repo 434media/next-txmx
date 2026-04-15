@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     // Generate a safe filename
     const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
     const folderParam = formData.get('folder') as string | null
-    const allowedFolders = ['fighters', '8count']
+    const allowedFolders = ['fighters', '8count', 'fan-cards']
     const folder = folderParam && allowedFolders.includes(folderParam) ? folderParam : 'fighters'
     const safeName = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
 

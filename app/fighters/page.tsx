@@ -35,19 +35,19 @@ export default async function FightersPage() {
       <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
         <Link
           href="/scorecard"
-          className="inline-flex items-center gap-2 text-white/30 text-[11px] font-semibold tracking-widest uppercase hover:text-white/60 transition-colors mb-8 group"
+          className="inline-flex items-center gap-2 text-white/40 text-[11px] font-semibold tracking-widest uppercase hover:text-white/70 transition-colors mb-8 group"
         >
           <svg className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
           Scorecard
         </Link>
         <div className="mb-12">
-          <p className="text-white/50 text-xs font-semibold tracking-[0.3em] uppercase mb-4">
+          <p className="text-amber-500/60 text-xs font-bold tracking-[0.3em] uppercase mb-4">
             TXMX Boxing
           </p>
           <h1 className="text-white text-4xl sm:text-5xl font-bold tracking-wide leading-none mb-4 uppercase">
             Fighter Directory
           </h1>
-          <p className="text-white/50 text-sm sm:text-base leading-relaxed max-w-xl">
+          <p className="text-white/60 text-sm sm:text-base font-medium leading-relaxed max-w-xl">
             Every TDLR-licensed boxer in Texas — searchable, sortable, and
             always up to date.
           </p>

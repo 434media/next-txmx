@@ -112,6 +112,15 @@
         { "fieldPath": "week", "order": "ASCENDING" },
         { "fieldPath": "tcEarned", "order": "DESCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "matchPicks",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "eventId", "order": "ASCENDING" },
+        { "fieldPath": "boutNumber", "order": "ASCENDING" }
+      ]
     }
   ],
   "fieldOverrides": [

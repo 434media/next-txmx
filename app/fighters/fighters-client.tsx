@@ -97,7 +97,7 @@ function FilterDropdown({
               </li>
             ))}
             {searchable && filtered.length === 0 && (
-              <li className="px-3 py-4 text-center text-white/30 text-xs font-medium">
+              <li className="px-3 py-4 text-center text-white/40 text-xs font-medium">
                 No results for &ldquo;{search}&rdquo;
               </li>
             )}
@@ -242,11 +242,11 @@ export default function FightersClient({ fighters }: FightersClientProps) {
 
       {/* Results count + pagination info */}
       <div className="flex items-center justify-between mb-6">
-        <p className="text-white/50 text-xs font-semibold tracking-widest uppercase">
+        <p className="text-white/60 text-xs font-bold tracking-widest uppercase">
           {filtered.length} Fighter{filtered.length !== 1 ? "s" : ""}
         </p>
         {totalPages > 1 && (
-          <p className="text-white/40 text-xs font-medium tabular-nums">
+          <p className="text-white/50 text-xs font-semibold tabular-nums">
             Page {safePage} of {totalPages}
           </p>
         )}
@@ -255,7 +255,12 @@ export default function FightersClient({ fighters }: FightersClientProps) {
       {/* Fighter Grid */}
       {filtered.length === 0 ? (
         <div className="text-center py-24">
-          <p className="text-white/40 text-sm font-medium leading-6">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-white/5 mb-4">
+            <svg className="w-6 h-6 text-white/20" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+            </svg>
+          </div>
+          <p className="text-white/50 text-sm font-semibold leading-6">
             No fighters match your search.
           </p>
           <button
@@ -267,7 +272,7 @@ export default function FightersClient({ fighters }: FightersClientProps) {
               setGymFilter("all")
               setPage(1)
             }}
-            className="mt-3 text-white/60 text-xs font-semibold tracking-wider uppercase hover:text-white transition-colors"
+            className="mt-3 text-amber-500/70 text-xs font-bold tracking-wider uppercase hover:text-amber-400 transition-colors"
           >
             Clear filters
           </button>
@@ -278,7 +283,7 @@ export default function FightersClient({ fighters }: FightersClientProps) {
             <Link
               key={fighter.id}
               href={`/fighters/${fighter.slug}`}
-              className="group border border-white/8 rounded-xl overflow-hidden hover:border-white/20 transition-all duration-300 bg-white/2 hover:bg-white/4"
+              className="group border border-white/10 rounded-xl overflow-hidden hover:border-white/20 transition-all duration-300 bg-white/2 hover:bg-white/5"
             >
               {/* Fighter Image */}
               <div className="relative h-52 bg-white/5">
@@ -292,7 +297,7 @@ export default function FightersClient({ fighters }: FightersClientProps) {
                   />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center bg-white/3">
-                    <span className="text-white/15 text-5xl font-bold uppercase select-none">
+                    <span className="text-white/20 text-5xl font-bold uppercase select-none">
                       {fighter.firstName[0]}
                       {fighter.lastName[0]}
                     </span>
@@ -317,27 +322,27 @@ export default function FightersClient({ fighters }: FightersClientProps) {
               {/* Fighter Info */}
               <div className="px-5 py-4">
                 <div className="flex items-start justify-between gap-3 mb-1">
-                  <h2 className="text-white text-[15px] font-bold leading-snug">
+                  <h2 className="text-white text-[15px] font-bold leading-snug uppercase">
                     {fighter.firstName} {fighter.lastName}
                   </h2>
-                  <span className="text-white/40 text-[11px] font-semibold tracking-wider shrink-0 mt-0.5">
+                  <span className="text-white/50 text-[10px] font-bold tracking-[0.15em] uppercase shrink-0 mt-1">
                     {fighter.region}
                   </span>
                 </div>
                 {fighter.nickname && (
-                  <p className="text-white/45 text-xs font-medium leading-5 mb-2">
+                  <p className="text-amber-500/50 text-xs font-semibold leading-5 mb-2">
                     &ldquo;{fighter.nickname}&rdquo;
                   </p>
                 )}
-                <div className="flex items-baseline gap-4 mt-2">
-                  <p className="text-white/80 text-sm font-bold tabular-nums leading-6">
+                <div className="flex items-baseline gap-3 mt-2">
+                  <p className="text-white text-base font-black tabular-nums leading-6">
                     {fighter.record.wins}-{fighter.record.losses}
                     {fighter.record.draws > 0
                       ? `-${fighter.record.draws}`
                       : ""}
                   </p>
                   {fighter.record.knockouts > 0 && (
-                    <p className="text-white/45 text-xs font-medium leading-5">
+                    <p className="text-white/55 text-xs font-semibold leading-5">
                       {fighter.record.knockouts} KO
                       {fighter.koPercentage
                         ? ` (${fighter.koPercentage}%)`
@@ -346,12 +351,12 @@ export default function FightersClient({ fighters }: FightersClientProps) {
                   )}
                 </div>
                 {fighter.weightClass && (
-                  <p className="text-white/35 text-xs font-medium leading-5 mt-1.5">
+                  <p className="text-white/50 text-xs font-semibold leading-5 mt-1.5">
                     {fighter.weightClass}
                   </p>
                 )}
                 {fighter.gym && (
-                  <p className="text-white/30 text-[11px] font-medium leading-5 mt-1 truncate">
+                  <p className="text-white/40 text-[11px] font-medium leading-5 mt-1 truncate">
                     {fighter.gym}
                   </p>
                 )}
@@ -367,7 +372,7 @@ export default function FightersClient({ fighters }: FightersClientProps) {
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={safePage <= 1}
-            className="px-4 py-2 text-sm font-semibold text-white/60 border border-white/10 rounded-lg hover:bg-white/5 hover:text-white/80 transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+            className="px-4 py-2.5 text-sm font-bold text-white/60 border border-white/10 rounded-lg hover:bg-white/5 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
           >
             Previous
           </button>
@@ -391,7 +396,7 @@ export default function FightersClient({ fighters }: FightersClientProps) {
                 item === "ellipsis" ? (
                   <span
                     key={`e-${i}`}
-                    className="px-2 text-white/30 text-sm select-none"
+                    className="px-2 text-white/40 text-sm select-none"
                   >
                     &hellip;
                   </span>
@@ -399,10 +404,10 @@ export default function FightersClient({ fighters }: FightersClientProps) {
                   <button
                     key={item}
                     onClick={() => setPage(item)}
-                    className={`min-w-9 h-9 text-sm font-semibold rounded-lg transition-colors ${
+                    className={`min-w-9 h-9 text-sm font-bold rounded-lg transition-colors ${
                       item === safePage
-                        ? "bg-white/10 text-white border border-white/20"
-                        : "text-white/50 hover:bg-white/5 hover:text-white/70"
+                        ? "bg-amber-500/10 text-amber-500 border border-amber-500/20"
+                        : "text-white/60 hover:bg-white/5 hover:text-white"
                     }`}
                   >
                     {item}
@@ -414,7 +419,7 @@ export default function FightersClient({ fighters }: FightersClientProps) {
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={safePage >= totalPages}
-            className="px-4 py-2 text-sm font-semibold text-white/60 border border-white/10 rounded-lg hover:bg-white/5 hover:text-white/80 transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+            className="px-4 py-2.5 text-sm font-bold text-white/60 border border-white/10 rounded-lg hover:bg-white/5 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
           >
             Next
           </button>

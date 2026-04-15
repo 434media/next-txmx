@@ -22,27 +22,27 @@ export default function FighterProfileClient({
       <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12">
         {/* Breadcrumb */}
         <nav className="mb-8">
-          <ol className="flex items-center gap-2 text-[11px] font-semibold tracking-widest uppercase text-white/30">
+          <ol className="flex items-center gap-2 text-[11px] font-semibold tracking-widest uppercase text-white/40">
             <li>
-              <Link href="/scorecard" className="hover:text-white/60 transition-colors">
+              <Link href="/scorecard" className="hover:text-white/70 transition-colors">
                 Scorecard
               </Link>
             </li>
-            <li className="text-white/10">/</li>
+            <li className="text-white/15">/</li>
             <li>
-              <Link href="/fighters" className="hover:text-white/60 transition-colors">
+              <Link href="/fighters" className="hover:text-white/70 transition-colors">
                 Fighters
               </Link>
             </li>
-            <li className="text-white/10">/</li>
-            <li className="text-white/50">{name}</li>
+            <li className="text-white/15">/</li>
+            <li className="text-amber-500/70">{name}</li>
           </ol>
         </nav>
 
         {/* Hero */}
         <div className="flex flex-col md:flex-row gap-8 mb-16">
           {/* Image */}
-          <div className="relative w-full md:w-72 h-80 md:h-96 rounded-xl overflow-hidden bg-white/5 shrink-0">
+          <div className="relative w-full md:w-72 h-80 md:h-96 rounded-xl overflow-hidden bg-white/5 shrink-0 ring-1 ring-white/10">
             {fighter.profileImageUrl ? (
               <Image
                 src={fighter.profileImageUrl}
@@ -53,8 +53,8 @@ export default function FighterProfileClient({
                 priority
               />
             ) : (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-white/15 text-7xl font-bold uppercase select-none">
+              <div className="absolute inset-0 flex items-center justify-center bg-white/3">
+                <span className="text-white/20 text-7xl font-bold uppercase select-none">
                   {fighter.firstName[0]}
                   {fighter.lastName[0]}
                 </span>
@@ -65,7 +65,7 @@ export default function FighterProfileClient({
           {/* Info */}
           <div className="flex-1 flex flex-col justify-center">
             {fighter.nickname && (
-              <p className="text-white/50 text-sm font-medium leading-6 mb-1">
+              <p className="text-amber-500/60 text-sm font-semibold leading-6 mb-1">
                 &ldquo;{fighter.nickname}&rdquo;
               </p>
             )}
@@ -73,11 +73,11 @@ export default function FighterProfileClient({
               {name}
             </h1>
             <div className="flex items-center gap-4 mb-6">
-              <span className="text-white/60 text-2xl font-bold tabular-nums">
+              <span className="text-white text-2xl font-black tabular-nums">
                 {record}
               </span>
               {fighter.record.knockouts > 0 && (
-                <span className="text-white/50 text-sm font-medium leading-6">
+                <span className="text-white/60 text-sm font-semibold leading-6">
                   {fighter.record.knockouts} KOs
                   {fighter.koPercentage
                     ? ` (${fighter.koPercentage}%)`
@@ -93,7 +93,7 @@ export default function FighterProfileClient({
             </div>
 
             {/* Quick Stats */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-4">
               {fighter.weightClass && (
                 <Stat label="Weight Class" value={fighter.weightClass} />
               )}
@@ -136,9 +136,7 @@ export default function FighterProfileClient({
         {/* Titles */}
         {fighter.titles && fighter.titles.length > 0 && (
           <section className="mb-12">
-            <h2 className="text-white text-lg font-bold mb-4 uppercase tracking-wider">
-              Titles
-            </h2>
+            <SectionHeading>Titles</SectionHeading>
             <div className="flex flex-wrap gap-3">
               {fighter.titles.map((title, i) => (
                 <div
@@ -146,15 +144,15 @@ export default function FighterProfileClient({
                   className={`border rounded-lg px-4 py-3 ${
                     title.current
                       ? "border-amber-500/40 bg-amber-500/5"
-                      : "border-white/10 bg-white/2"
+                      : "border-white/10 bg-white/3"
                   }`}
                 >
-                  <p className="text-white text-sm font-semibold">
+                  <p className="text-white text-sm font-bold">
                     {title.org}
                   </p>
-                  <p className="text-white/50 text-xs font-medium leading-5 mt-1">{title.title}</p>
+                  <p className="text-white/60 text-xs font-medium leading-5 mt-1">{title.title}</p>
                   {title.current && (
-                    <p className="text-amber-500 text-[10px] font-semibold tracking-wider mt-1 uppercase">
+                    <p className="text-amber-500 text-[10px] font-bold tracking-wider mt-1 uppercase">
                       Current
                     </p>
                   )}
@@ -167,10 +165,8 @@ export default function FighterProfileClient({
         {/* Bio */}
         {fighter.bio && (
           <section className="mb-12">
-            <h2 className="text-white text-lg font-bold mb-4 uppercase tracking-wider">
-              Bio
-            </h2>
-            <p className="text-white/50 text-sm leading-relaxed max-w-2xl">
+            <SectionHeading>Bio</SectionHeading>
+            <p className="text-white/60 text-sm leading-relaxed max-w-2xl">
               {fighter.bio}
             </p>
           </section>
@@ -179,9 +175,7 @@ export default function FighterProfileClient({
         {/* Social Links */}
         {fighter.social && Object.values(fighter.social).some(Boolean) && (
           <section className="mb-12">
-            <h2 className="text-white text-lg font-bold mb-4 uppercase tracking-wider">
-              Social
-            </h2>
+            <SectionHeading>Social</SectionHeading>
             <div className="flex flex-wrap gap-3">
               {fighter.social.instagram && (
                 <SocialLink
@@ -217,40 +211,38 @@ export default function FighterProfileClient({
         {/* Fight History */}
         {fights.length > 0 && (
           <section className="mb-12">
-            <h2 className="text-white text-lg font-bold mb-4 uppercase tracking-wider">
-              Fight History
-            </h2>
-            <div className="border border-white/10 rounded-xl overflow-hidden">
+            <SectionHeading>Fight History</SectionHeading>
+            <div className="border border-white/10 rounded-xl overflow-hidden divide-y divide-white/5">
               {fights.map((fight, i) => (
                 <div
                   key={fight.id || i}
-                  className={`flex items-center gap-4 px-4 py-3 ${i % 2 === 0 ? "bg-white/2" : ""}`}
+                  className={`flex items-center gap-4 px-5 py-3.5 ${i % 2 === 0 ? "bg-white/2" : ""}`}
                 >
                   <span
-                    className={`shrink-0 w-7 h-7 flex items-center justify-center rounded text-[11px] font-bold ${
+                    className={`shrink-0 w-8 h-8 flex items-center justify-center rounded-lg text-xs font-black ${
                       fight.result === "W"
                         ? "bg-emerald-500/15 text-emerald-400"
                         : fight.result === "L"
                           ? "bg-red-500/15 text-red-400"
-                          : "bg-white/10 text-white/50"
+                          : "bg-white/10 text-white/60"
                     }`}
                   >
                     {fight.result}
                   </span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-white/80 text-sm font-semibold truncate">
+                    <p className="text-white text-sm font-bold truncate">
                       {fight.opponent}
                     </p>
-                    <p className="text-white/40 text-[11px] font-medium">
+                    <p className="text-white/50 text-[11px] font-medium">
                       {fight.method}{fight.round ? ` R${fight.round}` : ""} &middot; {fight.weightClass}
                     </p>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="text-white/50 text-xs font-medium tabular-nums">
+                    <p className="text-white/60 text-xs font-semibold tabular-nums">
                       {fight.date}
                     </p>
                     {fight.titleFight && (
-                      <p className="text-amber-500 text-[10px] font-semibold uppercase">Title</p>
+                      <p className="text-amber-500 text-[10px] font-bold uppercase">Title</p>
                     )}
                   </div>
                 </div>
@@ -263,7 +255,7 @@ export default function FighterProfileClient({
         <section className="mb-12">
           <Link
             href={`/compare`}
-            className="block w-full text-center border border-white/10 rounded-lg py-4 text-white/50 text-xs font-semibold uppercase tracking-wider hover:text-white hover:border-white/20 transition-colors"
+            className="block w-full text-center border border-amber-500/20 rounded-lg py-4 text-amber-500/70 text-xs font-bold uppercase tracking-wider hover:text-amber-400 hover:border-amber-500/30 hover:bg-amber-500/5 transition-all"
           >
             Compare {fighter.firstName} with Another Fighter
           </Link>
@@ -309,47 +301,31 @@ function AdvancedStats({ fights }: { fights: FightRecord[] }) {
 
   return (
     <section className="mb-12">
-      <h2 className="text-white text-lg font-bold mb-4 uppercase tracking-wider">
-        Advanced Stats
-      </h2>
+      <SectionHeading>Advanced Stats</SectionHeading>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-        <div className="border border-white/10 rounded-lg p-4 bg-white/2">
-          <p className="text-white/40 text-[10px] font-semibold tracking-wider uppercase mb-1">Win Streak</p>
-          <p className="text-white text-xl font-bold tabular-nums">{currentStreak}</p>
-          <p className="text-white/30 text-[10px]">current</p>
-        </div>
-        <div className="border border-white/10 rounded-lg p-4 bg-white/2">
-          <p className="text-white/40 text-[10px] font-semibold tracking-wider uppercase mb-1">Best Streak</p>
-          <p className="text-white text-xl font-bold tabular-nums">{winStreak}</p>
-          <p className="text-white/30 text-[10px]">career</p>
-        </div>
-        <div className="border border-white/10 rounded-lg p-4 bg-white/2">
-          <p className="text-white/40 text-[10px] font-semibold tracking-wider uppercase mb-1">Title Fights</p>
-          <p className="text-white text-xl font-bold tabular-nums">{titleFights}</p>
-        </div>
-        <div className="border border-white/10 rounded-lg p-4 bg-white/2">
-          <p className="text-white/40 text-[10px] font-semibold tracking-wider uppercase mb-1">Total Bouts</p>
-          <p className="text-white text-xl font-bold tabular-nums">{fights.length}</p>
-        </div>
+        <StatCard label="Win Streak" value={currentStreak} sub="current" />
+        <StatCard label="Best Streak" value={winStreak} sub="career" />
+        <StatCard label="Title Fights" value={titleFights} />
+        <StatCard label="Total Bouts" value={fights.length} />
       </div>
 
       {/* Method Breakdown */}
       {sorted.length > 0 && (
         <div>
-          <h3 className="text-white/40 text-[10px] font-semibold tracking-wider uppercase mb-3">
+          <h3 className="text-white/50 text-[10px] font-bold tracking-[0.15em] uppercase mb-3">
             Victory Method Breakdown
           </h3>
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             {sorted.map(([method, count]) => (
               <div key={method} className="flex items-center gap-3">
-                <span className="text-white/60 text-xs font-semibold w-10 shrink-0">{method}</span>
-                <div className="flex-1 h-2 bg-white/5 rounded-full overflow-hidden">
+                <span className="text-white/70 text-xs font-bold w-12 shrink-0 uppercase">{method}</span>
+                <div className="flex-1 h-2.5 bg-white/5 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-amber-500/50 rounded-full"
+                    className="h-full bg-amber-500 rounded-full transition-all duration-500"
                     style={{ width: `${(count / maxMethod) * 100}%` }}
                   />
                 </div>
-                <span className="text-white/40 text-xs font-bold tabular-nums w-6 text-right">{count}</span>
+                <span className="text-white/60 text-xs font-bold tabular-nums w-6 text-right">{count}</span>
               </div>
             ))}
           </div>
@@ -359,13 +335,31 @@ function AdvancedStats({ fights }: { fights: FightRecord[] }) {
   )
 }
 
+function StatCard({ label, value, sub }: { label: string; value: number; sub?: string }) {
+  return (
+    <div className="border border-white/10 rounded-lg p-4 bg-white/3">
+      <p className="text-white/50 text-[10px] font-bold tracking-[0.15em] uppercase mb-1">{label}</p>
+      <p className="text-white text-2xl font-black tabular-nums">{value}</p>
+      {sub && <p className="text-white/40 text-[10px] font-medium">{sub}</p>}
+    </div>
+  )
+}
+
+function SectionHeading({ children }: { children: React.ReactNode }) {
+  return (
+    <h2 className="text-white text-lg font-bold mb-5 uppercase tracking-wider">
+      {children}
+    </h2>
+  )
+}
+
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-white/45 text-[10px] font-semibold tracking-wider uppercase leading-4 mb-1">
+      <p className="text-white/50 text-[10px] font-bold tracking-[0.15em] uppercase leading-4 mb-1">
         {label}
       </p>
-      <p className="text-white/80 text-sm font-semibold leading-6">{value}</p>
+      <p className="text-white/90 text-sm font-semibold leading-6">{value}</p>
     </div>
   )
 }
@@ -376,7 +370,7 @@ function SocialLink({ href, label }: { href: string; label: string }) {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="border border-white/10 rounded-lg px-4 py-2 text-white/50 text-xs font-medium hover:text-white hover:border-white/20 transition-colors"
+      className="border border-white/15 rounded-lg px-4 py-2.5 text-white/60 text-xs font-semibold hover:text-white hover:border-white/25 hover:bg-white/5 transition-all"
     >
       {label}
     </a>

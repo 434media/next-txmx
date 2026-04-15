@@ -38,7 +38,7 @@ export default function EventsClient({ events }: EventsClientProps) {
   const [search, setSearch] = useState("")
   const [cityFilter, setCityFilter] = useState("all")
   const [promoterFilter, setPromoterFilter] = useState("all")
-  const [tab, setTab] = useState<"all" | "upcoming" | "past">("all")
+  const [tab, setTab] = useState<"upcoming" | "past">("upcoming")
   const [page, setPage] = useState(1)
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [boutsCache, setBoutsCache] = useState<Record<string, EventBout[]>>({})
@@ -70,8 +70,7 @@ export default function EventsClient({ events }: EventsClientProps) {
         const rel = getRelativeLabel(e.date)
         return rel === "upcoming" || rel === "today"
       }
-      if (tab === "past") return getRelativeLabel(e.date) === "past"
-      return true
+      return getRelativeLabel(e.date) === "past"
     })
   }, [events, search, cityFilter, promoterFilter, tab])
 
@@ -119,7 +118,7 @@ export default function EventsClient({ events }: EventsClientProps) {
     <>
       {/* Tabs */}
       <div className="flex items-center gap-1 mb-8 border-b border-white/10 pb-px">
-        {(["all", "upcoming", "past"] as const).map((t) => (
+        {(["upcoming", "past"] as const).map((t) => (
           <button
             key={t}
             onClick={() => {
@@ -214,7 +213,7 @@ export default function EventsClient({ events }: EventsClientProps) {
               setSearch("")
               setCityFilter("all")
               setPromoterFilter("all")
-              setTab("all")
+              setTab("upcoming")
               setPage(1)
             }}
             className="mt-3 text-white/60 text-xs font-semibold tracking-wider uppercase hover:text-white transition-colors"

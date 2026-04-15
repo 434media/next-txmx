@@ -270,3 +270,12 @@ export async function getLeaderboard(limit = 50): Promise<LeaderboardEntry[]> {
     }
   })
 }
+
+// ── Profile Photo ────────────────────────────────────────
+
+export async function updateUserPhoto(uid: string, photoURL: string | null): Promise<void> {
+  const ref = firestore.collection("users").doc(uid)
+  const snap = await ref.get()
+  if (!snap.exists) throw new Error("User not found")
+  await ref.update({ photoURL, updatedAt: new Date().toISOString() })
+}

@@ -1,11 +1,20 @@
 'use server'
 
+import { firestore } from '../../lib/firebase-admin'
 import { getUserByUid } from './users'
 import { getSPAccount } from './skill-points'
 import { getCreditAccount } from './credits'
 import { getLPAccount } from './loyalty-points'
 import { getUserPicks } from './props'
 import { getUserBadges, getUserQuestProgress, getBadges, getActiveQuests, type BadgeDefinition, type UserBadge, type QuestDefinition, type QuestProgress } from './quests'
+
+/* ── Resolve gym ID → name ── */
+async function resolveGymName(gymId: string | null): Promise<string | null> {
+  if (!gymId) return null
+  const snap = await firestore.collection('gyms').doc(gymId).get()
+  if (!snap.exists) return gymId // fallback to ID if gym deleted
+  return (snap.data() as { name?: string }).name || gymId
+}
 
 export interface FanCardData {
   // Identity
@@ -14,6 +23,7 @@ export interface FanCardData {
   photoURL: string | null
   subscriptionStatus: 'none' | 'active' | 'canceled' | 'past_due'
   gymPledge: string | null
+  gymPledgeName: string | null
   rank: 'rookie' | 'contender' | 'champion' | 'hall_of_fame'
   legacyRank: 'rookie' | 'contender' | 'champion' | 'hall_of_fame' | null
   isVerified: boolean
@@ -77,12 +87,16 @@ export async function getFanCardData(userId: string): Promise<FanCardData | null
     definition: questMap.get(qp.questId),
   }))
 
+  // Resolve gym name
+  const gymPledgeName = await resolveGymName(user.gymPledge)
+
   return {
     uid: user.uid,
     displayName: user.displayName,
     photoURL: user.photoURL,
     subscriptionStatus: user.subscriptionStatus,
     gymPledge: user.gymPledge,
+    gymPledgeName,
     rank: user.rank,
     legacyRank: user.legacyRank ?? null,
     isVerified: user.isVerified ?? false,
@@ -114,6 +128,7 @@ export interface FanCardSummary {
   photoURL: string | null
   subscriptionStatus: 'none' | 'active' | 'canceled' | 'past_due'
   gymPledge: string | null
+  gymPledgeName: string | null
   rank: 'rookie' | 'contender' | 'champion' | 'hall_of_fame'
   legacyRank: 'rookie' | 'contender' | 'champion' | 'hall_of_fame' | null
   isVerified: boolean
@@ -145,12 +160,15 @@ export async function getFanCardSummary(userId: string): Promise<FanCardSummary 
   const losses = settled.filter(p => p.won === false).length
   const winRate = settled.length > 0 ? Math.round((wins / settled.length) * 100) : 0
 
+  const gymPledgeName = await resolveGymName(user.gymPledge)
+
   return {
     uid: user.uid,
     displayName: user.displayName,
     photoURL: user.photoURL,
     subscriptionStatus: user.subscriptionStatus,
     gymPledge: user.gymPledge,
+    gymPledgeName,
     rank: user.rank,
     legacyRank: user.legacyRank ?? null,
     isVerified: user.isVerified ?? false,
