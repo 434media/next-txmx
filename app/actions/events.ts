@@ -166,6 +166,25 @@ export async function getEventBouts(eventNumber: string): Promise<EventBout[]> {
   return bouts.sort((a, b) => a.boutNumber - b.boutNumber)
 }
 
+export async function getEventById(eventId: string): Promise<TXMXEvent | null> {
+  if (!eventId) return null
+  const doc = await firestore.collection('events').doc(eventId).get()
+  if (!doc.exists) return null
+  const data = doc.data()!
+  return {
+    id: doc.id,
+    eventNumber: data.eventNumber || '',
+    date: data.date || '',
+    city: data.city || '',
+    promoter: data.promoter || '',
+    venue: data.venue || '',
+    address: data.address || '',
+    boutCount: data.boutCount || 0,
+    source: data.source || '',
+    createdAt: data.createdAt || '',
+  }
+}
+
 export async function getUpcomingEvents(limit = 10): Promise<TXMXEvent[]> {
   const today = new Date().toISOString().split('T')[0]
   const snapshot = await firestore

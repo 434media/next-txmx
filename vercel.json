@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/tdlr-boxing",
       "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/cron/settle-picks",
+      "schedule": "0 14 * * *"
     }
   ]
 }

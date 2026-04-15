@@ -4,12 +4,14 @@ import { useState } from 'react'
 import type { Fighter } from '../../lib/types/fighter'
 import { WEIGHT_CLASSES } from '../../lib/types/fighter'
 import { deleteFighter, updateFighter } from '../actions/fighters'
+import type { GymData } from '../actions/gyms'
 
 interface FighterListProps {
   fighters: Fighter[]
   onDelete: (id: string) => void
   onUpdate: (updated: Fighter) => void
   gymNames?: string[]
+  gymDocs?: GymData[]
 }
 
 function GymCombobox({ value, onChange, gymNames, className }: { value: string; onChange: (v: string) => void; gymNames: string[]; className: string }) {
@@ -61,7 +63,7 @@ const inputClass =
   'w-full bg-gray-50 border border-gray-200 text-gray-900 text-[13px] font-medium leading-5 px-3 py-2 focus:outline-none focus:border-[#FFB800] focus:ring-1 focus:ring-[#FFB800]/30 placeholder:text-gray-400 rounded-md'
 const labelClass = 'block text-[11px] leading-4 font-semibold text-gray-500 tracking-[0.12em] mb-1'
 
-export default function FighterList({ fighters, onDelete, onUpdate, gymNames = [] }: FighterListProps) {
+export default function FighterList({ fighters, onDelete, onUpdate, gymNames = [], gymDocs = [] }: FighterListProps) {
   const [search, setSearch] = useState('')
   const [filterRegion, setFilterRegion] = useState<string>('all')
   const [filterStatus, setFilterStatus] = useState<string>('all')
@@ -148,6 +150,7 @@ export default function FighterList({ fighters, onDelete, onUpdate, gymNames = [
       record: { ...fighter.record },
       residence: fighter.residence ? { ...fighter.residence } : { city: '', state: '', country: '' },
       gym: fighter.gym || '',
+      gymId: fighter.gymId || '',
       trainer: fighter.trainer || '',
       promoter: fighter.promoter || '',
       bio: fighter.bio || '',
@@ -212,6 +215,7 @@ export default function FighterList({ fighters, onDelete, onUpdate, gymNames = [
       if (!updatePayload.nickname) delete updatePayload.nickname
       if (!updatePayload.dateOfBirth) delete updatePayload.dateOfBirth
       if (!updatePayload.gym) delete updatePayload.gym
+      if (!updatePayload.gymId) delete updatePayload.gymId
       if (!updatePayload.trainer) delete updatePayload.trainer
       if (!updatePayload.promoter) delete updatePayload.promoter
       if (!updatePayload.bio) delete updatePayload.bio
@@ -723,6 +727,19 @@ export default function FighterList({ fighters, onDelete, onUpdate, gymNames = [
                           gymNames={gymNames}
                           className={inputClass}
                         />
+                      </div>
+                      <div>
+                        <label className={labelClass}>Gym Link</label>
+                        <select
+                          value={editData.gymId || ''}
+                          onChange={e => setEditData(d => ({ ...d, gymId: e.target.value }))}
+                          className={inputClass}
+                        >
+                          <option value="">Not linked</option>
+                          {gymDocs.map(g => (
+                            <option key={g.id} value={g.id}>{g.name}</option>
+                          ))}
+                        </select>
                       </div>
                       <div>
                         <label className={labelClass}>Trainer</label>

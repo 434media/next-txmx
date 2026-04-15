@@ -83,6 +83,7 @@ export interface Fighter {
 
   // Team
   gym?: string
+  gymId?: string
   trainer?: string
   manager?: string
   promoter?: string

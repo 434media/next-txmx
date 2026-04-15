@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { getUpcomingEvents } from "../actions/events"
 import ScorecardVideo from "./scorecard-video"
 import ScorecardCta from "./scorecard-cta"
 import BlackCardCta from "./blackcard-cta"
@@ -82,7 +83,9 @@ const LP_ACTIONS = [
   { action: "Fan Multiplier", points: "1.1x per 1K fans" },
 ]
 
-export default function ScorecardPage() {
+export default async function ScorecardPage() {
+  const upcomingEvents = await getUpcomingEvents(3)
+
   return (
     <main className="relative min-h-screen bg-black font-sans">
       {/* ============================================================
@@ -170,42 +173,108 @@ export default function ScorecardPage() {
       </section>
 
       {/* ============================================================
-          2b. THIS WEEKEND — Urgency strip
+          2b. START PICKING — Live upcoming events
           ============================================================ */}
       <section className="relative border-t border-white/10">
         <div className="max-w-6xl mx-auto px-8 sm:px-12 lg:px-20 py-8 sm:py-10">
-          <div className="relative border border-amber-500/20 rounded-2xl bg-amber-500/3 px-6 sm:px-8 py-6 overflow-hidden">
-            {/* Subtle amber glow */}
-            <div className="absolute -top-12 -left-12 w-40 h-40 bg-amber-500/8 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-12 -right-12 w-40 h-40 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
-            <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
-              <div className="flex items-start sm:items-center gap-4">
-                <div className="shrink-0 mt-1 sm:mt-0">
-                  <div className="relative w-2.5 h-2.5">
+          {upcomingEvents.length > 0 ? (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center gap-3">
+                  <div className="relative w-2.5 h-2.5 shrink-0">
                     <div className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-40" />
                     <div className="relative w-2.5 h-2.5 rounded-full bg-emerald-500" />
                   </div>
-                </div>
-                <div>
-                  <p className="text-white text-sm sm:text-base font-black uppercase tracking-tight leading-tight mb-1">
-                    Fight cards drop every weekend
-                  </p>
-                  <p className="text-white/50 text-xs font-semibold leading-relaxed">
-                    Browse upcoming matchups, lock in your picks before the bell, and earn points on every correct call.
+                  <p className="text-white text-sm font-black uppercase tracking-tight">
+                    Upcoming Events
                   </p>
                 </div>
+                <Link
+                  href="/events"
+                  className="text-white/30 text-[10px] font-bold tracking-[0.15em] uppercase hover:text-white/60 transition-colors"
+                >
+                  View All
+                </Link>
               </div>
-              <Link
-                href="/events"
-                className="inline-flex items-center gap-2.5 bg-amber-500 text-black text-xs font-bold tracking-[0.15em] uppercase px-5 py-2.5 rounded-lg hover:bg-amber-400 transition-colors shrink-0 w-fit"
-              >
-                See Upcoming Events
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                </svg>
-              </Link>
+              {upcomingEvents.map((event) => {
+                const eventDate = new Date(event.date + "T12:00:00")
+                const dateLabel = eventDate.toLocaleDateString("en-US", {
+                  weekday: "short",
+                  month: "short",
+                  day: "numeric",
+                })
+                return (
+                  <Link
+                    key={event.id}
+                    href={`/events/${event.id}`}
+                    className="group relative flex items-center justify-between gap-4 border border-amber-500/20 rounded-xl bg-amber-500/3 px-5 sm:px-6 py-4 overflow-hidden hover:bg-amber-500/5 hover:border-amber-500/30 transition-all"
+                  >
+                    <div className="absolute -top-12 -left-12 w-32 h-32 bg-amber-500/8 rounded-full blur-3xl pointer-events-none" />
+                    <div className="relative flex items-center gap-4 min-w-0">
+                      <div className="shrink-0 text-center">
+                        <p className="text-amber-500/80 text-[10px] font-bold tracking-wider uppercase">
+                          {dateLabel}
+                        </p>
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-white text-sm font-bold leading-snug truncate">
+                          {event.promoter || "TBA"}
+                        </p>
+                        <p className="text-white/40 text-xs font-medium truncate">
+                          {event.venue} &middot; {event.city}
+                          {event.boutCount > 0 && (
+                            <span className="text-white/25">
+                              {" "}&middot; {event.boutCount} bout{event.boutCount !== 1 ? "s" : ""}
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="text-amber-500 text-[10px] font-bold tracking-[0.15em] uppercase hidden sm:block group-hover:text-amber-400 transition-colors">
+                        Start Picking
+                      </span>
+                      <svg className="w-4 h-4 text-amber-500/60 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                      </svg>
+                    </div>
+                  </Link>
+                )
+              })}
             </div>
-          </div>
+          ) : (
+            <div className="relative border border-amber-500/20 rounded-2xl bg-amber-500/3 px-6 sm:px-8 py-6 overflow-hidden">
+              <div className="absolute -top-12 -left-12 w-40 h-40 bg-amber-500/8 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-12 -right-12 w-40 h-40 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
+              <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+                <div className="flex items-start sm:items-center gap-4">
+                  <div className="shrink-0 mt-1 sm:mt-0">
+                    <div className="relative w-2.5 h-2.5">
+                      <div className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-40" />
+                      <div className="relative w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-white text-sm sm:text-base font-black uppercase tracking-tight leading-tight mb-1">
+                      Fight cards drop every weekend
+                    </p>
+                    <p className="text-white/50 text-xs font-semibold leading-relaxed">
+                      Browse upcoming matchups, lock in your picks before the bell, and earn points on every correct call.
+                    </p>
+                  </div>
+                </div>
+                <Link
+                  href="/events"
+                  className="inline-flex items-center gap-2.5 bg-amber-500 text-black text-xs font-bold tracking-[0.15em] uppercase px-5 py-2.5 rounded-lg hover:bg-amber-400 transition-colors shrink-0 w-fit"
+                >
+                  See All Events
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                  </svg>
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
@@ -634,10 +703,13 @@ export default function ScorecardPage() {
         </div>
       </section>
 
+      {/* ── Tier Divider: Free → Black Card ── */}
+      <div className="h-px bg-linear-to-r from-transparent via-amber-500/40 to-transparent" />
+
       {/* ============================================================
           6. BLACK CARD FEATURES — Prop Picks, Pledge, Community (with badges)
           ============================================================ */}
-      <section className="relative border-t border-white/5 overflow-hidden">
+      <section className="relative bg-zinc-950 overflow-hidden">
         {/* Section Label */}
         <div className="max-w-6xl mx-auto px-8 sm:px-12 lg:px-20 pt-20 pb-10">
           <div className="flex items-center gap-3">
@@ -843,7 +915,7 @@ export default function ScorecardPage() {
           <div className="max-w-6xl mx-auto">
             <Link
               href="/community"
-              className="group relative bg-black px-8 sm:px-12 lg:px-20 py-12 lg:py-16 flex flex-col hover:bg-zinc-950 transition-colors duration-300"
+              className="group relative bg-black px-8 sm:px-12 lg:px-20 py-12 lg:py-16 flex flex-col hover:bg-zinc-900 transition-colors duration-300"
             >
               <div className="flex items-center gap-2 mb-5">
                 <span className="inline-block px-2 py-0.5 bg-amber-500/10 border border-amber-500/30 text-amber-500 text-[9px] font-bold tracking-[0.2em] uppercase">
@@ -1055,7 +1127,7 @@ export default function ScorecardPage() {
       {/* ============================================================
           9. REWARDS STORE
           ============================================================ */}
-      <section className="relative border-t border-white/5 overflow-hidden">
+      <section className="relative border-t border-white/5 bg-zinc-950 overflow-hidden">
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2">
           <div className="flex flex-col justify-center px-8 sm:px-12 lg:px-20 py-16 lg:py-24 order-2 lg:order-1">
             <div className="flex items-center gap-2 mb-6">

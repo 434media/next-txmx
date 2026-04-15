@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo, useCallback } from "react"
+import Link from "next/link"
 import type { TXMXEvent, EventBout } from "../actions/events"
 import { getEventBouts } from "../actions/events"
 import ShareButton from "../../components/share-button"
@@ -352,9 +353,20 @@ export default function EventsClient({ events }: EventsClientProps) {
                       </div>
                     ) : bouts && bouts.length > 0 ? (
                       <div className="space-y-2">
-                        <p className="text-white/40 text-[10px] font-bold tracking-[0.2em] uppercase mb-3">
-                          Fight Card
-                        </p>
+                        <div className="flex items-center justify-between mb-3">
+                          <p className="text-white/40 text-[10px] font-bold tracking-[0.2em] uppercase">
+                            Fight Card
+                          </p>
+                          <Link
+                            href={`/events/${event.id}`}
+                            className="inline-flex items-center gap-1.5 text-amber-500/80 text-[10px] font-bold tracking-[0.15em] uppercase hover:text-amber-400 transition-colors"
+                          >
+                            {rel === "past" ? "View Results" : "Pick Winners"}
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                            </svg>
+                          </Link>
+                        </div>
                         {bouts.map((bout, i) => (
                           <BoutRow key={`${bout.boutNumber}-${i}`} bout={bout} isPast={rel === "past"} />
                         ))}

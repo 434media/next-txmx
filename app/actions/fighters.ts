@@ -82,6 +82,13 @@ export async function getFighterBySlug(slug: string): Promise<Fighter | null> {
   return { id: doc.id, ...doc.data() } as Fighter
 }
 
+export async function getFighterById(id: string): Promise<Fighter | null> {
+  if (!id) return null
+  const doc = await firestore.collection('fighters').doc(id).get()
+  if (!doc.exists) return null
+  return { id: doc.id, ...doc.data() } as Fighter
+}
+
 export async function getFighterFights(fighterId: string): Promise<FightRecord[]> {
   const snapshot = await firestore
     .collection('fighters')

@@ -380,7 +380,7 @@ export default function RewardsStoreClient() {
                         key={reward.id}
                         className={`border rounded-xl p-5 transition-colors ${
                           soldOut ? 'border-amber-500/5 opacity-50'
-                            : isBlackCard ? 'border-amber-500/20 hover:border-amber-500/40 bg-amber-500/[0.02]'
+                            : isBlackCard ? 'border-amber-500/20 hover:border-amber-500/40 bg-amber-500/2'
                             : 'border-white/5 opacity-60'
                         }`}
                       >

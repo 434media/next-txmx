@@ -23,6 +23,7 @@ import CommunityManager from './community-manager'
 import AbuseDashboard from './abuse-dashboard'
 import VerifiedManager from './verified-manager'
 import LegacyRankManager from './legacy-rank-manager'
+import SettlementManager from './settlement-manager'
 import type { VenueData } from '../actions/venues'
 import type { EventPromoter, PromoterData, TXMXEvent } from '../actions/events'
 import type { GymData } from '../actions/gyms'
@@ -40,7 +41,7 @@ interface AdminClientProps {
   initialEvents: TXMXEvent[]
 }
 
-type Tab = 'list' | 'add' | 'venues' | 'gyms' | 'promoters' | 'events' | 'props' | 'polls' | 'economy' | 'notifications' | 'tdlr' | 'eightcount' | 'flags' | 'quests' | 'rewards' | 'seasons' | 'community' | 'abuse' | 'verified' | 'legacy'
+type Tab = 'list' | 'add' | 'venues' | 'gyms' | 'promoters' | 'events' | 'props' | 'polls' | 'economy' | 'notifications' | 'tdlr' | 'eightcount' | 'flags' | 'quests' | 'rewards' | 'seasons' | 'community' | 'abuse' | 'verified' | 'legacy' | 'settlement'
 
 const NAV_SECTIONS = [
   {
@@ -58,6 +59,7 @@ const NAV_SECTIONS = [
     label: 'ENGAGEMENT',
     items: [
       { key: 'props' as Tab, label: 'Props', icon: '🎯' },
+      { key: 'settlement' as Tab, label: 'Settlement', icon: '⚖️' },
       { key: 'polls' as Tab, label: 'Polls', icon: '📊' },
       { key: 'quests' as Tab, label: 'Quests', icon: '⚔️' },
       { key: 'rewards' as Tab, label: 'Rewards', icon: '🎁' },
@@ -185,6 +187,7 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
     ]).size,
     events: eventDocs.length,
     props: 0,
+    settlement: 0,
     polls: 0,
     economy: 0,
     notifications: 0,
@@ -209,6 +212,7 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
     events: 'EVENTS',
     eightcount: 'THE 8 COUNT',
     props: 'PROP PICKS',
+    settlement: 'MATCH SETTLEMENT',
     polls: 'FAN POLLS',
     economy: 'ECONOMY GOVERNOR',
     notifications: 'PUSH NOTIFICATIONS',
@@ -350,7 +354,7 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
                   <span className="text-lg leading-none">+</span>
                   Add Fighter
                 </button>
-                <FighterList fighters={fighters} onDelete={handleFighterDeleted} onUpdate={handleFighterUpdated} gymNames={gymDocs.map(g => g.name).sort()} />
+                <FighterList fighters={fighters} onDelete={handleFighterDeleted} onUpdate={handleFighterUpdated} gymNames={gymDocs.map(g => g.name).sort()} gymDocs={gymDocs} />
               </div>
             ) : activeTab === 'add' ? (
               <AddFighterForm onSuccess={handleFighterAdded} existingGyms={gymDocs.map(g => g.name).sort()} />
@@ -364,6 +368,8 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
               <EventList events={eventDocs} fighters={fighters} onAdd={handleEventAdded} onUpdate={handleEventUpdated} onDelete={handleEventDeleted} />
             ) : activeTab === 'props' ? (
               <PropManager events={initialEvents} />
+            ) : activeTab === 'settlement' ? (
+              <SettlementManager events={initialEvents} />
             ) : activeTab === 'eightcount' ? (
               <EightCountManager />
             ) : activeTab === 'polls' ? (
