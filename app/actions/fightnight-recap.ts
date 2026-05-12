@@ -275,12 +275,23 @@ function renderRecapEmail(d: RecapEmailData): string {
             </td>
           </tr>
 
-          <!-- Footer -->
+          <!-- Thank-you closer -->
           <tr>
-            <td style="padding:40px 0 0;border-top:1px solid rgba(255,255,255,0.08);margin-top:32px;">
-              <p style="margin:24px 0 0;color:rgba(255,255,255,0.3);font-size:11px;line-height:1.6;text-align:center;">
-                Thanks for playing tonight. Levantamos los puños.<br>
-                <span style="color:rgba(255,255,255,0.2);">TXMX Boxing · build@434media.com</span>
+            <td style="padding:40px 0 0;border-top:1px solid rgba(255,255,255,0.08);">
+              <p style="margin:32px 0 0;color:rgba(255,255,255,0.7);font-size:13px;line-height:1.75;">
+                Thanks for being part of TXMX Fight Night Scorecard and helping bring a new kind of fan experience to life. Every pick, prediction, and interaction helped shape the night and added to the energy inside the room. This is about more than just watching fights — it&rsquo;s about rewarding the fans who show up, engage, compete, and become part of the culture. We appreciate you stepping into the experience with us and look forward to raising the stakes together at the next one.
+              </p>
+              <p style="margin:24px 0 0;color:#f59e0b;font-size:15px;font-weight:700;letter-spacing:0.5px;line-height:1.4;">
+                Levantamos los Puños.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer meta -->
+          <tr>
+            <td style="padding:32px 0 0;">
+              <p style="margin:0;color:rgba(255,255,255,0.25);font-size:11px;line-height:1.6;text-align:center;">
+                TXMX Boxing · build@434media.com
               </p>
             </td>
           </tr>
