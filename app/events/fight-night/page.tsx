@@ -46,22 +46,24 @@ export default async function FightNightPage() {
   const bouts = fightNight ? await getBouts(fightNight.id) : []
 
   return (
-    <main className="relative min-h-screen bg-black font-sans">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 pt-24 pb-20">
-        <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_440px] lg:gap-12 xl:gap-16 lg:items-start">
+    <main className="relative min-h-dvh bg-black font-sans">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 pt-[calc(6rem+var(--live-ribbon-h,0px))] pb-20">
+        <div className="fn-page-grid lg:grid lg:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_440px] lg:gap-12 xl:gap-16 lg:items-start">
           {/* ── LEFT / Mobile first — scrolling content
               Source-order first so mobile reads text → flyer.
               Desktop pins this in the left column. */}
           <div className="lg:order-1 space-y-16 lg:space-y-20">
-            <HeroIntro
-              title={fightNight?.title || "Members Only Fight Night"}
-              date={fightNight?.date}
-              venue={fightNight?.venue || "BOXR Station"}
-              city={fightNight?.city || "San Antonio"}
-              hasActiveEvent={!!fightNight}
-            />
+            <div className="fn-page-marketing space-y-16 lg:space-y-20">
+              <HeroIntro
+                title={fightNight?.title || "Members Only Fight Night"}
+                date={fightNight?.date}
+                venue={fightNight?.venue || "BOXR Station"}
+                city={fightNight?.city || "San Antonio"}
+                hasActiveEvent={!!fightNight}
+              />
 
-            <HowItWorks />
+              <HowItWorks />
+            </div>
 
             <FightNightClient fightNight={fightNight} bouts={bouts} />
           </div>
@@ -70,7 +72,7 @@ export default async function FightNightPage() {
               `lg:self-start` keeps the aside at its natural height instead
               of stretching to row height, so `position: sticky` anchors
               cleanly as the left column scrolls. */}
-          <aside className="lg:order-2 mt-10 lg:mt-0 lg:self-start lg:sticky lg:top-24">
+          <aside className="fn-flyer-aside lg:order-2 mt-10 lg:mt-0 lg:self-start lg:sticky lg:top-24">
             <FlyerCard
               title={fightNight?.title || "Members Only Fight Night"}
               date={fightNight?.date}

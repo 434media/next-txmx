@@ -2,6 +2,7 @@ import 'server-only'
 
 import { initializeApp, getApps, cert, type App } from 'firebase-admin/app'
 import { getFirestore } from 'firebase-admin/firestore'
+import { getAuth } from 'firebase-admin/auth'
 
 function getApp(): App {
   if (getApps().length > 0) {
@@ -29,5 +30,6 @@ function getApp(): App {
 
 const app = getApp()
 const firestore = getFirestore(app, 'txmx')
+const auth = getAuth(app)
 
-export { firestore }
+export { firestore, auth }

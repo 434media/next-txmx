@@ -20,6 +20,25 @@ interface FightCardProps {
   initialBouts: FightNightBout[]
 }
 
+/**
+ * Look up the currently-rendered bout wrapper for a given bout number.
+ * Both the mobile carousel and the desktop grid render wrappers tagged
+ * with `data-bout-anchor` — only one is visible at a time, so we pick
+ * the one with non-zero layout. Falls back to the first match if neither
+ * appears visible (e.g. during initial hydration).
+ */
+function findVisibleBoutElement(num: string): HTMLElement | null {
+  if (typeof document === "undefined") return null
+  const els = document.querySelectorAll<HTMLElement>(
+    `[data-bout-anchor="${num}"]`
+  )
+  for (const el of els) {
+    const rect = el.getBoundingClientRect()
+    if (rect.width > 0 || rect.height > 0) return el
+  }
+  return els[0] || null
+}
+
 export default function FightCard({ fightNightId, initialBouts }: FightCardProps) {
   const { user } = useAuth()
   const [bouts, setBouts] = useState<FightNightBout[]>(initialBouts)
@@ -68,19 +87,21 @@ export default function FightCard({ fightNightId, initialBouts }: FightCardProps
     return () => unsubs.forEach((u) => u())
   }, [user, fightNightId, bouts])
 
-  // Honor #bout-N hash anchors used by the LiveRibbon Jump CTA. We scroll
-  // both the page (block: 'center') and the horizontal carousel (inline:
-  // 'center') so the target bout lands centered no matter where it is.
+  // Honor #bout-N hash anchors used by the LiveRibbon Jump CTA. Both the
+  // mobile carousel and the desktop grid render bout wrappers, but only
+  // one is visible at a time — query by data-attribute and pick the
+  // visible one before scrolling.
   useEffect(() => {
     if (typeof window === "undefined" || bouts.length === 0) return
     function scrollToHash() {
       const hash = window.location.hash
       if (!hash.startsWith("#bout-")) return
-      const el = document.getElementById(hash.slice(1))
+      const num = hash.slice("#bout-".length)
+      const el = findVisibleBoutElement(num)
       if (!el) return
       el.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" })
     }
-    // initial mount — wait a tick for the carousel to lay out
+    // initial mount — wait a tick for layout to settle
     const t = window.setTimeout(scrollToHash, 120)
     window.addEventListener("hashchange", scrollToHash)
     return () => {
@@ -111,7 +132,7 @@ export default function FightCard({ fightNightId, initialBouts }: FightCardProps
     const hash = window.location.hash
     if (hash.startsWith("#bout-") && hash !== `#bout-${liveBoutNumber}`) return
 
-    const el = document.getElementById(`bout-${liveBoutNumber}`)
+    const el = findVisibleBoutElement(String(liveBoutNumber))
     if (!el) return
 
     const block: ScrollLogicalPosition = hasAutoScrolledRef.current
@@ -139,16 +160,45 @@ export default function FightCard({ fightNightId, initialBouts }: FightCardProps
   return (
     <>
       <BoutProgressStrip bouts={bouts} picks={picks} />
-      <Carousel
-        ariaLabel="Fight card"
-        swipeHint={`Swipe → for all ${bouts.length} bouts`}
-        scrollStep={400}
+
+      {/* Mobile + tablet: horizontal carousel (swipe through bouts). */}
+      <div className="lg:hidden">
+        <Carousel
+          ariaLabel="Fight card"
+          swipeHint={`Swipe → for all ${bouts.length} bouts`}
+          scrollStep={400}
+        >
+          {bouts.map((bout) => (
+            <div
+              key={bout.boutNumber}
+              data-bout-anchor={bout.boutNumber}
+              className="snap-start shrink-0 w-[88vw] sm:w-[380px] scroll-mt-32"
+            >
+              <BoutCard
+                fightNightId={fightNightId}
+                bout={bout}
+                pick={picks[bout.boutNumber]}
+                userId={user?.uid || null}
+              />
+            </div>
+          ))}
+        </Carousel>
+      </div>
+
+      {/* Desktop (lg+): all bouts visible as a responsive grid. Each card is
+          at least 320px wide; the grid auto-fills based on the available
+          column width, so 1 col at lg / 2 at xl / more at very wide. */}
+      <div
+        className="hidden lg:grid lg:grid-cols-[repeat(auto-fill,minmax(320px,1fr))] lg:gap-4"
+        role="list"
+        aria-label="Fight card"
       >
         {bouts.map((bout) => (
           <div
             key={bout.boutNumber}
-            id={`bout-${bout.boutNumber}`}
-            className="snap-start shrink-0 w-[88vw] sm:w-[380px] scroll-mt-32"
+            data-bout-anchor={bout.boutNumber}
+            role="listitem"
+            className="scroll-mt-32"
           >
             <BoutCard
               fightNightId={fightNightId}
@@ -158,7 +208,7 @@ export default function FightCard({ fightNightId, initialBouts }: FightCardProps
             />
           </div>
         ))}
-      </Carousel>
+      </div>
     </>
   )
 }
@@ -405,7 +455,7 @@ function BoutProgressStrip({
 
   function handleJump(boutNumber: number) {
     if (typeof window === "undefined") return
-    const el = document.getElementById(`bout-${boutNumber}`)
+    const el = findVisibleBoutElement(String(boutNumber))
     el?.scrollIntoView({
       behavior: "smooth",
       block: "nearest",

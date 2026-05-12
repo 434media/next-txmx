@@ -68,6 +68,15 @@ export default function LiveRibbon({ activeFightNight }: LiveRibbonProps) {
     return () => unsub()
   }, [user, activeFightNight, liveBout])
 
+  // Track ribbon visibility on the body so pages can shift their top
+  // padding to clear it (see globals.css `--live-ribbon-h`).
+  useEffect(() => {
+    if (typeof document === "undefined") return
+    if (!liveBout) return
+    document.body.classList.add("has-live-ribbon")
+    return () => document.body.classList.remove("has-live-ribbon")
+  }, [liveBout])
+
   if (!activeFightNight || !liveBout) return null
 
   const totalBouts = bouts.length

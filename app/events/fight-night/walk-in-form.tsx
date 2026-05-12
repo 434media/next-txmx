@@ -1,10 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { signInAnonymously, updateProfile } from "firebase/auth"
+import { signInWithCustomToken, updateProfile } from "firebase/auth"
 import { auth } from "../../../lib/firebase-client"
 import { getOrCreateUser } from "../../actions/users"
 import { setAtEvent } from "../../actions/fightnight-standings"
+import { createGuestSessionToken } from "../../actions/guest-session"
 
 const EMAIL_PATTERN = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
@@ -31,7 +32,13 @@ export default function WalkInForm({ fightNightId }: WalkInFormProps) {
 
     setSubmitting(true)
     try {
-      const cred = await signInAnonymously(auth)
+      const session = await createGuestSessionToken(trimmedEmail, trimmedName)
+      if (!session.success || !session.token) {
+        setError(session.error || "Could not sign you in")
+        setSubmitting(false)
+        return
+      }
+      const cred = await signInWithCustomToken(auth, session.token)
       await updateProfile(cred.user, { displayName: trimmedName })
       await getOrCreateUser(cred.user.uid, trimmedEmail, trimmedName, null)
       await setAtEvent(fightNightId, cred.user.uid, true, {

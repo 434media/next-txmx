@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation"
 import Navbar from "../components/navbar"
 import LiveRibbon from "../components/live-ribbon"
 import SettlementToasts from "../components/settlement-toasts"
+import NotificationPrompt from "../components/notification-prompt"
 import AuthModal from "../components/auth-modal"
 import SlideOutModal from "../components/slide-out-modal"
 import { AuthProvider } from "../lib/auth-context"
@@ -145,6 +146,7 @@ export default function ClientLayout({
           {!isFanos && <Navbar onMenuClick={openModal} onAuthClick={() => setIsAuthModalOpen(true)} activeFightNight={activeFightNight} />}
           {!isFanos && !isAdmin && <LiveRibbon activeFightNight={activeFightNight} />}
           {!isFanos && !isAdmin && <SettlementToasts activeFightNight={activeFightNight} />}
+          {!isFanos && !isAdmin && <NotificationPrompt activeFightNight={activeFightNight} />}
           {children}
           {!isAdmin && !isFanos && <Footer />}
           

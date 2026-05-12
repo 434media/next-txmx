@@ -1,0 +1,95 @@
+"use client"
+
+import { useState } from "react"
+import PropsSection from "./props-section"
+import PollsSection from "./polls-section"
+
+interface BeyondTheBoutsProps {
+  fightNightId: string
+  propsEnabled: boolean
+  pollsEnabled: boolean
+}
+
+type Tab = "props" | "polls"
+
+/**
+ * Combined surface for "extra picks" — props and polls — under one
+ * section heading. Cuts two stacked sections into one tabbed surface so
+ * the page footer doesn't keep walking down the scroll. Both tabs stay
+ * mounted (hidden via CSS) so their Firestore listeners don't churn on
+ * every switch.
+ */
+export default function BeyondTheBouts({
+  fightNightId,
+  propsEnabled,
+  pollsEnabled,
+}: BeyondTheBoutsProps) {
+  // Pick the initial tab based on what's actually enabled. Props is the
+  // default when both are on — props earn points, polls are softer.
+  const defaultTab: Tab = propsEnabled ? "props" : "polls"
+  const [tab, setTab] = useState<Tab>(defaultTab)
+
+  if (!propsEnabled && !pollsEnabled) return null
+
+  const showTabs = propsEnabled && pollsEnabled
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-5">
+        <h3 className="text-white text-lg font-bold uppercase tracking-tight">
+          Beyond the Bouts
+        </h3>
+        <span className="text-white/30 text-[10px] font-bold tracking-[0.2em] uppercase">
+          Extra picks · earn more
+        </span>
+      </div>
+
+      {showTabs && (
+        <div className="flex items-center gap-1 mb-6 border-b border-white/10">
+          <TabButton active={tab === "props"} onClick={() => setTab("props")}>
+            Props
+          </TabButton>
+          <TabButton active={tab === "polls"} onClick={() => setTab("polls")}>
+            Polls
+          </TabButton>
+        </div>
+      )}
+
+      {propsEnabled && (
+        <div className={showTabs && tab !== "props" ? "hidden" : ""}>
+          <PropsSection fightNightId={fightNightId} />
+        </div>
+      )}
+      {pollsEnabled && (
+        <div className={showTabs && tab !== "polls" ? "hidden" : ""}>
+          <PollsSection fightNightId={fightNightId} />
+        </div>
+      )}
+    </div>
+  )
+}
+
+function TabButton({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean
+  onClick: () => void
+  children: React.ReactNode
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`relative px-4 py-3 text-sm font-bold tracking-tight transition-colors ${
+        active ? "text-white" : "text-white/45 hover:text-white/75"
+      }`}
+    >
+      {children}
+      {active && (
+        <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-amber-500 rounded-t-full" />
+      )}
+    </button>
+  )
+}

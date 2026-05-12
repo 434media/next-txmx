@@ -32,3 +32,31 @@ body {
     color: inherit;
   }
 }
+
+/* When a signed-in user is actively engaged on a fight night (has placed
+   at least one pick), hide the page-level marketing content and the
+   flyer aside on lg+ and let the game grid take the full max-w-7xl
+   width. FightNightClient toggles `body.fn-game-active`. The page-level
+   classes (`fn-page-grid`, `fn-page-marketing`, `fn-flyer-aside`) act as
+   hooks for this. Below lg, layout is unaffected. */
+@media (min-width: 1024px) {
+  body.fn-game-active .fn-flyer-aside {
+    display: none;
+  }
+  body.fn-game-active .fn-page-marketing {
+    display: none;
+  }
+  body.fn-game-active .fn-page-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* LiveRibbon is fixed at top-16 with h-11 (~44px). When it's mounted,
+   pages need to shift their top padding to clear it. Set a CSS variable
+   that page wrappers consume via `pt-[calc(6rem+var(--live-ribbon-h))]`. */
+:root {
+  --live-ribbon-h: 0px;
+}
+body.has-live-ribbon {
+  --live-ribbon-h: 44px;
+}

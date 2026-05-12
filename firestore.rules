@@ -28,8 +28,12 @@ service cloud.firestore {
     match /fightNights/{fightNightId} {
       allow read: if request.auth != null;
 
+      // Bouts are public-readable. They're fight matchups (Gomez vs Paez,
+      // weight class, status) — like a sports schedule. Logged-out visitors
+      // need to read them so the LiveRibbon discovery hook can show
+      // "Bout 3 is live — sign in to play" without requiring auth first.
       match /bouts/{boutId} {
-        allow read: if request.auth != null;
+        allow read: if true;
       }
 
       match /standings/{userId} {
