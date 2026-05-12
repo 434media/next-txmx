@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { GALLERY_IMAGES } from '../../lib/gallery-images'
+import { GALLERY_IMAGES } from '../../../lib/gallery-images'
 
 export default function IconicSeriesClient() {
 
@@ -177,7 +177,7 @@ export default function IconicSeriesClient() {
                     Browse exclusive photos from the Rise of a Champion celebration, featuring red carpet arrivals, championship moments, live performances, and the unforgettable reception.
                   </p>
                   <a 
-                    href="/riseofachampion/gallery"
+                    href="/events/rise-of-a-champion/gallery"
                     className="inline-block bg-[#FFB800] text-black hover:bg-[#FFB800]/90 font-semibold py-3 px-6 rounded-md transition-all text-xs md:text-sm tracking-widest uppercase"
                   >
                     View Event Gallery →

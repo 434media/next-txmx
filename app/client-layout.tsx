@@ -6,6 +6,8 @@ import { GeistPixelSquare, GeistPixelGrid, GeistPixelCircle, GeistPixelTriangle,
 import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
 import Navbar from "../components/navbar"
+import LiveRibbon from "../components/live-ribbon"
+import SettlementToasts from "../components/settlement-toasts"
 import AuthModal from "../components/auth-modal"
 import SlideOutModal from "../components/slide-out-modal"
 import { AuthProvider } from "../lib/auth-context"
@@ -15,6 +17,7 @@ import Footer from "../components/footer"
 import DailyLoginReward from "../components/daily-login-reward"
 import { Analytics } from "@vercel/analytics/next"
 import Script from "next/script"
+import type { FightNight } from "./actions/fightnight"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,11 +44,15 @@ const orbitron = Orbitron({
   display: "swap",
 })
 
+interface ClientLayoutProps {
+  children: React.ReactNode
+  activeFightNight?: FightNight | null
+}
+
 export default function ClientLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+  activeFightNight = null,
+}: Readonly<ClientLayoutProps>) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const pathname = usePathname()
@@ -135,15 +142,17 @@ export default function ClientLayout({
 
         <AuthProvider>
           <GlobalStyles />
-          {!isFanos && <Navbar onMenuClick={openModal} onAuthClick={() => setIsAuthModalOpen(true)} />}
-          {children}        
+          {!isFanos && <Navbar onMenuClick={openModal} onAuthClick={() => setIsAuthModalOpen(true)} activeFightNight={activeFightNight} />}
+          {!isFanos && !isAdmin && <LiveRibbon activeFightNight={activeFightNight} />}
+          {!isFanos && !isAdmin && <SettlementToasts activeFightNight={activeFightNight} />}
+          {children}
           {!isAdmin && !isFanos && <Footer />}
           
           {/* Auth Modal */}
           <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
           
           {/* Universal Slide Out Modal */}
-          <SlideOutModal isOpen={isModalOpen} onClose={closeModal} onAuthClick={() => { closeModal(); setIsAuthModalOpen(true) }} />
+          <SlideOutModal isOpen={isModalOpen} onClose={closeModal} onAuthClick={() => { closeModal(); setIsAuthModalOpen(true) }} activeFightNight={activeFightNight} />
           
           {/* Daily Login Reward */}
           {!isFanos && <DailyLoginReward />}

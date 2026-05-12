@@ -1,6 +1,7 @@
 import type React from "react"
 import type { Metadata } from "next"
 import ClientLayout from "./client-layout"
+import { getActiveFightNight } from "./actions/fightnight"
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.txmxboxing.com'),
@@ -64,10 +65,19 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  return <ClientLayout>{children}</ClientLayout>
+  // Surface the active fight night (if any) into the nav. Fight Night is
+  // always visible in the dropdown — this just decides whether to show the
+  // red "Live" dot and point to the specific event vs. the landing page.
+  let activeFightNight = null
+  try {
+    activeFightNight = await getActiveFightNight()
+  } catch {
+    // Non-critical — nav falls back to the landing page only
+  }
+  return <ClientLayout activeFightNight={activeFightNight}>{children}</ClientLayout>
 }

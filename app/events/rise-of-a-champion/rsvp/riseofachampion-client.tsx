@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { GALLERY_IMAGES } from '../../../lib/gallery-images'
+import { GALLERY_IMAGES } from '../../../../lib/gallery-images'
 
 export default function RiseOfAChampionClient() {
   return (
@@ -147,7 +147,7 @@ export default function RiseOfAChampionClient() {
                   Relive the unforgettable moments from December 3rd, 2024. Browse exclusive photos from the celebration, featuring red carpet arrivals, championship moments, live performances, and more.
                 </p>
                 <a 
-                  href="/riseofachampion/gallery"
+                  href="/events/rise-of-a-champion/gallery"
                   className="inline-block bg-[#FFB800] text-black hover:bg-[#FFB800]/90 font-bold py-4 px-8 rounded-sm transition-all text-lg"
                 >
                   View Event Gallery →

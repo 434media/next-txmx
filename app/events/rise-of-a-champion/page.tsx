@@ -1,41 +1,41 @@
 import { Metadata } from 'next'
-import RiseOfAChampionClient from './riseofachampion-client'
+import IconicSeriesClient from './iconic-series-client'
 import { generateEventJsonLd, generateBreadcrumbJsonLd, generateOrganizationJsonLd } from '../../../lib/json-ld'
 
 export const metadata: Metadata = {
-  title: 'RSVP - Rise of a Champion',
-  description: 'Confirm your attendance for the exclusive Rise of a Champion event in San Antonio, TX. An invitation-only celebration honoring Jesse "Bam" Rodriguez, Selina Barrios, Joshua Franco, and Jesse James Leija. Filmed live for national distribution by TXMX Boxing x Icon Talks.',
+  title: 'Rise of a Champion - Iconic Series',
+  description: 'An exclusive invitation-only celebration honoring San Antonio\'s finest boxing champions - Jesse "Bam" Rodriguez, Mario "El Azteca" Barrios, Joshua "The Professor" Franco, and Jesse James Leija. Filmed live for national distribution in San Antonio, TX.',
   keywords: [
-    'Rise of a Champion RSVP',
-    'TXMX Boxing Event',
+    'Rise of a Champion',
+    'TXMX Boxing',
     'Icon Talks',
     'San Antonio Boxing',
     'Jesse Bam Rodriguez',
     'Selina Barrios',
-    'Joshua The Professor Franco',
+    'Joshua Franco',
     'Jesse James Leija',
-    'Boxing Event RSVP',
-    'Invitation Only',
-    'San Antonio Champions',
+    'Boxing Event',
+    'Sponsorship Packages',
+    'Boxing Champions',
+    'Texas Boxing',
+    'Invitation Only Event',
     'Sam Watson',
-    'Humanitarian Icon Award',
-    'Visionary Icon Awards',
   ],
   authors: [{ name: 'TXMX Boxing' }, { name: 'Icon Talks' }],
   creator: 'TXMX Boxing x Icon Talks',
   publisher: 'TXMX Boxing',
   openGraph: {
-    title: 'RSVP - Rise of a Champion | San Antonio, TX',
-    description: 'Confirm your attendance for this exclusive invitation-only celebration of San Antonio\'s boxing legends. Filmed live for the nationally distributed Rise of a Champion series. One night. Invitation only.',
-    url: 'https://www.txmxboxing.com/riseofachampion/rsvp',
+    title: 'Rise of a Champion - Iconic Series | TXMX Boxing',
+    description: 'An exclusive invitation-only experience honoring four of San Antonio\'s greatest boxing champions. Filmed live for national distribution. Sponsorship packages available.',
+    url: 'https://www.txmxboxing.com/events/rise-of-a-champion',
     siteName: 'TXMX Boxing',
     locale: 'en_US',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'RSVP - Rise of a Champion | San Antonio, TX',
-    description: 'Confirm your attendance for this exclusive celebration of San Antonio\'s boxing legends. One night. Invitation only. Filmed live.',
+    title: 'Rise of a Champion - Iconic Series | TXMX Boxing',
+    description: 'An exclusive invitation-only experience honoring San Antonio\'s greatest boxing champions. Sponsorship packages available.',
     creator: '@txmx',
   },
   robots: {
@@ -50,13 +50,13 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: 'https://www.txmxboxing.com/riseofachampion/rsvp',
+    canonical: 'https://www.txmxboxing.com/events/rise-of-a-champion',
   },
 }
 
-export default function RiseOfAChampionPage() {
+export default function IconicSeriesPage() {
   const eventJsonLd = generateEventJsonLd()
-  const breadcrumbJsonLd = generateBreadcrumbJsonLd('RSVP')
+  const breadcrumbJsonLd = generateBreadcrumbJsonLd('Iconic Series')
   const organizationJsonLd = generateOrganizationJsonLd()
 
   return (
@@ -74,7 +74,7 @@ export default function RiseOfAChampionPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
       />
-      <RiseOfAChampionClient />
+      <IconicSeriesClient />
     </>
   )
 }

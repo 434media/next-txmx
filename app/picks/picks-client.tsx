@@ -21,20 +21,16 @@ export default function PicksClient({ props }: PicksClientProps) {
           Sign in to make your picks.
         </p>
         <p className="text-white/30 text-xs leading-5">
-          Prop Picks is a Black Card feature.
+          Prop Picks is a Black Card feature — except for event-mode events,
+          which are free for everyone.
         </p>
       </div>
     )
   }
 
-  if (!isBlackCard) {
-    return (
-      <UpsellBanner
-        headline="Black Card Required"
-        message="Prop Picks is a Black Card feature. Subscribe for $14.99/mo to start earning Skill Points through predictions."
-      />
-    )
-  }
+  const freeProps = props.filter((p) => p.eventMode === "free-props")
+  const gatedProps = props.filter((p) => p.eventMode !== "free-props")
+  const visibleProps = isBlackCard ? props : freeProps
 
   if (props.length === 0) {
     return (
@@ -49,11 +45,40 @@ export default function PicksClient({ props }: PicksClientProps) {
     )
   }
 
+  if (!isBlackCard && freeProps.length === 0) {
+    return (
+      <UpsellBanner
+        headline="Black Card Required"
+        message="Prop Picks is a Black Card feature. Subscribe for $14.99/mo to start earning Skill Points through predictions."
+      />
+    )
+  }
+
   return (
     <div className="space-y-4">
-      {props.map((prop) => (
+      {!isBlackCard && freeProps.length > 0 && (
+        <div className="border border-amber-500/30 bg-amber-500/5 rounded-xl px-5 py-4 mb-2">
+          <p className="text-amber-400 text-xs font-bold tracking-[0.2em] uppercase mb-1">
+            Fight Night Mode
+          </p>
+          <p className="text-white/70 text-sm font-medium leading-6">
+            Props for this event are open to everyone — no Black Card needed.
+            Pick to earn Skill Points and climb the event leaderboard.
+          </p>
+        </div>
+      )}
+      {visibleProps.map((prop) => (
         <PropPickCard key={prop.id} prop={prop} userId={user.uid} />
       ))}
+      {!isBlackCard && gatedProps.length > 0 && (
+        <div className="pt-4">
+          <UpsellBanner
+            compact
+            headline={`${gatedProps.length} more prop${gatedProps.length === 1 ? "" : "s"} available with Black Card`}
+            message="Subscribe for $14.99/mo to make picks on every event."
+          />
+        </div>
+      )}
     </div>
   )
 }

@@ -93,6 +93,7 @@ export default function EventList({ events, fighters, onAdd, onUpdate, onDelete 
         address: event.address,
         boutCount: event.boutCount,
         eventNumber: event.eventNumber,
+        eventMode: event.eventMode || 'standard',
       })
       setEditingBoutIdx(null)
       setAddingBout(false)
@@ -411,6 +412,20 @@ export default function EventList({ events, fighters, onAdd, onUpdate, onDelete 
                     <div>
                       <label className={labelClass}>EVENT NUMBER</label>
                       <input type="text" value={editData.eventNumber || ''} onChange={e => setEditData(d => ({ ...d, eventNumber: e.target.value }))} className={inputClass} />
+                    </div>
+                    <div className="sm:col-span-2 lg:col-span-3">
+                      <label className={labelClass}>EVENT MODE</label>
+                      <select
+                        value={editData.eventMode || 'standard'}
+                        onChange={e => setEditData(d => ({ ...d, eventMode: e.target.value as 'standard' | 'free-props' }))}
+                        className={inputClass}
+                      >
+                        <option value="standard">Standard — props gated by Black Card</option>
+                        <option value="free-props">Free Props — open to all signed-in users (event-night mode)</option>
+                      </select>
+                      <p className="text-[10px] text-gray-400 mt-1 leading-relaxed">
+                        Use <strong>Free Props</strong> for one-day activations where walk-in fans need to play without paying for Black Card. Toggling this also updates any existing props on this event.
+                      </p>
                     </div>
                   </div>
 

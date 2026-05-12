@@ -3,9 +3,9 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { GALLERY_IMAGES, type GalleryImage, type GalleryCategory } from "../../../lib/gallery-images"
-import GalleryUnlockForm from "../../../components/gallery/gallery-unlock-form"
-import ImageModal from "../../../components/gallery/image-modal"
+import { GALLERY_IMAGES, type GalleryImage, type GalleryCategory } from "../../../../lib/gallery-images"
+import GalleryUnlockForm from "../../../../components/gallery/gallery-unlock-form"
+import ImageModal from "../../../../components/gallery/image-modal"
 
 export default function GalleryClient() {
   const [isUnlocked, setIsUnlocked] = useState(false)
@@ -136,7 +136,7 @@ export default function GalleryClient() {
           <div className="max-w-2xl mx-auto">
             {/* Back Link */}
             <Link
-              href="/riseofachampion"
+              href="/events/rise-of-a-champion"
               className="inline-flex items-center gap-2 text-white/60 hover:text-[#FFB800] text-xs font-semibold tracking-widest mb-8 transition-colors relative z-30 leading-relaxed uppercase"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -236,7 +236,7 @@ export default function GalleryClient() {
           <div className="max-w-7xl mx-auto">
             {/* Back Link */}
             <Link
-              href="/riseofachampion"
+              href="/events/rise-of-a-champion"
               className="inline-flex items-center gap-2 text-white/60 hover:text-[#FFB800] text-xs font-semibold tracking-widest mb-8 transition-colors leading-relaxed uppercase"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

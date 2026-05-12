@@ -1,6 +1,7 @@
 {
   "firestore": {
     "database": "txmx",
+    "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
   }
 }

@@ -5,7 +5,12 @@ import { useAuth } from "../lib/auth-context"
 import type { Poll, UserVote } from "../app/actions/polls"
 import { votePoll, getPolls, getUserVotes } from "../app/actions/polls"
 
-export default function FanPolls() {
+interface FanPollsProps {
+  /** When provided, only show polls tagged with this eventId. */
+  eventId?: string
+}
+
+export default function FanPolls({ eventId }: FanPollsProps = {}) {
   const { user } = useAuth()
   const [polls, setPolls] = useState<Poll[]>([])
   const [userVotes, setUserVotes] = useState<Record<string, number>>({})
@@ -17,10 +22,12 @@ export default function FanPolls() {
     async function load() {
       try {
         const [openPolls, closedPolls] = await Promise.all([
-          getPolls("open", 5),
-          getPolls("closed", 3),
+          getPolls("open", 25),
+          getPolls("closed", 25),
         ])
-        setPolls([...openPolls, ...closedPolls])
+        const all = [...openPolls, ...closedPolls]
+        const filtered = eventId ? all.filter((p) => p.eventId === eventId) : all
+        setPolls(filtered)
 
         if (user) {
           const votes = await getUserVotes(user.uid)
@@ -37,7 +44,7 @@ export default function FanPolls() {
       }
     }
     load()
-  }, [user])
+  }, [user, eventId])
 
   const handleVote = async (pollId: string, optionIndex: number) => {
     if (!user) {

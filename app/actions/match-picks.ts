@@ -9,6 +9,8 @@ import { checkCooldown, checkCategoryCap, setCooldown, incrementDailyTracker } f
 import { incrementQuestProgress } from './quests'
 import { getUserByUid } from './users'
 import { getFighterById } from './fighters'
+import { incrementEventSP, incrementEventPicksMade } from './event-leaderboard'
+import { lockPropsForBout } from './props'
 
 // ── Types ────────────────────────────────────────────────
 
@@ -156,6 +158,18 @@ export async function placeMatchPick(
     ])
   } catch {
     // Non-critical
+  }
+
+  // Track event participation for the event leaderboard (non-critical)
+  try {
+    const user = await getUserByUid(userId)
+    await incrementEventPicksMade(input.eventId, userId, {
+      displayName: user?.displayName || null,
+      photoURL: user?.photoURL || null,
+      rank: user?.rank || 'rookie',
+    })
+  } catch {
+    // Non-critical — leaderboard increment failure doesn't block the pick
   }
 
   return { success: true }
@@ -353,6 +367,17 @@ export async function settleEventMatchPicks(
           spAwarded: spAmount,
         })
 
+        // Event-scoped leaderboard increment (non-critical)
+        try {
+          await incrementEventSP(eventId, pick.userId, spAmount, {
+            displayName: user?.displayName || null,
+            photoURL: user?.photoURL || null,
+            rank: user?.rank || 'rookie',
+          })
+        } catch {
+          // Non-critical
+        }
+
         winners++
         settled++
       } catch {
@@ -377,6 +402,121 @@ export async function settleEventMatchPicks(
   }
 
   return { success: true, settled, winners, draws, skipped, errors }
+}
+
+// ── Fight Night: Record + Settle in One Call ──────────────
+
+/**
+ * Fight-night control: record a bout's winner AND settle its picks in one call.
+ * Designed for the live event admin panel — admin taps a winner, this updates the
+ * fight docs and immediately triggers settlement for match picks on that bout.
+ *
+ * @param winnerCorner  'fighter1' | 'fighter2' | 'draw'
+ */
+export async function recordBoutResult(
+  eventId: string,
+  eventNumber: string,
+  boutNumber: number,
+  winnerCorner: 'fighter1' | 'fighter2' | 'draw'
+): Promise<{
+  success: boolean
+  settled: number
+  winners: number
+  error?: string
+}> {
+  if (!eventId || !eventNumber) return { success: false, settled: 0, winners: 0, error: 'Missing event' }
+
+  // Find the bout docs (one per fighter) by querying fights for this event
+  const fightsSnap = await firestore
+    .collectionGroup('fights')
+    .where('eventNumber', '==', eventNumber)
+    .where('boutNumber', '==', boutNumber)
+    .get()
+
+  if (fightsSnap.empty) {
+    return { success: false, settled: 0, winners: 0, error: 'Bout not found' }
+  }
+
+  // Pair up the two fight docs and figure out fighter1/fighter2 IDs
+  const docs = fightsSnap.docs
+  if (docs.length < 1) {
+    return { success: false, settled: 0, winners: 0, error: 'Bout has no fight docs' }
+  }
+
+  // Determine fighter1Id and fighter2Id from the docs' parent fighter refs
+  const fighterIds: string[] = []
+  for (const d of docs) {
+    const parent = d.ref.parent.parent
+    if (parent) fighterIds.push(parent.id)
+  }
+
+  // Decide who's fighter1 vs fighter2 — use the boutKey docId convention from addBout
+  // (both docs share the same docId, which is e.g. "EVTNUM-01"), so we need to use
+  // the opponent field to determine ordering. The first doc's "result" is from its
+  // fighter's perspective.
+  const doc1 = docs[0]
+  const doc1Data = doc1.data()
+  const doc1FighterId = doc1.ref.parent.parent?.id || ''
+  const doc1OpponentId = doc1Data.opponentId as string | undefined
+
+  let fighter1Id = doc1FighterId
+  let fighter2Id = doc1OpponentId || (fighterIds.find((id) => id !== doc1FighterId) || '')
+
+  // Translate winnerCorner -> winnerResolution + fighter result perspectives
+  let winnerResolution: 'fighter1' | 'fighter2' | 'draw'
+  let result: 'W' | 'L' | 'D'
+  let winnerFighterId: string | null
+
+  if (winnerCorner === 'draw') {
+    winnerResolution = 'draw'
+    result = 'D'
+    winnerFighterId = null
+  } else if (winnerCorner === 'fighter1') {
+    winnerResolution = 'fighter1'
+    result = 'W' // fighter1 result is W
+    winnerFighterId = fighter1Id
+  } else {
+    winnerResolution = 'fighter2'
+    result = 'L' // fighter1 result is L (fighter2 won)
+    winnerFighterId = fighter2Id
+  }
+
+  // Update both fight docs (one per fighter, with mirrored result)
+  const batch = firestore.batch()
+  const now = new Date().toISOString()
+  for (const d of docs) {
+    const thisFighterId = d.ref.parent.parent?.id
+    const isFighter1 = thisFighterId === fighter1Id
+    let thisResult: string = result
+    if (winnerCorner === 'fighter1') thisResult = isFighter1 ? 'W' : 'L'
+    else if (winnerCorner === 'fighter2') thisResult = isFighter1 ? 'L' : 'W'
+    else thisResult = 'D'
+
+    batch.update(d.ref, {
+      winnerResolution,
+      result: thisResult,
+      updatedAt: now,
+    })
+  }
+  await batch.commit()
+
+  // Settle match picks for this bout
+  const settleRes = await settleBoutMatchPicks(eventId, boutNumber, winnerFighterId)
+
+  // Lock any open props tied to this bout (per-fight prop lock cascade) so no
+  // late picks can be placed on a now-decided bout. Settlement of those props
+  // is still admin-driven via the prop manager.
+  try {
+    await lockPropsForBout(eventId, boutNumber)
+  } catch {
+    // Non-critical — lock failure doesn't undo the bout result
+  }
+
+  return {
+    success: true,
+    settled: settleRes.settled,
+    winners: settleRes.winners,
+  }
 }
 
 // ── Settle a Single Bout ─────────────────────────────────
@@ -434,6 +574,18 @@ export async function settleBoutMatchPicks(
         })
 
         await pickDoc.ref.update({ settled: true, won: true, spAwarded: spAmount })
+
+        // Event-scoped leaderboard increment (non-critical)
+        try {
+          await incrementEventSP(eventId, pick.userId, spAmount, {
+            displayName: user?.displayName || null,
+            photoURL: user?.photoURL || null,
+            rank: user?.rank || 'rookie',
+          })
+        } catch {
+          // Non-critical
+        }
+
         winners++
       } catch {
         await pickDoc.ref.update({ settled: true, won: false, spAwarded: 0 })

@@ -1,90 +1,286 @@
 "use client"
 
+import { useState, useRef } from "react"
+import Link from "next/link"
+import { ArrowUpRight, Check } from "lucide-react"
+
+const EMAIL_PATTERN = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+
 export default function Footer() {
   const currentYear = new Date().getFullYear()
+  const [email, setEmail] = useState("")
+  const [submitting, setSubmitting] = useState(false)
+  const [success, setSuccess] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setError(null)
+
+    if (!email.trim()) {
+      setError("Enter your email to join the fight")
+      inputRef.current?.focus()
+      return
+    }
+    if (!EMAIL_PATTERN.test(email)) {
+      setError("Enter a valid email address")
+      inputRef.current?.focus()
+      return
+    }
+
+    setSubmitting(true)
+    try {
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setEmail("")
+        setSuccess(true)
+        // Reset after 5s so users who scroll back see the form again
+        setTimeout(() => setSuccess(false), 5000)
+      } else {
+        throw new Error(data.error || "Failed to join")
+      }
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Something went wrong. Try again."
+      )
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   return (
-    <footer className="relative bg-black/40 backdrop-blur-md border-t border-white/10">
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-        <div className="flex flex-row items-center justify-between gap-4">
-          {/* Copyright */}
-          <div className="flex items-center">
-            <p className="text-white/50 text-xs font-medium tracking-wide leading-relaxed">
-              © {currentYear}{" "}
-              <a
-                href="https://434media.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white/70 font-semibold tracking-widest hover:text-white transition-colors duration-200"
-              >
-                434 MEDIA
-              </a>
+    <footer className="relative bg-black border-t border-white/10 overflow-hidden">
+      {/* Subtle amber glow accent in the top-left, brand color without shouting */}
+      <div
+        aria-hidden
+        className="absolute -top-32 -left-32 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl pointer-events-none"
+      />
+
+      <div className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+        {/* ── HERO CTA: brand statement + newsletter ──────────────── */}
+        <section className="grid grid-cols-1 lg:grid-cols-5 gap-10 lg:gap-16 pt-20 pb-16 lg:pt-28 lg:pb-20 border-b border-white/10">
+          {/* Brand statement (3 of 5 cols) */}
+          <div className="lg:col-span-3">
+            <p className="text-amber-500 text-[11px] font-bold tracking-[0.3em] uppercase mb-5">
+              TXMX Boxing
+            </p>
+            <h2 className="text-white text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[0.95] uppercase">
+              Levantamos
+              <br />
+              <span className="text-white/35">Los Puños</span>
+            </h2>
+            <p className="mt-6 text-white/55 text-sm sm:text-base font-semibold leading-7 max-w-md">
+              Made from blood, sweat, and tears. The boxing media platform
+              built for the fans who study the game.
             </p>
           </div>
 
-          <div className="flex items-center gap-0 md:gap-4">
-            {/* YouTube */}
-            <a
-              href="https://www.youtube.com/@txmxboxing/shorts"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-white/80 hover:text-white transition-colors duration-200 flex items-center justify-center"
-              aria-label="Watch us on YouTube"
-            >
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-              </svg>
-            </a>
+          {/* Newsletter (2 of 5 cols) */}
+          <div className="lg:col-span-2 flex flex-col justify-center">
+            <p className="text-white/45 text-[10px] font-bold tracking-[0.3em] uppercase mb-3">
+              The 8 Count
+            </p>
+            <h3 className="text-white text-xl sm:text-2xl font-bold tracking-tight leading-tight mb-3">
+              Join the fight night list.
+            </h3>
+            <p className="text-white/55 text-sm font-medium leading-6 mb-5 max-w-sm">
+              Exclusive drops, fight-card alerts, and early access to The 8 Count —
+              a feed for fight fans.
+            </p>
 
-            {/* TikTok */}
-            <a
-              href="https://www.tiktok.com/@txmxboxing"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-white/80 hover:text-white transition-colors duration-200 flex items-center justify-center"
-              aria-label="Follow us on TikTok"
-            >
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.75a8.18 8.18 0 0 0 4.76 1.52V6.84a4.84 4.84 0 0 1-1-.15z" />
-              </svg>
-            </a>
-
-            {/* Instagram */}
-            <a
-              href="https://www.instagram.com/txmxboxing/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-white/80 hover:text-white transition-colors duration-200 flex items-center justify-center"
-              aria-label="Follow us on Instagram"
-            >
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
-              </svg>
-            </a>
-
-            {/* LinkedIn */}
-            <a
-              href="https://www.linkedin.com/company/434media"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-white/80 hover:text-white transition-colors duration-200 flex items-center justify-center"
-              aria-label="Follow us on LinkedIn"
-            >
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-              </svg>
-            </a>
+            {success ? (
+              <div className="flex items-center gap-3 px-4 py-3 border border-emerald-500/30 bg-emerald-500/5 rounded-md">
+                <div className="w-7 h-7 rounded-full bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center shrink-0">
+                  <Check className="w-3.5 h-3.5 text-emerald-400" strokeWidth={2.5} />
+                </div>
+                <div>
+                  <p className="text-emerald-400 text-[10px] font-bold tracking-[0.25em] uppercase leading-none mb-1">
+                    Somos Boxeo
+                  </p>
+                  <p className="text-white/65 text-xs font-medium leading-5">
+                    You're on the list. Keep an eye on your inbox.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-2.5">
+                <div className="flex gap-2">
+                  <input
+                    ref={inputRef}
+                    type="email"
+                    value={email}
+                    onChange={(e) => {
+                      setError(null)
+                      setEmail(e.target.value)
+                    }}
+                    placeholder="Enter your email"
+                    autoComplete="email"
+                    disabled={submitting}
+                    aria-label="Email address"
+                    aria-describedby={error ? "footer-newsletter-error" : undefined}
+                    className="flex-1 min-w-0 px-3.5 py-2.5 bg-white/5 border border-white/10 rounded-md text-white text-sm font-medium placeholder:text-white/35 focus:outline-none focus:border-white/30 focus:bg-white/8 transition-colors disabled:opacity-50"
+                  />
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="shrink-0 px-4 py-2.5 bg-white text-black text-xs font-bold tracking-[0.15em] uppercase rounded-md hover:bg-white/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {submitting ? "Joining…" : "Join"}
+                  </button>
+                </div>
+                {error && (
+                  <p
+                    id="footer-newsletter-error"
+                    role="alert"
+                    className="text-red-400 text-xs font-medium leading-5"
+                  >
+                    {error}
+                  </p>
+                )}
+                <p className="text-white/35 text-[10px] leading-relaxed">
+                  Free. Unsubscribe anytime.
+                </p>
+              </form>
+            )}
           </div>
-        </div>
-      </div>
+        </section>
 
-      {/* Bottom gradient */}
-      <div
-        className="absolute bottom-0 left-0 right-0 h-px"
-        style={{
-          background: "rgba(255,255,255,0.1)",
-        }}
-      />
+        {/* ── SITEMAP COLUMNS ───────────────────────────────────── */}
+        <section className="grid grid-cols-2 sm:grid-cols-4 gap-8 lg:gap-12 py-14 border-b border-white/10">
+          {/* Events */}
+          <div>
+            <p className="text-white text-[11px] font-bold tracking-[0.25em] uppercase mb-4">
+              Events
+            </p>
+            <ul className="space-y-2.5">
+              <FooterLink href="/events/fight-night">Fight Night</FooterLink>
+              <FooterLink href="/events/rise-of-a-champion">Rise of a Champion</FooterLink>
+            </ul>
+          </div>
+
+          {/* Coming Soon */}
+          <div>
+            <p className="text-white text-[11px] font-bold tracking-[0.25em] uppercase mb-4">
+              Coming Soon
+            </p>
+            <ul className="space-y-2.5">
+              <FooterLink href="/scorecard">
+                Scorecard
+                <PreviewBadge />
+              </FooterLink>
+              <FooterLink href="/8count">
+                The 8 Count
+                <PreviewBadge />
+              </FooterLink>
+            </ul>
+          </div>
+
+          {/* Shop */}
+          <div>
+            <p className="text-white text-[11px] font-bold tracking-[0.25em] uppercase mb-4">
+              Shop
+            </p>
+            <ul className="space-y-2.5">
+              <FooterLink href="https://434media.com/shop" external>
+                434 Media Shop
+              </FooterLink>
+            </ul>
+          </div>
+
+          {/* Follow Us */}
+          <div>
+            <p className="text-white text-[11px] font-bold tracking-[0.25em] uppercase mb-4">
+              Follow Us
+            </p>
+            <ul className="space-y-2.5">
+              <FooterLink href="https://www.instagram.com/txmxboxing/" external>
+                Instagram
+              </FooterLink>
+              <FooterLink href="https://www.youtube.com/@txmxboxing/shorts" external>
+                YouTube
+              </FooterLink>
+              <FooterLink href="https://www.tiktok.com/@txmxboxing" external>
+                TikTok
+              </FooterLink>
+            </ul>
+          </div>
+        </section>
+
+        {/* ── FINE PRINT ────────────────────────────────────────── */}
+        <section className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 py-6">
+          <p className="text-white/40 text-[11px] font-medium tracking-wide leading-relaxed">
+            © {currentYear} TXMX Boxing. All rights reserved.
+          </p>
+          <p className="text-white/40 text-[11px] font-medium tracking-wide leading-relaxed">
+            Built by{" "}
+            <a
+              href="https://434media.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white/60 font-semibold tracking-widest hover:text-white transition-colors duration-200 inline-flex items-center gap-1"
+            >
+              434 MEDIA
+              <ArrowUpRight className="w-3 h-3" strokeWidth={2.25} />
+            </a>
+          </p>
+        </section>
+      </div>
     </footer>
+  )
+}
+
+// ── Helpers ──────────────────────────────────────────────────
+
+function FooterLink({
+  href,
+  external,
+  children,
+}: {
+  href: string
+  external?: boolean
+  children: React.ReactNode
+}) {
+  const className =
+    "inline-flex items-center gap-1.5 text-white/55 text-[13px] font-medium leading-relaxed hover:text-white transition-colors duration-200 group"
+
+  if (external) {
+    return (
+      <li>
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={className}
+        >
+          {children}
+          <ArrowUpRight
+            className="w-3 h-3 text-white/30 group-hover:text-white/70 group-hover:-translate-y-px group-hover:translate-x-px transition-all duration-200"
+            strokeWidth={2.25}
+          />
+        </a>
+      </li>
+    )
+  }
+
+  return (
+    <li>
+      <Link href={href} className={className}>
+        {children}
+      </Link>
+    </li>
+  )
+}
+
+function PreviewBadge() {
+  return (
+    <span className="inline-flex items-center text-amber-400 text-[9px] font-bold tracking-[0.2em] uppercase px-1.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/25 leading-none">
+      Preview
+    </span>
   )
 }

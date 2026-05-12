@@ -1,0 +1,100 @@
+rules_version = '2';
+
+// TXMX Boxing — Firestore security rules (target: txmx database)
+//
+// Pattern: clients READ public game data via onSnapshot, all WRITES go through
+// server actions using firebase-admin SDK (which bypasses these rules entirely).
+// That means client write rules can stay locked down.
+//
+// Authentication: signed-in users (including anonymous walk-ins) can read the
+// public game surfaces — fight night data, bouts, standings, polls, props.
+// Per-user records (their own profile, their own pick docs) are gated to the
+// owner.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─────────────────────────────────────────────────────────────
+    // Default: deny everything not explicitly allowed below
+    // ─────────────────────────────────────────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // Fight Night live game data (publicly readable to signed-in users,
+    // including anonymous accounts created by the walk-in flow)
+    // ─────────────────────────────────────────────────────────────
+    match /fightNights/{fightNightId} {
+      allow read: if request.auth != null;
+
+      match /bouts/{boutId} {
+        allow read: if request.auth != null;
+      }
+
+      match /standings/{userId} {
+        allow read: if request.auth != null;
+      }
+
+      match /picks/{pickId} {
+        allow read: if request.auth != null;
+      }
+
+      match /polls/{pollId} {
+        allow read: if request.auth != null;
+      }
+
+      match /pollVotes/{voteId} {
+        allow read: if request.auth != null;
+      }
+
+      match /props/{propId} {
+        allow read: if request.auth != null;
+      }
+
+      match /propPicks/{pickId} {
+        allow read: if request.auth != null;
+      }
+
+      match /prizes/{prizeId} {
+        allow read: if request.auth != null;
+      }
+
+      // Check-in records: a user can read only their own. Admins use the
+      // server SDK (which bypasses rules) so they can see all.
+      match /checkIns/{userId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Active rotating check-in code: NEVER readable by clients. They submit
+      // a guess via the submitCheckInCode server action which validates with
+      // the admin SDK. Reading the code client-side would defeat the purpose.
+      match /codes/{codeId} {
+        allow read: if false;
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // User profiles
+    // ─────────────────────────────────────────────────────────────
+    match /users/{uid} {
+      // A user can read their own profile (used by /api/auth/profile + nav menu).
+      // Public profile data (displayName, photoURL) is also surfaced via the
+      // standings subcollection above, so we don't need to expose users/* to
+      // the public.
+      allow read: if request.auth != null && request.auth.uid == uid;
+
+      // Per-user subcollections (pollVotes, etc.) — owner-only read.
+      match /{document=**} {
+        allow read: if request.auth != null && request.auth.uid == uid;
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // Legacy scorecard-era collections — keep locked down. The scorecard
+    // product is in dev/test and reads happen server-side.
+    // ─────────────────────────────────────────────────────────────
+    // (events, fighters, gyms, venues, polls, props, picks, matchPicks, etc.)
+    // No client read/write access by default — server-only via firebase-admin.
+  }
+}

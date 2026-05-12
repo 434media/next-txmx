@@ -1,0 +1,351 @@
+'use server'
+
+import { firestore } from '../../lib/firebase-admin'
+import { getFightNight } from './fightnight'
+import { incrementStandingPoints, incrementPicksMade } from './fightnight-standings'
+import { lockPropsForBout } from './fightnight-props'
+import { sendPushToUsers } from './notifications'
+
+// ── Types ────────────────────────────────────────────────
+
+export type PickCorner = 'fighter1' | 'fighter2'
+
+export interface FightNightPick {
+  userId: string
+  boutNumber: number
+  pickedCorner: PickCorner
+  /** Snapshot of the picked fighter's name at pick time (for display when standings change) */
+  pickedFighterName: string
+  settled: boolean
+  won: boolean | null
+  pointsAwarded: number
+  createdAt: string
+  settledAt: string | null
+}
+
+const MATCH_WIN_POINTS = 100
+
+function picksCol(fightNightId: string) {
+  return firestore.collection('fightNights').doc(fightNightId).collection('picks')
+}
+
+function pickDocId(userId: string, boutNumber: number): string {
+  return `${userId}_${boutNumber}`
+}
+
+// ── Place a Pick ──────────────────────────────────────────
+
+export async function placeFightNightPick(
+  fightNightId: string,
+  userId: string,
+  boutNumber: number,
+  pickedCorner: PickCorner
+): Promise<{ success: boolean; error?: string }> {
+  if (!fightNightId || !userId) {
+    return { success: false, error: 'Missing fightNightId or userId' }
+  }
+  if (!boutNumber || boutNumber < 1) {
+    return { success: false, error: 'Invalid bout number' }
+  }
+  if (pickedCorner !== 'fighter1' && pickedCorner !== 'fighter2') {
+    return { success: false, error: 'Invalid corner' }
+  }
+
+  // Validate the fight night + bout
+  const fightNight = await getFightNight(fightNightId)
+  if (!fightNight) return { success: false, error: 'Fight night not found' }
+  if (fightNight.status === 'completed') {
+    return { success: false, error: 'This fight night has already ended' }
+  }
+
+  const boutRef = firestore
+    .collection('fightNights')
+    .doc(fightNightId)
+    .collection('bouts')
+    .doc(String(boutNumber))
+  const boutSnap = await boutRef.get()
+  if (!boutSnap.exists) return { success: false, error: 'Bout not found' }
+  const bout = boutSnap.data()!
+  if (bout.status === 'completed' || bout.status === 'live') {
+    return { success: false, error: 'This bout is locked' }
+  }
+
+  // Snapshot the picked fighter's name
+  const pickedFighterName =
+    pickedCorner === 'fighter1'
+      ? (bout.fighter1Name as string) || ''
+      : (bout.fighter2Name as string) || ''
+
+  // One pick per user per bout (idempotent by doc ID)
+  const ref = picksCol(fightNightId).doc(pickDocId(userId, boutNumber))
+  const existing = await ref.get()
+  if (existing.exists) {
+    return { success: false, error: 'You already picked this bout' }
+  }
+
+  const now = new Date().toISOString()
+  const pick: FightNightPick = {
+    userId,
+    boutNumber,
+    pickedCorner,
+    pickedFighterName,
+    settled: false,
+    won: null,
+    pointsAwarded: 0,
+    createdAt: now,
+    settledAt: null,
+  }
+  await ref.set(pick)
+
+  // Bump picksMade on standings (non-critical)
+  try {
+    const userSnap = await firestore.collection('users').doc(userId).get()
+    const u = userSnap.exists ? userSnap.data() : null
+    await incrementPicksMade(fightNightId, userId, {
+      displayName: u?.displayName || null,
+      photoURL: u?.photoURL || null,
+      email: u?.email || null,
+    })
+  } catch {
+    // Non-critical
+  }
+
+  return { success: true }
+}
+
+// ── Read Picks ─────────────────────────────────────────────
+
+export async function getUserPicks(
+  fightNightId: string,
+  userId: string
+): Promise<FightNightPick[]> {
+  if (!fightNightId || !userId) return []
+  const snap = await picksCol(fightNightId)
+    .where('userId', '==', userId)
+    .orderBy('boutNumber', 'asc')
+    .get()
+  return snap.docs.map((d) => d.data() as FightNightPick)
+}
+
+export async function getPicksForBout(
+  fightNightId: string,
+  boutNumber: number
+): Promise<FightNightPick[]> {
+  if (!fightNightId || !boutNumber) return []
+  const snap = await picksCol(fightNightId)
+    .where('boutNumber', '==', boutNumber)
+    .get()
+  return snap.docs.map((d) => d.data() as FightNightPick)
+}
+
+// ── Record + Settle a Bout ─────────────────────────────────
+
+/**
+ * Atomic fight-night control: write the bout's winner, mark it completed,
+ * settle every pick on that bout, increment standings for winners.
+ *
+ * @param winnerCorner  'fighter1' | 'fighter2' | 'draw'
+ */
+export async function recordFightNightBoutResult(
+  fightNightId: string,
+  boutNumber: number,
+  winnerCorner: 'fighter1' | 'fighter2' | 'draw'
+): Promise<{
+  success: boolean
+  settled: number
+  winners: number
+  error?: string
+}> {
+  if (!fightNightId || !boutNumber) {
+    return { success: false, settled: 0, winners: 0, error: 'Missing args' }
+  }
+
+  const boutRef = firestore
+    .collection('fightNights')
+    .doc(fightNightId)
+    .collection('bouts')
+    .doc(String(boutNumber))
+  const boutSnap = await boutRef.get()
+  if (!boutSnap.exists) {
+    return { success: false, settled: 0, winners: 0, error: 'Bout not found' }
+  }
+
+  // Update bout: status completed + winnerCorner + completedAt
+  const now = new Date().toISOString()
+  await boutRef.update({
+    winnerCorner,
+    status: 'completed' as const,
+    completedAt: now,
+    updatedAt: now,
+  })
+
+  // Pull all picks for this bout
+  const picksSnap = await picksCol(fightNightId)
+    .where('boutNumber', '==', boutNumber)
+    .get()
+
+  // Lock any open props tied to this bout (per-fight lock cascade) — non-critical
+  try {
+    await lockPropsForBout(fightNightId, boutNumber)
+  } catch {
+    // Non-critical
+  }
+
+  if (picksSnap.empty) {
+    return { success: true, settled: 0, winners: 0 }
+  }
+
+  let settled = 0
+  let winners = 0
+  const winnerUserIds: string[] = []
+  const loserUserIds: string[] = []
+  const drawUserIds: string[] = []
+
+  for (const doc of picksSnap.docs) {
+    const pick = doc.data() as FightNightPick
+    if (pick.settled) continue // already settled — skip
+
+    let won = false
+    let pointsAwarded = 0
+
+    if (winnerCorner === 'draw') {
+      // Nobody wins on a draw
+      won = false
+    } else if (pick.pickedCorner === winnerCorner) {
+      won = true
+      pointsAwarded = MATCH_WIN_POINTS
+    }
+
+    await doc.ref.update({
+      settled: true,
+      won,
+      pointsAwarded,
+      settledAt: now,
+    })
+    settled++
+
+    if (winnerCorner === 'draw') {
+      drawUserIds.push(pick.userId)
+    } else if (won) {
+      winnerUserIds.push(pick.userId)
+    } else {
+      loserUserIds.push(pick.userId)
+    }
+
+    if (won) {
+      winners++
+      try {
+        const userSnap = await firestore.collection('users').doc(pick.userId).get()
+        const u = userSnap.exists ? userSnap.data() : null
+        await incrementStandingPoints(fightNightId, pick.userId, pointsAwarded, {
+          displayName: u?.displayName || null,
+          photoURL: u?.photoURL || null,
+          email: u?.email || null,
+        })
+      } catch {
+        // Non-critical — points will be off, but settlement succeeded
+      }
+    }
+  }
+
+  // Outcome-grouped push pings — winners, losers, draws each get a
+  // tailored message. Same tag as the live push so a stale "live" alert
+  // gets replaced by the settled one.
+  try {
+    const boutData = boutSnap.data() as
+      | { fighter1Name?: string; fighter2Name?: string }
+      | undefined
+    const winnerName =
+      winnerCorner === 'fighter1'
+        ? boutData?.fighter1Name || 'Red corner'
+        : winnerCorner === 'fighter2'
+          ? boutData?.fighter2Name || 'Blue corner'
+          : null
+    const tag = `bout-${fightNightId}-${boutNumber}`
+    const url = `/events/fight-night#bout-${boutNumber}`
+
+    if (winnerUserIds.length > 0) {
+      await sendPushToUsers(
+        winnerUserIds,
+        `Your pick won · Bout ${boutNumber}`,
+        `+${MATCH_WIN_POINTS} pts. ${winnerName} took it.`,
+        url,
+        tag
+      )
+    }
+    if (loserUserIds.length > 0 && winnerName) {
+      await sendPushToUsers(
+        loserUserIds,
+        `Bout ${boutNumber} settled`,
+        `${winnerName} took it. Your pick missed.`,
+        url,
+        tag
+      )
+    }
+    if (drawUserIds.length > 0) {
+      await sendPushToUsers(
+        drawUserIds,
+        `Bout ${boutNumber} was a draw`,
+        `No points awarded.`,
+        url,
+        tag
+      )
+    }
+  } catch {
+    // Non-critical — settlement is the source of truth, push is just UX
+  }
+
+  return { success: true, settled, winners }
+}
+
+/**
+ * Lock all open bouts at or before a given bout number (called when a bout starts).
+ * Use this when the admin clicks "Bout N is live" before recording the result, to prevent
+ * late picks once the bell has rung.
+ */
+export async function markBoutLive(
+  fightNightId: string,
+  boutNumber: number
+): Promise<void> {
+  const boutRef = firestore
+    .collection('fightNights')
+    .doc(fightNightId)
+    .collection('bouts')
+    .doc(String(boutNumber))
+  const now = new Date().toISOString()
+  await boutRef.update({
+    status: 'live' as const,
+    startedAt: now,
+    updatedAt: now,
+  })
+
+  // Ping fans whose picks are now in flight on this bout. Push failures
+  // must not block the status update, so wrap in try/catch.
+  try {
+    const boutSnap = await boutRef.get()
+    const bout = boutSnap.data() as
+      | { fighter1Name?: string; fighter2Name?: string }
+      | undefined
+    const picksSnap = await picksCol(fightNightId)
+      .where('boutNumber', '==', boutNumber)
+      .get()
+    const userIds = Array.from(
+      new Set(picksSnap.docs.map((d) => (d.data() as FightNightPick).userId))
+    )
+    if (userIds.length > 0) {
+      const matchup =
+        bout?.fighter1Name && bout?.fighter2Name
+          ? `${bout.fighter1Name} vs ${bout.fighter2Name}`
+          : `Bout ${boutNumber}`
+      await sendPushToUsers(
+        userIds,
+        `Bout ${boutNumber} is live`,
+        `${matchup} — your pick is on the line.`,
+        `/events/fight-night#bout-${boutNumber}`,
+        `bout-${fightNightId}-${boutNumber}`
+      )
+    }
+  } catch {
+    // Non-critical — status flip is the source of truth, push is just UX
+  }
+}

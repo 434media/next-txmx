@@ -7,6 +7,8 @@ import { checkCooldown, checkCategoryCap, setCooldown, incrementDailyTracker } f
 import { getEconomyConfig } from "./economy"
 import { incrementQuestProgress } from "./quests"
 import { getUserByUid } from "./users"
+import type { EventMode } from "./events"
+import { incrementEventSP, incrementEventTC, incrementEventPicksMade } from "./event-leaderboard"
 
 export type PropStatus = "open" | "locked" | "settled" | "voided"
 export type PropType = "match_winner" | "method" | "round" | "over_under"
@@ -15,6 +17,10 @@ export interface Prop {
   id: string
   eventId: string
   eventDate: string
+  /** Snapshotted from the event at create-time. 'free-props' opens this prop to non-Black-Card users. */
+  eventMode: EventMode
+  /** Bout this prop is tied to (1-indexed). null/undefined for event-wide props. */
+  boutNumber: number | null
   title: string
   description: string
   type: PropType
@@ -45,6 +51,45 @@ export interface PropPick {
   won: boolean | null
 }
 
+function mapPropDoc(doc: FirebaseFirestore.QueryDocumentSnapshot): Prop {
+  const data = doc.data()
+  return {
+    id: doc.id,
+    ...data,
+    eventMode: (data.eventMode as EventMode) || 'standard',
+    boutNumber: typeof data.boutNumber === 'number' ? data.boutNumber : null,
+  } as Prop
+}
+
+/**
+ * Bulk-lock all open props for a specific bout. Called from `recordBoutResult`
+ * to enforce the per-fight lock cascade — once the bout's result is recorded
+ * no further picks can be placed on it.
+ */
+export async function lockPropsForBout(
+  eventId: string,
+  boutNumber: number
+): Promise<{ locked: number }> {
+  if (!eventId || !boutNumber) return { locked: 0 }
+
+  const snap = await firestore
+    .collection('props')
+    .where('eventId', '==', eventId)
+    .where('boutNumber', '==', boutNumber)
+    .where('status', '==', 'open')
+    .get()
+
+  if (snap.empty) return { locked: 0 }
+
+  const batch = firestore.batch()
+  const now = new Date().toISOString()
+  for (const d of snap.docs) {
+    batch.update(d.ref, { status: 'locked', updatedAt: now })
+  }
+  await batch.commit()
+  return { locked: snap.size }
+}
+
 export async function getProps(status?: PropStatus): Promise<Prop[]> {
   let query = firestore.collection("props").orderBy("createdAt", "desc") as FirebaseFirestore.Query
 
@@ -54,10 +99,7 @@ export async function getProps(status?: PropStatus): Promise<Prop[]> {
 
   const snapshot = await query.limit(100).get()
 
-  return snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  })) as Prop[]
+  return snapshot.docs.map(mapPropDoc)
 }
 
 export async function getOpenProps(): Promise<Prop[]> {
@@ -71,18 +113,31 @@ export async function getPropsByEvent(eventId: string): Promise<Prop[]> {
     .orderBy("createdAt", "asc")
     .get()
 
-  return snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  })) as Prop[]
+  return snapshot.docs.map(mapPropDoc)
 }
 
 export async function createProp(
-  data: Omit<Prop, "id" | "createdAt" | "updatedAt" | "settledAt" | "correctOptionId" | "status">
+  data: Omit<Prop, "id" | "createdAt" | "updatedAt" | "settledAt" | "correctOptionId" | "status" | "eventMode" | "boutNumber"> & {
+    eventMode?: EventMode
+    boutNumber?: number | null
+  }
 ): Promise<{ success: boolean; id: string }> {
   const now = new Date().toISOString()
+
+  // Snapshot eventMode from the linked event so the prop carries its own copy
+  let eventMode: EventMode = data.eventMode || 'standard'
+  if (!data.eventMode && data.eventId) {
+    const eventSnap = await firestore.collection('events').doc(data.eventId).get()
+    if (eventSnap.exists) {
+      const mode = eventSnap.data()?.eventMode as EventMode | undefined
+      if (mode) eventMode = mode
+    }
+  }
+
   const docRef = await firestore.collection("props").add({
     ...data,
+    eventMode,
+    boutNumber: typeof data.boutNumber === 'number' ? data.boutNumber : null,
     status: "open" as PropStatus,
     correctOptionId: null,
     settledAt: null,
@@ -178,6 +233,20 @@ export async function placePick(
     // Non-critical
   }
 
+  // Track event participation for the event leaderboard (non-critical)
+  if (prop.eventId) {
+    try {
+      const user = await getUserByUid(userId)
+      await incrementEventPicksMade(prop.eventId, userId, {
+        displayName: user?.displayName || null,
+        photoURL: user?.photoURL || null,
+        rank: user?.rank || 'rookie',
+      })
+    } catch {
+      // Non-critical
+    }
+  }
+
   return { success: true }
 }
 
@@ -254,14 +323,27 @@ export async function settleProp(propId: string, correctOptionId: string) {
     const isBlackCard = winner?.subscriptionStatus === 'active'
     const subMult = isBlackCard && config.subscriberMultiplier > 1 ? config.subscriberMultiplier : 1
 
+    const boostedSP = Math.max(1, Math.floor(prop.spReward * subMult))
     try {
-      const boostedSP = Math.max(1, Math.floor(prop.spReward * subMult))
       await awardSP(winnerId, boostedSP, 'prop_pick_win', spKey, {
         referenceId: propId,
         eventId: prop.eventId,
         sourceType: prop.isUnderdog ? 'prop_pick_underdog' : 'prop_pick_standard',
         multiplierApplied: subMult > 1 ? subMult : undefined,
       })
+
+      // Event-scoped leaderboard increment (non-critical)
+      if (prop.eventId) {
+        try {
+          await incrementEventSP(prop.eventId, winnerId, boostedSP, {
+            displayName: winner?.displayName || null,
+            photoURL: winner?.photoURL || null,
+            rank: winner?.rank || 'rookie',
+          })
+        } catch {
+          // Non-critical
+        }
+      }
     } catch {
       // SP award failure is logged but doesn't block settlement
     }
@@ -276,6 +358,14 @@ export async function settleProp(propId: string, correctOptionId: string) {
           tcKey,
           { propId, eventId: prop.eventId, ...(subMult > 1 ? { subscriberMultiplier: subMult } : {}) }
         )
+
+        if (prop.eventId) {
+          try {
+            await incrementEventTC(prop.eventId, winnerId, boostedTC)
+          } catch {
+            // Non-critical
+          }
+        }
       }
     } catch {
       // TC award failure is logged but doesn't block settlement

@@ -18,7 +18,7 @@ const nextConfig: NextConfig = {
             value: "riseofachampion.com",
           },
         ],
-        destination: "https://www.txmxboxing.com/riseofachampion",
+        destination: "https://www.txmxboxing.com/events/rise-of-a-champion",
         permanent: true,
       },
       {
@@ -29,7 +29,7 @@ const nextConfig: NextConfig = {
             value: "riseofachampion.com",
           },
         ],
-        destination: "https://www.txmxboxing.com/riseofachampion",
+        destination: "https://www.txmxboxing.com/events/rise-of-a-champion",
         permanent: true,
       },
     ];
@@ -41,6 +41,11 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "storage.googleapis.com",
         pathname: "/groovy-ego-462522-v2.firebasestorage.app/**",
+      },
+      {
+        protocol: "https",
+        hostname: "firebasestorage.googleapis.com",
+        pathname: "/v0/b/groovy-ego-462522-v2.firebasestorage.app/**",
       },
       {
         protocol: "https",

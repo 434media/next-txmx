@@ -70,7 +70,7 @@ export function generateEventJsonLd() {
       priceCurrency: 'USD',
       lowPrice: 10000,
       highPrice: 100000,
-      url: 'https://www.txmxboxing.com/riseofachampion',
+      url: 'https://www.txmxboxing.com/events/rise-of-a-champion',
     },
   }
 }
@@ -90,7 +90,7 @@ export function generateBreadcrumbJsonLd(pageName: string) {
         '@type': 'ListItem',
         position: 2,
         name: 'Iconic Series',
-        item: 'https://www.txmxboxing.com/riseofachampion',
+        item: 'https://www.txmxboxing.com/events/rise-of-a-champion',
       },
       ...(pageName === 'RSVP'
         ? [
@@ -98,7 +98,7 @@ export function generateBreadcrumbJsonLd(pageName: string) {
               '@type': 'ListItem',
               position: 3,
               name: 'RSVP',
-              item: 'https://www.txmxboxing.com/riseofachampion/rsvp',
+              item: 'https://www.txmxboxing.com/events/rise-of-a-champion/rsvp',
             },
           ]
         : pageName === 'Gallery'
@@ -107,7 +107,7 @@ export function generateBreadcrumbJsonLd(pageName: string) {
               '@type': 'ListItem',
               position: 3,
               name: 'Gallery',
-              item: 'https://www.txmxboxing.com/riseofachampion/gallery',
+              item: 'https://www.txmxboxing.com/events/rise-of-a-champion/gallery',
             },
           ]
         : []),

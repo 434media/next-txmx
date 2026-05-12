@@ -24,6 +24,7 @@ import AbuseDashboard from './abuse-dashboard'
 import VerifiedManager from './verified-manager'
 import LegacyRankManager from './legacy-rank-manager'
 import SettlementManager from './settlement-manager'
+import FightNightsManager from './fight-nights-manager'
 import type { VenueData } from '../actions/venues'
 import type { EventPromoter, PromoterData, TXMXEvent } from '../actions/events'
 import type { GymData } from '../actions/gyms'
@@ -41,56 +42,123 @@ interface AdminClientProps {
   initialEvents: TXMXEvent[]
 }
 
-type Tab = 'list' | 'add' | 'venues' | 'gyms' | 'promoters' | 'events' | 'props' | 'polls' | 'economy' | 'notifications' | 'tdlr' | 'eightcount' | 'flags' | 'quests' | 'rewards' | 'seasons' | 'community' | 'abuse' | 'verified' | 'legacy' | 'settlement'
+type Tab = 'list' | 'add' | 'venues' | 'gyms' | 'promoters' | 'events' | 'props' | 'polls' | 'economy' | 'notifications' | 'tdlr' | 'eightcount' | 'flags' | 'quests' | 'rewards' | 'seasons' | 'community' | 'abuse' | 'verified' | 'legacy' | 'settlement' | 'fnights'
 
-const NAV_SECTIONS = [
+interface NavItem {
+  key: Tab
+  label: string
+}
+
+interface NavSubsection {
+  label: string
+  items: NavItem[]
+}
+
+interface NavSection {
+  label: string
+  /** Flat list of items (used when the section has no subgroups) */
+  items?: NavItem[]
+  /** Grouped subsections (used when the section nests, e.g. SCORECARD) */
+  subsections?: NavSubsection[]
+}
+
+const NAV_SECTIONS: NavSection[] = [
   {
-    label: 'DATABASE',
-    items: [
-      { key: 'list' as Tab, label: 'Fighters', icon: '🥊' },
-      { key: 'add' as Tab, label: 'Add Fighter', icon: '+' },
-      { key: 'venues' as Tab, label: 'Venues', icon: '🏟️' },
-      { key: 'gyms' as Tab, label: 'Gyms', icon: '🏋️' },
-      { key: 'promoters' as Tab, label: 'Promoters', icon: '🎤' },
-      { key: 'events' as Tab, label: 'Events', icon: '📅' },
+    label: 'Fight Nights',
+    items: [{ key: 'fnights', label: 'Fight Nights' }],
+  },
+  {
+    label: 'Scorecard',
+    subsections: [
+      {
+        label: 'Database',
+        items: [
+          { key: 'list', label: 'Fighters' },
+          { key: 'venues', label: 'Venues' },
+          { key: 'gyms', label: 'Gyms' },
+          { key: 'promoters', label: 'Promoters' },
+          { key: 'events', label: 'Events' },
+        ],
+      },
+      {
+        label: 'Engagement',
+        items: [
+          { key: 'props', label: 'Props' },
+          { key: 'settlement', label: 'Settlement' },
+          { key: 'polls', label: 'Polls' },
+          { key: 'quests', label: 'Quests' },
+          { key: 'rewards', label: 'Rewards' },
+          { key: 'seasons', label: 'Seasons' },
+          { key: 'economy', label: 'Economy' },
+        ],
+      },
+      {
+        label: 'Content',
+        items: [
+          { key: 'eightcount', label: '8 Count' },
+          { key: 'community', label: 'Community' },
+        ],
+      },
+      {
+        label: 'Moderation',
+        items: [
+          { key: 'abuse', label: 'Abuse Prevention' },
+          { key: 'verified', label: 'Verified Accounts' },
+          { key: 'legacy', label: 'Legacy Rank' },
+        ],
+      },
+      {
+        label: 'Tools',
+        items: [{ key: 'tdlr', label: 'Import TDLR' }],
+      },
     ],
   },
   {
-    label: 'ENGAGEMENT',
+    label: 'System',
     items: [
-      { key: 'props' as Tab, label: 'Props', icon: '🎯' },
-      { key: 'settlement' as Tab, label: 'Settlement', icon: '⚖️' },
-      { key: 'polls' as Tab, label: 'Polls', icon: '📊' },
-      { key: 'quests' as Tab, label: 'Quests', icon: '⚔️' },
-      { key: 'rewards' as Tab, label: 'Rewards', icon: '🎁' },
-      { key: 'seasons' as Tab, label: 'Seasons', icon: '🏆' },
-      { key: 'economy' as Tab, label: 'Economy', icon: '⚙️' },
-    ],
-  },
-  {
-    label: 'CONTENT',
-    items: [
-      { key: 'eightcount' as Tab, label: '8 Count', icon: '📰' },
-      { key: 'community' as Tab, label: 'Community', icon: '💬' },
-      { key: 'notifications' as Tab, label: 'Notify', icon: '🔔' },
-    ],
-  },
-  {
-    label: 'MODERATION',
-    items: [
-      { key: 'abuse' as Tab, label: 'Abuse', icon: '🛡️' },
-      { key: 'flags' as Tab, label: 'Flags', icon: '🚩' },
-      { key: 'verified' as Tab, label: 'Verified', icon: '✓' },
-      { key: 'legacy' as Tab, label: 'Legacy Rank', icon: '👑' },
-    ],
-  },
-  {
-    label: 'TOOLS',
-    items: [
-      { key: 'tdlr' as Tab, label: 'Import TDLR', icon: '📄' },
+      { key: 'flags', label: 'Feature Flags' },
+      { key: 'notifications', label: 'Push Notifications' },
     ],
   },
 ]
+
+function NavLink({
+  item,
+  isActive,
+  count,
+  onClick,
+}: {
+  item: NavItem
+  isActive: boolean
+  count: number
+  onClick: () => void
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`w-full flex items-center justify-between gap-2 px-2 py-1.5 rounded-md text-left transition-colors duration-100 ${
+        isActive
+          ? 'bg-gray-100 text-gray-900'
+          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+      }`}
+    >
+      <span className="text-[13px] leading-none truncate">
+        {item.label}
+      </span>
+      {count > 0 && (
+        <span
+          className={`text-[10px] tabular-nums leading-none px-1.5 py-0.5 rounded shrink-0 ${
+            isActive
+              ? 'bg-white text-gray-600 border border-gray-200'
+              : 'bg-gray-100 text-gray-400'
+          }`}
+        >
+          {count}
+        </span>
+      )}
+    </button>
+  )
+}
 
 export default function AdminClient({ initialFighters, initialVenues, eventPromoters: initialEventPromoters, initialPromoterDocs, initialGyms, initialEvents }: AdminClientProps) {
   const [fighters, setFighters] = useState<Fighter[]>(initialFighters)
@@ -188,6 +256,7 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
     events: eventDocs.length,
     props: 0,
     settlement: 0,
+    fnights: 0,
     polls: 0,
     economy: 0,
     notifications: 0,
@@ -205,27 +274,28 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
   }
 
   const pageTitle: Record<Tab, string> = {
-    list: 'FIGHTERS',
-    venues: 'VENUES',
-    gyms: 'GYMS',
-    promoters: 'PROMOTERS',
-    events: 'EVENTS',
-    eightcount: 'THE 8 COUNT',
-    props: 'PROP PICKS',
-    settlement: 'MATCH SETTLEMENT',
-    polls: 'FAN POLLS',
-    economy: 'ECONOMY GOVERNOR',
-    notifications: 'PUSH NOTIFICATIONS',
-    add: 'ADD FIGHTER',
-    tdlr: 'IMPORT TDLR',
-    flags: 'FEATURE FLAGS',
-    quests: 'QUESTS & BADGES',
-    rewards: 'REWARDS STORE',
-    seasons: 'SEASONS',
-    community: 'COMMUNITY',
-    abuse: 'ABUSE PREVENTION',
-    verified: 'VERIFIED ACCOUNTS',
-    legacy: 'LEGACY RANK',
+    list: 'Fighters',
+    venues: 'Venues',
+    gyms: 'Gyms',
+    promoters: 'Promoters',
+    events: 'Events',
+    eightcount: 'The 8 Count',
+    props: 'Prop Picks',
+    settlement: 'Match Settlement',
+    fnights: 'Fight Nights',
+    polls: 'Fan Polls',
+    economy: 'Economy Governor',
+    notifications: 'Push Notifications',
+    add: 'Add Fighter',
+    tdlr: 'Import TDLR',
+    flags: 'Feature Flags',
+    quests: 'Quests & Badges',
+    rewards: 'Rewards Store',
+    seasons: 'Seasons',
+    community: 'Community',
+    abuse: 'Abuse Prevention',
+    verified: 'Verified Accounts',
+    legacy: 'Legacy Rank',
   }
 
   const handleNav = (key: Tab) => {
@@ -246,7 +316,7 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
             <path strokeLinecap="round" strokeLinejoin="round" d={sidebarOpen ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'} />
           </svg>
         </button>
-        <span className="text-gray-800 text-xs font-semibold tracking-[0.2em]">{pageTitle[activeTab]}</span>
+        <span className="text-gray-900 text-sm font-semibold tracking-tight">{pageTitle[activeTab]}</span>
         <div className="w-5" />
       </div>
 
@@ -271,63 +341,71 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
             </h1>
           </div>
 
-          <nav className="px-2 pb-8 flex flex-col h-[calc(100%-3.5rem)]">
-            <div className="flex-1">
-            {NAV_SECTIONS.map(section => (
-              <div key={section.label} className="mb-5">
-                <p className="px-3 mb-1.5 text-[10px] font-semibold text-gray-300 tracking-[0.2em] leading-relaxed">
-                  {section.label}
-                </p>
-                {section.items.map(item => {
-                  const isActive = activeTab === item.key
-                  const count = counts[item.key]
-                  return (
-                    <button
-                      key={item.key}
-                      onClick={() => handleNav(item.key)}
-                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-left transition-colors duration-150 group ${
-                        isActive
-                          ? 'bg-gray-100 text-gray-900'
-                          : 'text-gray-400 hover:bg-gray-50 hover:text-gray-700'
-                      }`}
-                    >
-                      <span className="text-sm leading-none w-5 text-center shrink-0">{item.icon}</span>
-                      <span className="text-[13px] font-medium tracking-wide leading-none flex-1">
-                        {item.label}
-                      </span>
-                      {count > 0 && (
-                        <span className={`text-[10px] font-semibold tabular-nums leading-none px-1.5 py-0.5 rounded ${
-                          isActive
-                            ? 'bg-amber-100 text-[#FFB800]'
-                            : 'bg-gray-100 text-gray-400 group-hover:text-gray-400'
-                        }`}>
-                          {count}
-                        </span>
-                      )}
-                    </button>
-                  )
-                })}
-              </div>
-            ))}
+          <nav className="px-3 pb-8 flex flex-col h-[calc(100%-3.5rem)]">
+            <div className="flex-1 space-y-6">
+              {NAV_SECTIONS.map((section) => (
+                <div key={section.label}>
+                  <p className="px-2 mb-2 text-[11px] font-semibold text-gray-500 tracking-tight leading-none">
+                    {section.label}
+                  </p>
+
+                  {/* Flat section */}
+                  {section.items && (
+                    <div className="space-y-0.5">
+                      {section.items.map((item) => (
+                        <NavLink
+                          key={item.key}
+                          item={item}
+                          isActive={activeTab === item.key}
+                          count={counts[item.key]}
+                          onClick={() => handleNav(item.key)}
+                        />
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Nested subsections (e.g. SCORECARD) */}
+                  {section.subsections && (
+                    <div className="space-y-4 mt-1">
+                      {section.subsections.map((sub) => (
+                        <div key={sub.label}>
+                          <p className="px-2 mb-1 text-[10px] font-medium text-gray-400 tracking-tight leading-none uppercase">
+                            {sub.label}
+                          </p>
+                          <div className="space-y-0.5">
+                            {sub.items.map((item) => (
+                              <NavLink
+                                key={item.key}
+                                item={item}
+                                isActive={activeTab === item.key}
+                                count={counts[item.key]}
+                                onClick={() => handleNav(item.key)}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
 
             {/* Sign Out */}
-            <div className="border-t border-gray-200 pt-4">
+            <div className="border-t border-gray-200 pt-4 mt-6">
               {user && (
-                <p className="px-3 mb-2 text-[10px] text-gray-300 tracking-wide truncate" title={user.email || ''}>
+                <p className="px-2 mb-2 text-[11px] text-gray-400 tracking-tight truncate" title={user.email || ''}>
                   {user.email}
                 </p>
               )}
               <button
                 onClick={handleSignOut}
-                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-left text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors duration-150"
+                className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-left text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-colors duration-150"
               >
-                <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
                 </svg>
-                <span className="text-[13px] font-medium tracking-wide leading-none">
-                  Sign Out
-                </span>
+                <span className="text-[13px] leading-none">Sign out</span>
               </button>
             </div>
           </nav>
@@ -338,10 +416,9 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 lg:pt-8 pb-16">
             {/* Page header */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 tracking-[0.15em] leading-tight">
+              <h2 className="text-2xl font-semibold text-gray-900 tracking-tight leading-tight">
                 {pageTitle[activeTab]}
               </h2>
-              <div className="mt-1.5 h-px w-10 bg-[#FFB800]/60" />
             </div>
 
             {/* Content */}
@@ -349,9 +426,9 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
               <div className="space-y-6">
                 <button
                   onClick={() => setActiveTab('add')}
-                  className="inline-flex items-center gap-2 bg-[#FFB800] hover:bg-amber-500 text-black text-[13px] font-bold tracking-[0.12em] uppercase px-5 py-2.5 rounded-md transition-colors"
+                  className="inline-flex items-center gap-1.5 bg-gray-900 hover:bg-gray-800 text-white text-[13px] font-medium px-4 py-2 rounded-md transition-colors"
                 >
-                  <span className="text-lg leading-none">+</span>
+                  <span className="text-base leading-none">+</span>
                   Add Fighter
                 </button>
                 <FighterList fighters={fighters} onDelete={handleFighterDeleted} onUpdate={handleFighterUpdated} gymNames={gymDocs.map(g => g.name).sort()} gymDocs={gymDocs} />
@@ -370,6 +447,8 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
               <PropManager events={initialEvents} />
             ) : activeTab === 'settlement' ? (
               <SettlementManager events={initialEvents} />
+            ) : activeTab === 'fnights' ? (
+              <FightNightsManager />
             ) : activeTab === 'eightcount' ? (
               <EightCountManager />
             ) : activeTab === 'polls' ? (

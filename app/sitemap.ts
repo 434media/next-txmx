@@ -23,19 +23,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/riseofachampion`,
+      url: `${baseUrl}/events/rise-of-a-champion`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/riseofachampion/gallery`,
+      url: `${baseUrl}/events/rise-of-a-champion/gallery`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/riseofachampion/rsvp`,
+      url: `${baseUrl}/events/rise-of-a-champion/rsvp`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.8,

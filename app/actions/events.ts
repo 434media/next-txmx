@@ -2,6 +2,8 @@
 
 import { firestore } from '../../lib/firebase-admin'
 
+export type EventMode = 'standard' | 'free-props'
+
 export interface TXMXEvent {
   id: string
   eventNumber: string
@@ -13,6 +15,12 @@ export interface TXMXEvent {
   boutCount: number
   source: string
   createdAt: string
+  /** 'free-props' opens props to non-Black-Card users for this event only. Default 'standard'. */
+  eventMode: EventMode
+  /** Promotional flyer image URL (rendered in fight-night hero). Optional. */
+  flyerUrl?: string
+  /** Short event title shown in nav/hero, e.g. "Members Only Fight Night". Optional. */
+  eventTitle?: string
 }
 
 export interface EventBout {
@@ -53,6 +61,9 @@ export async function getEvents(): Promise<TXMXEvent[]> {
       boutCount: data.boutCount || 0,
       source: data.source || '',
       createdAt: data.createdAt || '',
+      eventMode: (data.eventMode as EventMode) || 'standard',
+      flyerUrl: data.flyerUrl || undefined,
+      eventTitle: data.eventTitle || undefined,
     }
   })
 
@@ -182,6 +193,49 @@ export async function getEventById(eventId: string): Promise<TXMXEvent | null> {
     boutCount: data.boutCount || 0,
     source: data.source || '',
     createdAt: data.createdAt || '',
+    eventMode: (data.eventMode as EventMode) || 'standard',
+  }
+}
+
+/**
+ * Returns the active fight night event — the soonest free-props event whose
+ * date is today or within the next `lookAheadDays` days. Used by the navbar
+ * to conditionally surface a "Fight Night Live" link.
+ */
+export async function getActiveFightNightEvent(
+  lookAheadDays = 2
+): Promise<TXMXEvent | null> {
+  const today = new Date().toISOString().split('T')[0]
+  const cutoff = new Date(Date.now() + lookAheadDays * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .split('T')[0]
+
+  const snap = await firestore
+    .collection('events')
+    .where('eventMode', '==', 'free-props')
+    .where('date', '>=', today)
+    .where('date', '<=', cutoff)
+    .orderBy('date', 'asc')
+    .limit(1)
+    .get()
+
+  if (snap.empty) return null
+  const doc = snap.docs[0]
+  const data = doc.data()
+  return {
+    id: doc.id,
+    eventNumber: data.eventNumber || '',
+    date: data.date || '',
+    city: data.city || '',
+    promoter: data.promoter || '',
+    venue: data.venue || '',
+    address: data.address || '',
+    boutCount: data.boutCount || 0,
+    source: data.source || '',
+    createdAt: data.createdAt || '',
+    eventMode: (data.eventMode as EventMode) || 'standard',
+    flyerUrl: data.flyerUrl || undefined,
+    eventTitle: data.eventTitle || undefined,
   }
 }
 
@@ -207,6 +261,9 @@ export async function getUpcomingEvents(limit = 10): Promise<TXMXEvent[]> {
       boutCount: data.boutCount || 0,
       source: data.source || '',
       createdAt: data.createdAt || '',
+      eventMode: (data.eventMode as EventMode) || 'standard',
+      flyerUrl: data.flyerUrl || undefined,
+      eventTitle: data.eventTitle || undefined,
     }
   })
 }
@@ -326,19 +383,42 @@ export async function updateEvent(id: string, data: Partial<Omit<TXMXEvent, 'id'
     ...data,
     updatedAt: new Date().toISOString(),
   })
+
+  // If eventMode changed, propagate to any existing props for this event so
+  // the picks UI can gate without re-fetching the event for every prop.
+  if (data.eventMode) {
+    const propsSnap = await firestore
+      .collection('props')
+      .where('eventId', '==', id)
+      .get()
+
+    if (!propsSnap.empty) {
+      const batch = firestore.batch()
+      const now = new Date().toISOString()
+      for (const propDoc of propsSnap.docs) {
+        batch.update(propDoc.ref, { eventMode: data.eventMode, updatedAt: now })
+      }
+      await batch.commit()
+    }
+  }
+
   return { success: true }
 }
 
-export async function addEvent(data: Omit<TXMXEvent, 'id' | 'createdAt' | 'source'>): Promise<{ success: true; event: TXMXEvent }> {
+export async function addEvent(
+  data: Omit<TXMXEvent, 'id' | 'createdAt' | 'source' | 'eventMode'> & { eventMode?: EventMode }
+): Promise<{ success: true; event: TXMXEvent }> {
   const now = new Date().toISOString()
+  const eventMode: EventMode = data.eventMode || 'standard'
   const docRef = await firestore.collection('events').add({
     ...data,
+    eventMode,
     source: 'ADMIN',
     createdAt: now,
   })
   return {
     success: true,
-    event: { ...data, id: docRef.id, source: 'ADMIN', createdAt: now },
+    event: { ...data, eventMode, id: docRef.id, source: 'ADMIN', createdAt: now },
   }
 }
 

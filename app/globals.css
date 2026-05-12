@@ -5,18 +5,18 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* Note: do NOT set `overflow-y: auto` or `overflow: hidden` on html/body —
+   it creates a competing scroll container and breaks `position: sticky`.
+   `overflow-x: clip` is the modern equivalent of `hidden` that doesn't
+   create a scroll container, so sticky still works. */
 html {
-  height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
+  min-height: 100%;
 }
 
 body {
   font-family: Arial, Helvetica, sans-serif;
-  height: 100%;
   min-height: 100vh;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow-x: clip;
   position: relative;
 }
 

@@ -2,28 +2,61 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { Menu } from "lucide-react"
+import { Menu, ArrowUpRight, ChevronDown } from "lucide-react"
 import { useState, useRef, useEffect } from "react"
+import {
+  collection,
+  doc,
+  limit,
+  onSnapshot,
+  orderBy,
+  query,
+} from "firebase/firestore"
+import { db } from "../lib/firebase-client"
 import { useAuth } from "../lib/auth-context"
 import NotificationBell from "./notification-bell"
+import type { FightNight } from "../app/actions/fightnight"
+import type { FightNightStanding } from "../app/actions/fightnight-standings"
 
 interface NavbarProps {
   onMenuClick: () => void
   onAuthClick: () => void
+  activeFightNight?: FightNight | null
 }
 
-function getRankForSP(sp: number) {
-  if (sp >= 100000) return "Hall of Fame"
-  if (sp >= 25000) return "Champion"
-  if (sp >= 5000) return "Contender"
-  return "Rookie"
+function PreviewPill() {
+  return (
+    <span className="inline-flex items-center text-amber-400 text-[9px] font-bold tracking-[0.2em] uppercase px-1.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/25 leading-none">
+      Preview
+    </span>
+  )
 }
 
-export default function Navbar({ onMenuClick, onAuthClick }: NavbarProps) {
+function StatusPill({ status }: { status: "announced" | "doors_open" | "live" | "completed" }) {
+  const label =
+    status === "live"
+      ? "Live Now"
+      : status === "doors_open"
+        ? "Doors Open"
+        : status === "completed"
+          ? "Past"
+          : "Coming Up"
+  return (
+    <span className="inline-flex items-center text-amber-400 text-[9px] font-bold tracking-[0.2em] uppercase px-1.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/25 leading-none whitespace-nowrap">
+      {label}
+    </span>
+  )
+}
+
+export default function Navbar({ onMenuClick, activeFightNight = null }: NavbarProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+  const [isEventsOpen, setIsEventsOpen] = useState(false)
+  const [isComingSoonOpen, setIsComingSoonOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const userMenuRef = useRef<HTMLDivElement>(null)
+  const eventsRef = useRef<HTMLDivElement>(null)
+  const comingSoonRef = useRef<HTMLDivElement>(null)
   const { user, profile, loading, signOut } = useAuth()
 
   useEffect(() => {
@@ -33,6 +66,12 @@ export default function Navbar({ onMenuClick, onAuthClick }: NavbarProps) {
       }
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
         setIsUserMenuOpen(false)
+      }
+      if (eventsRef.current && !eventsRef.current.contains(event.target as Node)) {
+        setIsEventsOpen(false)
+      }
+      if (comingSoonRef.current && !comingSoonRef.current.contains(event.target as Node)) {
+        setIsComingSoonOpen(false)
       }
     }
     document.addEventListener("mousedown", handleClickOutside)
@@ -62,200 +101,219 @@ export default function Navbar({ onMenuClick, onAuthClick }: NavbarProps) {
 
           {/* Desktop Navigation Links - Hidden on mobile */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link
-              href="/scorecard"
-              className="text-white text-xs font-semibold tracking-widest leading-relaxed hover:text-white/80 hover:underline decoration-2 underline-offset-4 transition-all duration-300"
-            >
-              SCORECARD
-            </Link>
-            <Link
-              href="/8count"
-              className="text-white text-xs font-semibold tracking-widest leading-relaxed hover:text-white/80 hover:underline decoration-2 underline-offset-4 transition-all duration-300"
-            >
-              THE 8 COUNT
-            </Link>
-            <Link
-              href="/riseofachampion"
-              className="text-white text-xs font-semibold tracking-widest leading-relaxed hover:text-white/80 hover:underline decoration-2 underline-offset-4 transition-all duration-300"
-            >
-              RISE OF A CHAMPION
-            </Link>
+            {/* EVENTS Dropdown */}
+            <div ref={eventsRef} className="relative">
+              <button
+                onClick={() => setIsEventsOpen(!isEventsOpen)}
+                className="text-white text-xs font-semibold tracking-widest leading-relaxed hover:text-white/70 transition-colors duration-200 flex items-center gap-1.5"
+              >
+                EVENTS
+                <ChevronDown
+                  className={`w-3.5 h-3.5 text-white/60 transition-transform duration-200 ${isEventsOpen ? "rotate-180" : ""}`}
+                  strokeWidth={2.25}
+                />
+              </button>
+
+              {isEventsOpen && (
+                <div className="absolute right-0 mt-3 w-72 bg-black/95 backdrop-blur-md border border-white/10 rounded-lg shadow-2xl overflow-hidden">
+                  <div className="py-1">
+                    <Link
+                      href="/events/fight-night"
+                      onClick={() => setIsEventsOpen(false)}
+                      className="block px-4 py-3 hover:bg-white/5 transition-colors duration-200 border-b border-white/5"
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                          <p className="text-white text-xs font-semibold tracking-wide leading-relaxed mb-1">
+                            FIGHT NIGHT
+                        </p>
+                      </div>
+                      <p className="text-white/45 text-[11px] font-medium leading-relaxed">
+                        BOXR STATION PRESENTS
+                      </p>
+                    </Link>
+                    <Link
+                      href="/events/rise-of-a-champion"
+                      onClick={() => setIsEventsOpen(false)}
+                      className="block px-4 py-3 hover:bg-white/5 transition-colors duration-200 border-b border-white/5"
+                    >
+                      <p className="text-white text-xs font-semibold tracking-wide leading-relaxed mb-1">
+                        RISE OF A CHAMPION
+                      </p>
+                      <p className="text-white/45 text-[11px] font-medium leading-relaxed">
+                        ICONTALKS x TXMX BOXING 
+                      </p>
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
             <a
               href="https://434media.com/shop"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-white text-xs font-semibold tracking-widest leading-relaxed hover:text-white/80 hover:underline decoration-2 underline-offset-4 transition-all duration-300"
+              aria-label="Shop (opens in new tab)"
+              className="text-white text-xs font-semibold tracking-widest leading-relaxed hover:text-white/70 transition-colors duration-200 inline-flex items-center gap-1.5 group"
             >
               SHOP
+              <ArrowUpRight
+                className="w-3.5 h-3.5 text-white/50 group-hover:text-white/80 group-hover:-translate-y-px group-hover:translate-x-px transition-all duration-200"
+                strokeWidth={2.25}
+              />
             </a>
 
-            {/* @TXMXBOXING Dropdown */}
+            {/* COMING SOON Dropdown */}
+            <div ref={comingSoonRef} className="relative">
+              <button
+                onClick={() => setIsComingSoonOpen(!isComingSoonOpen)}
+                className="text-white text-xs font-semibold tracking-widest leading-relaxed hover:text-white/70 transition-colors duration-200 flex items-center gap-1.5"
+              >
+                COMING SOON
+                <ChevronDown
+                  className={`w-3.5 h-3.5 text-white/60 transition-transform duration-200 ${isComingSoonOpen ? "rotate-180" : ""}`}
+                  strokeWidth={2.25}
+                />
+              </button>
+
+              {isComingSoonOpen && (
+                <div className="absolute right-0 mt-3 w-72 bg-black/95 backdrop-blur-md border border-white/10 rounded-lg shadow-2xl overflow-hidden">
+                  <div className="py-1">
+                    <Link
+                      href="/scorecard"
+                      onClick={() => setIsComingSoonOpen(false)}
+                      className="block px-4 py-3 hover:bg-white/5 transition-colors duration-200"
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-white text-xs font-semibold tracking-wide leading-relaxed">
+                          SCORECARD
+                        </span>
+                        <PreviewPill />
+                      </div>
+                      <p className="text-white/45 text-[11px] font-medium leading-relaxed">
+                        Skill-based fan game. Pick winners, earn points, climb ranks.
+                      </p>
+                    </Link>
+                    <Link
+                      href="/8count"
+                      onClick={() => setIsComingSoonOpen(false)}
+                      className="block px-4 py-3 hover:bg-white/5 transition-colors duration-200 border-t border-white/5"
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-white text-xs font-semibold tracking-wide leading-relaxed">
+                          THE 8 COUNT
+                        </span>
+                        <PreviewPill />
+                      </div>
+                      <p className="text-white/45 text-[11px] font-medium leading-relaxed">
+                        Editorial feed for fight fans. Stories, recaps, breakdowns.
+                      </p>
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* FOLLOW US Dropdown */}
             <div ref={dropdownRef} className="relative">
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="text-white text-xs font-semibold tracking-widest leading-relaxed hover:text-white/80 transition-all duration-300 flex items-center gap-1.5"
+                className="text-white text-xs font-semibold tracking-widest leading-relaxed hover:text-white/70 transition-colors duration-200 flex items-center gap-1.5"
               >
-                @TXMXBOXING
-                <svg
-                  className={`w-3 h-3 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
-                </svg>
+                FOLLOW US
+                <ChevronDown
+                  className={`w-3.5 h-3.5 text-white/60 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`}
+                  strokeWidth={2.25}
+                />
               </button>
 
               {isDropdownOpen && (
-                <div className="absolute right-0 mt-3 w-60 bg-black/95 backdrop-blur-sm border border-white/20 rounded-md shadow-2xl">
+                <div className="absolute right-0 mt-3 w-60 bg-black/95 backdrop-blur-md border border-white/10 rounded-lg shadow-2xl overflow-hidden">
                   <div className="py-1">
-                    <a
-                      href="https://www.instagram.com/txmxboxing/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors duration-200 group"
-                      onClick={() => setIsDropdownOpen(false)}
-                    >
-                      <svg className="w-4 h-4 text-white/60 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
-                      </svg>
-                      <div>
-                        <p className="text-white text-xs font-semibold tracking-wide leading-relaxed">INSTAGRAM</p>
-                        <p className="text-white/40 text-[11px] font-medium tracking-wide leading-relaxed">@txmxboxing</p>
-                      </div>
-                    </a>
-                    <a
-                      href="https://www.youtube.com/@txmxboxing/shorts"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors duration-200 group"
-                      onClick={() => setIsDropdownOpen(false)}
-                    >
-                      <svg className="w-4 h-4 text-white/60 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-                      </svg>
-                      <div>
-                        <p className="text-white text-xs font-semibold tracking-wide leading-relaxed">YOUTUBE</p>
-                        <p className="text-white/40 text-[11px] font-medium tracking-wide leading-relaxed">@txmxboxing</p>
-                      </div>
-                    </a>
-                    <a
-                      href="https://www.tiktok.com/@txmxboxing"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors duration-200 group"
-                      onClick={() => setIsDropdownOpen(false)}
-                    >
-                      <svg className="w-4 h-4 text-white/60 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.75a8.18 8.18 0 0 0 4.76 1.52V6.84a4.84 4.84 0 0 1-1-.15z" />
-                      </svg>
-                      <div>
-                        <p className="text-white text-xs font-semibold tracking-wide leading-relaxed">TIKTOK</p>
-                        <p className="text-white/40 text-[11px] font-medium tracking-wide leading-relaxed">@txmxboxing</p>
-                      </div>
-                    </a>
+                    {[
+                      { label: "INSTAGRAM", href: "https://www.instagram.com/txmxboxing/" },
+                      { label: "YOUTUBE", href: "https://www.youtube.com/@txmxboxing/shorts" },
+                      { label: "TIKTOK", href: "https://www.tiktok.com/@txmxboxing" },
+                    ].map((item, i) => (
+                      <a
+                        key={item.label}
+                        href={item.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => setIsDropdownOpen(false)}
+                        className={`flex items-center justify-between px-4 py-3 hover:bg-white/5 transition-colors duration-200 group ${i > 0 ? "border-t border-white/5" : ""}`}
+                      >
+                        <div>
+                          <p className="text-white text-xs font-semibold tracking-wide leading-relaxed">{item.label}</p>
+                          <p className="text-white/45 text-[11px] font-medium leading-relaxed mt-0.5">@txmxboxing</p>
+                        </div>
+                        <ArrowUpRight
+                          className="w-3.5 h-3.5 text-white/30 group-hover:text-white/70 group-hover:-translate-y-px group-hover:translate-x-px transition-all duration-200"
+                          strokeWidth={2.25}
+                        />
+                      </a>
+                    ))}
                   </div>
                 </div>
               )}
             </div>
 
             {/* Auth */}
-            {!loading && (
-              user ? (
-                <div ref={userMenuRef} className="relative">
-                  <button
-                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                    className="flex items-center gap-2 text-white/60 text-[11px] font-semibold tracking-widest uppercase hover:text-white transition-colors"
-                  >
-                    {profile?.subscriptionStatus === "active" && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                    )}
-                    {user.displayName?.split(" ")[0]?.toUpperCase() || "ACCOUNT"}
-                    <svg
-                      className={`w-3 h-3 transition-transform duration-200 ${isUserMenuOpen ? "rotate-180" : ""}`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-                  {isUserMenuOpen && (
-                    <div className="absolute right-0 mt-3 w-72 bg-black border border-white/10 shadow-2xl overflow-hidden">
-                      {/* User header */}
-                      <div className="px-5 py-4 border-b border-white/5 bg-white/2">
-                        <p className="text-white text-xs font-semibold tracking-wide truncate">{user.displayName || "Account"}</p>
-                        <p className="text-white/40 text-[11px] font-medium tracking-wide mt-0.5 truncate">{user.email}</p>
-                      </div>
+            {!loading && user && (
+              <div ref={userMenuRef} className="relative">
+                <button
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className="text-white text-xs font-semibold tracking-widest leading-relaxed hover:text-white/70 transition-colors duration-200 flex items-center gap-1.5 uppercase"
+                >
+                  {user.displayName?.split(" ")[0] || "Account"}
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 text-white/60 transition-transform duration-200 ${isUserMenuOpen ? "rotate-180" : ""}`}
+                    strokeWidth={2.25}
+                  />
+                </button>
 
-                      {/* Currency stats */}
-                      {profile && (
-                        <div className="px-5 py-3 border-b border-white/5 grid grid-cols-3 gap-2">
-                          <div className="text-center">
-                            <p className="text-blue-400 text-xs font-bold tabular-nums">{profile.skillPoints}</p>
-                            <p className="text-white/30 text-[9px] tracking-wider">SP</p>
-                          </div>
-                          <div className="text-center">
-                            <p className="text-emerald-400 text-xs font-bold tabular-nums">{profile.txCredits}</p>
-                            <p className="text-white/30 text-[9px] tracking-wider">TC</p>
-                          </div>
-                          <div className="text-center">
-                            <p className="text-purple-400 text-xs font-bold tabular-nums">{profile.loyaltyPoints}</p>
-                            <p className="text-white/30 text-[9px] tracking-wider">LP</p>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Rank */}
-                      {profile && (
-                        <div className="px-5 py-3 border-b border-white/5 flex items-center justify-between">
-                          <p className="text-white/40 text-[11px] font-medium tracking-wider uppercase">Rank</p>
-                          <p className="text-white text-[11px] font-semibold tracking-wider uppercase">{getRankForSP(profile.skillPoints)}</p>
-                        </div>
-                      )}
-
-                      {/* Black Card */}
-                      <div className="border-b border-white/5">
-                        {profile?.subscriptionStatus === "active" ? (
-                          <div className="px-5 py-3 flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                              <p className="text-amber-500 text-[11px] font-semibold tracking-wider uppercase">Black Card</p>
-                            </div>
-                            <p className="text-white/30 text-[11px] font-medium tracking-wide">Active</p>
-                          </div>
-                        ) : (
-                          <Link
-                            href="/checkout"
-                            className="flex items-center justify-between px-5 py-3 hover:bg-white/5 transition-colors group"
-                            onClick={() => setIsUserMenuOpen(false)}
-                          >
-                            <div className="flex items-center gap-2">
-                              <span className="w-1.5 h-1.5 rounded-full bg-white/20 group-hover:bg-amber-500 transition-colors" />
-                              <p className="text-white/60 text-[11px] font-semibold tracking-wider uppercase group-hover:text-white transition-colors">Black Card</p>
-                            </div>
-                            <p className="text-amber-500 text-[11px] font-semibold tracking-wide">$14.99/mo</p>
-                          </Link>
+                {isUserMenuOpen && (
+                  <div className="absolute right-0 mt-3 w-72 bg-black/95 backdrop-blur-md border border-white/10 rounded-lg shadow-2xl overflow-hidden">
+                    {/* User identity */}
+                    <div className="px-4 py-3 border-b border-white/5">
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="text-white text-xs font-semibold tracking-wide leading-relaxed truncate">
+                          {user.displayName || "Account"}
+                        </p>
+                        {profile?.subscriptionStatus === "active" && (
+                          <span className="inline-flex items-center text-amber-400 text-[9px] font-bold tracking-[0.2em] uppercase px-1.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/25 leading-none whitespace-nowrap">
+                            Black Card
+                          </span>
                         )}
                       </div>
-
-                      {/* Notifications */}
-                      <div className="px-5 py-3 border-b border-white/5 flex items-center justify-between">
-                        <p className="text-white/40 text-[11px] font-medium tracking-wider uppercase">Notifications</p>
-                        <NotificationBell />
-                      </div>
-
-                      {/* Sign out */}
-                      <button
-                        onClick={() => { signOut(); setIsUserMenuOpen(false) }}
-                        className="w-full text-left px-5 py-3 text-white/40 text-[11px] font-medium tracking-wider uppercase hover:bg-white/5 hover:text-white/60 transition-colors"
-                      >
-                        Sign Out
-                      </button>
+                      <p className="text-white/45 text-[11px] font-medium leading-relaxed truncate">
+                        {user.email}
+                      </p>
                     </div>
-                  )}
-                </div>
-              ) : null
+
+                    {/* Tonight — only when an event is active */}
+                    {activeFightNight && (
+                      <TonightPanel
+                        fightNight={activeFightNight}
+                        userId={user.uid}
+                        onNavigate={() => setIsUserMenuOpen(false)}
+                      />
+                    )}
+
+                    {/* Notifications */}
+                    <div className="px-4 py-2.5 border-b border-white/5 flex items-center justify-between">
+                      <p className="text-white/45 text-[11px] font-medium leading-relaxed">Notifications</p>
+                      <NotificationBell />
+                    </div>
+
+                    {/* Sign out */}
+                    <button
+                      onClick={() => { signOut(); setIsUserMenuOpen(false) }}
+                      className="w-full text-left px-4 py-2.5 text-white/55 text-[11px] font-medium leading-relaxed hover:bg-white/5 hover:text-white transition-colors"
+                    >
+                      Sign out
+                    </button>
+                  </div>
+                )}
+              </div>
             )}
           </div>
 
@@ -270,5 +328,112 @@ export default function Navbar({ onMenuClick, onAuthClick }: NavbarProps) {
         </div>
       </div>
     </nav>
+  )
+}
+
+// Live per-event standing for the signed-in user. Mounts only while the
+// user dropdown is open, so the listeners spin up on open and tear down
+// on close.
+function TonightPanel({
+  fightNight,
+  userId,
+  onNavigate,
+}: {
+  fightNight: FightNight
+  userId: string
+  onNavigate: () => void
+}) {
+  const [entry, setEntry] = useState<FightNightStanding | null>(null)
+  const [loaded, setLoaded] = useState(false)
+  const [rank, setRank] = useState<{ position: number; total: number } | null>(null)
+
+  useEffect(() => {
+    const ref = doc(db, "fightNights", fightNight.id, "standings", userId)
+    const unsub = onSnapshot(
+      ref,
+      (snap) => {
+        setEntry(snap.exists() ? (snap.data() as FightNightStanding) : null)
+        setLoaded(true)
+      },
+      () => setLoaded(true)
+    )
+    return () => unsub()
+  }, [fightNight.id, userId])
+
+  useEffect(() => {
+    if (!entry || entry.points === 0) {
+      setRank(null)
+      return
+    }
+    const q = query(
+      collection(db, "fightNights", fightNight.id, "standings"),
+      orderBy("points", "desc"),
+      limit(500)
+    )
+    const unsub = onSnapshot(q, (snap) => {
+      const docs = snap.docs.map((d) => d.data() as FightNightStanding)
+      const i = docs.findIndex((d) => d.userId === userId)
+      setRank(i === -1 ? null : { position: i + 1, total: docs.length })
+    })
+    return () => unsub()
+  }, [fightNight.id, userId, entry])
+
+  const hasPoints = !!entry && entry.points > 0
+  const cta = entry ? "Open card" : "Join the game"
+
+  return (
+    <div className="px-4 py-3 border-b border-white/5">
+      <div className="flex items-center gap-2 mb-2">
+        <span className="text-amber-400 text-[9px] font-bold tracking-[0.25em] uppercase">
+          Tonight
+        </span>
+        <span className="text-white/55 text-[11px] font-medium truncate">
+          {fightNight.title}
+        </span>
+      </div>
+
+      {!loaded ? (
+        <p className="text-white/30 text-[11px] font-medium mb-3">Loading…</p>
+      ) : !entry ? (
+        <p className="text-white/55 text-[11px] font-medium leading-relaxed mb-3">
+          You haven&apos;t joined tonight&apos;s game yet.
+        </p>
+      ) : !hasPoints ? (
+        <p className="text-white/55 text-[11px] font-medium leading-relaxed mb-3">
+          Make your first pick to land on the board.
+        </p>
+      ) : (
+        <div className="flex items-end justify-between gap-4 mb-3">
+          <div>
+            <p className="text-white text-lg font-black tabular-nums leading-none">
+              {entry.points.toLocaleString()}
+              <span className="text-white/40 text-xs font-medium ml-1">pts</span>
+            </p>
+            <p className="text-white/45 text-[10px] font-medium mt-1 tabular-nums">
+              {entry.picksWon}/{entry.picksMade} picks
+            </p>
+          </div>
+          {rank && (
+            <div className="text-right">
+              <p className="text-white text-sm font-bold tabular-nums leading-none">
+                #{rank.position}
+              </p>
+              <p className="text-white/40 text-[10px] font-medium mt-1">
+                of {rank.total}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
+      <Link
+        href="/events/fight-night"
+        onClick={onNavigate}
+        className="inline-flex items-center gap-1 text-white/75 text-[11px] font-semibold tracking-wide hover:text-amber-400 transition-colors"
+      >
+        {cta}
+        <ArrowUpRight className="w-3 h-3" strokeWidth={2.25} />
+      </Link>
+    </div>
   )
 }

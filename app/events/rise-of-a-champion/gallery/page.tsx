@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import GalleryClient from "./gallery-client"
-import { generateBreadcrumbJsonLd, generateOrganizationJsonLd } from '../../../lib/json-ld'
+import { generateBreadcrumbJsonLd, generateOrganizationJsonLd } from '../../../../lib/json-ld'
 
 export const metadata: Metadata = {
   title: 'Event Gallery - Rise of a Champion',
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Event Gallery - Rise of a Champion | TXMX Boxing',
     description: "Relive the unforgettable moments from Rise of a Champion. Exclusive photos from red carpet arrivals, championship moments, and live performances honoring San Antonio's boxing legends.",
-    url: 'https://www.txmxboxing.com/riseofachampion/gallery',
+    url: 'https://www.txmxboxing.com/events/rise-of-a-champion/gallery',
     siteName: 'TXMX Boxing',
     locale: 'en_US',
     type: 'website',
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: 'https://www.txmxboxing.com/riseofachampion/gallery',
+    canonical: 'https://www.txmxboxing.com/events/rise-of-a-champion/gallery',
   },
 }
 

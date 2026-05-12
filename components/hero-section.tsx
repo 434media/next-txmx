@@ -1,16 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import Image from "next/image"
-import TXMXNewsletter from "./txmx-newsletter"
+import FightNightPopup from "./fight-night-popup"
 
 export default function HeroSection() {
-  const [showTXMXNewsletter, setShowTXMXNewsletter] = useState(false)
-
-  useEffect(() => {
-    const timer = setTimeout(() => setShowTXMXNewsletter(true), 4000)
-    return () => clearTimeout(timer)
-  }, [])
 
   return (
     <section className="relative h-dvh flex items-center justify-center overflow-hidden">
@@ -71,8 +64,8 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* TXMX Newsletter Modal */}
-      <TXMXNewsletter showModal={showTXMXNewsletter} onClose={() => setShowTXMXNewsletter(false)} />
+      {/* Fight Night corner popup — homepage only, self-manages its delay + dismissal */}
+      <FightNightPopup />
 
       <style jsx>{`
         @keyframes float {
