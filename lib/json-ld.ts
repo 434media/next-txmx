@@ -1,9 +1,12 @@
+const SITE_URL = 'https://www.txmxboxing.com'
+
 export function generateEventJsonLd() {
   return {
     '@context': 'https://schema.org',
     '@type': 'Event',
     name: 'Rise of a Champion - Iconic Series',
-    description: 'An exclusive invitation-only celebration honoring San Antonio\'s finest boxing champions - Jesse "Bam" Rodriguez, Mario "El Azteca" Barrios, Joshua "The Professor" Franco, and Jesse James Leija. Filmed live for national distribution.',
+    description:
+      'An exclusive invitation-only celebration honoring San Antonio\'s finest boxing champions - Jesse "Bam" Rodriguez, Mario "El Azteca" Barrios, Joshua "The Professor" Franco, and Jesse James Leija. Filmed live for national distribution.',
     startDate: '2025-12-03T18:00:00-06:00',
     endDate: '2025-12-03T23:00:00-06:00',
     eventStatus: 'https://schema.org/EventScheduled',
@@ -26,7 +29,7 @@ export function generateEventJsonLd() {
       {
         '@type': 'Organization',
         name: 'TXMX Boxing',
-        url: 'https://www.txmxboxing.com',
+        url: SITE_URL,
       },
       {
         '@type': 'Organization',
@@ -35,34 +38,13 @@ export function generateEventJsonLd() {
       },
     ],
     performer: [
-      {
-        '@type': 'Person',
-        name: 'Jesse "Bam" Rodriguez',
-      },
-      {
-        '@type': 'Person',
-        name: 'Mario "El Azteca" Barrios',
-      },
-      {
-        '@type': 'Person',
-        name: 'Joshua "The Professor" Franco',
-      },
-      {
-        '@type': 'Person',
-        name: 'Jesse James Leija',
-      },
-      {
-        '@type': 'Person',
-        name: 'Stephen Jackson',
-      },
-      {
-        '@type': 'Person',
-        name: 'Matt Barnes',
-      },
-      {
-        '@type': 'Person',
-        name: 'Sam Watson',
-      },
+      { '@type': 'Person', name: 'Jesse "Bam" Rodriguez' },
+      { '@type': 'Person', name: 'Mario "El Azteca" Barrios' },
+      { '@type': 'Person', name: 'Joshua "The Professor" Franco' },
+      { '@type': 'Person', name: 'Jesse James Leija' },
+      { '@type': 'Person', name: 'Stephen Jackson' },
+      { '@type': 'Person', name: 'Matt Barnes' },
+      { '@type': 'Person', name: 'Sam Watson' },
     ],
     offers: {
       '@type': 'AggregateOffer',
@@ -70,7 +52,7 @@ export function generateEventJsonLd() {
       priceCurrency: 'USD',
       lowPrice: 10000,
       highPrice: 100000,
-      url: 'https://www.txmxboxing.com/events/rise-of-a-champion',
+      url: `${SITE_URL}/events/rise-of-a-champion`,
     },
   }
 }
@@ -84,13 +66,13 @@ export function generateBreadcrumbJsonLd(pageName: string) {
         '@type': 'ListItem',
         position: 1,
         name: 'Home',
-        item: 'https://www.txmxboxing.com',
+        item: SITE_URL,
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: 'Iconic Series',
-        item: 'https://www.txmxboxing.com/events/rise-of-a-champion',
+        item: `${SITE_URL}/events/rise-of-a-champion`,
       },
       ...(pageName === 'RSVP'
         ? [
@@ -98,19 +80,19 @@ export function generateBreadcrumbJsonLd(pageName: string) {
               '@type': 'ListItem',
               position: 3,
               name: 'RSVP',
-              item: 'https://www.txmxboxing.com/events/rise-of-a-champion/rsvp',
+              item: `${SITE_URL}/events/rise-of-a-champion/rsvp`,
             },
           ]
         : pageName === 'Gallery'
-        ? [
-            {
-              '@type': 'ListItem',
-              position: 3,
-              name: 'Gallery',
-              item: 'https://www.txmxboxing.com/events/rise-of-a-champion/gallery',
-            },
-          ]
-        : []),
+          ? [
+              {
+                '@type': 'ListItem',
+                position: 3,
+                name: 'Gallery',
+                item: `${SITE_URL}/events/rise-of-a-champion/gallery`,
+              },
+            ]
+          : []),
     ],
   }
 }
@@ -118,14 +100,192 @@ export function generateBreadcrumbJsonLd(pageName: string) {
 export function generateOrganizationJsonLd() {
   return {
     '@context': 'https://schema.org',
-    '@type': 'Organization',
+    '@type': 'SportsOrganization',
+    '@id': `${SITE_URL}#organization`,
     name: 'TXMX Boxing',
-    url: 'https://www.txmxboxing.com',
-    logo: 'https://www.txmxboxing.com/opengraph-image.png',
+    alternateName: ['TXMX', 'Texas-Mexico Boxing'],
+    url: SITE_URL,
+    logo: {
+      '@type': 'ImageObject',
+      url: 'https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/iconic-series/TXMXDistressedTransparent.png',
+      width: 1200,
+      height: 600,
+    },
+    image: `${SITE_URL}/opengraph-image`,
+    sport: 'Boxing',
+    areaServed: [
+      { '@type': 'AdministrativeArea', name: 'Texas' },
+      { '@type': 'Country', name: 'Mexico' },
+    ],
     sameAs: [
-      'https://www.instagram.com/txmxboxing',
+      'https://www.instagram.com/txmxboxing/',
+      'https://www.youtube.com/@txmxboxing',
+      'https://www.tiktok.com/@txmxboxing',
       'https://twitter.com/txmx',
     ],
-    description: 'TXMX Boxing is a dynamic media platform designed to connect brands with a passionate fight fan audience. By celebrating the rich cultural heritage of Texas and Mexico, TXMX Boxing offers unique opportunities for brands to authentically engage with a community that is deeply rooted in both sport and culture.',
+    description:
+      'TXMX Boxing is a dynamic media platform designed to connect brands with a passionate fight fan audience. By celebrating the rich cultural heritage of Texas and Mexico, TXMX Boxing offers unique opportunities for brands to authentically engage with a community that is deeply rooted in both sport and culture.',
+  }
+}
+
+export function generateWebSiteJsonLd() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': `${SITE_URL}#website`,
+    url: SITE_URL,
+    name: 'TXMX Boxing',
+    alternateName: 'TXMX',
+    description:
+      'Texas-Mexico boxing media platform — fighter records, TDLR-sanctioned event results, ringside news, and fan engagement.',
+    publisher: { '@id': `${SITE_URL}#organization` },
+    inLanguage: 'en-US',
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${SITE_URL}/fighters?q={search_term_string}`,
+      },
+      'query-input': 'required name=search_term_string',
+    },
+  }
+}
+
+export function generateSiteNavigationJsonLd() {
+  const items: Array<{ name: string; url: string }> = [
+    { name: 'The 8 Count', url: `${SITE_URL}/8count` },
+    { name: 'Fighters', url: `${SITE_URL}/fighters` },
+    { name: 'Events', url: `${SITE_URL}/events` },
+    { name: 'Compare', url: `${SITE_URL}/compare` },
+    { name: 'Polls', url: `${SITE_URL}/polls` },
+    { name: 'Prop Picks', url: `${SITE_URL}/picks` },
+    { name: 'Gym Pledge', url: `${SITE_URL}/pledge` },
+    { name: 'Leaderboard', url: `${SITE_URL}/leaderboard` },
+    { name: 'Scorecard', url: `${SITE_URL}/scorecard` },
+    { name: 'Black Card', url: `${SITE_URL}/checkout` },
+    { name: 'Rise of a Champion', url: `${SITE_URL}/events/rise-of-a-champion` },
+  ]
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'TXMX Boxing — Primary Navigation',
+    itemListElement: items.map((it, i) => ({
+      '@type': 'SiteNavigationElement',
+      position: i + 1,
+      name: it.name,
+      url: it.url,
+    })),
+  }
+}
+
+type FighterLike = {
+  firstName: string
+  lastName: string
+  nickname?: string
+  dateOfBirth?: string
+  residence?: { city?: string; state?: string; country?: string }
+  weightClass?: string
+  stance?: string
+  record: { wins: number; losses: number; draws: number; knockouts: number }
+}
+
+export function generateFighterJsonLd(fighter: FighterLike, slug: string) {
+  const fullName = `${fighter.firstName} ${fighter.lastName}`.trim()
+  const r = fighter.record
+  const hometown = [fighter.residence?.city, fighter.residence?.state]
+    .filter(Boolean)
+    .join(', ')
+  const description = [
+    `Professional boxer${hometown ? ` from ${hometown}` : ''}.`,
+    `Record: ${r.wins}-${r.losses}${r.draws > 0 ? `-${r.draws}` : ''} (${r.knockouts} KO).`,
+    'TDLR-licensed; record sourced from official Texas bout filings.',
+  ].join(' ')
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    '@id': `${SITE_URL}/fighters/${slug}#person`,
+    name: fullName,
+    alternateName: fighter.nickname || undefined,
+    url: `${SITE_URL}/fighters/${slug}`,
+    description,
+    jobTitle: 'Professional Boxer',
+    knowsAbout: ['Boxing', 'TDLR-Sanctioned Boxing', fighter.weightClass].filter(
+      Boolean
+    ),
+    affiliation: { '@id': `${SITE_URL}#organization` },
+    birthDate: fighter.dateOfBirth || undefined,
+  }
+}
+
+type EventLike = {
+  promoter?: string
+  venue?: string
+  city?: string
+  date: string
+  eventNumber?: string
+  boutCount?: number
+}
+
+export function generateBoxingEventJsonLd(event: EventLike, eventId: string) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'SportsEvent',
+    '@id': `${SITE_URL}/events/${eventId}#event`,
+    name: event.promoter
+      ? `${event.promoter} — Texas Boxing`
+      : 'TDLR-Sanctioned Texas Boxing Event',
+    sport: 'Boxing',
+    startDate: event.date,
+    url: `${SITE_URL}/events/${eventId}`,
+    location: {
+      '@type': 'Place',
+      name: event.venue || event.city || 'Texas, USA',
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: event.city || undefined,
+        addressRegion: 'TX',
+        addressCountry: 'US',
+      },
+    },
+    organizer: {
+      '@type': 'Organization',
+      name: event.promoter || 'TXMX Boxing',
+      url: SITE_URL,
+    },
+    description: `TDLR-sanctioned boxing event${event.boutCount ? ` featuring ${event.boutCount} bouts` : ''}${
+      event.city ? ` in ${event.city}, TX` : ''
+    }. Records verified against Texas Department of Licensing and Regulation filings.`,
+  }
+}
+
+type NewsLike = {
+  title: string
+  excerpt: string
+  slug: string
+  publishedAt?: string
+  updatedAt?: string
+  imageUrl?: string
+  author?: string
+}
+
+export function generateNewsArticleJsonLd(post: NewsLike) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'NewsArticle',
+    '@id': `${SITE_URL}/8count/${post.slug}#article`,
+    headline: post.title,
+    description: post.excerpt,
+    url: `${SITE_URL}/8count/${post.slug}`,
+    datePublished: post.publishedAt,
+    dateModified: post.updatedAt || post.publishedAt,
+    image: post.imageUrl ? [post.imageUrl] : undefined,
+    author: {
+      '@type': 'Organization',
+      name: post.author || 'TXMX Boxing',
+      url: SITE_URL,
+    },
+    publisher: { '@id': `${SITE_URL}#organization` },
+    articleSection: 'The 8 Count',
+    isAccessibleForFree: true,
   }
 }

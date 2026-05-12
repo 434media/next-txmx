@@ -1,6 +1,10 @@
 import type { Metadata } from "next"
 import HeroSection from "../components/hero-section"
-import { generateOrganizationJsonLd } from "../lib/json-ld"
+import {
+  generateOrganizationJsonLd,
+  generateSiteNavigationJsonLd,
+  generateWebSiteJsonLd,
+} from "../lib/json-ld"
 
 export const metadata: Metadata = {
   title: 'TXMX Boxing | Boxing Media Platform',
@@ -20,13 +24,20 @@ export const metadata: Metadata = {
 }
 
 export default function TXMXLanding() {
-  const organizationJsonLd = generateOrganizationJsonLd()
+  const graph = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      generateOrganizationJsonLd(),
+      generateWebSiteJsonLd(),
+      generateSiteNavigationJsonLd(),
+    ],
+  }
 
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }}
       />
       <main className="relative min-h-screen bg-black overflow-hidden font-sans">
         <HeroSection />

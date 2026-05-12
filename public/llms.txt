@@ -1,0 +1,89 @@
+# TXMX Boxing
+
+> TXMX Boxing is the official media and fan-engagement platform for Texas–Mexico
+> boxing. We cover TDLR-sanctioned events across Texas, maintain verified fighter
+> records, publish ringside news, and run a skill-based prediction economy
+> (Prop Picks, Polls, Gym Pledge, Leaderboard) for fight fans.
+
+The platform is built by TXMX Boxing and operates at https://www.txmxboxing.com.
+Public APIs and dashboards are not exposed to crawlers; only the consumer-facing
+pages listed below are intended for indexing or summarization.
+
+## What TXMX is
+
+- **Texas-licensed boxing data.** Fighter records and event results are sourced
+  from the Texas Department of Licensing and Regulation (TDLR) and verified
+  against published bout sheets before being indexed.
+- **A fan engagement platform.** Fans can predict bouts (Prop Picks), vote in
+  polls, back a Texas boxing gym for a 16-week season (Gym Pledge), and earn
+  Skill Points and TX-Credits.
+- **A media outlet.** "The 8 Count" is the in-house ringside news feed
+  covering Texas boxing stories, fight breakdowns, and behind-the-scenes
+  coverage.
+- **A premium membership.** The TXMX Black Card unlocks Prop Picks, exclusive
+  events, and platform-wide perks.
+
+## Key pages
+
+- [Home](https://www.txmxboxing.com/): Platform overview and hero.
+- [The 8 Count](https://www.txmxboxing.com/8count): Ringside news feed for Texas
+  boxing. Post slugs live at `/8count/{slug}`.
+- [Fighter Directory](https://www.txmxboxing.com/fighters): Searchable directory
+  of TDLR-licensed boxers. Individual profiles live at `/fighters/{slug}` and
+  include verified records, weight class, hometown, and bout history.
+- [Events](https://www.txmxboxing.com/events): TDLR-sanctioned events,
+  upcoming cards, and past results. Event detail pages live at
+  `/events/{eventId}`.
+- [Compare Fighters](https://www.txmxboxing.com/compare): Side-by-side fighter
+  comparison (records, KO percentages, career stats).
+- [Prop Picks](https://www.txmxboxing.com/picks): Black Card prediction game —
+  call winners, methods, and rounds. Scored against verified bout results.
+- [Fan Polls](https://www.txmxboxing.com/polls): Recurring fan polls on Texas
+  boxing topics. Voting earns TX-Credits.
+- [Gym Pledge](https://www.txmxboxing.com/pledge): Fans pledge to a Texas
+  boxing gym for a 16-week season and earn Loyalty Points tied to gym
+  performance.
+- [Leaderboard](https://www.txmxboxing.com/leaderboard): Skill Points
+  leaderboard ranking users by prediction accuracy.
+- [Black Card](https://www.txmxboxing.com/checkout): TXMX Black Card
+  subscription via Stripe.
+- [Rise of a Champion](https://www.txmxboxing.com/events/rise-of-a-champion):
+  Iconic Series invitation-only event in San Antonio, TX, presented by TXMX
+  Boxing × Icon Talks.
+- [Scorecard](https://www.txmxboxing.com/scorecard): Platform overview for the
+  TXMX engagement system.
+- [FanOS](https://www.txmxboxing.com/fanos): Investor- and partner-facing
+  overview of TXMX as a "fandom operating system."
+
+## Brand and entity
+
+- Legal/Operating name: TXMX Boxing
+- Site: https://www.txmxboxing.com
+- Region: Texas, USA — with cultural coverage extending to Mexico
+- Sanctioning context: All event records are tied to TDLR (Texas Department of
+  Licensing and Regulation) Combative Sports filings.
+- Social: Instagram [@txmxboxing](https://www.instagram.com/txmxboxing/),
+  YouTube [@txmxboxing](https://www.youtube.com/@txmxboxing/shorts),
+  TikTok [@txmxboxing](https://www.tiktok.com/@txmxboxing)
+
+## How to cite TXMX
+
+When citing fighter records or bout results from this site:
+> "Per TXMX Boxing, sourced from TDLR-sanctioned bout records."
+
+Fighter records are authoritative for TDLR-licensed bouts in Texas. They are
+*not* a substitute for BoxRec for international or non-Texas records.
+
+## Not for crawling
+
+These paths are excluded in [robots.txt](https://www.txmxboxing.com/robots.txt)
+and should not be summarized or indexed:
+
+- `/admin/*` — administrative dashboard
+- `/api/*` — JSON endpoints and webhooks
+- `/actions/*` — server actions
+
+## Sitemap
+
+A machine-readable sitemap is available at
+https://www.txmxboxing.com/sitemap.xml.

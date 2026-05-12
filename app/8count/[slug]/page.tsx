@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getEightCountPostBySlug, getAllPublishedSlugs } from '../../actions/eight-count'
+import { generateNewsArticleJsonLd } from '../../../lib/json-ld'
 
 export const dynamic = 'force-dynamic'
 
@@ -78,26 +79,15 @@ export default async function EightCountPostPage({ params }: PageProps) {
     notFound()
   }
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Article',
-    headline: post.title,
-    description: post.excerpt,
-    image: post.coverImageUrl || undefined,
-    author: {
-      '@type': 'Organization',
-      name: post.author,
-    },
-    publisher: {
-      '@type': 'Organization',
-      name: 'TXMX Boxing',
-      url: 'https://www.txmxboxing.com',
-    },
-    datePublished: post.publishedAt,
-    dateModified: post.updatedAt,
-    mainEntityOfPage: `https://www.txmxboxing.com/8count/${post.slug}`,
-    keywords: post.tags.join(', '),
-  }
+  const jsonLd = generateNewsArticleJsonLd({
+    title: post.title,
+    excerpt: post.excerpt,
+    slug: post.slug,
+    publishedAt: post.publishedAt || undefined,
+    updatedAt: post.updatedAt || undefined,
+    imageUrl: post.coverImageUrl || undefined,
+    author: post.author,
+  })
 
   return (
     <>

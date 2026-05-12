@@ -1,15 +1,15 @@
 import { OG_CONTENT_TYPE, OG_SIZE, renderTxmxOg } from '../../lib/og-template'
 
 export const runtime = 'edge'
-export const alt = 'Prop Picks — Predict Bout Outcomes | TXMX Boxing'
+export const alt = 'FanOS — The Fandom Operating System | TXMX Boxing'
 export const size = OG_SIZE
 export const contentType = OG_CONTENT_TYPE
 
 export default async function Image() {
   return renderTxmxOg({
-    eyebrow: 'BLACK CARD EXCLUSIVE',
-    title: 'Prop Picks',
-    subtitle: 'Predict the Method, Round, and Winner',
-    tagline: 'PICK FIGHTERS • CALL ROUNDS • EARN POINTS',
+    eyebrow: 'FANDOM OPERATING SYSTEM',
+    title: 'FanOS',
+    subtitle: 'Predictions • Rankings • Rewards • Engagement Economy',
+    tagline: 'OWN THE ACTION',
   })
 }

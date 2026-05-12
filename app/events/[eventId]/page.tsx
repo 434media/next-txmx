@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { getEventById, getEventBouts } from "../../actions/events"
+import { generateBoxingEventJsonLd } from "../../../lib/json-ld"
 import EventPicksClient from "./event-picks-client"
 import EventLeaderboardLive from "./event-leaderboard-live"
 import CheckInForm from "./check-in-form"
@@ -76,9 +77,14 @@ export default async function EventDetailPage({ params }: PageProps) {
 
   const upcoming = isUpcoming(event.date)
   const isFightNight = event.eventMode === "free-props" && upcoming
+  const eventJsonLd = generateBoxingEventJsonLd(event, eventId)
 
   return (
     <main className="relative min-h-screen bg-black font-sans">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(eventJsonLd) }}
+      />
       {/* Fight night skin: full-bleed hero + playbook above the fold */}
       {isFightNight ? (
         <>
