@@ -363,3 +363,100 @@ export async function markBoutLive(
     // Non-critical — status flip is the source of truth, push is just UX
   }
 }
+
+/**
+ * Reopen a previously-settled bout. Undoes the side-effects of
+ * `recordFightNightBoutResult`:
+ *   - Resets bout to `scheduled` (clears winnerCorner, completedAt,
+ *     startedAt) so admin can mark it live again and declare a winner.
+ *   - Resets every pick on the bout (settled → false, won/pointsAwarded
+ *     cleared).
+ *   - For each pick that previously won, decrements that user's standing
+ *     points + picksWon counter by the awarded amount.
+ *
+ * Intended for testing cleanup and "I declared the wrong winner" rescues.
+ * Push notifications are NOT reversed (already delivered).
+ */
+export async function reopenFightNightBout(
+  fightNightId: string,
+  boutNumber: number
+): Promise<{
+  success: boolean
+  unsettled: number
+  pointsReversed: number
+  error?: string
+}> {
+  if (!fightNightId || !boutNumber) {
+    return { success: false, unsettled: 0, pointsReversed: 0, error: 'Missing args' }
+  }
+
+  const boutRef = firestore
+    .collection('fightNights')
+    .doc(fightNightId)
+    .collection('bouts')
+    .doc(String(boutNumber))
+  const boutSnap = await boutRef.get()
+  if (!boutSnap.exists) {
+    return { success: false, unsettled: 0, pointsReversed: 0, error: 'Bout not found' }
+  }
+  const bout = boutSnap.data() as { status?: string }
+  if (bout.status !== 'completed') {
+    return {
+      success: false,
+      unsettled: 0,
+      pointsReversed: 0,
+      error: 'Bout is not settled — nothing to reopen',
+    }
+  }
+
+  const picksSnap = await picksCol(fightNightId)
+    .where('boutNumber', '==', boutNumber)
+    .get()
+
+  let unsettled = 0
+  let pointsReversed = 0
+  const now = new Date().toISOString()
+
+  for (const doc of picksSnap.docs) {
+    const pick = doc.data() as FightNightPick
+    if (pick.settled && pick.won === true && pick.pointsAwarded > 0) {
+      try {
+        const standingRef = firestore
+          .collection('fightNights')
+          .doc(fightNightId)
+          .collection('standings')
+          .doc(pick.userId)
+        await firestore.runTransaction(async (tx) => {
+          const snap = await tx.get(standingRef)
+          if (!snap.exists) return
+          const cur = snap.data() as { points?: number; picksWon?: number }
+          tx.update(standingRef, {
+            points: Math.max(0, (cur.points || 0) - pick.pointsAwarded),
+            picksWon: Math.max(0, (cur.picksWon || 0) - 1),
+            updatedAt: now,
+          })
+        })
+        pointsReversed += pick.pointsAwarded
+      } catch {
+        // Non-critical — pick reset still happens below
+      }
+    }
+    await doc.ref.update({
+      settled: false,
+      won: null,
+      pointsAwarded: 0,
+      settledAt: null,
+    })
+    unsettled++
+  }
+
+  await boutRef.update({
+    status: 'scheduled' as const,
+    winnerCorner: null,
+    completedAt: null,
+    startedAt: null,
+    updatedAt: now,
+  })
+
+  return { success: true, unsettled, pointsReversed }
+}

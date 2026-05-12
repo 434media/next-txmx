@@ -189,3 +189,122 @@ export async function getUserStanding(
   if (!snap.exists) return null
   return snap.data() as FightNightStanding
 }
+
+/**
+ * Remove a participant from a fight night entirely. Deletes:
+ *   - their standing doc
+ *   - every bout pick they placed (no point reversal — settled picks
+ *     already credited points, but their standing is being deleted)
+ *   - every prop pick
+ *   - every poll vote (with poll aggregate decrement)
+ *
+ * Intended for test-data cleanup. Does NOT delete the user's global
+ * `users/{uid}` profile — they can rejoin a future event.
+ */
+export async function removeFightNightParticipant(
+  fightNightId: string,
+  userId: string
+): Promise<{
+  success: boolean
+  removed: {
+    picks: number
+    propPicks: number
+    pollVotes: number
+    standingDeleted: boolean
+  }
+  error?: string
+}> {
+  if (!fightNightId || !userId) {
+    return {
+      success: false,
+      removed: { picks: 0, propPicks: 0, pollVotes: 0, standingDeleted: false },
+      error: 'Missing args',
+    }
+  }
+
+  const fnDoc = firestore.collection('fightNights').doc(fightNightId)
+
+  // ── Poll votes — decrement poll aggregates atomically, then delete.
+  const votesSnap = await fnDoc
+    .collection('pollVotes')
+    .where('userId', '==', userId)
+    .get()
+
+  // Group by poll for atomic update
+  const votesByPoll = new Map<string, number[]>()
+  for (const doc of votesSnap.docs) {
+    const v = doc.data() as { pollId: string; optionIndex: number }
+    const arr = votesByPoll.get(v.pollId) || []
+    arr.push(v.optionIndex)
+    votesByPoll.set(v.pollId, arr)
+  }
+  for (const [pollId, optionIndexes] of votesByPoll) {
+    const pollRef = fnDoc.collection('polls').doc(pollId)
+    try {
+      await firestore.runTransaction(async (tx) => {
+        const snap = await tx.get(pollRef)
+        if (!snap.exists) return
+        const poll = snap.data() as {
+          options?: { label: string; votes: number }[]
+          totalVotes?: number
+        }
+        const options = (poll.options || []).map((o) => ({ ...o }))
+        for (const idx of optionIndexes) {
+          if (options[idx]) {
+            options[idx].votes = Math.max(0, (options[idx].votes || 0) - 1)
+          }
+        }
+        tx.update(pollRef, {
+          options,
+          totalVotes: Math.max(0, (poll.totalVotes || 0) - optionIndexes.length),
+        })
+      })
+    } catch {
+      // Non-critical — vote docs still get deleted below
+    }
+  }
+
+  // Batched deletes — Firestore admin batch caps at 500.
+  async function batchDelete(docs: FirebaseFirestore.QueryDocumentSnapshot[]) {
+    while (docs.length > 0) {
+      const chunk = docs.splice(0, 400)
+      const batch = firestore.batch()
+      chunk.forEach((d) => batch.delete(d.ref))
+      await batch.commit()
+    }
+  }
+
+  await batchDelete([...votesSnap.docs])
+
+  const picksSnap = await fnDoc
+    .collection('picks')
+    .where('userId', '==', userId)
+    .get()
+  const picksCount = picksSnap.size
+  await batchDelete([...picksSnap.docs])
+
+  const propPicksSnap = await fnDoc
+    .collection('propPicks')
+    .where('userId', '==', userId)
+    .get()
+  const propPicksCount = propPicksSnap.size
+  await batchDelete([...propPicksSnap.docs])
+
+  const standingRef = entryRef(fightNightId, userId)
+  const standingSnap = await standingRef.get()
+  let standingDeleted = false
+  if (standingSnap.exists) {
+    await standingRef.delete()
+    standingDeleted = true
+  }
+
+  return {
+    success: true,
+    removed: {
+      picks: picksCount,
+      propPicks: propPicksCount,
+      pollVotes: votesSnap.size,
+      standingDeleted,
+    },
+  }
+}

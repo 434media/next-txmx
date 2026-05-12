@@ -9,7 +9,10 @@ import {
   getUserPicks,
   type FightNightPick,
 } from "../actions/fightnight-picks"
-import { type FightNightStanding } from "../actions/fightnight-standings"
+import {
+  removeFightNightParticipant,
+  type FightNightStanding,
+} from "../actions/fightnight-standings"
 import {
   getPolls,
   getUserVotesForFightNight,
@@ -55,6 +58,8 @@ export default function UserActivityDrawer({
   const [propPicks, setPropPicks] = useState<FightNightPropPick[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
+  const [removing, setRemoving] = useState(false)
+  const [removeResult, setRemoveResult] = useState<string | null>(null)
 
   // Lock background scroll while open
   useEffect(() => {
@@ -114,6 +119,32 @@ export default function UserActivityDrawer({
   useEffect(() => {
     load()
   }, [load])
+
+  async function handleRemove() {
+    const name = standing?.displayName || "Anonymous"
+    if (
+      !confirm(
+        `Remove ${name} from this fight night? This deletes their standing, every pick they made, every poll vote, and every prop pick. Their TXMX account is NOT deleted — they can rejoin a future event.`
+      )
+    )
+      return
+    setRemoving(true)
+    setRemoveResult(null)
+    try {
+      const res = await removeFightNightParticipant(fightNightId, userId)
+      if (!res.success) {
+        setRemoveResult(res.error || "Failed to remove")
+        setRemoving(false)
+        return
+      }
+      // Success — close the drawer; the live Participants subscription
+      // will drop this user from the list automatically.
+      onClose()
+    } catch (e) {
+      setRemoveResult(e instanceof Error ? e.message : "Failed to remove")
+      setRemoving(false)
+    }
+  }
 
   const isWalkIn = userId.startsWith("guest_")
   const method = isWalkIn ? "Walk-in" : "Google"
@@ -258,7 +289,32 @@ export default function UserActivityDrawer({
           </Section>
         )}
 
-        <div className="h-12" />
+        {/* Destructive footer — remove this user from the event. Confined
+            to the drawer so admin has full context before deleting. */}
+        <div className="border-t border-gray-200 px-5 py-4 bg-gray-50/40">
+          <p className="text-[10px] font-bold text-gray-400 tracking-[0.25em] uppercase mb-2">
+            Danger Zone
+          </p>
+          <p className="text-[11px] text-gray-600 leading-relaxed mb-3">
+            Removing a participant deletes their standing, picks, poll votes,
+            and prop picks for this fight night. Their global account remains
+            so they can rejoin future events.
+          </p>
+          {removeResult && (
+            <p className="text-[11px] text-red-700 font-medium mb-2">
+              {removeResult}
+            </p>
+          )}
+          <button
+            onClick={handleRemove}
+            disabled={removing}
+            className="px-3 py-1.5 border border-red-200 bg-white hover:bg-red-50 text-red-700 text-[11px] font-bold tracking-wider uppercase rounded-md transition-colors disabled:opacity-50"
+          >
+            {removing ? "Removing…" : "Remove participant"}
+          </button>
+        </div>
+
+        <div className="h-6" />
       </div>
     </div>
   )

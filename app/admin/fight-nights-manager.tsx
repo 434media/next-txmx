@@ -25,6 +25,7 @@ import {
 import {
   recordFightNightBoutResult,
   markBoutLive,
+  reopenFightNightBout,
   getPickCount,
   getPicksForBout,
   type FightNightPick,
@@ -2060,6 +2061,25 @@ function LivePanel({ fightNight }: { fightNight: FightNight }) {
     }
   }
 
+  async function handleReopen(boutNumber: number) {
+    if (
+      !confirm(
+        `Reopen bout #${boutNumber}? This unsettles every pick on the bout and reverses any points that were awarded. Push notifications already sent are NOT recalled.`
+      )
+    )
+      return
+    setBusyBout(boutNumber)
+    setError("")
+    try {
+      const res = await reopenFightNightBout(fightNight.id, boutNumber)
+      if (!res.success) setError(res.error || "Failed")
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed")
+    } finally {
+      setBusyBout(null)
+    }
+  }
+
   const settledCount = bouts.filter((b) => b.status === "completed").length
   const liveBout = bouts.find((b) => b.status === "live")
   const nextScheduled = bouts.find((b) => b.status === "scheduled")
@@ -2114,6 +2134,7 @@ function LivePanel({ fightNight }: { fightNight: FightNight }) {
                 }
                 onCancelConfirm={() => setConfirming(null)}
                 onConfirmDeclare={(c) => handleDeclare(bout.boutNumber, c)}
+                onReopen={() => handleReopen(bout.boutNumber)}
               />
             ))}
           </div>
@@ -2133,6 +2154,7 @@ function BoutControlCard({
   onAskConfirm,
   onCancelConfirm,
   onConfirmDeclare,
+  onReopen,
 }: {
   bout: FightNightBout
   picks: FightNightPick[]
@@ -2143,6 +2165,7 @@ function BoutControlCard({
   onAskConfirm: (c: "fighter1" | "fighter2" | "draw") => void
   onCancelConfirm: () => void
   onConfirmDeclare: (c: "fighter1" | "fighter2" | "draw") => void
+  onReopen: () => void
 }) {
   const isScheduled = bout.status === "scheduled"
   const isLive = bout.status === "live"
@@ -2237,6 +2260,15 @@ function BoutControlCard({
               locked={true}
               winnerCorner={bout.winnerCorner ?? null}
             />
+            <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-end">
+              <button
+                onClick={onReopen}
+                disabled={isBusy}
+                className="text-[11px] text-gray-500 hover:text-amber-700 font-medium tracking-wide transition-colors disabled:opacity-50"
+              >
+                {isBusy ? "Reopening…" : "Reopen bout"}
+              </button>
+            </div>
           </>
         ) : (
           <>
