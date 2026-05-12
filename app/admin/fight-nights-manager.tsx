@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import {
   collection,
+  limit as fbLimit,
   onSnapshot,
   orderBy,
   query,
@@ -24,6 +25,8 @@ import {
 import {
   recordFightNightBoutResult,
   markBoutLive,
+  getPickCount,
+  getPicksForBout,
   type FightNightPick,
 } from "../actions/fightnight-picks"
 import {
@@ -64,6 +67,7 @@ import {
 } from "../actions/fightnight-standings"
 import { useAdminAuth } from "./admin-auth-gate"
 import FlyerUploader from "./flyer-uploader"
+import UserActivityDrawer from "./user-activity-drawer"
 
 const inputClass =
   "w-full bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800] focus:ring-1 focus:ring-[#FFB800]/30 placeholder:text-gray-400 rounded-md"
@@ -206,6 +210,10 @@ function FightNightDetail({
   onChange: () => void
 }) {
   const [tab, setTab] = useState<DetailTab>("overview")
+  // When set, the user-activity drawer renders over everything. Cleared
+  // by closing the drawer (backdrop, X, or Escape). Drives drill-down
+  // from both the Participants feed and the Leaderboard preview.
+  const [drilldownUserId, setDrilldownUserId] = useState<string | null>(null)
   const [hasLiveBout, setHasLiveBout] = useState(false)
   const [pendingBouts, setPendingBouts] = useState(0)
 
@@ -306,9 +314,31 @@ function FightNightDetail({
         {tab === "polls" && <PollsPanel fightNight={fightNight} />}
         {tab === "props" && <PropsPanel fightNight={fightNight} />}
         {tab === "live" && <LivePanel fightNight={fightNight} />}
-        {tab === "standings" && <LeaderboardPreviewPanel fightNight={fightNight} />}
+        {tab === "standings" && (
+          <div className="space-y-6">
+            <LeaderboardPreviewPanel
+              fightNight={fightNight}
+              onDrillDown={setDrilldownUserId}
+            />
+            <ParticipantsPanel
+              fightNight={fightNight}
+              onDrillDown={setDrilldownUserId}
+            />
+          </div>
+        )}
         {tab === "prizes" && <PrizesPanel fightNight={fightNight} />}
       </div>
+
+      {/* Per-user activity drawer — mounts as an overlay on top of the
+          tab content. Opened by clicking a row in Participants or
+          Leaderboard, closed via X / backdrop / Escape. */}
+      {drilldownUserId && (
+        <UserActivityDrawer
+          fightNightId={fightNight.id}
+          userId={drilldownUserId}
+          onClose={() => setDrilldownUserId(null)}
+        />
+      )}
     </div>
   )
 }
@@ -325,8 +355,8 @@ function OverviewPanel({
   const [stats, setStats] = useState({
     bouts: 0,
     boutsCompleted: 0,
-    checkIns: 0,
-    standings: 0,
+    participants: 0,
+    picksPlaced: 0,
     topPoints: 0,
     topName: "",
     pollsCount: 0,
@@ -337,21 +367,22 @@ function OverviewPanel({
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const [bouts, checkIns, standings, polls, props] = await Promise.all([
+      const [bouts, top, polls, props, picksPlaced] = await Promise.all([
         getBouts(fightNight.id),
-        getCheckIns(fightNight.id),
-        getStandings(fightNight.id, { atEventOnly: false, limit: 1 }),
+        getStandings(fightNight.id, { limit: 1 }),
         getPolls(fightNight.id, "all"),
         getProps(fightNight.id),
+        getPickCount(fightNight.id),
       ])
-      const top = standings[0]
+      const participantCount = (await getStandings(fightNight.id, { limit: 1000 })).length
+      const topPlayer = top[0]
       setStats({
         bouts: bouts.length,
         boutsCompleted: bouts.filter((b) => b.status === "completed").length,
-        checkIns: checkIns.length,
-        standings: (await getStandings(fightNight.id, { limit: 1000 })).length,
-        topPoints: top?.points || 0,
-        topName: top?.displayName || (top ? "Anonymous" : ""),
+        participants: participantCount,
+        picksPlaced,
+        topPoints: topPlayer?.points || 0,
+        topName: topPlayer?.displayName || (topPlayer ? "Anonymous" : ""),
         pollsCount: polls.length,
         propsCount: props.length,
       })
@@ -364,6 +395,11 @@ function OverviewPanel({
     load()
   }, [load])
 
+  const avgPicks =
+    stats.participants > 0
+      ? (stats.picksPlaced / stats.participants).toFixed(1)
+      : "0"
+
   const cards = [
     {
       label: "Bouts settled",
@@ -372,10 +408,21 @@ function OverviewPanel({
       tab: "card" as DetailTab,
     },
     {
-      label: "Players",
-      value: stats.standings.toLocaleString(),
-      hint: stats.standings === 0 ? "No picks yet" : null,
+      label: "Participants",
+      value: stats.participants.toLocaleString(),
+      hint: stats.participants === 0 ? "Nobody signed up yet" : null,
       tab: "standings" as DetailTab,
+    },
+    {
+      label: "Picks placed",
+      value: stats.picksPlaced.toLocaleString(),
+      hint:
+        stats.picksPlaced === 0
+          ? "No picks yet"
+          : stats.participants > 0
+            ? `${avgPicks} per player`
+            : null,
+      tab: "live" as DetailTab,
     },
     {
       label: "Top player",
@@ -523,22 +570,229 @@ function CheckInsPanel({ fightNight }: { fightNight: FightNight }) {
   )
 }
 
+// ── Participants Panel (live signup feed) ──────────────────
+
+/**
+ * Live feed of everyone who's joined the fight night, ordered by most
+ * recent. Real-time via onSnapshot so the admin can watch fans stream in
+ * during the event. Distinguishes walk-in (custom-token guest UID prefix
+ * `guest_`) from authenticated accounts (Google sign-in or any other
+ * provider that produced a regular Firebase Auth UID).
+ */
+function ParticipantsPanel({
+  fightNight,
+  onDrillDown,
+}: {
+  fightNight: FightNight
+  onDrillDown: (userId: string) => void
+}) {
+  const [participants, setParticipants] = useState<FightNightStanding[]>([])
+  const [loading, setLoading] = useState(true)
+  const [tick, setTick] = useState(0)
+
+  // Re-render once a minute so relative timestamps stay accurate without
+  // each row managing its own timer.
+  useEffect(() => {
+    const id = window.setInterval(() => setTick((t) => t + 1), 60_000)
+    return () => window.clearInterval(id)
+  }, [])
+
+  useEffect(() => {
+    const q = query(
+      collection(db, "fightNights", fightNight.id, "standings"),
+      orderBy("joinedAt", "desc"),
+      fbLimit(200)
+    )
+    const unsub = onSnapshot(
+      q,
+      (snap) => {
+        setParticipants(snap.docs.map((d) => d.data() as FightNightStanding))
+        setLoading(false)
+      },
+      () => setLoading(false)
+    )
+    return () => unsub()
+  }, [fightNight.id])
+
+  const total = participants.length
+  // useMemo on the same dep set as `tick` so it recomputes minute-over-minute
+  const counts = (() => {
+    void tick
+    const now = Date.now()
+    let last10m = 0
+    let walkIn = 0
+    let google = 0
+    for (const p of participants) {
+      const joined = new Date(p.joinedAt).getTime()
+      if (now - joined < 10 * 60_000) last10m++
+      if (p.userId.startsWith("guest_")) walkIn++
+      else google++
+    }
+    return { last10m, walkIn, google }
+  })()
+
+  return (
+    <section className="border border-gray-200 rounded-xl bg-white">
+      <div className="border-b border-gray-200 px-5 py-4">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h3 className="text-sm font-bold text-gray-900 tracking-wide uppercase">
+              Participants
+            </h3>
+            <p className="text-[11px] text-gray-500 font-medium mt-0.5">
+              Live signup feed · most recent first
+            </p>
+          </div>
+          <div className="text-right">
+            <p className="text-gray-900 text-lg font-bold tabular-nums leading-none">
+              {total.toLocaleString()}
+            </p>
+            <p className="text-[10px] text-gray-500 font-medium tracking-wider uppercase mt-1">
+              Total
+            </p>
+          </div>
+        </div>
+
+        {/* Quick counts strip */}
+        <div className="grid grid-cols-3 gap-2">
+          <CountTile label="Last 10 min" value={counts.last10m} accent="emerald" />
+          <CountTile label="Walk-in" value={counts.walkIn} accent="amber" />
+          <CountTile label="Google" value={counts.google} accent="blue" />
+        </div>
+      </div>
+
+      <div className="divide-y divide-gray-100 max-h-[600px] overflow-y-auto">
+        {loading ? (
+          <p className="px-5 py-8 text-gray-400 text-sm text-center">Loading…</p>
+        ) : participants.length === 0 ? (
+          <p className="px-5 py-8 text-gray-400 text-sm text-center">
+            No signups yet. The feed updates live as fans join.
+          </p>
+        ) : (
+          participants.map((p) => (
+            <ParticipantRow
+              key={p.userId}
+              entry={p}
+              onClick={() => onDrillDown(p.userId)}
+            />
+          ))
+        )}
+      </div>
+    </section>
+  )
+}
+
+function CountTile({
+  label,
+  value,
+  accent,
+}: {
+  label: string
+  value: number
+  accent: "emerald" | "amber" | "blue"
+}) {
+  const palette =
+    accent === "emerald"
+      ? "text-emerald-700 bg-emerald-50 border-emerald-200"
+      : accent === "amber"
+        ? "text-amber-700 bg-amber-50 border-amber-200"
+        : "text-blue-700 bg-blue-50 border-blue-200"
+  return (
+    <div className={`border rounded-md px-2.5 py-1.5 ${palette}`}>
+      <p className="text-base font-bold tabular-nums leading-none">{value}</p>
+      <p className="text-[9px] font-bold tracking-wider uppercase mt-1 opacity-80">
+        {label}
+      </p>
+    </div>
+  )
+}
+
+function ParticipantRow({
+  entry,
+  onClick,
+}: {
+  entry: FightNightStanding
+  onClick: () => void
+}) {
+  const isWalkIn = entry.userId.startsWith("guest_")
+  const method = isWalkIn ? "Walk-in" : "Google"
+  const methodClass = isWalkIn
+    ? "text-amber-700 bg-amber-50 border-amber-200"
+    : "text-blue-700 bg-blue-50 border-blue-200"
+  const joinedAgo = formatRelativeTime(entry.joinedAt)
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="w-full text-left px-5 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors focus:outline-none focus:bg-gray-50"
+    >
+      <div className="w-16 shrink-0">
+        <p className="text-[11px] text-gray-500 font-medium tabular-nums">
+          {joinedAgo}
+        </p>
+      </div>
+
+      <div className="min-w-0 flex-1">
+        <p className="text-[13px] font-semibold text-gray-900 truncate">
+          {entry.displayName || "Anonymous"}
+        </p>
+        <p className="text-[11px] text-gray-500 truncate">
+          {entry.email || "—"}
+        </p>
+      </div>
+
+      <span
+        className={`inline-flex items-center text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full border shrink-0 ${methodClass}`}
+      >
+        {method}
+      </span>
+
+      <div className="text-right w-20 shrink-0">
+        <p className="text-[11px] text-gray-700 font-medium tabular-nums">
+          {entry.picksMade || 0} pick{(entry.picksMade || 0) === 1 ? "" : "s"}
+        </p>
+        {(entry.points || 0) > 0 && (
+          <p className="text-[10px] text-gray-500 tabular-nums">
+            {(entry.points || 0).toLocaleString()} pts
+          </p>
+        )}
+      </div>
+    </button>
+  )
+}
+
+function formatRelativeTime(iso: string): string {
+  if (!iso) return "—"
+  const ms = Date.now() - new Date(iso).getTime()
+  if (ms < 0) return "just now"
+  if (ms < 60_000) return "just now"
+  if (ms < 60 * 60_000) return `${Math.floor(ms / 60_000)}m ago`
+  if (ms < 24 * 60 * 60_000) return `${Math.floor(ms / (60 * 60_000))}h ago`
+  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+}
+
 // ── Leaderboard Preview Panel (read-only) ──────────────────
 
-function LeaderboardPreviewPanel({ fightNight }: { fightNight: FightNight }) {
+function LeaderboardPreviewPanel({
+  fightNight,
+  onDrillDown,
+}: {
+  fightNight: FightNight
+  onDrillDown: (userId: string) => void
+}) {
   const [standings, setStandings] = useState<FightNightStanding[]>([])
   const [loading, setLoading] = useState(true)
-  const [atEventOnly, setAtEventOnly] = useState(false)
 
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const data = await getStandings(fightNight.id, { atEventOnly, limit: 25 })
+      const data = await getStandings(fightNight.id, { limit: 25 })
       setStandings(data)
     } finally {
       setLoading(false)
     }
-  }, [fightNight.id, atEventOnly])
+  }, [fightNight.id])
 
   useEffect(() => {
     load()
@@ -550,24 +804,13 @@ function LeaderboardPreviewPanel({ fightNight }: { fightNight: FightNight }) {
         <h3 className="text-sm font-bold text-gray-800 tracking-wide uppercase">
           Leaderboard Preview
         </h3>
-        <div className="flex items-center gap-3">
-          <label className="flex items-center gap-1.5 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={atEventOnly}
-              onChange={(e) => setAtEventOnly(e.target.checked)}
-              className="accent-[#FFB800]"
-            />
-            <span className="text-[11px] text-gray-600 font-medium">At-event only</span>
-          </label>
-          <button
-            onClick={load}
-            disabled={loading}
-            className="text-[10px] text-gray-500 hover:text-gray-800 px-2 py-1 border border-gray-200 rounded disabled:opacity-50"
-          >
-            {loading ? "…" : "Refresh"}
-          </button>
-        </div>
+        <button
+          onClick={load}
+          disabled={loading}
+          className="text-[10px] text-gray-500 hover:text-gray-800 px-2 py-1 border border-gray-200 rounded disabled:opacity-50"
+        >
+          {loading ? "…" : "Refresh"}
+        </button>
       </div>
 
       {loading ? (
@@ -600,7 +843,20 @@ function LeaderboardPreviewPanel({ fightNight }: { fightNight: FightNight }) {
             </thead>
             <tbody>
               {standings.map((s, i) => (
-                <tr key={s.userId} className="border-b border-gray-100 last:border-0">
+                <tr
+                  key={s.userId}
+                  onClick={() => onDrillDown(s.userId)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault()
+                      onDrillDown(s.userId)
+                    }
+                  }}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`Open activity for ${s.displayName || "Anonymous"}`}
+                  className="border-b border-gray-100 last:border-0 hover:bg-gray-50 cursor-pointer focus:outline-none focus:bg-gray-50"
+                >
                   <td className="px-3 py-2 text-[12px] tabular-nums text-gray-400">{i + 1}</td>
                   <td className="px-3 py-2 text-[12px]">
                     <p className="text-gray-800 font-semibold truncate">
@@ -1741,12 +1997,24 @@ function LivePanel({ fightNight }: { fightNight: FightNight }) {
     return () => unsub()
   }, [fightNight.id])
 
-  // Live picks per non-completed bout — drives the "X picked Gomez / Y picked Paez"
-  // stakes meter and the per-button "N fans correct" preview.
+  // Pick data per bout — drives the "X picked Gomez / Y picked Paez" stakes
+  // meter on every card (live AND settled).
+  //
+  // - Scheduled / live bouts: real-time onSnapshot so the meter updates as
+  //   fans place picks.
+  // - Completed bouts: one-shot fetch. Settled picks are frozen, so a
+  //   subscription would waste a listener for data that never changes.
   useEffect(() => {
     const unsubs: (() => void)[] = []
+    let cancelled = false
     for (const bout of bouts) {
-      if (bout.status === "completed") continue
+      if (bout.status === "completed") {
+        getPicksForBout(fightNight.id, bout.boutNumber).then((picks) => {
+          if (cancelled) return
+          setPicksByBout((prev) => ({ ...prev, [bout.boutNumber]: picks }))
+        })
+        continue
+      }
       const q = query(
         collection(db, "fightNights", fightNight.id, "picks"),
         where("boutNumber", "==", bout.boutNumber)
@@ -1757,7 +2025,10 @@ function LivePanel({ fightNight }: { fightNight: FightNight }) {
       })
       unsubs.push(unsub)
     }
-    return () => unsubs.forEach((u) => u())
+    return () => {
+      cancelled = true
+      unsubs.forEach((u) => u())
+    }
   }, [fightNight.id, bouts])
 
   async function handleStart(boutNumber: number) {
@@ -1947,12 +2218,26 @@ function BoutControlCard({
       {/* Body */}
       <div className="px-4 py-4">
         {isCompleted ? (
-          <div className="flex items-center justify-between">
-            <p className="text-[12px] text-gray-700">
-              <span className="text-gray-500">Winner:</span>{" "}
-              <span className="font-bold text-green-700">{winnerName}</span>
-            </p>
-          </div>
+          <>
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-[12px] text-gray-700">
+                <span className="text-gray-500">Winner:</span>{" "}
+                <span className="font-bold text-green-700">{winnerName}</span>
+              </p>
+              <p className="text-[10px] text-gray-400 font-medium tracking-wider uppercase">
+                Final tally
+              </p>
+            </div>
+            <PickMeter
+              f1Name={bout.fighter1Name || "Red"}
+              f2Name={bout.fighter2Name || "Blue"}
+              f1Picks={f1Picks}
+              f2Picks={f2Picks}
+              total={totalPicks}
+              locked={true}
+              winnerCorner={bout.winnerCorner ?? null}
+            />
+          </>
         ) : (
           <>
             <PickMeter
@@ -2024,6 +2309,7 @@ function PickMeter({
   f2Picks,
   total,
   locked,
+  winnerCorner,
 }: {
   f1Name: string
   f2Name: string
@@ -2031,9 +2317,21 @@ function PickMeter({
   f2Picks: number
   total: number
   locked: boolean
+  /** When set, marks the winning legend with a "Won" chip — used to
+   *  retain the final tally on settled bouts. */
+  winnerCorner?: "fighter1" | "fighter2" | "draw" | null
 }) {
   const f1Pct = total > 0 ? Math.round((f1Picks / total) * 100) : 0
   const f2Pct = total > 0 ? 100 - f1Pct : 0
+  const f1Won = winnerCorner === "fighter1"
+  const f2Won = winnerCorner === "fighter2"
+  // Highlight the side with fewer picks if they ended up winning — that
+  // is an "upset" in crowd-sentiment terms; surface it explicitly.
+  const upset =
+    !!winnerCorner &&
+    winnerCorner !== "draw" &&
+    total > 0 &&
+    ((f1Won && f1Picks < f2Picks) || (f2Won && f2Picks < f1Picks))
 
   return (
     <div>
@@ -2041,13 +2339,16 @@ function PickMeter({
         <span className="font-semibold text-gray-700 truncate flex items-center gap-1.5 min-w-0">
           <span className="w-1.5 h-1.5 rounded-full bg-red-400 shrink-0" />
           <span className="truncate">{f1Name}</span>
+          {f1Won && <WonBadge />}
         </span>
         <span className="text-gray-400 tabular-nums shrink-0 text-[10px]">
           {total === 0
-            ? "No picks yet"
+            ? "No picks"
             : `${total} pick${total === 1 ? "" : "s"}${locked ? " · locked" : ""}`}
+          {upset && <span className="ml-1 text-amber-600 font-bold">· upset</span>}
         </span>
         <span className="font-semibold text-gray-700 truncate flex items-center gap-1.5 min-w-0 justify-end">
+          {f2Won && <WonBadge />}
           <span className="truncate">{f2Name}</span>
           <span className="w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0" />
         </span>
@@ -2055,8 +2356,14 @@ function PickMeter({
       <div className="h-2 rounded-full bg-gray-100 overflow-hidden flex">
         {total > 0 && (
           <>
-            <div className="bg-red-400" style={{ width: `${f1Pct}%` }} />
-            <div className="bg-blue-400" style={{ width: `${f2Pct}%` }} />
+            <div
+              className={`${f1Won ? "bg-green-500" : "bg-red-400"}`}
+              style={{ width: `${f1Pct}%` }}
+            />
+            <div
+              className={`${f2Won ? "bg-green-500" : "bg-blue-400"}`}
+              style={{ width: `${f2Pct}%` }}
+            />
           </>
         )}
       </div>
@@ -2071,6 +2378,14 @@ function PickMeter({
         </span>
       </div>
     </div>
+  )
+}
+
+function WonBadge() {
+  return (
+    <span className="inline-flex items-center text-[9px] font-bold tracking-wider uppercase px-1.5 py-0.5 rounded bg-green-100 text-green-700 border border-green-200 shrink-0 leading-none">
+      Won
+    </span>
   )
 }
 

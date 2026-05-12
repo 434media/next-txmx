@@ -120,11 +120,14 @@ export async function getUserPicks(
   userId: string
 ): Promise<FightNightPick[]> {
   if (!fightNightId || !userId) return []
+  // Sort client-side rather than on Firestore so we don't need a
+  // composite (userId, boutNumber) index. Per-user picks are bounded
+  // by the bout count (~8/event), so the sort is effectively free.
   const snap = await picksCol(fightNightId)
     .where('userId', '==', userId)
-    .orderBy('boutNumber', 'asc')
     .get()
-  return snap.docs.map((d) => d.data() as FightNightPick)
+  const picks = snap.docs.map((d) => d.data() as FightNightPick)
+  return picks.sort((a, b) => a.boutNumber - b.boutNumber)
 }
 
 export async function getPicksForBout(
@@ -136,6 +139,17 @@ export async function getPicksForBout(
     .where('boutNumber', '==', boutNumber)
     .get()
   return snap.docs.map((d) => d.data() as FightNightPick)
+}
+
+/**
+ * Count of all bout picks placed on a fight night. Uses Firestore's
+ * server-side count aggregation so the cost is one read regardless of
+ * how many pick docs exist. Drives the Overview engagement metric.
+ */
+export async function getPickCount(fightNightId: string): Promise<number> {
+  if (!fightNightId) return 0
+  const agg = await picksCol(fightNightId).count().get()
+  return agg.data().count
 }
 
 // ── Record + Settle a Bout ─────────────────────────────────
