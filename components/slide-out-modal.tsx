@@ -85,31 +85,32 @@ export default function SlideOutModal({ isOpen, onClose, onAuthClick, activeFigh
             {/* Navigation Links */}
             <div className="flex flex-col space-y-4 w-full">
               {/* Events Dropdown */}
-              <div className="border-b border-white/10">
+              <div>
                 <button
                   onClick={() => setEventsOpen(!eventsOpen)}
-                  className="group flex items-center justify-between w-full py-4 hover:-translate-y-0.5 transition-transform duration-200"
+                  aria-expanded={eventsOpen}
+                  className="group block w-full py-4 text-left border-b border-white/10 hover:-translate-y-0.5 transition-transform duration-200"
                 >
-                  <div>
-                    <div className="text-white text-sm font-semibold tracking-widest leading-relaxed group-hover:text-white/70 transition-colors">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-white text-sm font-semibold tracking-widest leading-relaxed group-hover:text-white/70 transition-colors">
                       EVENTS
-                    </div>
-                    <div className="text-white/30 text-xs font-medium tracking-wide leading-relaxed mt-0.5">
-                      Fight cards & series
-                    </div>
+                    </span>
+                    <svg
+                      className={`w-3 h-3 shrink-0 text-white/60 transition-transform duration-200 ${eventsOpen ? "rotate-180" : ""}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                    </svg>
                   </div>
-                  <svg
-                    className={`w-3 h-3 text-white/60 transition-transform duration-200 ${eventsOpen ? "rotate-180" : ""}`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
-                  </svg>
+                  <div className="text-white/30 text-xs font-medium tracking-wide leading-relaxed mt-0.5">
+                    Fight cards & series
+                  </div>
                 </button>
 
                 {eventsOpen && (
-                  <div className="pb-3 space-y-1">
+                  <div className="pt-2 pb-1 space-y-1">
                     <Link
                       href="/events/fight-night"
                       onClick={onClose}
@@ -147,27 +148,28 @@ export default function SlideOutModal({ isOpen, onClose, onAuthClick, activeFigh
               </a>
 
               {/* Coming Soon Dropdown */}
-              <div className="border-b border-white/10">
+              <div>
                 <button
                   onClick={() => setComingSoonOpen(!comingSoonOpen)}
-                  className="group flex items-center justify-between w-full py-4 hover:-translate-y-0.5 transition-transform duration-200"
+                  aria-expanded={comingSoonOpen}
+                  className="group block w-full py-4 text-left border-b border-white/10 hover:-translate-y-0.5 transition-transform duration-200"
                 >
-                  <div>
-                    <div className="text-white text-sm font-semibold tracking-widest leading-relaxed group-hover:text-white/70 transition-colors">COMING SOON</div>
-                    <div className="text-white/30 text-xs font-medium tracking-wide leading-relaxed mt-0.5">A look at what's next</div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-white text-sm font-semibold tracking-widest leading-relaxed group-hover:text-white/70 transition-colors">COMING SOON</span>
+                    <svg
+                      className={`w-3 h-3 shrink-0 text-white/60 transition-transform duration-200 ${comingSoonOpen ? "rotate-180" : ""}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                    </svg>
                   </div>
-                  <svg
-                    className={`w-3 h-3 text-white/60 transition-transform duration-200 ${comingSoonOpen ? "rotate-180" : ""}`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
-                  </svg>
+                  <div className="text-white/30 text-xs font-medium tracking-wide leading-relaxed mt-0.5">A look at what's next</div>
                 </button>
 
                 {comingSoonOpen && (
-                  <div className="pb-3 space-y-1">
+                  <div className="pt-2 pb-1 space-y-1">
                     <Link
                       href="/scorecard"
                       onClick={onClose}
@@ -203,27 +205,28 @@ export default function SlideOutModal({ isOpen, onClose, onAuthClick, activeFigh
               </div>
 
               {/* FOLLOW US Dropdown */}
-              <div className="border-b border-white/10">
+              <div>
                 <button
                   onClick={() => setSocialOpen(!socialOpen)}
-                  className="group flex items-center justify-between w-full py-4 hover:-translate-y-0.5 transition-transform duration-200"
+                  aria-expanded={socialOpen}
+                  className="group block w-full py-4 text-left border-b border-white/10 hover:-translate-y-0.5 transition-transform duration-200"
                 >
-                  <div>
-                    <div className="text-white text-sm font-semibold tracking-widest leading-relaxed group-hover:text-white/70 transition-colors">FOLLOW US</div>
-                    <div className="text-white/30 text-xs font-medium tracking-wide leading-relaxed mt-0.5">Instagram, YouTube, TikTok</div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-white text-sm font-semibold tracking-widest leading-relaxed group-hover:text-white/70 transition-colors">FOLLOW US</span>
+                    <svg
+                      className={`w-3 h-3 shrink-0 text-white/60 transition-transform duration-200 ${socialOpen ? "rotate-180" : ""}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                    </svg>
                   </div>
-                  <svg
-                    className={`w-3 h-3 text-white/60 transition-transform duration-200 ${socialOpen ? "rotate-180" : ""}`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
-                  </svg>
+                  <div className="text-white/30 text-xs font-medium tracking-wide leading-relaxed mt-0.5">Instagram, YouTube, TikTok</div>
                 </button>
 
                 {socialOpen && (
-                  <div className="pb-3 space-y-1">
+                  <div className="pt-2 pb-1 space-y-1">
                     {[
                       { label: "INSTAGRAM", href: "https://www.instagram.com/txmxboxing/" },
                       { label: "YOUTUBE", href: "https://www.youtube.com/@txmxboxing/shorts" },
