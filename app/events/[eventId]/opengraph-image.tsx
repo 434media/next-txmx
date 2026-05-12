@@ -1,7 +1,8 @@
 import { getEventById } from '../../actions/events'
 import { OG_CONTENT_TYPE, OG_SIZE, renderTxmxOg } from '../../../lib/og-template'
 
-export const runtime = 'edge'
+// Node.js runtime — this OG image reads from Firestore via firebase-admin,
+// which depends on `process` and isn't edge-compatible.
 export const alt = 'Boxing Event | TXMX Boxing'
 export const size = OG_SIZE
 export const contentType = OG_CONTENT_TYPE

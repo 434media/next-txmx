@@ -1,6 +1,5 @@
 import { OG_CONTENT_TYPE, OG_SIZE, renderTxmxOg } from '../lib/og-template'
 
-export const runtime = 'edge'
 export const alt = 'TXMX Boxing — THE OPERATING SYSTEM FOR FIGHT FANS'
 export const size = OG_SIZE
 export const contentType = OG_CONTENT_TYPE

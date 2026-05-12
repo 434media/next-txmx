@@ -1,8 +1,8 @@
 # TXMX Boxing
 
-The official platform for Texas–Mexico boxing — TDLR-sanctioned event results,
+The official platform for TXMX Boxing — TDLR-sanctioned event results,
 verified fighter profiles, ringside news ("The 8 Count"), Prop Picks, Polls,
-Gym Pledge, the TXMX Black Card subscription, and the Rise of a Champion
+Gym Pledge, the Black Card subscription, and the Rise of a Champion
 Iconic Series.
 
 **Site:** https://www.txmxboxing.com

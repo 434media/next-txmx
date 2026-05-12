@@ -1,6 +1,5 @@
 import { OG_CONTENT_TYPE, OG_SIZE, renderTxmxOg } from '../../lib/og-template'
 
-export const runtime = 'edge'
 export const alt = 'The 8 Count — A Feed for Fight Fans | TXMX Boxing'
 export const size = OG_SIZE
 export const contentType = OG_CONTENT_TYPE
