@@ -3,7 +3,7 @@
 import { firestore } from '../../lib/firebase-admin'
 import { getFightNight } from './fightnight'
 import { incrementStandingPoints, incrementPicksMade } from './fightnight-standings'
-import { lockPropsForBout } from './fightnight-props'
+import { lockPropsForBout, unlockPropsForBout } from './fightnight-props'
 import { sendPushToUsers } from './notifications'
 
 // ── Types ────────────────────────────────────────────────
@@ -20,6 +20,8 @@ export interface FightNightPick {
   won: boolean | null
   pointsAwarded: number
   createdAt: string
+  /** Set when a pick is changed before the bout locks. */
+  updatedAt?: string
   settledAt: string | null
 }
 
@@ -76,14 +78,32 @@ export async function placeFightNightPick(
       ? (bout.fighter1Name as string) || ''
       : (bout.fighter2Name as string) || ''
 
-  // One pick per user per bout (idempotent by doc ID)
+  // One pick doc per user per bout (doc ID = `${userId}_${boutNumber}`).
+  // First pick creates the doc; subsequent picks BEFORE the bout locks
+  // are pick-swaps — overwrite the corner, keep createdAt, don't double-
+  // count picksMade. The bout-status guard above ensures swaps only land
+  // while the bout is still `scheduled`.
   const ref = picksCol(fightNightId).doc(pickDocId(userId, boutNumber))
   const existing = await ref.get()
+  const now = new Date().toISOString()
+
   if (existing.exists) {
-    return { success: false, error: 'You already picked this bout' }
+    const prev = existing.data() as FightNightPick
+    if (prev.settled) {
+      return { success: false, error: 'This pick is already settled' }
+    }
+    // No-op when re-tapping the same corner.
+    if (prev.pickedCorner === pickedCorner) {
+      return { success: true }
+    }
+    await ref.update({
+      pickedCorner,
+      pickedFighterName,
+      updatedAt: now,
+    })
+    return { success: true }
   }
 
-  const now = new Date().toISOString()
   const pick: FightNightPick = {
     userId,
     boutNumber,
@@ -97,7 +117,7 @@ export async function placeFightNightPick(
   }
   await ref.set(pick)
 
-  // Bump picksMade on standings (non-critical)
+  // Bump picksMade on standings only on first pick — swaps don't increment.
   try {
     const userSnap = await firestore.collection('users').doc(userId).get()
     const u = userSnap.exists ? userSnap.data() : null
@@ -333,6 +353,15 @@ export async function markBoutLive(
     updatedAt: now,
   })
 
+  // Cascade: any prop tied to this bout also locks the moment the bell
+  // rings — so fans can't sneak prop picks in after the bout has started.
+  // Non-critical; the bout flip is the source of truth.
+  try {
+    await lockPropsForBout(fightNightId, boutNumber)
+  } catch {
+    // ignore
+  }
+
   // Ping fans whose picks are now in flight on this bout. Push failures
   // must not block the status update, so wrap in try/catch.
   try {
@@ -457,6 +486,16 @@ export async function reopenFightNightBout(
     startedAt: null,
     updatedAt: now,
   })
+
+  // Reverse the prop-lock cascade that fired when this bout originally
+  // went live. Settled and voided props are preserved — only props that
+  // were auto-locked by the bout lifecycle flip back to open. Non-
+  // critical: bout state is the source of truth, prop sync is UX.
+  try {
+    await unlockPropsForBout(fightNightId, boutNumber)
+  } catch {
+    // ignore
+  }
 
   return { success: true, unsettled, pointsReversed }
 }

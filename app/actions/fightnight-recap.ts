@@ -7,7 +7,8 @@ import { getStandings, type FightNightStanding } from './fightnight-standings'
 import { getPrizes } from './fightnight-prizes'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
-const EMAIL_FROM = 'TXMX Boxing <noreply@send.434media.com>'
+const EMAIL_FROM = 'Marcos Resendez <noreply@send.434media.com>'
+const REPLY_TO = 'build@434media.com'
 
 // Resend free tier ≈ 10/sec. Throttle each send to stay well under.
 const SEND_DELAY_MS = 120
@@ -80,6 +81,7 @@ export async function sendFightNightRecap(
     try {
       await resend.emails.send({
         from: EMAIL_FROM,
+        replyTo: REPLY_TO,
         to: s.email,
         subject: `Your Fight Night recap — ${fightNight.title || 'Fight Night'}`,
         html: renderRecapEmail({
@@ -278,7 +280,7 @@ function renderRecapEmail(d: RecapEmailData): string {
             <td style="padding:40px 0 0;border-top:1px solid rgba(255,255,255,0.08);margin-top:32px;">
               <p style="margin:24px 0 0;color:rgba(255,255,255,0.3);font-size:11px;line-height:1.6;text-align:center;">
                 Thanks for playing tonight. Levantamos los puños.<br>
-                <span style="color:rgba(255,255,255,0.2);">TXMX Boxing · noreply@send.434media.com</span>
+                <span style="color:rgba(255,255,255,0.2);">TXMX Boxing · build@434media.com</span>
               </p>
             </td>
           </tr>

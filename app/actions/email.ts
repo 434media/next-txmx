@@ -4,7 +4,8 @@ import { Resend } from "resend"
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
-const EMAIL_FROM = "TXMX Boxing <noreply@send.434media.com>"
+const EMAIL_FROM = "Marcos Resendez <noreply@send.434media.com>"
+const REPLY_TO = "build@434media.com"
 
 export async function sendSubscriptionConfirmation(
   email: string,
@@ -13,7 +14,8 @@ export async function sendSubscriptionConfirmation(
   const firstName = displayName?.split(" ")[0] || "Champ"
 
   await resend.emails.send({
-    from: "TXMX Boxing <noreply@send.434media.com>",
+    from: EMAIL_FROM,
+    replyTo: REPLY_TO,
     to: email,
     subject: "Welcome to the Black Card — TXMX Boxing",
     html: `
@@ -123,6 +125,7 @@ export async function sendEventWelcomeEmail(
 
   await resend.emails.send({
     from: EMAIL_FROM,
+    replyTo: REPLY_TO,
     to: email,
     subject: `You're in — ${event.eventName} starts soon`,
     html: `
@@ -228,6 +231,7 @@ export async function sendEventWinnerEmail(
 
   await resend.emails.send({
     from: EMAIL_FROM,
+    replyTo: REPLY_TO,
     to: email,
     subject: `You finished ${positionLabel} at ${event.eventName} — claim your prize`,
     html: `

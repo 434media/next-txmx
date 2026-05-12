@@ -960,6 +960,15 @@ function PropsPanel({ fightNight }: { fightNight: FightNight }) {
     await load()
   }
 
+  async function handleUnlock(propId: string, boutNumber: number | null) {
+    const warning = boutNumber
+      ? `Reopen this prop for picking? Fans can pick again. Note: this prop is tied to bout #${boutNumber} — if that bout is already live, it will auto-relock the next time the bout starts.`
+      : "Reopen this prop for picking? Fans can pick again until you lock it manually."
+    if (!confirm(warning)) return
+    await updatePropStatus(fightNight.id, propId, "open")
+    await load()
+  }
+
   async function handleSettle(propId: string, optionId: string) {
     await settleProp(fightNight.id, propId, optionId)
     await load()
@@ -1169,6 +1178,12 @@ function PropsPanel({ fightNight }: { fightNight: FightNight }) {
                       {opt.label}
                     </button>
                   ))}
+                  <button
+                    onClick={() => handleUnlock(prop.id, prop.boutNumber)}
+                    className="text-[11px] px-3 py-1 rounded-md text-gray-500 hover:text-amber-700"
+                  >
+                    Reopen
+                  </button>
                   <button
                     onClick={() => handleVoid(prop.id)}
                     className="text-[11px] px-3 py-1 rounded-md text-gray-400 hover:text-gray-600"

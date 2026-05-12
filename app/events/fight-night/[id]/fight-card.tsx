@@ -39,10 +39,18 @@ function findVisibleBoutElement(num: string): HTMLElement | null {
   return els[0] || null
 }
 
+/** Aggregated pick counts per bout for the crowd-stake meter. */
+interface BoutStake {
+  fighter1: number
+  fighter2: number
+  total: number
+}
+
 export default function FightCard({ fightNightId, initialBouts }: FightCardProps) {
   const { user } = useAuth()
   const [bouts, setBouts] = useState<FightNightBout[]>(initialBouts)
   const [picks, setPicks] = useState<Record<number, FightNightPick>>({})
+  const [stakeByBout, setStakeByBout] = useState<Record<number, BoutStake>>({})
 
   // Real-time bout statuses
   useEffect(() => {
@@ -53,6 +61,26 @@ export default function FightCard({ fightNightId, initialBouts }: FightCardProps
     const unsub = onSnapshot(q, (snap) => {
       const data = snap.docs.map((d) => d.data() as FightNightBout)
       if (data.length > 0) setBouts(data)
+    })
+    return () => unsub()
+  }, [fightNightId])
+
+  // Crowd-stake meter — single listener on all picks, grouped per-bout
+  // on the client. One listener is cheaper than 8 per-bout listeners and
+  // the data is tiny (one small doc per fan per bout).
+  useEffect(() => {
+    const q = query(collection(db, "fightNights", fightNightId, "picks"))
+    const unsub = onSnapshot(q, (snap) => {
+      const counts: Record<number, BoutStake> = {}
+      for (const doc of snap.docs) {
+        const pick = doc.data() as FightNightPick
+        const n = pick.boutNumber
+        if (!counts[n]) counts[n] = { fighter1: 0, fighter2: 0, total: 0 }
+        counts[n].total++
+        if (pick.pickedCorner === "fighter1") counts[n].fighter1++
+        else if (pick.pickedCorner === "fighter2") counts[n].fighter2++
+      }
+      setStakeByBout(counts)
     })
     return () => unsub()
   }, [fightNightId])
@@ -179,6 +207,7 @@ export default function FightCard({ fightNightId, initialBouts }: FightCardProps
                 bout={bout}
                 pick={picks[bout.boutNumber]}
                 userId={user?.uid || null}
+                stake={stakeByBout[bout.boutNumber] || null}
               />
             </div>
           ))}
@@ -205,6 +234,7 @@ export default function FightCard({ fightNightId, initialBouts }: FightCardProps
               bout={bout}
               pick={picks[bout.boutNumber]}
               userId={user?.uid || null}
+              stake={stakeByBout[bout.boutNumber] || null}
             />
           </div>
         ))}
@@ -218,11 +248,13 @@ function BoutCard({
   bout,
   pick,
   userId,
+  stake,
 }: {
   fightNightId: string
   bout: FightNightBout
   pick: FightNightPick | undefined
   userId: string | null
+  stake: BoutStake | null
 }) {
   const [submitting, setSubmitting] = useState<"fighter1" | "fighter2" | null>(null)
   const [error, setError] = useState("")
@@ -236,8 +268,9 @@ function BoutCard({
       setError("Sign in to make picks")
       return
     }
-    if (userPicked) return
     if (isLocked) return
+    // Re-tapping the current pick is a no-op (skip network round-trip).
+    if (userPicked === corner) return
     setSubmitting(corner)
     setError("")
     try {
@@ -317,7 +350,7 @@ function BoutCard({
       <div className="grid grid-cols-2 divide-x divide-white/5">
         <button
           onClick={() => handlePick("fighter1")}
-          disabled={!!userPicked || isLocked || !!submitting}
+          disabled={isLocked || !!submitting}
           className={`text-left px-4 py-4 transition-all relative ${
             f1Selected && f1Won
               ? "bg-emerald-500/10"
@@ -325,9 +358,9 @@ function BoutCard({
                 ? "bg-amber-500/10"
                 : f1Won
                   ? "bg-emerald-500/5"
-                  : !userPicked && !isLocked
-                    ? "hover:bg-white/4 cursor-pointer"
-                    : "opacity-60"
+                  : isLocked
+                    ? "opacity-60"
+                    : "hover:bg-white/4 cursor-pointer"
           } ${submitting === "fighter1" ? "opacity-50" : ""}`}
         >
           {f1Selected && (
@@ -349,7 +382,7 @@ function BoutCard({
         </button>
         <button
           onClick={() => handlePick("fighter2")}
-          disabled={!!userPicked || isLocked || !!submitting}
+          disabled={isLocked || !!submitting}
           className={`text-left px-4 py-4 transition-all relative ${
             f2Selected && f2Won
               ? "bg-emerald-500/10"
@@ -357,9 +390,9 @@ function BoutCard({
                 ? "bg-amber-500/10"
                 : f2Won
                   ? "bg-emerald-500/5"
-                  : !userPicked && !isLocked
-                    ? "hover:bg-white/4 cursor-pointer"
-                    : "opacity-60"
+                  : isLocked
+                    ? "opacity-60"
+                    : "hover:bg-white/4 cursor-pointer"
           } ${submitting === "fighter2" ? "opacity-50" : ""}`}
         >
           {f2Selected && (
@@ -382,15 +415,24 @@ function BoutCard({
       </div>
 
       {/* Footer status */}
+      {/* Crowd-stake meter — surfaces real-time pick distribution as
+          social proof while the bout is still open or in flight. Hidden
+          on settled bouts (those show the user's own outcome below). */}
+      {!isCompleted && stake && stake.total > 0 && (
+        <CrowdStakeMeter stake={stake} />
+      )}
+
       {error && (
         <div className="px-4 py-2 border-t border-red-500/20 bg-red-500/5">
           <p className="text-red-400 text-xs font-medium">{error}</p>
         </div>
       )}
-      {!error && userPicked && !isCompleted && !isLocked && (
+      {!error && !isCompleted && !isLocked && (
         <div className="px-4 py-2 border-t border-white/5">
           <p className="text-white/45 text-[11px] font-medium">
-            Pick locked in. Waiting for the bell.
+            {userPicked
+              ? "Tap the other corner to switch · locks at the bell."
+              : "Tap a corner to pick · locks at the bell."}
           </p>
         </div>
       )}
@@ -407,6 +449,26 @@ function BoutCard({
           )}
         </div>
       )}
+    </div>
+  )
+}
+
+function CrowdStakeMeter({ stake }: { stake: BoutStake }) {
+  const f1Pct = stake.total > 0 ? Math.round((stake.fighter1 / stake.total) * 100) : 0
+  const f2Pct = stake.total > 0 ? 100 - f1Pct : 0
+  return (
+    <div className="px-4 py-2.5 border-t border-white/5">
+      <div className="flex items-center justify-between text-[10px] text-white/45 font-medium tabular-nums mb-1.5">
+        <span>{f1Pct}% picked red</span>
+        <span className="text-white/35">
+          {stake.total} pick{stake.total === 1 ? "" : "s"}
+        </span>
+        <span>{f2Pct}% picked blue</span>
+      </div>
+      <div className="h-1 rounded-full bg-white/5 overflow-hidden flex">
+        <div className="bg-red-400/70" style={{ width: `${f1Pct}%` }} />
+        <div className="bg-blue-400/70" style={{ width: `${f2Pct}%` }} />
+      </div>
     </div>
   )
 }

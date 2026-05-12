@@ -37,6 +37,8 @@ export interface FightNightPropPick {
   propId: string
   optionId: string
   createdAt: string
+  /** Set when the user swaps to a different option before the prop locks. */
+  updatedAt?: string
   settled: boolean
   won: boolean | null
   pointsAwarded: number
@@ -174,6 +176,36 @@ export async function lockPropsForBout(
   return { locked: snap.size }
 }
 
+/**
+ * Reverse cascade for bout reopen: flip every `locked` prop tied to this
+ * bout back to `open`. Skips `settled` and `voided` props — those were
+ * intentional admin actions and shouldn't get undone by a bout rewind.
+ *
+ * Filters status client-side so we don't need a composite (boutNumber,
+ * status) Firestore index for a rarely-used admin path.
+ */
+export async function unlockPropsForBout(
+  fightNightId: string,
+  boutNumber: number
+): Promise<{ unlocked: number }> {
+  if (!fightNightId || !boutNumber) return { unlocked: 0 }
+  const snap = await propsCol(fightNightId)
+    .where('boutNumber', '==', boutNumber)
+    .get()
+  if (snap.empty) return { unlocked: 0 }
+  const now = new Date().toISOString()
+  const batch = firestore.batch()
+  let count = 0
+  for (const d of snap.docs) {
+    const p = d.data() as FightNightProp
+    if (p.status !== 'locked') continue
+    batch.update(d.ref, { status: 'open' as PropStatus, updatedAt: now })
+    count++
+  }
+  if (count > 0) await batch.commit()
+  return { unlocked: count }
+}
+
 // ── Place a Pick ──────────────────────────────────────────
 
 export async function placePropPick(
@@ -197,13 +229,27 @@ export async function placePropPick(
     return { success: false, error: 'Invalid option' }
   }
 
+  // One pick doc per user per prop. First tap creates; subsequent taps
+  // BEFORE the prop locks are swaps — overwrite the option, keep
+  // createdAt, don't double-count picksMade. The status guard above
+  // ensures swaps only land while the prop is still `open`.
   const ref = picksCol(fightNightId).doc(pickDocId(userId, propId))
   const existing = await ref.get()
+  const now = new Date().toISOString()
+
   if (existing.exists) {
-    return { success: false, error: 'You already picked this prop' }
+    const prev = existing.data() as FightNightPropPick
+    if (prev.settled) {
+      return { success: false, error: 'This pick is already settled' }
+    }
+    // Re-tapping the current option is a no-op.
+    if (prev.optionId === optionId) {
+      return { success: true }
+    }
+    await ref.update({ optionId, updatedAt: now })
+    return { success: true }
   }
 
-  const now = new Date().toISOString()
   await ref.set({
     userId,
     propId,
@@ -214,7 +260,7 @@ export async function placePropPick(
     pointsAwarded: 0,
   } as FightNightPropPick)
 
-  // Bump picksMade on standings (non-critical)
+  // Bump picksMade on standings only on FIRST pick (not on swaps).
   try {
     const userSnap = await firestore.collection('users').doc(userId).get()
     const u = userSnap.exists ? userSnap.data() : null

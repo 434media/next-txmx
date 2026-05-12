@@ -1,6 +1,8 @@
 "use client"
 
 import { useEffect, useState, useCallback } from "react"
+import { collection, onSnapshot, query } from "firebase/firestore"
+import { db } from "../../../../lib/firebase-client"
 import { useAuth } from "../../../../lib/auth-context"
 import {
   type FightNightProp,
@@ -15,10 +17,18 @@ interface PropsSectionProps {
   fightNightId: string
 }
 
+/** Aggregate of all picks on a single prop, used to render the crowd-
+ *  stake bars on each option. */
+interface PropStake {
+  byOption: Record<string, number>
+  total: number
+}
+
 export default function PropsSection({ fightNightId }: PropsSectionProps) {
   const { user } = useAuth()
   const [props, setProps] = useState<FightNightProp[]>([])
   const [userPicks, setUserPicks] = useState<Record<string, FightNightPropPick>>({})
+  const [stakeByProp, setStakeByProp] = useState<Record<string, PropStake>>({})
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState<string | null>(null)
   const [errorById, setErrorById] = useState<Record<string, string>>({})
@@ -43,6 +53,26 @@ export default function PropsSection({ fightNightId }: PropsSectionProps) {
   useEffect(() => {
     load()
   }, [load])
+
+  // Crowd-stake meter — single listener on the prop-picks collection,
+  // grouped by propId + optionId on the client. One listener for the
+  // whole tab is cheaper than per-prop subscriptions, and the data is
+  // small (one doc per fan per prop they've picked).
+  useEffect(() => {
+    const q = query(collection(db, "fightNights", fightNightId, "propPicks"))
+    const unsub = onSnapshot(q, (snap) => {
+      const next: Record<string, PropStake> = {}
+      for (const doc of snap.docs) {
+        const pick = doc.data() as FightNightPropPick
+        const stake = next[pick.propId] || { byOption: {}, total: 0 }
+        stake.byOption[pick.optionId] = (stake.byOption[pick.optionId] || 0) + 1
+        stake.total++
+        next[pick.propId] = stake
+      }
+      setStakeByProp(next)
+    })
+    return () => unsub()
+  }, [fightNightId])
 
   async function handlePick(propId: string, optionId: string) {
     if (!user) {
@@ -88,6 +118,10 @@ export default function PropsSection({ fightNightId }: PropsSectionProps) {
           const isSettled = prop.status === "settled"
           const userWon =
             isSettled && myPick && myPick.optionId === prop.correctOptionId
+          const stake = stakeByProp[prop.id]
+          // Show the crowd-stake bars on open + locked props. Settled
+          // props already render their own correct/incorrect bars.
+          const showStakes = !isSettled && !!stake && stake.total > 0
 
           return (
             <div
@@ -181,50 +215,124 @@ export default function PropsSection({ fightNightId }: PropsSectionProps) {
                   )
                 }
 
-                if (myPick) {
-                  // User has already picked — show their choice highlighted, others muted
-                  return (
-                    <div
-                      key={opt.id}
-                      className={`px-4 py-3 rounded-lg border text-sm font-semibold ${
-                        isMyPick
-                          ? "border-amber-500/40 bg-amber-500/10 text-amber-200"
-                          : "border-white/5 bg-white/2 text-white/35"
-                      }`}
-                    >
-                      {opt.label}
-                      {isMyPick && (
-                        <span className="ml-2 text-[9px] font-bold tracking-wider uppercase text-amber-400">
-                          · Your Pick
-                        </span>
-                      )}
-                    </div>
-                  )
-                }
+                const optVotes = stake?.byOption[opt.id] || 0
+                const optPct =
+                  showStakes && stake && stake.total > 0
+                    ? (optVotes / stake.total) * 100
+                    : 0
 
                 if (isLocked) {
+                  // Locked but not settled — dim everything; show user's
+                  // pick highlighted if they had one. Crowd stake bar
+                  // persists so admins/fans see the final distribution
+                  // before settlement.
                   return (
                     <div
                       key={opt.id}
-                      className="px-4 py-3 rounded-lg border border-white/5 bg-white/2 text-sm font-semibold text-white/30"
+                      className={`relative overflow-hidden px-4 py-3 rounded-lg border text-sm font-semibold ${
+                        isMyPick
+                          ? "border-amber-500/30 bg-amber-500/5 text-amber-200/80"
+                          : "border-white/5 bg-white/2 text-white/30"
+                      }`}
                     >
-                      {opt.label}
+                      {showStakes && optPct > 0 && (
+                        <span
+                          className={`absolute inset-y-0 left-0 ${
+                            isMyPick ? "bg-amber-500/10" : "bg-white/4"
+                          } transition-all duration-500`}
+                          style={{ width: `${optPct}%` }}
+                        />
+                      )}
+                      <span className="relative flex items-center justify-between gap-2">
+                        <span className="truncate">
+                          {opt.label}
+                          {isMyPick && (
+                            <span className="ml-2 text-[9px] font-bold tracking-wider uppercase text-amber-400/70">
+                              · Your Pick
+                            </span>
+                          )}
+                        </span>
+                        {showStakes && (
+                          <span
+                            className={`shrink-0 text-[10px] font-bold tabular-nums ${
+                              isMyPick ? "text-amber-400/70" : "text-white/35"
+                            }`}
+                          >
+                            {optPct.toFixed(0)}%
+                          </span>
+                        )}
+                      </span>
                     </div>
                   )
                 }
 
+                // Open state — every option stays tappable so users can
+                // swap their pick freely until the prop locks. Current
+                // pick gets an amber highlight; the rest stay neutral.
+                // Crowd-stake bar shows share of all picks for that option.
                 return (
                   <button
                     key={opt.id}
                     onClick={() => handlePick(prop.id, opt.id)}
                     disabled={submitting === prop.id}
-                    className="px-4 py-3 rounded-lg border border-white/10 bg-white/2 text-sm font-semibold text-white/80 hover:border-white/25 hover:bg-white/5 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-left"
+                    className={`relative overflow-hidden text-left px-4 py-3 rounded-lg border text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                      isMyPick
+                        ? "border-amber-500/40 bg-amber-500/10 text-amber-200 hover:bg-amber-500/15"
+                        : "border-white/10 bg-white/2 text-white/80 hover:border-white/25 hover:bg-white/5 hover:text-white"
+                    }`}
                   >
-                    {opt.label}
+                    {showStakes && optPct > 0 && (
+                      <span
+                        className={`absolute inset-y-0 left-0 ${
+                          isMyPick ? "bg-amber-500/15" : "bg-white/5"
+                        } transition-all duration-500 pointer-events-none`}
+                        style={{ width: `${optPct}%` }}
+                      />
+                    )}
+                    <span className="relative flex items-center justify-between gap-2">
+                      <span className="truncate">
+                        {opt.label}
+                        {isMyPick && (
+                          <span className="ml-2 text-[9px] font-bold tracking-wider uppercase text-amber-400">
+                            · Your Pick
+                          </span>
+                        )}
+                      </span>
+                      {showStakes && (
+                        <span
+                          className={`shrink-0 text-[10px] font-bold tabular-nums ${
+                            isMyPick ? "text-amber-400" : "text-white/45"
+                          }`}
+                        >
+                          {optPct.toFixed(0)}%
+                        </span>
+                      )}
+                    </span>
                   </button>
                 )
               })}
             </div>
+
+            {!isSettled && !isLocked && (
+              <div className="mt-3 flex items-center justify-between gap-3 text-[11px] font-medium">
+                <p className="text-white/45">
+                  {myPick ? "Tap another to switch · " : "Tap to pick · "}
+                  {prop.boutNumber
+                    ? `locks when bout ${prop.boutNumber} starts.`
+                    : "locks at the bell."}
+                </p>
+                {showStakes && stake && (
+                  <p className="text-white/35 tabular-nums shrink-0">
+                    {stake.total} pick{stake.total === 1 ? "" : "s"}
+                  </p>
+                )}
+              </div>
+            )}
+            {isLocked && !isSettled && showStakes && stake && (
+              <p className="mt-3 text-white/35 text-[11px] font-medium tabular-nums">
+                {stake.total} pick{stake.total === 1 ? "" : "s"} · locked
+              </p>
+            )}
 
             {myError && (
               <p className="mt-3 text-red-400 text-xs font-medium">{myError}</p>

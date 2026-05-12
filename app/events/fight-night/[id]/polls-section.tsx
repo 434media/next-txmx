@@ -8,13 +8,24 @@ import {
   votePoll,
   getUserVotesForFightNight,
 } from "../../../actions/fightnight-polls"
-import RecapSequence from "./recap-sequence"
+import Carousel from "./carousel"
 
 interface PollsSectionProps {
   fightNightId: string
+  /**
+   * Which subset of polls to render. The Polls and Recap tabs share the
+   * same `polls` collection but split it by ID prefix so each tab is its
+   * own focused surface.
+   *   - "main"  (default): everything that isn't a recap poll
+   *   - "recap": only night-prefixed polls
+   */
+  filter?: "main" | "recap"
 }
 
-export default function PollsSection({ fightNightId }: PollsSectionProps) {
+export default function PollsSection({
+  fightNightId,
+  filter = "main",
+}: PollsSectionProps) {
   const { user } = useAuth()
   const [polls, setPolls] = useState<FightNightPoll[]>([])
   const [userVotes, setUserVotes] = useState<Record<string, number>>({})
@@ -52,7 +63,6 @@ export default function PollsSection({ fightNightId }: PollsSectionProps) {
     try {
       const res = await votePoll(fightNightId, user.uid, pollId, optionIndex)
       if (res.success) {
-        // Optimistically reflect vote + reload
         setUserVotes((m) => ({ ...m, [pollId]: optionIndex }))
         await load()
       } else {
@@ -63,6 +73,11 @@ export default function PollsSection({ fightNightId }: PollsSectionProps) {
     }
   }
 
+  // Filter to the subset this section is responsible for.
+  const visiblePolls = polls.filter((p) =>
+    filter === "recap" ? p.id.startsWith("night-") : !p.id.startsWith("night-")
+  )
+
   if (loading) {
     return (
       <div className="text-center py-8">
@@ -71,32 +86,19 @@ export default function PollsSection({ fightNightId }: PollsSectionProps) {
     )
   }
 
-  if (polls.length === 0) {
+  if (visiblePolls.length === 0) {
     return (
       <div className="text-center py-12 border border-white/8 rounded-xl bg-white/2">
-        <p className="text-white/40 text-sm font-medium">No polls yet for this event.</p>
+        <p className="text-white/40 text-sm font-medium">
+          {filter === "recap"
+            ? "Recap polls open after the night winds down."
+            : "No polls yet for this event."}
+        </p>
       </div>
     )
   }
 
-  // Group polls by ID prefix so the section reads as a progression
-  // through the night (Opening → Vibes → Recap) rather than a long stack.
-  const groups: { label: string; tag: string; polls: typeof polls }[] = [
-    { label: "Opening — warm up the crowd", tag: "Opening", polls: polls.filter((p) => p.id.startsWith("opening-")) },
-    { label: "Vibe checks — call the fight", tag: "Vibes", polls: polls.filter((p) => p.id.startsWith("bout-")) },
-    { label: "Recap — your call on the night", tag: "Recap", polls: polls.filter((p) => p.id.startsWith("night-")) },
-  ]
-  const ungrouped = polls.filter(
-    (p) =>
-      !p.id.startsWith("opening-") &&
-      !p.id.startsWith("bout-") &&
-      !p.id.startsWith("night-")
-  )
-  if (ungrouped.length > 0) {
-    groups.push({ label: "More polls", tag: "More", polls: ungrouped })
-  }
-
-  function renderPoll(poll: (typeof polls)[number]) {
+  function renderPoll(poll: FightNightPoll) {
     const userVote = userVotes[poll.id]
     const hasVoted = userVote !== undefined
     const isClosed = poll.status === "closed"
@@ -107,8 +109,10 @@ export default function PollsSection({ fightNightId }: PollsSectionProps) {
     return (
       <div
         key={poll.id}
-        className={`border rounded-xl p-5 ${
-          isClosed ? "border-white/5 bg-white/2 opacity-70" : "border-white/8 bg-white/2"
+        className={`snap-start shrink-0 w-[85vw] sm:w-[360px] border rounded-xl p-5 ${
+          isClosed
+            ? "border-white/5 bg-white/2 opacity-70"
+            : "border-white/8 bg-white/2"
         }`}
       >
         <div className="flex items-start justify-between gap-3 mb-4">
@@ -153,15 +157,33 @@ export default function PollsSection({ fightNightId }: PollsSectionProps) {
                   <div className="relative flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2 min-w-0">
                       {isMyPick && (
-                        <svg className="w-3.5 h-3.5 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                        <svg
+                          className="w-3.5 h-3.5 text-amber-400 shrink-0"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2.5}
+                            d="M5 13l4 4L19 7"
+                          />
                         </svg>
                       )}
-                      <p className={`text-sm font-semibold leading-snug truncate ${isMyPick ? "text-white" : "text-white/70"}`}>
+                      <p
+                        className={`text-sm font-semibold leading-snug truncate ${
+                          isMyPick ? "text-white" : "text-white/70"
+                        }`}
+                      >
                         {opt.label}
                       </p>
                     </div>
-                    <p className={`text-xs font-bold tabular-nums shrink-0 ${isMyPick ? "text-amber-400" : "text-white/55"}`}>
+                    <p
+                      className={`text-xs font-bold tabular-nums shrink-0 ${
+                        isMyPick ? "text-amber-400" : "text-white/55"
+                      }`}
+                    >
                       {pct.toFixed(0)}%
                       <span className="text-white/40 ml-1.5">·</span>
                       <span className="text-white/40 ml-1.5">{opt.votes}</span>
@@ -186,7 +208,9 @@ export default function PollsSection({ fightNightId }: PollsSectionProps) {
           })}
         </div>
 
-        {myError && <p className="mt-3 text-red-400 text-xs font-medium">{myError}</p>}
+        {myError && (
+          <p className="mt-3 text-red-400 text-xs font-medium">{myError}</p>
+        )}
 
         <p className="mt-3 text-white/50 text-[10px] font-bold tracking-wider uppercase">
           {totalVotes} {totalVotes === 1 ? "vote" : "votes"}
@@ -196,30 +220,18 @@ export default function PollsSection({ fightNightId }: PollsSectionProps) {
     )
   }
 
-  return (
-    <div className="space-y-12">
-      {groups.map((group) =>
-        group.polls.length === 0 ? null : (
-          <div key={group.tag}>
-            <div className="flex items-center gap-2 mb-4">
-              <span className="text-amber-400 text-[10px] font-bold tracking-[0.25em] uppercase">
-                {group.tag}
-              </span>
-              <span className="text-white/55 text-xs font-medium">
-                — {group.label}
-              </span>
-            </div>
+  const swipeHint =
+    filter === "recap"
+      ? `Swipe → for all ${visiblePolls.length} recap polls`
+      : `Swipe → for all ${visiblePolls.length} polls`
 
-            {/* Recap is rendered as a step-through onboarding-style sequence.
-                Everything else stays as quick-scan stacks. */}
-            {group.tag === "Recap" ? (
-              <RecapSequence fightNightId={fightNightId} polls={group.polls} />
-            ) : (
-              <div className="space-y-4">{group.polls.map(renderPoll)}</div>
-            )}
-          </div>
-        )
-      )}
-    </div>
+  return (
+    <Carousel
+      ariaLabel={filter === "recap" ? "Recap polls" : "Polls"}
+      swipeHint={swipeHint}
+      scrollStep={380}
+    >
+      {visiblePolls.map(renderPoll)}
+    </Carousel>
   )
 }

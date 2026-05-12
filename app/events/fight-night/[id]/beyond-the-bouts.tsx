@@ -10,28 +10,38 @@ interface BeyondTheBoutsProps {
   pollsEnabled: boolean
 }
 
-type Tab = "props" | "polls"
+type Tab = "props" | "polls" | "recap"
 
 /**
- * Combined surface for "extra picks" — props and polls — under one
- * section heading. Cuts two stacked sections into one tabbed surface so
- * the page footer doesn't keep walking down the scroll. Both tabs stay
- * mounted (hidden via CSS) so their Firestore listeners don't churn on
- * every switch.
+ * Combined surface for "extra picks" — props, polls, and the night recap
+ * — under one section heading. All three tabs render as horizontal
+ * carousels so the page footprint stays consistent across surfaces.
+ * Tabs stay mounted (hidden via CSS) so their Firestore listeners don't
+ * churn on every switch.
+ *
+ * Recap is a filtered view of the same polls collection (`night-*` ids),
+ * separated so the post-event recap polls don't compete with in-event
+ * vibes/opening polls for attention.
  */
 export default function BeyondTheBouts({
   fightNightId,
   propsEnabled,
   pollsEnabled,
 }: BeyondTheBoutsProps) {
-  // Pick the initial tab based on what's actually enabled. Props is the
-  // default when both are on — props earn points, polls are softer.
-  const defaultTab: Tab = propsEnabled ? "props" : "polls"
+  // Default: Props if enabled, else Polls, else Recap (only meaningful
+  // when polls are enabled since Recap is a poll subset).
+  const defaultTab: Tab = propsEnabled ? "props" : pollsEnabled ? "polls" : "recap"
   const [tab, setTab] = useState<Tab>(defaultTab)
 
   if (!propsEnabled && !pollsEnabled) return null
 
-  const showTabs = propsEnabled && pollsEnabled
+  // Tab bar shows whenever 2+ tabs are renderable. Recap tab only renders
+  // when polls are enabled (Recap is a poll subset).
+  const visibleTabs: Tab[] = [
+    ...(propsEnabled ? ["props" as Tab] : []),
+    ...(pollsEnabled ? ["polls" as Tab, "recap" as Tab] : []),
+  ]
+  const showTabs = visibleTabs.length > 1
 
   return (
     <div>
@@ -45,13 +55,31 @@ export default function BeyondTheBouts({
       </div>
 
       {showTabs && (
-        <div className="flex items-center gap-1 mb-6 border-b border-white/10">
-          <TabButton active={tab === "props"} onClick={() => setTab("props")}>
-            Props
-          </TabButton>
-          <TabButton active={tab === "polls"} onClick={() => setTab("polls")}>
-            Polls
-          </TabButton>
+        <div className="flex items-center gap-1 mb-6 border-b border-white/10 overflow-x-auto">
+          {visibleTabs.includes("props") && (
+            <TabButton
+              active={tab === "props"}
+              onClick={() => setTab("props")}
+            >
+              Props
+            </TabButton>
+          )}
+          {visibleTabs.includes("polls") && (
+            <TabButton
+              active={tab === "polls"}
+              onClick={() => setTab("polls")}
+            >
+              Polls
+            </TabButton>
+          )}
+          {visibleTabs.includes("recap") && (
+            <TabButton
+              active={tab === "recap"}
+              onClick={() => setTab("recap")}
+            >
+              Recap
+            </TabButton>
+          )}
         </div>
       )}
 
@@ -62,7 +90,12 @@ export default function BeyondTheBouts({
       )}
       {pollsEnabled && (
         <div className={showTabs && tab !== "polls" ? "hidden" : ""}>
-          <PollsSection fightNightId={fightNightId} />
+          <PollsSection fightNightId={fightNightId} filter="main" />
+        </div>
+      )}
+      {pollsEnabled && (
+        <div className={showTabs && tab !== "recap" ? "hidden" : ""}>
+          <PollsSection fightNightId={fightNightId} filter="recap" />
         </div>
       )}
     </div>
@@ -82,7 +115,7 @@ function TabButton({
     <button
       type="button"
       onClick={onClick}
-      className={`relative px-4 py-3 text-sm font-bold tracking-tight transition-colors ${
+      className={`relative px-4 py-3 text-sm font-bold tracking-tight transition-colors shrink-0 ${
         active ? "text-white" : "text-white/45 hover:text-white/75"
       }`}
     >
