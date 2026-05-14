@@ -193,7 +193,7 @@ export default function FightCard({ fightNightId, initialBouts }: FightCardProps
       <div className="lg:hidden">
         <Carousel
           ariaLabel="Fight card"
-          swipeHint={`Swipe → for all ${bouts.length} bouts`}
+          swipeHint={`Swipe for all ${bouts.length} bouts`}
           scrollStep={400}
         >
           {bouts.map((bout) => (

@@ -230,7 +230,7 @@ export default function PollsSection({
   return (
     <Carousel
       ariaLabel="Polls"
-      swipeHint={`Swipe → for all ${polls.length} polls`}
+      swipeHint={`Swipe for all ${polls.length} polls`}
       scrollStep={380}
     >
       {polls.map(renderPoll)}

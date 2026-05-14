@@ -118,7 +118,7 @@ export default function PropsSection({ fightNightId }: PropsSectionProps) {
   }
 
   return (
-    <Carousel ariaLabel="Props" swipeHint={`Swipe → for more props · ${props.length} total`}>
+    <Carousel ariaLabel="Props" swipeHint={`Swipe for more props · ${props.length} total`}>
       {props.map((prop) => {
           const myPick = userPicks[prop.id]
           const myError = errorById[prop.id]
