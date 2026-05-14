@@ -33,26 +33,34 @@ export default function PropsSection({ fightNightId }: PropsSectionProps) {
   const [submitting, setSubmitting] = useState<string | null>(null)
   const [errorById, setErrorById] = useState<Record<string, string>>({})
 
-  const load = useCallback(async () => {
-    setLoading(true)
-    try {
-      const data = await getProps(fightNightId)
-      // Hide voided props from the public view
-      setProps(data.filter((p) => p.status !== "voided"))
-      if (user) {
-        const picks = await getUserPropPicks(fightNightId, user.uid)
-        const map: Record<string, FightNightPropPick> = {}
-        for (const p of picks) map[p.propId] = p
-        setUserPicks(map)
-      }
-    } finally {
-      setLoading(false)
+  // Silent refetch — used after a pick so the card swaps in the user's
+  // selection and updated state without unmounting the carousel. The
+  // visible "Saving…" pill on the card itself (via `submitting`) keeps
+  // the section's height stable so the page doesn't reflow the flyer
+  // into view.
+  const refresh = useCallback(async () => {
+    const data = await getProps(fightNightId)
+    setProps(data.filter((p) => p.status !== "voided"))
+    if (user) {
+      const picks = await getUserPropPicks(fightNightId, user.uid)
+      const map: Record<string, FightNightPropPick> = {}
+      for (const p of picks) map[p.propId] = p
+      setUserPicks(map)
     }
   }, [fightNightId, user])
 
   useEffect(() => {
-    load()
-  }, [load])
+    let cancelled = false
+    setLoading(true)
+    refresh()
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [refresh])
 
   // Crowd-stake meter — single listener on the prop-picks collection,
   // grouped by propId + optionId on the client. One listener for the
@@ -84,7 +92,7 @@ export default function PropsSection({ fightNightId }: PropsSectionProps) {
     try {
       const res = await placePropPick(fightNightId, user.uid, propId, optionId)
       if (res.success) {
-        await load()
+        await refresh()
       } else {
         setErrorById((m) => ({ ...m, [propId]: res.error || "Failed" }))
       }
@@ -122,6 +130,7 @@ export default function PropsSection({ fightNightId }: PropsSectionProps) {
           // Show the crowd-stake bars on open + locked props. Settled
           // props already render their own correct/incorrect bars.
           const showStakes = !isSettled && !!stake && stake.total > 0
+          const isSaving = submitting === prop.id
 
           return (
             <div
@@ -316,10 +325,19 @@ export default function PropsSection({ fightNightId }: PropsSectionProps) {
             {!isSettled && !isLocked && (
               <div className="mt-3 flex items-center justify-between gap-3 text-[11px] font-medium">
                 <p className="text-white/45">
-                  {myPick ? "Tap another to switch · " : "Tap to pick · "}
-                  {prop.boutNumber
-                    ? `locks when bout ${prop.boutNumber} starts.`
-                    : "locks at the bell."}
+                  {isSaving ? (
+                    <span className="inline-flex items-center gap-1.5 text-amber-400/85">
+                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                      Saving…
+                    </span>
+                  ) : (
+                    <>
+                      {myPick ? "Tap another to switch · " : "Tap to pick · "}
+                      {prop.boutNumber
+                        ? `locks when bout ${prop.boutNumber} starts.`
+                        : "locks at the bell."}
+                    </>
+                  )}
                 </p>
                 {showStakes && stake && (
                   <p className="text-white/35 tabular-nums shrink-0">

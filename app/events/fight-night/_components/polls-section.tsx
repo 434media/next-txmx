@@ -24,25 +24,33 @@ export default function PollsSection({
   const [submitting, setSubmitting] = useState<string | null>(null)
   const [errorById, setErrorById] = useState<Record<string, string>>({})
 
-  const load = useCallback(async () => {
-    setLoading(true)
-    try {
-      const data = await getPolls(fightNightId, "all")
-      setPolls(data)
-      if (user) {
-        const votes = await getUserVotesForFightNight(fightNightId, user.uid)
-        const map: Record<string, number> = {}
-        for (const v of votes) map[v.pollId] = v.optionIndex
-        setUserVotes(map)
-      }
-    } finally {
-      setLoading(false)
+  // Silent refetch — used after a vote so the card swaps in fresh tallies
+  // without unmounting the carousel. The visible "Saving…" pill lives on
+  // the card itself (via `submitting`), keeping the section's height stable
+  // and stopping the page from reflowing the flyer into view.
+  const refresh = useCallback(async () => {
+    const data = await getPolls(fightNightId, "all")
+    setPolls(data)
+    if (user) {
+      const votes = await getUserVotesForFightNight(fightNightId, user.uid)
+      const map: Record<string, number> = {}
+      for (const v of votes) map[v.pollId] = v.optionIndex
+      setUserVotes(map)
     }
   }, [fightNightId, user])
 
   useEffect(() => {
-    load()
-  }, [load])
+    let cancelled = false
+    setLoading(true)
+    refresh()
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [refresh])
 
   async function handleVote(pollId: string, optionIndex: number) {
     if (!user) {
@@ -54,8 +62,11 @@ export default function PollsSection({
     try {
       const res = await votePoll(fightNightId, user.uid, pollId, optionIndex)
       if (res.success) {
+        // Optimistic update — flips the card to results immediately
         setUserVotes((m) => ({ ...m, [pollId]: optionIndex }))
-        await load()
+        // Silent background refresh — pulls fresh tallies without
+        // collapsing the section.
+        await refresh()
       } else {
         setErrorById((m) => ({ ...m, [pollId]: res.error || "Failed to vote" }))
       }
@@ -89,6 +100,7 @@ export default function PollsSection({
     const showResults = hasVoted || isClosed
     const totalVotes = poll.totalVotes || 0
     const myError = errorById[poll.id]
+    const isSaving = submitting === poll.id
 
     return (
       <div
@@ -196,9 +208,20 @@ export default function PollsSection({
           <p className="mt-3 text-red-400 text-xs font-medium">{myError}</p>
         )}
 
-        <p className="mt-3 text-white/50 text-[10px] font-bold tracking-wider uppercase">
-          {totalVotes} {totalVotes === 1 ? "vote" : "votes"}
-          {hasVoted && !isClosed && " · you voted"}
+        <p className="mt-3 text-white/50 text-[10px] font-bold tracking-wider uppercase flex items-center gap-1.5">
+          <span>
+            {totalVotes} {totalVotes === 1 ? "vote" : "votes"}
+            {hasVoted && !isClosed && !isSaving && " · you voted"}
+          </span>
+          {isSaving && (
+            <>
+              <span className="text-white/20">·</span>
+              <span className="inline-flex items-center gap-1 text-amber-400/80">
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                Saving…
+              </span>
+            </>
+          )}
         </p>
       </div>
     )

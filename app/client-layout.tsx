@@ -66,6 +66,7 @@ export default function ClientLayout({
   }, [])
   const isAdmin = pathname?.startsWith('/admin')
   const isFanos = pathname === '/fanos'
+  const isFightNight = pathname?.startsWith('/events/fight-night')
 
   const openModal = () => setIsModalOpen(true)
   const closeModal = () => setIsModalOpen(false)
@@ -156,8 +157,9 @@ export default function ClientLayout({
           {/* Universal Slide Out Modal */}
           <SlideOutModal isOpen={isModalOpen} onClose={closeModal} onAuthClick={() => { closeModal(); setIsAuthModalOpen(true) }} activeFightNight={activeFightNight} />
           
-          {/* Daily Login Reward */}
-          {!isFanos && <DailyLoginReward />}
+          {/* Daily Login Reward — suppressed on the fight night page so the
+              toast doesn't compete with the live game UI */}
+          {!isFanos && !isFightNight && <DailyLoginReward />}
         </AuthProvider>
       </body>
     </html>
