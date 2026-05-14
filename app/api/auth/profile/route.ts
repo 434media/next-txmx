@@ -12,10 +12,18 @@ export async function GET(request: NextRequest) {
 
   try {
     const decoded = await getAuth().verifyIdToken(token)
+    // `decoded.name` / `decoded.picture` are standard Firebase profile fields
+    // populated when the user signed in via a provider (Google) or after an
+    // updateProfile() call. Walk-in guests sign in with a custom token whose
+    // claims include `displayName` — fall through to that so their name lands
+    // on the users doc on this very first call (instead of waiting for a
+    // backfill on the next getOrCreateUser write).
+    const customDisplayName =
+      typeof decoded.displayName === "string" ? decoded.displayName : null
     const user = await getOrCreateUser(
       decoded.uid,
       decoded.email || null,
-      decoded.name || null,
+      decoded.name || customDisplayName || null,
       decoded.picture || null
     )
 

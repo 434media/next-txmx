@@ -56,8 +56,11 @@ export async function incrementStandingPoints(
       tx.update(ref, {
         points: (current.points || 0) + amount,
         picksWon: (current.picksWon || 0) + 1,
-        displayName: meta.displayName,
-        photoURL: meta.photoURL,
+        // Preserve a previously-good displayName/photoURL — only overwrite
+        // when meta has a value, so a callsite reading from a stale users
+        // doc can't null out a name we already captured.
+        displayName: meta.displayName || current.displayName || null,
+        photoURL: meta.photoURL || current.photoURL || null,
         email: current.email || meta.email,
         updatedAt: now,
       })
@@ -102,8 +105,10 @@ export async function incrementPicksMade(
       const current = snap.data() as Partial<FightNightStanding>
       tx.update(ref, {
         picksMade: (current.picksMade || 0) + 1,
-        displayName: meta.displayName,
-        photoURL: meta.photoURL,
+        // See incrementStandingPoints — never clobber a good displayName
+        // with null from a stale users-doc read.
+        displayName: meta.displayName || current.displayName || null,
+        photoURL: meta.photoURL || current.photoURL || null,
         email: current.email || meta.email,
         updatedAt: now,
       })

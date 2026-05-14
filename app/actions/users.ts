@@ -57,7 +57,24 @@ export async function getOrCreateUser(
   const snap = await ref.get()
 
   if (snap.exists) {
-    return snap.data() as UserRecord
+    // Backfill any profile fields still null when this caller now knows them.
+    // Race we have to handle: the walk-in flow signs the user in with a custom
+    // token, which immediately triggers onAuthStateChanged → /api/auth/profile,
+    // and that path verifies a token with no Firebase Auth profile yet so
+    // displayName/email/photoURL come through null. The walk-in form then
+    // calls this with the real name — without backfill, the null wins and the
+    // leaderboard shows "Anonymous" forever.
+    const current = snap.data() as UserRecord
+    const updates: Partial<UserRecord> = {}
+    if (!current.displayName && displayName) updates.displayName = displayName
+    if (!current.email && email) updates.email = email
+    if (!current.photoURL && photoURL) updates.photoURL = photoURL
+    if (Object.keys(updates).length > 0) {
+      updates.updatedAt = new Date().toISOString()
+      await ref.update(updates)
+      return { ...current, ...updates }
+    }
+    return current
   }
 
   const now = new Date().toISOString()
