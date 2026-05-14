@@ -12,19 +12,10 @@ import Carousel from "./carousel"
 
 interface PollsSectionProps {
   fightNightId: string
-  /**
-   * Which subset of polls to render. The Polls and Recap tabs share the
-   * same `polls` collection but split it by ID prefix so each tab is its
-   * own focused surface.
-   *   - "main"  (default): everything that isn't a recap poll
-   *   - "recap": only night-prefixed polls
-   */
-  filter?: "main" | "recap"
 }
 
 export default function PollsSection({
   fightNightId,
-  filter = "main",
 }: PollsSectionProps) {
   const { user } = useAuth()
   const [polls, setPolls] = useState<FightNightPoll[]>([])
@@ -73,11 +64,6 @@ export default function PollsSection({
     }
   }
 
-  // Filter to the subset this section is responsible for.
-  const visiblePolls = polls.filter((p) =>
-    filter === "recap" ? p.id.startsWith("night-") : !p.id.startsWith("night-")
-  )
-
   if (loading) {
     return (
       <div className="text-center py-8">
@@ -86,13 +72,11 @@ export default function PollsSection({
     )
   }
 
-  if (visiblePolls.length === 0) {
+  if (polls.length === 0) {
     return (
       <div className="text-center py-12 border border-white/8 rounded-xl bg-white/2">
         <p className="text-white/40 text-sm font-medium">
-          {filter === "recap"
-            ? "Recap polls open after the night winds down."
-            : "No polls yet for this event."}
+          No polls yet for this event.
         </p>
       </div>
     )
@@ -220,18 +204,13 @@ export default function PollsSection({
     )
   }
 
-  const swipeHint =
-    filter === "recap"
-      ? `Swipe → for all ${visiblePolls.length} recap polls`
-      : `Swipe → for all ${visiblePolls.length} polls`
-
   return (
     <Carousel
-      ariaLabel={filter === "recap" ? "Recap polls" : "Polls"}
-      swipeHint={swipeHint}
+      ariaLabel="Polls"
+      swipeHint={`Swipe → for all ${polls.length} polls`}
       scrollStep={380}
     >
-      {visiblePolls.map(renderPoll)}
+      {polls.map(renderPoll)}
     </Carousel>
   )
 }

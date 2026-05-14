@@ -159,11 +159,14 @@ export async function getFightNight(id: string): Promise<FightNight | null> {
 
 /**
  * Get the active fight night — the one users should land on right now.
- * Priority: `live` → `doors_open` → soonest `announced` within 7 days → null.
+ * Priority: `live` → `doors_open` → soonest `announced` within 7 days →
+ * fallback to the most-recent fight night by date.
  *
- * Implementation: single-field index on `date` only. Fight nights are sparse
- * (a few per year), so we fetch the most recent 50 by date and filter status
- * client-side. This avoids needing composite Firestore indexes.
+ * The fallback exists because there's only one fight night being managed
+ * at a time; an empty result was confusing admins who'd edit a fight night
+ * outside the 7-day window and find the landing page showing nothing (or a
+ * different event). The landing page always reflects the single fight night
+ * the admin is working on.
  */
 export async function getActiveFightNight(): Promise<FightNight | null> {
   const today = new Date().toISOString().slice(0, 10)
@@ -193,7 +196,10 @@ export async function getActiveFightNight(): Promise<FightNight | null> {
       (d) => d.status === 'announced' && d.date >= today && d.date <= sevenDays
     )
     .sort((a, b) => a.date.localeCompare(b.date))
-  return upcoming[0] || null
+  if (upcoming[0]) return upcoming[0]
+
+  // Fallback: most recent fight night by date (docs already sorted desc)
+  return docs[0] || null
 }
 
 /**

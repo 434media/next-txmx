@@ -5,10 +5,10 @@ import { collection, doc, onSnapshot, query } from "firebase/firestore"
 import { db } from "../../../lib/firebase-client"
 import { useAuth } from "../../../lib/auth-context"
 import WalkInForm from "./walk-in-form"
-import StatusStrip from "./[id]/status-strip"
-import FightCard from "./[id]/fight-card"
-import LeaderboardLive from "./[id]/leaderboard-live"
-import BeyondTheBouts from "./[id]/beyond-the-bouts"
+import StatusStrip from "./_components/status-strip"
+import FightCard from "./_components/fight-card"
+import LeaderboardLive from "./_components/leaderboard-live"
+import BeyondTheBouts from "./_components/beyond-the-bouts"
 import type { FightNight, FightNightBout } from "../../actions/fightnight"
 import type { FightNightStanding } from "../../actions/fightnight-standings"
 
@@ -243,6 +243,12 @@ export default function FightNightClient({ fightNight, bouts }: FightNightClient
                 Top 3 · Your neighborhood
               </span>
             </div>
+            {fightNight.prizeLabel && (
+              <PrizeChip
+                label={fightNight.prizeLabel}
+                details={fightNight.prizeDetails}
+              />
+            )}
             <LeaderboardLive fightNightId={fightNight.id} />
           </div>
 
@@ -256,6 +262,60 @@ export default function FightNightClient({ fightNight, bouts }: FightNightClient
         </div>
       </div>
     </section>
+  )
+}
+
+function PrizeChip({ label, details }: { label: string; details?: string }) {
+  const [open, setOpen] = useState(false)
+  const hasDetails = !!details?.trim()
+
+  return (
+    <div className="mb-3 border border-amber-500/25 bg-amber-500/5 rounded-lg overflow-hidden">
+      <button
+        type="button"
+        onClick={() => hasDetails && setOpen((v) => !v)}
+        disabled={!hasDetails}
+        className={`w-full flex items-center gap-2 px-3 py-2 text-left ${
+          hasDetails ? "hover:bg-amber-500/10 transition-colors cursor-pointer" : "cursor-default"
+        }`}
+      >
+        <svg
+          className="w-3.5 h-3.5 text-amber-400 shrink-0"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M5 4h14l-1.5 9a3 3 0 01-3 2.5h-5a3 3 0 01-3-2.5L5 4zM9 20h6M12 16v4M8 4V3h8v1"
+          />
+        </svg>
+        <span className="text-amber-400 text-[9px] font-bold tracking-[0.25em] uppercase shrink-0">
+          Tonight's Prize
+        </span>
+        <span className="text-white/30">·</span>
+        <span className="text-white/85 text-xs font-semibold leading-snug truncate flex-1">
+          {label}
+        </span>
+        {hasDetails && (
+          <svg
+            className={`w-3 h-3 text-white/40 shrink-0 transition-transform ${open ? "rotate-180" : ""}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        )}
+      </button>
+      {hasDetails && open && (
+        <div className="px-3 pb-3 -mt-1">
+          <p className="text-white/65 text-xs font-medium leading-5">{details}</p>
+        </div>
+      )}
+    </div>
   )
 }
 

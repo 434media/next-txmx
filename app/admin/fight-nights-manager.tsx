@@ -15,6 +15,7 @@ import {
   type FightNightStatus,
   type FightNightBout,
   getFightNights,
+  getActiveFightNight,
   createFightNight,
   updateFightNight,
   deleteFightNight,
@@ -99,8 +100,15 @@ export default function FightNightsManager() {
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const data = await getFightNights()
+      // Use the SAME selection logic as the public landing page so admin
+      // and `/events/fight-night` always resolve to the same fight night.
+      // Only seeds the selection on first load — admin can switch manually.
+      const [data, active] = await Promise.all([
+        getFightNights(),
+        getActiveFightNight(),
+      ])
       setFightNights(data)
+      setSelectedId((current) => current || active?.id || data[0]?.id || "")
     } finally {
       setLoading(false)
     }

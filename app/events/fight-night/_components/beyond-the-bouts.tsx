@@ -10,36 +10,27 @@ interface BeyondTheBoutsProps {
   pollsEnabled: boolean
 }
 
-type Tab = "props" | "polls" | "recap"
+type Tab = "props" | "polls"
 
 /**
- * Combined surface for "extra picks" — props, polls, and the night recap
- * — under one section heading. All three tabs render as horizontal
- * carousels so the page footprint stays consistent across surfaces.
- * Tabs stay mounted (hidden via CSS) so their Firestore listeners don't
- * churn on every switch.
- *
- * Recap is a filtered view of the same polls collection (`night-*` ids),
- * separated so the post-event recap polls don't compete with in-event
- * vibes/opening polls for attention.
+ * Combined surface for "extra picks" — props and polls — under one section
+ * heading. Tabs render as horizontal carousels so the page footprint stays
+ * consistent. Tabs stay mounted (hidden via CSS) so their Firestore
+ * listeners don't churn on every switch.
  */
 export default function BeyondTheBouts({
   fightNightId,
   propsEnabled,
   pollsEnabled,
 }: BeyondTheBoutsProps) {
-  // Default: Props if enabled, else Polls, else Recap (only meaningful
-  // when polls are enabled since Recap is a poll subset).
-  const defaultTab: Tab = propsEnabled ? "props" : pollsEnabled ? "polls" : "recap"
+  const defaultTab: Tab = propsEnabled ? "props" : "polls"
   const [tab, setTab] = useState<Tab>(defaultTab)
 
   if (!propsEnabled && !pollsEnabled) return null
 
-  // Tab bar shows whenever 2+ tabs are renderable. Recap tab only renders
-  // when polls are enabled (Recap is a poll subset).
   const visibleTabs: Tab[] = [
     ...(propsEnabled ? ["props" as Tab] : []),
-    ...(pollsEnabled ? ["polls" as Tab, "recap" as Tab] : []),
+    ...(pollsEnabled ? ["polls" as Tab] : []),
   ]
   const showTabs = visibleTabs.length > 1
 
@@ -72,14 +63,6 @@ export default function BeyondTheBouts({
               Polls
             </TabButton>
           )}
-          {visibleTabs.includes("recap") && (
-            <TabButton
-              active={tab === "recap"}
-              onClick={() => setTab("recap")}
-            >
-              Recap
-            </TabButton>
-          )}
         </div>
       )}
 
@@ -90,12 +73,7 @@ export default function BeyondTheBouts({
       )}
       {pollsEnabled && (
         <div className={showTabs && tab !== "polls" ? "hidden" : ""}>
-          <PollsSection fightNightId={fightNightId} filter="main" />
-        </div>
-      )}
-      {pollsEnabled && (
-        <div className={showTabs && tab !== "recap" ? "hidden" : ""}>
-          <PollsSection fightNightId={fightNightId} filter="recap" />
+          <PollsSection fightNightId={fightNightId} />
         </div>
       )}
     </div>
