@@ -131,6 +131,73 @@ export async function updatePropStatus(
   })
 }
 
+/**
+ * Edit a prop's content. Settled props are NOT editable — once points are
+ * awarded the structure is immutable. For options, callers pass each row
+ * as `{ id?, label }`: rows with `id` keep the existing option id (so any
+ * picks already placed survive), rows without `id` become brand-new
+ * options. If a previously-existing option id is dropped from the list,
+ * picks that pointed to it are NOT migrated — they orphan and won't
+ * settle. Admins should only restructure options before picks land.
+ */
+export async function updateProp(
+  fightNightId: string,
+  propId: string,
+  data: {
+    title?: string
+    description?: string
+    options?: { id?: string; label: string }[]
+    pointsReward?: number
+    isUnderdog?: boolean
+    boutNumber?: number | null
+  }
+): Promise<void> {
+  if (!fightNightId || !propId) throw new Error('Missing args')
+  const ref = propsCol(fightNightId).doc(propId)
+  const snap = await ref.get()
+  if (!snap.exists) throw new Error('Prop not found')
+  const current = mapProp(snap)
+  if (current.status === 'settled') {
+    throw new Error('Settled props cannot be edited')
+  }
+
+  const update: Record<string, unknown> = {}
+
+  if (data.title !== undefined) {
+    const t = data.title.trim()
+    if (!t) throw new Error('Title is required')
+    update.title = t
+  }
+
+  if (data.description !== undefined) {
+    update.description = data.description.trim()
+  }
+
+  if (data.pointsReward !== undefined) {
+    update.pointsReward = data.pointsReward
+  }
+
+  if (data.isUnderdog !== undefined) {
+    update.isUnderdog = data.isUnderdog
+  }
+
+  if (data.boutNumber !== undefined) {
+    update.boutNumber = data.boutNumber
+  }
+
+  if (data.options !== undefined) {
+    if (data.options.length < 2) throw new Error('At least 2 options required')
+    update.options = data.options.map((o) => ({
+      id: o.id || generateId(),
+      label: o.label.trim(),
+    }))
+  }
+
+  if (Object.keys(update).length === 0) return
+  update.updatedAt = new Date().toISOString()
+  await ref.update(update)
+}
+
 export async function deleteProp(
   fightNightId: string,
   propId: string

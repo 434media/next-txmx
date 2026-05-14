@@ -73,6 +73,59 @@ export async function closePoll(fightNightId: string, pollId: string): Promise<v
   })
 }
 
+/**
+ * Edit a poll's content. Vote handling:
+ *   - If option count is unchanged, vote tallies are preserved by index
+ *     (admin can fix typos without losing votes).
+ *   - If option count changes, ALL vote tallies reset to 0 and totalVotes
+ *     resets to 0 — the question structure has changed, the old votes are
+ *     no longer meaningful. Vote *docs* in pollVotes are NOT cleaned up
+ *     (they're keyed by `${userId}_${pollId}` and would need a separate
+ *     pass) — accept the orphan and move on; it just blocks affected users
+ *     from re-voting on the new shape.
+ */
+export async function updatePoll(
+  fightNightId: string,
+  pollId: string,
+  data: {
+    question?: string
+    options?: string[]
+    boutNumber?: number | null
+  }
+): Promise<void> {
+  if (!fightNightId || !pollId) throw new Error('Missing args')
+  const ref = pollsCol(fightNightId).doc(pollId)
+  const snap = await ref.get()
+  if (!snap.exists) throw new Error('Poll not found')
+  const current = snap.data() as Omit<FightNightPoll, 'id'>
+
+  const update: Record<string, unknown> = {}
+
+  if (data.question !== undefined) {
+    const q = data.question.trim()
+    if (!q) throw new Error('Question is required')
+    update.question = q
+  }
+
+  if (data.boutNumber !== undefined) {
+    update.boutNumber = data.boutNumber
+  }
+
+  if (data.options !== undefined) {
+    const labels = data.options.map((l) => l.trim()).filter(Boolean)
+    if (labels.length < 2) throw new Error('At least 2 options required')
+    const sameCount = labels.length === current.options.length
+    update.options = labels.map((label, i) => ({
+      label,
+      votes: sameCount ? current.options[i]?.votes ?? 0 : 0,
+    }))
+    if (!sameCount) update.totalVotes = 0
+  }
+
+  if (Object.keys(update).length === 0) return
+  await ref.update(update)
+}
+
 export async function deletePoll(fightNightId: string, pollId: string): Promise<void> {
   await pollsCol(fightNightId).doc(pollId).delete()
 }

@@ -52,6 +52,7 @@ import {
   getPolls,
   closePoll,
   deletePoll,
+  updatePoll,
 } from "../actions/fightnight-polls"
 import {
   type FightNightProp,
@@ -59,6 +60,7 @@ import {
   createProp,
   getProps,
   updatePropStatus,
+  updateProp,
   settleProp,
   voidProp,
   deleteProp,
@@ -911,6 +913,17 @@ function PropsPanel({ fightNight }: { fightNight: FightNight }) {
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState("")
 
+  // Inline-edit state — when set, the matching prop row swaps to a form.
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editTitle, setEditTitle] = useState("")
+  const [editDescription, setEditDescription] = useState("")
+  const [editOptionsText, setEditOptionsText] = useState("")
+  const [editPointsReward, setEditPointsReward] = useState(500)
+  const [editIsUnderdog, setEditIsUnderdog] = useState(false)
+  const [editBoutNumber, setEditBoutNumber] = useState<number | "">("")
+  const [editError, setEditError] = useState("")
+  const [savingEdit, setSavingEdit] = useState(false)
+
   const load = useCallback(async () => {
     setLoading(true)
     try {
@@ -992,6 +1005,64 @@ function PropsPanel({ fightNight }: { fightNight: FightNight }) {
     if (!confirm("Delete this prop? Picks will be orphaned.")) return
     await deleteProp(fightNight.id, propId)
     await load()
+  }
+
+  function startEdit(prop: FightNightProp) {
+    setEditingId(prop.id)
+    setEditTitle(prop.title)
+    setEditDescription(prop.description)
+    setEditOptionsText(prop.options.map((o) => o.label).join("\n"))
+    setEditPointsReward(prop.pointsReward)
+    setEditIsUnderdog(prop.isUnderdog)
+    setEditBoutNumber(prop.boutNumber ?? "")
+    setEditError("")
+  }
+
+  function cancelEdit() {
+    setEditingId(null)
+    setEditError("")
+  }
+
+  async function saveEdit(propId: string) {
+    setEditError("")
+    const lines = editOptionsText
+      .split("\n")
+      .map((l) => l.trim())
+      .filter(Boolean)
+    if (!editTitle.trim()) {
+      setEditError("Title required")
+      return
+    }
+    if (lines.length < 2) {
+      setEditError("At least 2 options required (one per line)")
+      return
+    }
+    const original = props.find((p) => p.id === propId)
+    // Preserve option IDs by position so existing picks still resolve.
+    // Lines beyond the original count become brand-new options (server
+    // will mint a fresh id). Reordering is treated as relabeling — admins
+    // who actually want a fresh structure should delete + recreate.
+    const options = lines.map((label, i) => ({
+      id: original?.options[i]?.id,
+      label,
+    }))
+    setSavingEdit(true)
+    try {
+      await updateProp(fightNight.id, propId, {
+        title: editTitle,
+        description: editDescription,
+        options,
+        pointsReward: editPointsReward,
+        isUnderdog: editIsUnderdog,
+        boutNumber: typeof editBoutNumber === "number" ? editBoutNumber : null,
+      })
+      setEditingId(null)
+      await load()
+    } catch (e) {
+      setEditError(e instanceof Error ? e.message : "Failed to save")
+    } finally {
+      setSavingEdit(false)
+    }
   }
 
   const STATUS_STYLES: Record<PropStatus, string> = {
@@ -1105,112 +1176,252 @@ function PropsPanel({ fightNight }: { fightNight: FightNight }) {
         <p className="text-gray-400 text-sm">No props yet.</p>
       ) : (
         <div className="space-y-2">
-          {props.map((prop) => (
-            <div key={prop.id} className="border border-gray-200 rounded-lg p-3">
-              <div className="flex items-start justify-between gap-2 mb-2">
-                <div className="flex-1 min-w-0">
-                  <p className="text-[13px] font-bold text-gray-900 leading-snug">
-                    {prop.title}
-                  </p>
-                  {prop.description && (
-                    <p className="text-[11px] text-gray-500 leading-5 mt-0.5">
-                      {prop.description}
-                    </p>
-                  )}
-                </div>
-                <span
-                  className={`text-[9px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full border shrink-0 ${STATUS_STYLES[prop.status]}`}
+          {props.map((prop) => {
+            if (editingId === prop.id) {
+              return (
+                <div
+                  key={prop.id}
+                  className="border border-amber-300 bg-amber-50/30 rounded-lg p-3"
                 >
-                  {prop.status}
-                </span>
-              </div>
-
-              <div className="flex flex-wrap gap-1.5 mb-2">
-                {prop.options.map((opt) => {
-                  const isCorrect = prop.correctOptionId === opt.id
-                  return (
-                    <span
-                      key={opt.id}
-                      className={`text-[11px] px-2 py-0.5 rounded border ${
-                        isCorrect
-                          ? "bg-green-50 text-green-700 border-green-200 font-semibold"
-                          : "bg-gray-50 text-gray-600 border-gray-200"
-                      }`}
+                  <p className="text-[10px] font-bold text-amber-700 tracking-[0.2em] uppercase mb-2">
+                    Editing Prop
+                  </p>
+                  {editError && (
+                    <p className="text-red-600 text-xs mb-2">{editError}</p>
+                  )}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
+                    <div className="sm:col-span-2">
+                      <label className={labelClass}>TITLE</label>
+                      <input
+                        type="text"
+                        value={editTitle}
+                        onChange={(e) => setEditTitle(e.target.value)}
+                        className={inputClass}
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className={labelClass}>DESCRIPTION (optional)</label>
+                      <input
+                        type="text"
+                        value={editDescription}
+                        onChange={(e) => setEditDescription(e.target.value)}
+                        className={inputClass}
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className={labelClass}>
+                        OPTIONS (one per line, 2+ required)
+                      </label>
+                      <textarea
+                        value={editOptionsText}
+                        onChange={(e) => setEditOptionsText(e.target.value)}
+                        rows={Math.max(3, editOptionsText.split("\n").length)}
+                        className={inputClass + " resize-none"}
+                      />
+                      <p className="text-[10px] text-amber-700 mt-1">
+                        Order matters: each line maps to the existing option in the same
+                        slot, so picks survive label edits. Adding lines creates new
+                        options; removing lines orphans any picks on them.
+                      </p>
+                    </div>
+                    <div>
+                      <label className={labelClass}>POINTS</label>
+                      <input
+                        type="number"
+                        min={1}
+                        value={editPointsReward}
+                        onChange={(e) =>
+                          setEditPointsReward(Number(e.target.value))
+                        }
+                        className={inputClass}
+                      />
+                    </div>
+                    <div>
+                      <label className={labelClass}>BOUT # (optional)</label>
+                      <input
+                        type="number"
+                        min={1}
+                        value={editBoutNumber}
+                        onChange={(e) => {
+                          const v = e.target.value
+                          setEditBoutNumber(v === "" ? "" : Number(v))
+                        }}
+                        placeholder="—"
+                        className={inputClass}
+                      />
+                    </div>
+                    <div className="sm:col-span-2 flex items-center pt-1">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={editIsUnderdog}
+                          onChange={(e) => setEditIsUnderdog(e.target.checked)}
+                          className="accent-[#FFB800]"
+                        />
+                        <span className="text-[11px] text-gray-700 font-medium">
+                          Underdog (1.25× payout)
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => saveEdit(prop.id)}
+                      disabled={savingEdit}
+                      className="px-4 py-1.5 bg-[#FFB800] text-white text-[11px] font-semibold rounded-md disabled:opacity-50"
                     >
-                      {opt.label}
-                      {isCorrect && " ✓"}
-                    </span>
-                  )
-                })}
-              </div>
+                      {savingEdit ? "Saving…" : "Save"}
+                    </button>
+                    <button
+                      onClick={cancelEdit}
+                      disabled={savingEdit}
+                      className="px-3 py-1.5 text-[11px] text-gray-600 hover:text-gray-900 font-semibold"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )
+            }
 
-              <div className="flex items-center gap-2 text-[10px] text-gray-400 mb-2">
-                <span>{prop.pointsReward} pts</span>
-                {prop.isUnderdog && <span className="text-amber-600 font-semibold">Underdog 1.25×</span>}
-                {prop.boutNumber && <span>· Bout {prop.boutNumber}</span>}
-              </div>
+            return (
+              <div key={prop.id} className="border border-gray-200 rounded-lg p-3">
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[13px] font-bold text-gray-900 leading-snug">
+                      {prop.title}
+                    </p>
+                    {prop.description && (
+                      <p className="text-[11px] text-gray-500 leading-5 mt-0.5">
+                        {prop.description}
+                      </p>
+                    )}
+                  </div>
+                  <span
+                    className={`text-[9px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full border shrink-0 ${STATUS_STYLES[prop.status]}`}
+                  >
+                    {prop.status}
+                  </span>
+                </div>
 
-              {/* Actions per status */}
-              {prop.status === "open" && (
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => handleLock(prop.id)}
-                    className="text-[11px] px-3 py-1 rounded-md border border-amber-200 text-amber-700 hover:bg-amber-50"
-                  >
-                    Lock
-                  </button>
-                  <button
-                    onClick={() => handleVoid(prop.id)}
-                    className="text-[11px] px-3 py-1 rounded-md text-gray-400 hover:text-gray-600"
-                  >
-                    Void
-                  </button>
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                  {prop.options.map((opt) => {
+                    const isCorrect = prop.correctOptionId === opt.id
+                    return (
+                      <span
+                        key={opt.id}
+                        className={`text-[11px] px-2 py-0.5 rounded border ${
+                          isCorrect
+                            ? "bg-green-50 text-green-700 border-green-200 font-semibold"
+                            : "bg-gray-50 text-gray-600 border-gray-200"
+                        }`}
+                      >
+                        {opt.label}
+                        {isCorrect && " ✓"}
+                      </span>
+                    )
+                  })}
+                </div>
+
+                <div className="flex items-center gap-2 text-[10px] text-gray-400 mb-2">
+                  <span>{prop.pointsReward} pts</span>
+                  {prop.isUnderdog && (
+                    <span className="text-amber-600 font-semibold">Underdog 1.25×</span>
+                  )}
+                  {prop.boutNumber && <span>· Bout {prop.boutNumber}</span>}
+                </div>
+
+                {/* Actions per status */}
+                {prop.status === "open" && (
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => startEdit(prop)}
+                      className="text-[11px] px-3 py-1 rounded-md text-blue-600 hover:text-blue-700 font-semibold"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleLock(prop.id)}
+                      className="text-[11px] px-3 py-1 rounded-md border border-amber-200 text-amber-700 hover:bg-amber-50"
+                    >
+                      Lock
+                    </button>
+                    <button
+                      onClick={() => handleVoid(prop.id)}
+                      className="text-[11px] px-3 py-1 rounded-md text-gray-400 hover:text-gray-600"
+                    >
+                      Void
+                    </button>
+                    <button
+                      onClick={() => handleDelete(prop.id)}
+                      className="text-[11px] px-3 py-1 rounded-md text-gray-300 hover:text-red-500 ml-auto"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
+
+                {prop.status === "locked" && (
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-[11px] text-gray-500 mr-1">Settle:</span>
+                    {prop.options.map((opt) => (
+                      <button
+                        key={opt.id}
+                        onClick={() => handleSettle(prop.id, opt.id)}
+                        className="text-[11px] px-2.5 py-1 rounded-md border border-green-200 text-green-700 hover:bg-green-50"
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                    <button
+                      onClick={() => startEdit(prop)}
+                      className="text-[11px] px-3 py-1 rounded-md text-blue-600 hover:text-blue-700 font-semibold"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleUnlock(prop.id, prop.boutNumber)}
+                      className="text-[11px] px-3 py-1 rounded-md text-gray-500 hover:text-amber-700"
+                    >
+                      Reopen
+                    </button>
+                    <button
+                      onClick={() => handleVoid(prop.id)}
+                      className="text-[11px] px-3 py-1 rounded-md text-gray-400 hover:text-gray-600"
+                    >
+                      Void
+                    </button>
+                  </div>
+                )}
+
+                {prop.status === "voided" && (
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => startEdit(prop)}
+                      className="text-[11px] text-blue-600 hover:text-blue-700 font-semibold"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(prop.id)}
+                      className="text-[11px] text-gray-300 hover:text-red-500"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
+
+                {prop.status === "settled" && (
                   <button
                     onClick={() => handleDelete(prop.id)}
-                    className="text-[11px] px-3 py-1 rounded-md text-gray-300 hover:text-red-500 ml-auto"
+                    className="text-[11px] text-gray-300 hover:text-red-500"
                   >
                     Delete
                   </button>
-                </div>
-              )}
-
-              {prop.status === "locked" && (
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-[11px] text-gray-500 mr-1">Settle:</span>
-                  {prop.options.map((opt) => (
-                    <button
-                      key={opt.id}
-                      onClick={() => handleSettle(prop.id, opt.id)}
-                      className="text-[11px] px-2.5 py-1 rounded-md border border-green-200 text-green-700 hover:bg-green-50"
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                  <button
-                    onClick={() => handleUnlock(prop.id, prop.boutNumber)}
-                    className="text-[11px] px-3 py-1 rounded-md text-gray-500 hover:text-amber-700"
-                  >
-                    Reopen
-                  </button>
-                  <button
-                    onClick={() => handleVoid(prop.id)}
-                    className="text-[11px] px-3 py-1 rounded-md text-gray-400 hover:text-gray-600"
-                  >
-                    Void
-                  </button>
-                </div>
-              )}
-
-              {(prop.status === "settled" || prop.status === "voided") && (
-                <button
-                  onClick={() => handleDelete(prop.id)}
-                  className="text-[11px] text-gray-300 hover:text-red-500"
-                >
-                  Delete
-                </button>
-              )}
-            </div>
-          ))}
+                )}
+              </div>
+            )
+          })}
         </div>
       )}
     </section>
@@ -1227,6 +1438,14 @@ function PollsPanel({ fightNight }: { fightNight: FightNight }) {
   const [boutNumber, setBoutNumber] = useState<number | "">("")
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState("")
+
+  // Inline-edit state — when set, the matching poll row swaps to a form.
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editQuestion, setEditQuestion] = useState("")
+  const [editOptionsText, setEditOptionsText] = useState("")
+  const [editBoutNumber, setEditBoutNumber] = useState<number | "">("")
+  const [editError, setEditError] = useState("")
+  const [savingEdit, setSavingEdit] = useState(false)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -1283,6 +1502,62 @@ function PollsPanel({ fightNight }: { fightNight: FightNight }) {
     if (!confirm("Delete this poll? Votes will also be orphaned.")) return
     await deletePoll(fightNight.id, pollId)
     await load()
+  }
+
+  function startEdit(poll: FightNightPoll) {
+    setEditingId(poll.id)
+    setEditQuestion(poll.question)
+    setEditOptionsText(poll.options.map((o) => o.label).join("\n"))
+    setEditBoutNumber(poll.boutNumber ?? "")
+    setEditError("")
+  }
+
+  function cancelEdit() {
+    setEditingId(null)
+    setEditError("")
+  }
+
+  async function saveEdit(pollId: string) {
+    setEditError("")
+    const options = editOptionsText
+      .split("\n")
+      .map((l) => l.trim())
+      .filter(Boolean)
+    if (!editQuestion.trim()) {
+      setEditError("Question required")
+      return
+    }
+    if (options.length < 2) {
+      setEditError("At least 2 options required (one per line)")
+      return
+    }
+    const original = polls.find((p) => p.id === pollId)
+    const optionCountChanged =
+      !!original && options.length !== original.options.length
+    if (
+      optionCountChanged &&
+      original &&
+      original.totalVotes > 0 &&
+      !confirm(
+        `This poll has ${original.totalVotes} vote${original.totalVotes === 1 ? "" : "s"}. Changing the number of options will reset all vote tallies to 0. Continue?`
+      )
+    ) {
+      return
+    }
+    setSavingEdit(true)
+    try {
+      await updatePoll(fightNight.id, pollId, {
+        question: editQuestion,
+        options,
+        boutNumber: typeof editBoutNumber === "number" ? editBoutNumber : null,
+      })
+      setEditingId(null)
+      await load()
+    } catch (e) {
+      setEditError(e instanceof Error ? e.message : "Failed to save")
+    } finally {
+      setSavingEdit(false)
+    }
   }
 
   return (
@@ -1347,56 +1622,139 @@ function PollsPanel({ fightNight }: { fightNight: FightNight }) {
         <p className="text-gray-400 text-sm">No polls yet.</p>
       ) : (
         <div className="space-y-2">
-          {polls.map((poll) => (
-            <div key={poll.id} className="border border-gray-200 rounded-lg p-3">
-              <div className="flex items-start justify-between gap-2 mb-2">
-                <p className="text-[13px] font-bold text-gray-900 flex-1">
-                  {poll.question}
-                </p>
-                <span
-                  className={`text-[9px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full border ${
-                    poll.status === "open"
-                      ? "bg-green-50 text-green-700 border-green-200"
-                      : "bg-gray-100 text-gray-500 border-gray-200"
-                  }`}
+          {polls.map((poll) => {
+            const isEditing = editingId === poll.id
+            if (isEditing) {
+              return (
+                <div
+                  key={poll.id}
+                  className="border border-amber-300 bg-amber-50/30 rounded-lg p-3"
                 >
-                  {poll.status}
-                </span>
-              </div>
-              <div className="flex flex-wrap gap-1.5 mb-2">
-                {poll.options.map((opt, i) => (
+                  <p className="text-[10px] font-bold text-amber-700 tracking-[0.2em] uppercase mb-2">
+                    Editing Poll
+                  </p>
+                  {editError && (
+                    <p className="text-red-600 text-xs mb-2">{editError}</p>
+                  )}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
+                    <div className="sm:col-span-2">
+                      <label className={labelClass}>QUESTION</label>
+                      <input
+                        type="text"
+                        value={editQuestion}
+                        onChange={(e) => setEditQuestion(e.target.value)}
+                        className={inputClass}
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className={labelClass}>
+                        OPTIONS (one per line, 2+ required)
+                      </label>
+                      <textarea
+                        value={editOptionsText}
+                        onChange={(e) => setEditOptionsText(e.target.value)}
+                        rows={Math.max(3, editOptionsText.split("\n").length)}
+                        className={inputClass + " resize-none"}
+                      />
+                      {poll.totalVotes > 0 && (
+                        <p className="text-[10px] text-amber-700 mt-1">
+                          {poll.totalVotes} vote{poll.totalVotes === 1 ? "" : "s"} cast.
+                          Edits to labels keep tallies; adding/removing options resets them.
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <label className={labelClass}>BOUT # (optional)</label>
+                      <input
+                        type="number"
+                        min={1}
+                        value={editBoutNumber}
+                        onChange={(e) => {
+                          const v = e.target.value
+                          setEditBoutNumber(v === "" ? "" : Number(v))
+                        }}
+                        placeholder="—"
+                        className={inputClass}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => saveEdit(poll.id)}
+                      disabled={savingEdit}
+                      className="px-4 py-1.5 bg-[#FFB800] text-white text-[11px] font-semibold rounded-md disabled:opacity-50"
+                    >
+                      {savingEdit ? "Saving…" : "Save"}
+                    </button>
+                    <button
+                      onClick={cancelEdit}
+                      disabled={savingEdit}
+                      className="px-3 py-1.5 text-[11px] text-gray-600 hover:text-gray-900 font-semibold"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )
+            }
+
+            return (
+              <div key={poll.id} className="border border-gray-200 rounded-lg p-3">
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <p className="text-[13px] font-bold text-gray-900 flex-1">
+                    {poll.question}
+                  </p>
                   <span
-                    key={i}
-                    className="text-[11px] text-gray-600 bg-gray-50 border border-gray-200 px-2 py-0.5 rounded"
+                    className={`text-[9px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full border ${
+                      poll.status === "open"
+                        ? "bg-green-50 text-green-700 border-green-200"
+                        : "bg-gray-100 text-gray-500 border-gray-200"
+                    }`}
                   >
-                    {opt.label}
-                    <span className="text-gray-400 ml-1">· {opt.votes}</span>
+                    {poll.status}
                   </span>
-                ))}
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] text-gray-400">
-                  {poll.totalVotes} votes
-                  {poll.boutNumber && ` · Bout ${poll.boutNumber}`}
-                </span>
-                <div className="flex-1" />
-                {poll.status === "open" && (
+                </div>
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                  {poll.options.map((opt, i) => (
+                    <span
+                      key={i}
+                      className="text-[11px] text-gray-600 bg-gray-50 border border-gray-200 px-2 py-0.5 rounded"
+                    >
+                      {opt.label}
+                      <span className="text-gray-400 ml-1">· {opt.votes}</span>
+                    </span>
+                  ))}
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] text-gray-400">
+                    {poll.totalVotes} votes
+                    {poll.boutNumber && ` · Bout ${poll.boutNumber}`}
+                  </span>
+                  <div className="flex-1" />
                   <button
-                    onClick={() => handleClose(poll.id)}
-                    className="text-[10px] text-amber-600 hover:text-amber-700 font-semibold"
+                    onClick={() => startEdit(poll)}
+                    className="text-[10px] text-blue-600 hover:text-blue-700 font-semibold"
                   >
-                    Close
+                    Edit
                   </button>
-                )}
-                <button
-                  onClick={() => handleDelete(poll.id)}
-                  className="text-[10px] text-gray-300 hover:text-red-500 font-semibold"
-                >
-                  Delete
-                </button>
+                  {poll.status === "open" && (
+                    <button
+                      onClick={() => handleClose(poll.id)}
+                      className="text-[10px] text-amber-600 hover:text-amber-700 font-semibold"
+                    >
+                      Close
+                    </button>
+                  )}
+                  <button
+                    onClick={() => handleDelete(poll.id)}
+                    className="text-[10px] text-gray-300 hover:text-red-500 font-semibold"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </section>
