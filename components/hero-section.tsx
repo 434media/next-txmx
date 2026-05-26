@@ -1,7 +1,6 @@
 "use client"
 
 import Image from "next/image"
-import FightNightPopup from "./fight-night-popup"
 
 export default function HeroSection() {
 
@@ -63,9 +62,6 @@ export default function HeroSection() {
           />
         </div>
       </div>
-
-      {/* Fight Night corner popup — homepage only, self-manages its delay + dismissal */}
-      <FightNightPopup />
 
       <style jsx>{`
         @keyframes float {
