@@ -87,10 +87,11 @@ export default function LiveRibbon({ activeFightNight }: LiveRibbonProps) {
         ? liveBout.fighter2Name
         : null
 
-  const onFightNightPage = pathname === "/events/fight-night"
+  const fnPath = `/fight-nights/${activeFightNight.slug || activeFightNight.id}`
+  const onFightNightPage = pathname === fnPath
   const jumpHref = onFightNightPage
     ? `#bout-${liveBout.boutNumber}`
-    : `/events/fight-night#bout-${liveBout.boutNumber}`
+    : `${fnPath}#bout-${liveBout.boutNumber}`
 
   return (
     <div

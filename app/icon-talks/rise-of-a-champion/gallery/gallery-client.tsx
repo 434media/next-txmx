@@ -136,7 +136,7 @@ export default function GalleryClient() {
           <div className="max-w-2xl mx-auto">
             {/* Back Link */}
             <Link
-              href="/events/rise-of-a-champion"
+              href="/icon-talks/rise-of-a-champion"
               className="inline-flex items-center gap-2 text-white/60 hover:text-[#FFB800] text-xs font-semibold tracking-widest mb-8 transition-colors relative z-30 leading-relaxed uppercase"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -236,7 +236,7 @@ export default function GalleryClient() {
           <div className="max-w-7xl mx-auto">
             {/* Back Link */}
             <Link
-              href="/events/rise-of-a-champion"
+              href="/icon-talks/rise-of-a-champion"
               className="inline-flex items-center gap-2 text-white/60 hover:text-[#FFB800] text-xs font-semibold tracking-widest mb-8 transition-colors leading-relaxed uppercase"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

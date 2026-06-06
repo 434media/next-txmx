@@ -68,8 +68,8 @@ export async function sendSubscriptionConfirmation(
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center" style="padding:8px 0;">
-                    <a href="https://www.txmxboxing.com/scorecard" style="display:inline-block;background:#f59e0b;color:#000;font-size:14px;font-weight:600;letter-spacing:0.5px;text-decoration:none;padding:14px 32px;border-radius:8px;">
-                      Open Scorecard
+                    <a href="https://www.txmxboxing.com/leaderboard" style="display:inline-block;background:#f59e0b;color:#000;font-size:14px;font-weight:600;letter-spacing:0.5px;text-decoration:none;padding:14px 32px;border-radius:8px;">
+                      View Leaderboard
                     </a>
                   </td>
                 </tr>

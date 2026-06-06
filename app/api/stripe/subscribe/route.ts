@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     if (user.subscriptionStatus === "active" && user.stripeCustomerId) {
       const portalSession = await stripe.billingPortal.sessions.create({
         customer: user.stripeCustomerId,
-        return_url: `${request.nextUrl.origin}/scorecard`,
+        return_url: `${request.nextUrl.origin}/leaderboard`,
       })
       return NextResponse.json({ url: portalSession.url })
     }
@@ -62,8 +62,8 @@ export async function POST(request: NextRequest) {
           quantity: 1,
         },
       ],
-      success_url: `${request.nextUrl.origin}/scorecard?subscribed=true`,
-      cancel_url: `${request.nextUrl.origin}/scorecard`,
+      success_url: `${request.nextUrl.origin}/leaderboard?subscribed=true`,
+      cancel_url: `${request.nextUrl.origin}/leaderboard`,
       subscription_data: {
         metadata: { firebaseUid: decoded.uid },
       },

@@ -165,7 +165,7 @@ function CheckoutForm() {
             Leaderboard, Rewards Store, and the complete TXMX economy.
           </p>
           <button
-            onClick={() => router.push("/scorecard")}
+            onClick={() => router.push("/leaderboard")}
             className="px-8 py-3 bg-white text-black font-bold uppercase tracking-wider hover:bg-zinc-200 transition-colors"
           >
             Open Scorecard

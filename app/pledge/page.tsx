@@ -54,8 +54,8 @@ export default async function PledgePage() {
         <nav className="mb-8">
           <ol className="flex items-center gap-2 text-[11px] font-semibold tracking-widest uppercase text-white/40">
             <li>
-              <Link href="/scorecard" className="hover:text-white/70 transition-colors">
-                Scorecard
+              <Link href="/leaderboard" className="hover:text-white/70 transition-colors">
+                Leaderboard
               </Link>
             </li>
             <li className="text-white/15">/</li>

@@ -26,7 +26,6 @@ export default function SlideOutModal({ isOpen, onClose, onAuthClick, activeFigh
   const [isAnimating, setIsAnimating] = useState(false)
   const [socialOpen, setSocialOpen] = useState(false)
   const [eventsOpen, setEventsOpen] = useState(false)
-  const [comingSoonOpen, setComingSoonOpen] = useState(false)
   const { user, profile, signOut } = useAuth()
 
   useEffect(() => {
@@ -84,7 +83,21 @@ export default function SlideOutModal({ isOpen, onClose, onAuthClick, activeFigh
 
             {/* Navigation Links */}
             <div className="flex flex-col space-y-4 w-full">
-              {/* Events Dropdown */}
+              {/* Fight Nights */}
+              <Link
+                href="/fight-nights"
+                onClick={onClose}
+                className="group block w-full py-4 text-left border-b border-white/10 hover:-translate-y-0.5 transition-transform duration-200"
+              >
+                <span className="text-white text-sm font-semibold tracking-widest leading-relaxed group-hover:text-white/70 transition-colors">
+                  FIGHT NIGHTS
+                </span>
+                <div className="text-white/30 text-xs font-medium tracking-wide leading-relaxed mt-0.5">
+                  Play live · pick winners · climb the board
+                </div>
+              </Link>
+
+              {/* Icon Talks Dropdown */}
               <div>
                 <button
                   onClick={() => setEventsOpen(!eventsOpen)}
@@ -93,7 +106,7 @@ export default function SlideOutModal({ isOpen, onClose, onAuthClick, activeFigh
                 >
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-white text-sm font-semibold tracking-widest leading-relaxed group-hover:text-white/70 transition-colors">
-                      EVENTS
+                      ICON TALKS
                     </span>
                     <svg
                       className={`w-3 h-3 shrink-0 text-white/60 transition-transform duration-200 ${eventsOpen ? "rotate-180" : ""}`}
@@ -105,22 +118,14 @@ export default function SlideOutModal({ isOpen, onClose, onAuthClick, activeFigh
                     </svg>
                   </div>
                   <div className="text-white/30 text-xs font-medium tracking-wide leading-relaxed mt-0.5">
-                    Fight cards & series
+                    The TXMX Iconic Series
                   </div>
                 </button>
 
                 {eventsOpen && (
                   <div className="pt-2 pb-1 space-y-1">
                     <Link
-                      href="/events/fight-night"
-                      onClick={onClose}
-                      className="block px-4 py-3 rounded-md hover:bg-white/5 transition-colors"
-                    >
-                      <p className="text-white text-xs font-semibold tracking-wide leading-relaxed mb-1">FIGHT NIGHT</p>
-                      <p className="text-white/45 text-[11px] font-medium leading-relaxed">BOXR STATION PRESENTS</p>
-                    </Link>
-                    <Link
-                      href="/events/rise-of-a-champion"
+                      href="/icon-talks/rise-of-a-champion"
                       onClick={onClose}
                       className="block px-4 py-3 rounded-md hover:bg-white/5 transition-colors"
                     >
@@ -146,63 +151,6 @@ export default function SlideOutModal({ isOpen, onClose, onAuthClick, activeFigh
                 </div>
                 <div className="text-white/30 text-xs font-medium tracking-wide leading-relaxed mt-0.5">434media.com</div>
               </a>
-
-              {/* Coming Soon Dropdown */}
-              <div>
-                <button
-                  onClick={() => setComingSoonOpen(!comingSoonOpen)}
-                  aria-expanded={comingSoonOpen}
-                  className="group block w-full py-4 text-left border-b border-white/10 hover:-translate-y-0.5 transition-transform duration-200"
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="text-white text-sm font-semibold tracking-widest leading-relaxed group-hover:text-white/70 transition-colors">COMING SOON</span>
-                    <svg
-                      className={`w-3 h-3 shrink-0 text-white/60 transition-transform duration-200 ${comingSoonOpen ? "rotate-180" : ""}`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </div>
-                  <div className="text-white/30 text-xs font-medium tracking-wide leading-relaxed mt-0.5">A look at what's next</div>
-                </button>
-
-                {comingSoonOpen && (
-                  <div className="pt-2 pb-1 space-y-1">
-                    <Link
-                      href="/scorecard"
-                      onClick={onClose}
-                      className="block px-4 py-3 rounded-md hover:bg-white/5 transition-colors"
-                    >
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className="text-white text-xs font-semibold tracking-wide leading-relaxed">SCORECARD</p>
-                        <span className="inline-flex items-center text-amber-400 text-[9px] font-bold tracking-[0.2em] uppercase px-1.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/25 leading-none">
-                          Preview
-                        </span>
-                      </div>
-                      <p className="text-white/45 text-[11px] font-medium leading-relaxed">
-                        Skill-based fan game. Pick winners, earn points, climb ranks.
-                      </p>
-                    </Link>
-                    <Link
-                      href="/8count"
-                      onClick={onClose}
-                      className="block px-4 py-3 rounded-md hover:bg-white/5 transition-colors"
-                    >
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className="text-white text-xs font-semibold tracking-wide leading-relaxed">THE 8 COUNT</p>
-                        <span className="inline-flex items-center text-amber-400 text-[9px] font-bold tracking-[0.2em] uppercase px-1.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/25 leading-none">
-                          Preview
-                        </span>
-                      </div>
-                      <p className="text-white/45 text-[11px] font-medium leading-relaxed">
-                        Editorial feed for fight fans. Stories, recaps, breakdowns.
-                      </p>
-                    </Link>
-                  </div>
-                )}
-              </div>
 
               {/* FOLLOW US Dropdown */}
               <div>

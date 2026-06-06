@@ -159,25 +159,8 @@ export default function Footer() {
               Events
             </p>
             <ul className="space-y-2.5">
-              <FooterLink href="/events/fight-night">Fight Night</FooterLink>
-              <FooterLink href="/events/rise-of-a-champion">Rise of a Champion</FooterLink>
-            </ul>
-          </div>
-
-          {/* Coming Soon */}
-          <div>
-            <p className="text-white text-[11px] font-bold tracking-[0.25em] uppercase mb-4">
-              Coming Soon
-            </p>
-            <ul className="space-y-2.5">
-              <FooterLink href="/scorecard">
-                Scorecard
-                <PreviewBadge />
-              </FooterLink>
-              <FooterLink href="/8count">
-                The 8 Count
-                <PreviewBadge />
-              </FooterLink>
+              <FooterLink href="/fight-nights">Fight Nights</FooterLink>
+              <FooterLink href="/icon-talks/rise-of-a-champion">Rise of a Champion</FooterLink>
             </ul>
           </div>
 
@@ -277,10 +260,3 @@ function FooterLink({
   )
 }
 
-function PreviewBadge() {
-  return (
-    <span className="inline-flex items-center text-amber-400 text-[9px] font-bold tracking-[0.2em] uppercase px-1.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/25 leading-none">
-      Preview
-    </span>
-  )
-}

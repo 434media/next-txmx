@@ -66,7 +66,7 @@ export default function ClientLayout({
   }, [])
   const isAdmin = pathname?.startsWith('/admin')
   const isFanos = pathname === '/fanos'
-  const isFightNight = pathname?.startsWith('/events/fight-night')
+  const isFightNight = pathname?.startsWith('/fight-nights')
 
   const openModal = () => setIsModalOpen(true)
   const closeModal = () => setIsModalOpen(false)

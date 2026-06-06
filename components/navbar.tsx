@@ -24,14 +24,6 @@ interface NavbarProps {
   activeFightNight?: FightNight | null
 }
 
-function PreviewPill() {
-  return (
-    <span className="inline-flex items-center text-amber-400 text-[9px] font-bold tracking-[0.2em] uppercase px-1.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/25 leading-none">
-      Preview
-    </span>
-  )
-}
-
 function StatusPill({ status }: { status: "announced" | "doors_open" | "live" | "completed" }) {
   const label =
     status === "live"
@@ -52,11 +44,9 @@ export default function Navbar({ onMenuClick, activeFightNight = null }: NavbarP
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const [isEventsOpen, setIsEventsOpen] = useState(false)
-  const [isComingSoonOpen, setIsComingSoonOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const userMenuRef = useRef<HTMLDivElement>(null)
   const eventsRef = useRef<HTMLDivElement>(null)
-  const comingSoonRef = useRef<HTMLDivElement>(null)
   const { user, profile, loading, signOut } = useAuth()
 
   useEffect(() => {
@@ -69,9 +59,6 @@ export default function Navbar({ onMenuClick, activeFightNight = null }: NavbarP
       }
       if (eventsRef.current && !eventsRef.current.contains(event.target as Node)) {
         setIsEventsOpen(false)
-      }
-      if (comingSoonRef.current && !comingSoonRef.current.contains(event.target as Node)) {
-        setIsComingSoonOpen(false)
       }
     }
     document.addEventListener("mousedown", handleClickOutside)
@@ -101,13 +88,21 @@ export default function Navbar({ onMenuClick, activeFightNight = null }: NavbarP
 
           {/* Desktop Navigation Links - Hidden on mobile */}
           <div className="hidden md:flex items-center space-x-8">
-            {/* EVENTS Dropdown */}
+            {/* FIGHT NIGHTS */}
+            <Link
+              href="/fight-nights"
+              className="text-white text-xs font-semibold tracking-widest leading-relaxed hover:text-white/70 transition-colors duration-200"
+            >
+              FIGHT NIGHTS
+            </Link>
+
+            {/* ICON TALKS Dropdown */}
             <div ref={eventsRef} className="relative">
               <button
                 onClick={() => setIsEventsOpen(!isEventsOpen)}
                 className="text-white text-xs font-semibold tracking-widest leading-relaxed hover:text-white/70 transition-colors duration-200 flex items-center gap-1.5"
               >
-                EVENTS
+                ICON TALKS
                 <ChevronDown
                   className={`w-3.5 h-3.5 text-white/60 transition-transform duration-200 ${isEventsOpen ? "rotate-180" : ""}`}
                   strokeWidth={2.25}
@@ -118,29 +113,15 @@ export default function Navbar({ onMenuClick, activeFightNight = null }: NavbarP
                 <div className="absolute right-0 mt-3 w-72 bg-black/95 backdrop-blur-md border border-white/10 rounded-lg shadow-2xl overflow-hidden">
                   <div className="py-1">
                     <Link
-                      href="/events/fight-night"
+                      href="/icon-talks/rise-of-a-champion"
                       onClick={() => setIsEventsOpen(false)}
-                      className="block px-4 py-3 hover:bg-white/5 transition-colors duration-200 border-b border-white/5"
-                    >
-                      <div className="flex items-center gap-2 mb-1">
-                          <p className="text-white text-xs font-semibold tracking-wide leading-relaxed mb-1">
-                            FIGHT NIGHT
-                        </p>
-                      </div>
-                      <p className="text-white/45 text-[11px] font-medium leading-relaxed">
-                        BOXR STATION PRESENTS
-                      </p>
-                    </Link>
-                    <Link
-                      href="/events/rise-of-a-champion"
-                      onClick={() => setIsEventsOpen(false)}
-                      className="block px-4 py-3 hover:bg-white/5 transition-colors duration-200 border-b border-white/5"
+                      className="block px-4 py-3 hover:bg-white/5 transition-colors duration-200"
                     >
                       <p className="text-white text-xs font-semibold tracking-wide leading-relaxed mb-1">
                         RISE OF A CHAMPION
                       </p>
                       <p className="text-white/45 text-[11px] font-medium leading-relaxed">
-                        ICONTALKS x TXMX BOXING 
+                        ICONTALKS x TXMX BOXING
                       </p>
                     </Link>
                   </div>
@@ -160,57 +141,6 @@ export default function Navbar({ onMenuClick, activeFightNight = null }: NavbarP
                 strokeWidth={2.25}
               />
             </a>
-
-            {/* COMING SOON Dropdown */}
-            <div ref={comingSoonRef} className="relative">
-              <button
-                onClick={() => setIsComingSoonOpen(!isComingSoonOpen)}
-                className="text-white text-xs font-semibold tracking-widest leading-relaxed hover:text-white/70 transition-colors duration-200 flex items-center gap-1.5"
-              >
-                COMING SOON
-                <ChevronDown
-                  className={`w-3.5 h-3.5 text-white/60 transition-transform duration-200 ${isComingSoonOpen ? "rotate-180" : ""}`}
-                  strokeWidth={2.25}
-                />
-              </button>
-
-              {isComingSoonOpen && (
-                <div className="absolute right-0 mt-3 w-72 bg-black/95 backdrop-blur-md border border-white/10 rounded-lg shadow-2xl overflow-hidden">
-                  <div className="py-1">
-                    <Link
-                      href="/scorecard"
-                      onClick={() => setIsComingSoonOpen(false)}
-                      className="block px-4 py-3 hover:bg-white/5 transition-colors duration-200"
-                    >
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-white text-xs font-semibold tracking-wide leading-relaxed">
-                          SCORECARD
-                        </span>
-                        <PreviewPill />
-                      </div>
-                      <p className="text-white/45 text-[11px] font-medium leading-relaxed">
-                        Skill-based fan game. Pick winners, earn points, climb ranks.
-                      </p>
-                    </Link>
-                    <Link
-                      href="/8count"
-                      onClick={() => setIsComingSoonOpen(false)}
-                      className="block px-4 py-3 hover:bg-white/5 transition-colors duration-200 border-t border-white/5"
-                    >
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-white text-xs font-semibold tracking-wide leading-relaxed">
-                          THE 8 COUNT
-                        </span>
-                        <PreviewPill />
-                      </div>
-                      <p className="text-white/45 text-[11px] font-medium leading-relaxed">
-                        Editorial feed for fight fans. Stories, recaps, breakdowns.
-                      </p>
-                    </Link>
-                  </div>
-                </div>
-              )}
-            </div>
 
             {/* FOLLOW US Dropdown */}
             <div ref={dropdownRef} className="relative">
@@ -427,7 +357,7 @@ function TonightPanel({
       )}
 
       <Link
-        href="/events/fight-night"
+        href="/fight-nights"
         onClick={onNavigate}
         className="inline-flex items-center gap-1 text-white/75 text-[11px] font-semibold tracking-wide hover:text-amber-400 transition-colors"
       >

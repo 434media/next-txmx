@@ -6,10 +6,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: baseUrl, lastModified: now, changeFrequency: 'weekly', priority: 1 },
-    { url: `${baseUrl}/8count`, lastModified: now, changeFrequency: 'daily', priority: 0.95 },
     { url: `${baseUrl}/fighters`, lastModified: now, changeFrequency: 'daily', priority: 0.9 },
-    { url: `${baseUrl}/events`, lastModified: now, changeFrequency: 'daily', priority: 0.9 },
-    { url: `${baseUrl}/scorecard`, lastModified: now, changeFrequency: 'weekly', priority: 0.85 },
+    { url: `${baseUrl}/fight-nights`, lastModified: now, changeFrequency: 'daily', priority: 0.95 },
     { url: `${baseUrl}/picks`, lastModified: now, changeFrequency: 'daily', priority: 0.8 },
     { url: `${baseUrl}/polls`, lastModified: now, changeFrequency: 'daily', priority: 0.8 },
     { url: `${baseUrl}/leaderboard`, lastModified: now, changeFrequency: 'daily', priority: 0.8 },
@@ -23,47 +21,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/fanos`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
     { url: `${baseUrl}/checkout`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
     {
-      url: `${baseUrl}/events/rise-of-a-champion`,
+      url: `${baseUrl}/icon-talks/rise-of-a-champion`,
       lastModified: now,
       changeFrequency: 'weekly',
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/events/rise-of-a-champion/gallery`,
+      url: `${baseUrl}/icon-talks/rise-of-a-champion/gallery`,
       lastModified: now,
       changeFrequency: 'weekly',
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/events/rise-of-a-champion/rsvp`,
+      url: `${baseUrl}/icon-talks/rise-of-a-champion/rsvp`,
       lastModified: now,
       changeFrequency: 'weekly',
       priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/events/fight-night`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.85,
     },
   ]
 
   const dynamicRoutes: MetadataRoute.Sitemap = []
-
-  try {
-    const { getAllPublishedSlugs } = await import('./actions/eight-count')
-    const slugs = await getAllPublishedSlugs()
-    for (const slug of slugs) {
-      dynamicRoutes.push({
-        url: `${baseUrl}/8count/${slug}`,
-        lastModified: now,
-        changeFrequency: 'weekly',
-        priority: 0.7,
-      })
-    }
-  } catch {
-    // If Firestore is unavailable at build time, skip dynamic 8count entries.
-  }
 
   try {
     const { getFighters } = await import('./actions/fighters')
@@ -82,19 +59,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   try {
-    const { getEvents } = await import('./actions/events')
-    const events = await getEvents()
-    for (const e of events) {
-      if (!e.id) continue
+    const { getFightNights } = await import('./actions/fightnight')
+    const nights = await getFightNights()
+    for (const fn of nights) {
       dynamicRoutes.push({
-        url: `${baseUrl}/events/${e.id}`,
+        url: `${baseUrl}/fight-nights/${fn.slug || fn.id}`,
         lastModified: now,
         changeFrequency: 'weekly',
-        priority: 0.7,
+        priority: 0.8,
       })
     }
   } catch {
-    // If Firestore is unavailable at build time, skip dynamic event entries.
+    // If Firestore is unavailable at build time, skip dynamic fight-night entries.
   }
 
   return [...staticRoutes, ...dynamicRoutes]

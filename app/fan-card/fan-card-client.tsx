@@ -226,8 +226,8 @@ export default function FanCardClient() {
         <nav className="mb-8">
           <ol className="flex items-center gap-2 text-[11px] font-semibold tracking-widest uppercase text-white/40">
             <li>
-              <Link href="/scorecard" className="hover:text-white/70 transition-colors">
-                Scorecard
+              <Link href="/leaderboard" className="hover:text-white/70 transition-colors">
+                Leaderboard
               </Link>
             </li>
             <li className="text-white/15">/</li>
@@ -413,7 +413,6 @@ export default function FanCardClient() {
             { href: '/picks', label: 'Make Picks', icon: '🎯' },
             { href: '/leaderboard', label: 'Leaderboard', icon: '🏆' },
             { href: '/pledge', label: 'Gym Pledge', icon: '🏋️' },
-            { href: '/scorecard', label: 'Scorecard', icon: '📊' },
           ].map((link) => (
             <Link
               key={link.href}

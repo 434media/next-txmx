@@ -35,6 +35,25 @@ function pickDocId(userId: string, boutNumber: number): string {
   return `${userId}_${boutNumber}`
 }
 
+/**
+ * Public deep-link to a specific bout on the night's dedicated page. Uses the
+ * slug when available and falls back to the fight night id (the [slug] route
+ * resolves both), so push notifications land on /fight-nights/<slug>#bout-N.
+ */
+async function fightNightBoutPath(
+  fightNightId: string,
+  boutNumber: number
+): Promise<string> {
+  let slugOrId = fightNightId
+  try {
+    const fn = await getFightNight(fightNightId)
+    if (fn?.slug) slugOrId = fn.slug
+  } catch {
+    // fall back to the id
+  }
+  return `/fight-nights/${slugOrId}#bout-${boutNumber}`
+}
+
 // ── Place a Pick ──────────────────────────────────────────
 
 export async function placeFightNightPick(
@@ -296,7 +315,7 @@ export async function recordFightNightBoutResult(
           ? boutData?.fighter2Name || 'Blue corner'
           : null
     const tag = `bout-${fightNightId}-${boutNumber}`
-    const url = `/events/fight-night#bout-${boutNumber}`
+    const url = await fightNightBoutPath(fightNightId, boutNumber)
 
     if (winnerUserIds.length > 0) {
       await sendPushToUsers(
@@ -380,11 +399,12 @@ export async function markBoutLive(
         bout?.fighter1Name && bout?.fighter2Name
           ? `${bout.fighter1Name} vs ${bout.fighter2Name}`
           : `Bout ${boutNumber}`
+      const liveUrl = await fightNightBoutPath(fightNightId, boutNumber)
       await sendPushToUsers(
         userIds,
         `Bout ${boutNumber} is live`,
         `${matchup} — your pick is on the line.`,
-        `/events/fight-night#bout-${boutNumber}`,
+        liveUrl,
         `bout-${fightNightId}-${boutNumber}`
       )
     }

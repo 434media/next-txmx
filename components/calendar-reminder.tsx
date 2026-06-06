@@ -45,7 +45,7 @@ export default function CalendarReminder({
       `DTEND:${dtEnd}`,
       `SUMMARY:${escapeICS(title)}`,
       `LOCATION:${escapeICS(location)}`,
-      `DESCRIPTION:${escapeICS(`TXMX Boxing Event\\n${title}\\n${location}\\n\\nMore info: https://www.txmxboxing.com/events`)}`,
+      `DESCRIPTION:${escapeICS(`TXMX Boxing Event\\n${title}\\n${location}\\n\\nMore info: https://www.txmxboxing.com/fight-nights`)}`,
       "BEGIN:VALARM",
       "TRIGGER:-P1D",
       "ACTION:DISPLAY",

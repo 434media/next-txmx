@@ -52,7 +52,7 @@ export default function ImageModal({ image, onClose, onPrevious, onNext }: Image
   }
 
   const handleShare = async () => {
-    const shareUrl = 'https://www.txmxboxing.com/events/rise-of-a-champion/gallery'
+    const shareUrl = 'https://www.txmxboxing.com/icon-talks/rise-of-a-champion/gallery'
     const shareTitle = 'Rise of a Champion Event Gallery | TXMX Boxing'
     const shareText = 'Check out exclusive photos from the Rise of a Champion celebration honoring San Antonio\'s boxing legends! 🥊✨'
     
@@ -84,7 +84,7 @@ export default function ImageModal({ image, onClose, onPrevious, onNext }: Image
   }
 
   const handleSocialShare = (platform: string) => {
-    const shareUrl = 'https://www.txmxboxing.com/events/rise-of-a-champion/gallery'
+    const shareUrl = 'https://www.txmxboxing.com/icon-talks/rise-of-a-champion/gallery'
     const shareTitle = 'Rise of a Champion Event Gallery | TXMX Boxing'
     const shareText = 'Check out exclusive photos from the Rise of a Champion celebration honoring San Antonio\'s boxing legends! 🥊✨'
     

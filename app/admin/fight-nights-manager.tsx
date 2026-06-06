@@ -103,7 +103,7 @@ export default function FightNightsManager() {
     setLoading(true)
     try {
       // Use the SAME selection logic as the public landing page so admin
-      // and `/events/fight-night` always resolve to the same fight night.
+      // and the featured night on `/fight-nights` resolve to the same event.
       // Only seeds the selection on first load — admin can switch manually.
       const [data, active] = await Promise.all([
         getFightNights(),
@@ -1763,6 +1763,17 @@ function PollsPanel({ fightNight }: { fightNight: FightNight }) {
 
 // ── Metadata Panel ──────────────────────────────────────────
 
+/** Client-side slug normalizer — mirrors the server's `slugify` for live
+ * preview/suggestions. The server remains the source of truth for uniqueness. */
+function clientSlugify(input: string): string {
+  return (input || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 60)
+    .replace(/-+$/g, "")
+}
+
 function MetadataPanel({
   fightNight,
   onChange,
@@ -1771,6 +1782,7 @@ function MetadataPanel({
   onChange: () => void
 }) {
   const [edit, setEdit] = useState({
+    slug: fightNight.slug,
     title: fightNight.title,
     subtitle: fightNight.subtitle,
     venue: fightNight.venue,
@@ -1835,6 +1847,37 @@ function MetadataPanel({
             placeholder="e.g. Members Only Fight Night"
             className={inputClass}
           />
+        </div>
+        <div className="sm:col-span-2">
+          <label className={labelClass}>PUBLIC URL SLUG</label>
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              value={edit.slug}
+              onChange={(e) =>
+                setEdit((d) => ({ ...d, slug: clientSlugify(e.target.value) }))
+              }
+              placeholder="auto-generated from title + date"
+              className={inputClass}
+            />
+            <button
+              type="button"
+              onClick={() =>
+                setEdit((d) => ({
+                  ...d,
+                  slug: clientSlugify([d.title, d.date].filter(Boolean).join(" ")),
+                }))
+              }
+              className="shrink-0 px-3 py-2 text-[11px] font-semibold text-gray-600 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors whitespace-nowrap"
+            >
+              Suggest
+            </button>
+          </div>
+          <p className="mt-1 text-[11px] text-gray-400">
+            /fight-nights/
+            <span className="text-gray-600 font-medium">{edit.slug || "…"}</span>
+            {" · "}must be unique; clearing it regenerates from the title on save.
+          </p>
         </div>
         <div>
           <label className={labelClass}>SUBTITLE / EYEBROW</label>

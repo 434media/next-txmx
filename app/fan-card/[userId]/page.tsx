@@ -66,10 +66,10 @@ export default async function PublicFanCardPage({ params }: { params: Promise<{ 
           <h2 className="text-2xl font-black uppercase tracking-tight mb-4">Profile Not Found</h2>
           <p className="text-white/50 text-sm font-medium mb-6">This fan card doesn&apos;t exist or the user hasn&apos;t joined yet.</p>
           <Link
-            href="/scorecard"
+            href="/leaderboard"
             className="text-amber-400 text-xs font-bold tracking-wider uppercase hover:text-amber-300 transition-colors"
           >
-            ← Back to Scorecard
+            ← Back to Leaderboard
           </Link>
         </div>
       </div>
@@ -206,10 +206,10 @@ export default async function PublicFanCardPage({ params }: { params: Promise<{ 
         {/* CTA */}
         <div className="mt-8 text-center">
           <Link
-            href="/scorecard"
+            href="/leaderboard"
             className="inline-block bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/60 hover:text-white px-6 py-3 rounded-xl text-xs font-bold tracking-[0.2em] uppercase transition-all"
           >
-            Join the Scorecard
+            View Leaderboard
           </Link>
         </div>
       </div>

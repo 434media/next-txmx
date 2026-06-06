@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Rise of a Champion - Iconic Series | TXMX Boxing',
     description: 'An exclusive invitation-only experience honoring four of San Antonio\'s greatest boxing champions. Filmed live for national distribution. Sponsorship packages available.',
-    url: 'https://www.txmxboxing.com/events/rise-of-a-champion',
+    url: 'https://www.txmxboxing.com/icon-talks/rise-of-a-champion',
     siteName: 'TXMX Boxing',
     locale: 'en_US',
     type: 'website',
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: 'https://www.txmxboxing.com/events/rise-of-a-champion',
+    canonical: 'https://www.txmxboxing.com/icon-talks/rise-of-a-champion',
   },
 }
 

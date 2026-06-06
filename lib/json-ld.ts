@@ -52,7 +52,7 @@ export function generateEventJsonLd() {
       priceCurrency: 'USD',
       lowPrice: 10000,
       highPrice: 100000,
-      url: `${SITE_URL}/events/rise-of-a-champion`,
+      url: `${SITE_URL}/icon-talks/rise-of-a-champion`,
     },
   }
 }
@@ -72,7 +72,7 @@ export function generateBreadcrumbJsonLd(pageName: string) {
         '@type': 'ListItem',
         position: 2,
         name: 'Iconic Series',
-        item: `${SITE_URL}/events/rise-of-a-champion`,
+        item: `${SITE_URL}/icon-talks/rise-of-a-champion`,
       },
       ...(pageName === 'RSVP'
         ? [
@@ -80,7 +80,7 @@ export function generateBreadcrumbJsonLd(pageName: string) {
               '@type': 'ListItem',
               position: 3,
               name: 'RSVP',
-              item: `${SITE_URL}/events/rise-of-a-champion/rsvp`,
+              item: `${SITE_URL}/icon-talks/rise-of-a-champion/rsvp`,
             },
           ]
         : pageName === 'Gallery'
@@ -89,7 +89,7 @@ export function generateBreadcrumbJsonLd(pageName: string) {
                 '@type': 'ListItem',
                 position: 3,
                 name: 'Gallery',
-                item: `${SITE_URL}/events/rise-of-a-champion/gallery`,
+                item: `${SITE_URL}/icon-talks/rise-of-a-champion/gallery`,
               },
             ]
           : []),
@@ -153,17 +153,15 @@ export function generateWebSiteJsonLd() {
 
 export function generateSiteNavigationJsonLd() {
   const items: Array<{ name: string; url: string }> = [
-    { name: 'The 8 Count', url: `${SITE_URL}/8count` },
+    { name: 'Fight Nights', url: `${SITE_URL}/fight-nights` },
     { name: 'Fighters', url: `${SITE_URL}/fighters` },
-    { name: 'Events', url: `${SITE_URL}/events` },
     { name: 'Compare', url: `${SITE_URL}/compare` },
     { name: 'Polls', url: `${SITE_URL}/polls` },
     { name: 'Prop Picks', url: `${SITE_URL}/picks` },
     { name: 'Gym Pledge', url: `${SITE_URL}/pledge` },
     { name: 'Leaderboard', url: `${SITE_URL}/leaderboard` },
-    { name: 'Scorecard', url: `${SITE_URL}/scorecard` },
     { name: 'Black Card', url: `${SITE_URL}/checkout` },
-    { name: 'Rise of a Champion', url: `${SITE_URL}/events/rise-of-a-champion` },
+    { name: 'Rise of a Champion', url: `${SITE_URL}/icon-talks/rise-of-a-champion` },
   ]
   return {
     '@context': 'https://schema.org',
@@ -214,47 +212,6 @@ export function generateFighterJsonLd(fighter: FighterLike, slug: string) {
     ),
     affiliation: { '@id': `${SITE_URL}#organization` },
     birthDate: fighter.dateOfBirth || undefined,
-  }
-}
-
-type EventLike = {
-  promoter?: string
-  venue?: string
-  city?: string
-  date: string
-  eventNumber?: string
-  boutCount?: number
-}
-
-export function generateBoxingEventJsonLd(event: EventLike, eventId: string) {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'SportsEvent',
-    '@id': `${SITE_URL}/events/${eventId}#event`,
-    name: event.promoter
-      ? `${event.promoter} — Texas Boxing`
-      : 'TDLR-Sanctioned Texas Boxing Event',
-    sport: 'Boxing',
-    startDate: event.date,
-    url: `${SITE_URL}/events/${eventId}`,
-    location: {
-      '@type': 'Place',
-      name: event.venue || event.city || 'Texas, USA',
-      address: {
-        '@type': 'PostalAddress',
-        addressLocality: event.city || undefined,
-        addressRegion: 'TX',
-        addressCountry: 'US',
-      },
-    },
-    organizer: {
-      '@type': 'Organization',
-      name: event.promoter || 'TXMX Boxing',
-      url: SITE_URL,
-    },
-    description: `TDLR-sanctioned boxing event${event.boutCount ? ` featuring ${event.boutCount} bouts` : ''}${
-      event.city ? ` in ${event.city}, TX` : ''
-    }. Records verified against Texas Department of Licensing and Regulation filings.`,
   }
 }
 

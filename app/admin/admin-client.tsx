@@ -1,37 +1,20 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState } from 'react'
 import type { Fighter } from '../../lib/types/fighter'
 import { useAdminAuth } from './admin-auth-gate'
 import AddFighterForm from './add-fighter-form'
 import FighterList from './fighter-list'
-import TDLRImport from './tdlr-import'
 import VenueList from './venue-list'
 import GymList from './gym-list'
 import PromoterList from './promoter-list'
-import PropManager from './prop-manager'
 import EventList from './event-list'
-import PollManager from './poll-manager'
-import EconomyGovernor from './economy-governor'
 import NotificationSender from './notification-sender'
-import EightCountManager from './eight-count-manager'
 import FeatureFlagsManager from './feature-flags'
-import QuestManager from './quest-manager'
-import RewardsManager from './rewards-manager'
-import SeasonManager from './season-manager'
-import CommunityManager from './community-manager'
-import AbuseDashboard from './abuse-dashboard'
-import VerifiedManager from './verified-manager'
-import LegacyRankManager from './legacy-rank-manager'
-import SettlementManager from './settlement-manager'
 import FightNightsManager from './fight-nights-manager'
 import type { VenueData } from '../actions/venues'
 import type { EventPromoter, PromoterData, TXMXEvent } from '../actions/events'
 import type { GymData } from '../actions/gyms'
-import { getFighters } from '../actions/fighters'
-import { getVenues } from '../actions/venues'
-import { getEventPromoters, getPromoters } from '../actions/events'
-import { getGyms } from '../actions/gyms'
 
 interface AdminClientProps {
   initialFighters: Fighter[]
@@ -42,24 +25,16 @@ interface AdminClientProps {
   initialEvents: TXMXEvent[]
 }
 
-type Tab = 'list' | 'add' | 'venues' | 'gyms' | 'promoters' | 'events' | 'props' | 'polls' | 'economy' | 'notifications' | 'tdlr' | 'eightcount' | 'flags' | 'quests' | 'rewards' | 'seasons' | 'community' | 'abuse' | 'verified' | 'legacy' | 'settlement' | 'fnights'
+type Tab = 'list' | 'add' | 'venues' | 'gyms' | 'promoters' | 'events' | 'notifications' | 'flags' | 'fnights'
 
 interface NavItem {
   key: Tab
   label: string
 }
 
-interface NavSubsection {
-  label: string
-  items: NavItem[]
-}
-
 interface NavSection {
   label: string
-  /** Flat list of items (used when the section has no subgroups) */
-  items?: NavItem[]
-  /** Grouped subsections (used when the section nests, e.g. SCORECARD) */
-  subsections?: NavSubsection[]
+  items: NavItem[]
 }
 
 const NAV_SECTIONS: NavSection[] = [
@@ -69,48 +44,12 @@ const NAV_SECTIONS: NavSection[] = [
   },
   {
     label: 'Scorecard',
-    subsections: [
-      {
-        label: 'Database',
-        items: [
-          { key: 'list', label: 'Fighters' },
-          { key: 'venues', label: 'Venues' },
-          { key: 'gyms', label: 'Gyms' },
-          { key: 'promoters', label: 'Promoters' },
-          { key: 'events', label: 'Events' },
-        ],
-      },
-      {
-        label: 'Engagement',
-        items: [
-          { key: 'props', label: 'Props' },
-          { key: 'settlement', label: 'Settlement' },
-          { key: 'polls', label: 'Polls' },
-          { key: 'quests', label: 'Quests' },
-          { key: 'rewards', label: 'Rewards' },
-          { key: 'seasons', label: 'Seasons' },
-          { key: 'economy', label: 'Economy' },
-        ],
-      },
-      {
-        label: 'Content',
-        items: [
-          { key: 'eightcount', label: '8 Count' },
-          { key: 'community', label: 'Community' },
-        ],
-      },
-      {
-        label: 'Moderation',
-        items: [
-          { key: 'abuse', label: 'Abuse Prevention' },
-          { key: 'verified', label: 'Verified Accounts' },
-          { key: 'legacy', label: 'Legacy Rank' },
-        ],
-      },
-      {
-        label: 'Tools',
-        items: [{ key: 'tdlr', label: 'Import TDLR' }],
-      },
+    items: [
+      { key: 'list', label: 'Fighters' },
+      { key: 'venues', label: 'Venues' },
+      { key: 'gyms', label: 'Gyms' },
+      { key: 'promoters', label: 'Promoters' },
+      { key: 'events', label: 'Events' },
     ],
   },
   {
@@ -163,7 +102,7 @@ function NavLink({
 export default function AdminClient({ initialFighters, initialVenues, eventPromoters: initialEventPromoters, initialPromoterDocs, initialGyms, initialEvents }: AdminClientProps) {
   const [fighters, setFighters] = useState<Fighter[]>(initialFighters)
   const [venues, setVenues] = useState<VenueData[]>(initialVenues)
-  const [promoters, setPromoters] = useState<EventPromoter[]>(initialEventPromoters)
+  const [promoters] = useState<EventPromoter[]>(initialEventPromoters)
   const [promoterDocs, setPromoterDocs] = useState<PromoterData[]>(initialPromoterDocs)
   const [gymDocs, setGymDocs] = useState<GymData[]>(initialGyms)
   const [eventDocs, setEventDocs] = useState<TXMXEvent[]>(initialEvents)
@@ -185,21 +124,6 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
       prev.map(f => (f.id === updated.id ? updated : f)).sort((a, b) => a.lastName.localeCompare(b.lastName))
     )
   }
-
-  const handleImportComplete = useCallback(async () => {
-    const [newFighters, newVenues, newPromoters, newPromoterDocs, newGyms] = await Promise.all([
-      getFighters(),
-      getVenues(),
-      getEventPromoters(),
-      getPromoters(),
-      getGyms(),
-    ])
-    setFighters(newFighters)
-    setVenues(newVenues)
-    setPromoters(newPromoters)
-    setPromoterDocs(newPromoterDocs)
-    setGymDocs(newGyms)
-  }, [])
 
   const handleVenueUpdated = (updated: VenueData) => {
     setVenues(prev => prev.map(v => v.id === updated.id ? updated : v))
@@ -254,23 +178,10 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
       ...promoters.map(p => p.name),
     ]).size,
     events: eventDocs.length,
-    props: 0,
-    settlement: 0,
     fnights: 0,
-    polls: 0,
-    economy: 0,
     notifications: 0,
     add: 0,
-    tdlr: 0,
-    eightcount: 0,
     flags: 0,
-    quests: 0,
-    rewards: 0,
-    seasons: 0,
-    community: 0,
-    abuse: 0,
-    verified: 0,
-    legacy: 0,
   }
 
   const pageTitle: Record<Tab, string> = {
@@ -279,23 +190,10 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
     gyms: 'Gyms',
     promoters: 'Promoters',
     events: 'Events',
-    eightcount: 'The 8 Count',
-    props: 'Prop Picks',
-    settlement: 'Match Settlement',
     fnights: 'Fight Nights',
-    polls: 'Fan Polls',
-    economy: 'Economy Governor',
     notifications: 'Push Notifications',
     add: 'Add Fighter',
-    tdlr: 'Import TDLR',
     flags: 'Feature Flags',
-    quests: 'Quests & Badges',
-    rewards: 'Rewards Store',
-    seasons: 'Seasons',
-    community: 'Community',
-    abuse: 'Abuse Prevention',
-    verified: 'Verified Accounts',
-    legacy: 'Legacy Rank',
   }
 
   const handleNav = (key: Tab) => {
@@ -348,45 +246,17 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
                   <p className="px-2 mb-2 text-[11px] font-semibold text-gray-500 tracking-tight leading-none">
                     {section.label}
                   </p>
-
-                  {/* Flat section */}
-                  {section.items && (
-                    <div className="space-y-0.5">
-                      {section.items.map((item) => (
-                        <NavLink
-                          key={item.key}
-                          item={item}
-                          isActive={activeTab === item.key}
-                          count={counts[item.key]}
-                          onClick={() => handleNav(item.key)}
-                        />
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Nested subsections (e.g. SCORECARD) */}
-                  {section.subsections && (
-                    <div className="space-y-4 mt-1">
-                      {section.subsections.map((sub) => (
-                        <div key={sub.label}>
-                          <p className="px-2 mb-1 text-[10px] font-medium text-gray-400 tracking-tight leading-none uppercase">
-                            {sub.label}
-                          </p>
-                          <div className="space-y-0.5">
-                            {sub.items.map((item) => (
-                              <NavLink
-                                key={item.key}
-                                item={item}
-                                isActive={activeTab === item.key}
-                                count={counts[item.key]}
-                                onClick={() => handleNav(item.key)}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  <div className="space-y-0.5">
+                    {section.items.map((item) => (
+                      <NavLink
+                        key={item.key}
+                        item={item}
+                        isActive={activeTab === item.key}
+                        count={counts[item.key]}
+                        onClick={() => handleNav(item.key)}
+                      />
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>
@@ -443,38 +313,12 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
               <PromoterList fighters={fighters} eventPromoters={promoters} promoterDocs={promoterDocs} onUpdate={handlePromoterDocUpdated} onDelete={handlePromoterDocDeleted} />
             ) : activeTab === 'events' ? (
               <EventList events={eventDocs} fighters={fighters} onAdd={handleEventAdded} onUpdate={handleEventUpdated} onDelete={handleEventDeleted} />
-            ) : activeTab === 'props' ? (
-              <PropManager events={initialEvents} />
-            ) : activeTab === 'settlement' ? (
-              <SettlementManager events={initialEvents} />
             ) : activeTab === 'fnights' ? (
               <FightNightsManager />
-            ) : activeTab === 'eightcount' ? (
-              <EightCountManager />
-            ) : activeTab === 'polls' ? (
-              <PollManager />
-            ) : activeTab === 'economy' ? (
-              <EconomyGovernor />
             ) : activeTab === 'notifications' ? (
               <NotificationSender />
-            ) : activeTab === 'flags' ? (
-              <FeatureFlagsManager />
-            ) : activeTab === 'quests' ? (
-              <QuestManager />
-            ) : activeTab === 'rewards' ? (
-              <RewardsManager />
-            ) : activeTab === 'seasons' ? (
-              <SeasonManager />
-            ) : activeTab === 'community' ? (
-              <CommunityManager />
-            ) : activeTab === 'abuse' ? (
-              <AbuseDashboard />
-            ) : activeTab === 'verified' ? (
-              <VerifiedManager />
-            ) : activeTab === 'legacy' ? (
-              <LegacyRankManager />
             ) : (
-              <TDLRImport onImportComplete={handleImportComplete} />
+              <FeatureFlagsManager />
             )}
           </div>
         </main>

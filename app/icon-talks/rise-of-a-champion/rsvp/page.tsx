@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'RSVP - Rise of a Champion | San Antonio, TX',
     description: 'Confirm your attendance for this exclusive invitation-only celebration of San Antonio\'s boxing legends. Filmed live for the nationally distributed Rise of a Champion series. One night. Invitation only.',
-    url: 'https://www.txmxboxing.com/events/rise-of-a-champion/rsvp',
+    url: 'https://www.txmxboxing.com/icon-talks/rise-of-a-champion/rsvp',
     siteName: 'TXMX Boxing',
     locale: 'en_US',
     type: 'website',
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: 'https://www.txmxboxing.com/events/rise-of-a-champion/rsvp',
+    canonical: 'https://www.txmxboxing.com/icon-talks/rise-of-a-champion/rsvp',
   },
 }
 

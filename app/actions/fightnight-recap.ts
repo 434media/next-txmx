@@ -91,6 +91,7 @@ export async function sendFightNightRecap(
           date: fightNight.date || null,
           venue: fightNight.venue || null,
           city: fightNight.city || null,
+          recapUrl: `https://www.txmxboxing.com/fight-nights/${fightNight.slug || fightNightId}`,
           position,
           totalPlayers: standings.length,
           points: s.points || 0,
@@ -137,6 +138,7 @@ interface RecapEmailData {
   date: string | null
   venue: string | null
   city: string | null
+  recapUrl: string
   position: number
   totalPlayers: number
   points: number
@@ -269,7 +271,7 @@ function renderRecapEmail(d: RecapEmailData): string {
           <!-- CTA -->
           <tr>
             <td align="center" style="padding:32px 0 0;">
-              <a href="https://www.txmxboxing.com/events/fight-night" style="display:inline-block;padding:12px 24px;background-color:#f59e0b;color:#000;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;text-decoration:none;border-radius:8px;">
+              <a href="${d.recapUrl}" style="display:inline-block;padding:12px 24px;background-color:#f59e0b;color:#000;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;text-decoration:none;border-radius:8px;">
                 See the full leaderboard
               </a>
             </td>

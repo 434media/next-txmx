@@ -12,6 +12,9 @@ export type FightNightStatus =
 
 export interface FightNight {
   id: string
+  /** URL slug for the public page, e.g. "boxr-station-jan-2026". Unique
+   * across fight nights; auto-derived from title + date on create. */
+  slug: string
   /** Short title shown in hero, e.g. "Members Only Fight Night" */
   title: string
   /** Eyebrow above title, e.g. "BOXR Station Presents" */
@@ -75,6 +78,7 @@ function boutsCol(fightNightId: string) {
 
 function emptyDefaults(): Omit<FightNight, 'id' | 'createdAt' | 'updatedAt'> {
   return {
+    slug: '',
     title: '',
     subtitle: '',
     venue: '',
@@ -93,11 +97,60 @@ function emptyDefaults(): Omit<FightNight, 'id' | 'createdAt' | 'updatedAt'> {
   }
 }
 
+// ── Slug helpers ─────────────────────────────────────────
+
+/** Normalize an arbitrary string into a URL-safe slug fragment. */
+function slugify(input: string): string {
+  return (input || '')
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[̀-ͯ]/g, '') // strip accents
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60)
+    .replace(/-+$/g, '')
+}
+
+/** Build a slug base from a fight night's identity fields (title + date). */
+function buildSlugBase(data: { title?: string; venue?: string; date?: string }): string {
+  const name = slugify(data.title || data.venue || '')
+  const datePart = data.date ? slugify(data.date) : ''
+  const base = [name, datePart].filter(Boolean).join('-')
+  return base || 'fight-night'
+}
+
+/**
+ * Return a slug guaranteed unique across the `fightNights` collection. If the
+ * base is taken by another doc, append `-2`, `-3`, … until free. `excludeId`
+ * lets a doc keep its own slug on update without colliding with itself.
+ */
+async function ensureUniqueSlug(base: string, excludeId?: string): Promise<string> {
+  const root = base || 'fight-night'
+  let candidate = root
+  let n = 1
+  // Equality queries on `slug` use the auto-created single-field index.
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const snap = await firestore
+      .collection('fightNights')
+      .where('slug', '==', candidate)
+      .limit(1)
+      .get()
+    const taken = !snap.empty && snap.docs[0].id !== excludeId
+    if (!taken) return candidate
+    n += 1
+    candidate = `${root}-${n}`
+  }
+}
+
 export async function createFightNight(
   data: Partial<Omit<FightNight, 'id' | 'createdAt' | 'updatedAt'>>
 ): Promise<FightNight> {
   const now = new Date().toISOString()
-  const payload = { ...emptyDefaults(), ...data, createdAt: now, updatedAt: now }
+  const merged = { ...emptyDefaults(), ...data }
+  const base = merged.slug ? slugify(merged.slug) : buildSlugBase(merged)
+  merged.slug = await ensureUniqueSlug(base)
+  const payload = { ...merged, createdAt: now, updatedAt: now }
   const ref = await firestore.collection('fightNights').add(payload)
   return { id: ref.id, ...payload }
 }
@@ -106,10 +159,18 @@ export async function updateFightNight(
   id: string,
   data: Partial<Omit<FightNight, 'id' | 'createdAt'>>
 ): Promise<void> {
-  await fightNightRef(id).update({
+  const patch: Record<string, unknown> = {
     ...data,
     updatedAt: new Date().toISOString(),
-  })
+  }
+  // When the slug is part of the patch, sanitize it and guarantee it stays
+  // unique (excluding this doc). An empty/blank slug regenerates from the
+  // night's identity fields so the public URL is never broken.
+  if (typeof data.slug === 'string') {
+    const base = slugify(data.slug) || buildSlugBase(data)
+    patch.slug = await ensureUniqueSlug(base, id)
+  }
+  await fightNightRef(id).update(patch)
 }
 
 export async function deleteFightNight(id: string): Promise<void> {
@@ -122,6 +183,7 @@ function mapDoc(doc: FirebaseFirestore.DocumentSnapshot): FightNight {
   const data = doc.data() || {}
   return {
     id: doc.id,
+    slug: data.slug || '',
     title: data.title || '',
     subtitle: data.subtitle || '',
     venue: data.venue || '',
@@ -155,6 +217,67 @@ export async function getFightNight(id: string): Promise<FightNight | null> {
   const snap = await fightNightRef(id).get()
   if (!snap.exists) return null
   return mapDoc(snap)
+}
+
+/**
+ * Resolve a fight night by its public slug. Falls back to treating the param
+ * as a raw doc id, so legacy/id-based URLs keep working after the slug
+ * migration. Returns null if neither matches.
+ */
+export async function getFightNightBySlug(slug: string): Promise<FightNight | null> {
+  if (!slug) return null
+  const snap = await firestore
+    .collection('fightNights')
+    .where('slug', '==', slug)
+    .limit(1)
+    .get()
+  if (!snap.empty) return mapDoc(snap.docs[0])
+  return getFightNight(slug)
+}
+
+/**
+ * Upcoming fight nights for the public calendar — `announced` events dated
+ * today or later, soonest first. (Live / doors-open events are surfaced
+ * separately as the "featured" night on the hub.)
+ */
+export async function getUpcomingFightNights(): Promise<FightNight[]> {
+  const today = new Date().toISOString().slice(0, 10)
+  const all = await getFightNights()
+  return all
+    .filter((d) => d.status === 'announced' && !!d.date && d.date >= today)
+    .sort((a, b) => a.date.localeCompare(b.date))
+}
+
+/**
+ * Past fight nights for the public archive — `completed` events, most recent
+ * first. `getFightNights()` already orders by date desc.
+ */
+export async function getPastFightNights(limit = 12): Promise<FightNight[]> {
+  const all = await getFightNights()
+  return all.filter((d) => d.status === 'completed').slice(0, limit)
+}
+
+/**
+ * One-time migration: assign a unique slug to every fight night that lacks
+ * one. Idempotent — re-running skips nights that already have a slug. Safe to
+ * trigger from an admin button or a one-off server invocation.
+ */
+export async function backfillFightNightSlugs(): Promise<{ updated: number }> {
+  const snap = await firestore.collection('fightNights').get()
+  let updated = 0
+  for (const doc of snap.docs) {
+    const data = doc.data() || {}
+    if (data.slug) continue
+    const base = buildSlugBase({
+      title: data.title,
+      venue: data.venue,
+      date: data.date,
+    })
+    const slug = await ensureUniqueSlug(base, doc.id)
+    await doc.ref.update({ slug, updatedAt: new Date().toISOString() })
+    updated += 1
+  }
+  return { updated }
 }
 
 /**
