@@ -14,9 +14,9 @@ type OnboardingQuest = QuestDefinition & {
 
 const QUEST_LINKS: Record<string, { href: string; cta: string }> = {
   daily_login: { href: '/leaderboard', cta: 'Done' },
-  poll_vote: { href: '/polls', cta: 'Vote Now' },
+  poll_vote: { href: '/fight-nights', cta: 'Vote Now' },
   share: { href: '/leaderboard', cta: 'Share' },
-  prediction_placed: { href: '/picks', cta: 'Make Pick' },
+  prediction_placed: { href: '/fight-nights', cta: 'Make Pick' },
 }
 
 export default function OnboardingChecklist() {

@@ -410,7 +410,7 @@ export default function FanCardClient() {
         {/* ═══ Quick Links ═══ */}
         <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
-            { href: '/picks', label: 'Make Picks', icon: '🎯' },
+            { href: '/fight-nights', label: 'Fight Nights', icon: '🥊' },
             { href: '/leaderboard', label: 'Leaderboard', icon: '🏆' },
             { href: '/pledge', label: 'Gym Pledge', icon: '🏋️' },
           ].map((link) => (

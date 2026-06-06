@@ -4,6 +4,7 @@ import { notFound } from "next/navigation"
 import { getFightNightBySlug, getBouts } from "../../actions/fightnight"
 import { getStandings } from "../../actions/fightnight-standings"
 import { getPrizes } from "../../actions/fightnight-prizes"
+import { generateFightNightJsonLd } from "../../../lib/json-ld"
 import FightNightClient from "./fight-night-client"
 import HeroCta from "./hero-cta"
 import RecapView from "./recap-view"
@@ -71,6 +72,14 @@ export default async function FightNightSlugPage({ params }: PageProps) {
 
   const bouts = await getBouts(fightNight.id)
 
+  const jsonLd = generateFightNightJsonLd(fightNight)
+  const jsonLdScript = (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+    />
+  )
+
   // Completed nights render a static, server-rendered recap so the final
   // results + leaderboard are visible to everyone (standings/prizes are
   // auth-gated client-side, so we fetch them with the admin SDK here).
@@ -80,12 +89,15 @@ export default async function FightNightSlugPage({ params }: PageProps) {
       getPrizes(fightNight.id),
     ])
     return (
-      <RecapView
-        fightNight={fightNight}
-        bouts={bouts}
-        standings={standings}
-        prizes={prizes}
-      />
+      <>
+        {jsonLdScript}
+        <RecapView
+          fightNight={fightNight}
+          bouts={bouts}
+          standings={standings}
+          prizes={prizes}
+        />
+      </>
     )
   }
 
@@ -94,6 +106,7 @@ export default async function FightNightSlugPage({ params }: PageProps) {
 
   return (
     <main className="relative min-h-dvh bg-black font-sans">
+      {jsonLdScript}
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 pt-[calc(6rem+var(--live-ribbon-h,0px))] pb-20">
         <div className="fn-page-grid lg:grid lg:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_440px] lg:gap-12 xl:gap-16 lg:items-start">
           {/* ── LEFT / Mobile first — scrolling content */}

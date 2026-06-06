@@ -46,3 +46,6 @@ next-env.d.ts
 
 # Playwright local browser profile/cache
 /.playwright-boxrec-profile
+
+# Local Firestore purge/backup snapshots (one-off scripts)
+/scripts/backups

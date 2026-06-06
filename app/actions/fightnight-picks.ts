@@ -169,6 +169,35 @@ export async function getUserPicks(
   return picks.sort((a, b) => a.boutNumber - b.boutNumber)
 }
 
+/**
+ * Every bout pick a user has placed across all fight nights, newest nights
+ * first. Powers the fan card's all-time pick record. Iterates the (small)
+ * fight-nights collection rather than a collectionGroup query, so it needs no
+ * extra index and never collides with the legacy top-level `picks` collection.
+ */
+export async function getAllUserPicks(
+  userId: string,
+  max = 500
+): Promise<FightNightPick[]> {
+  if (!userId) return []
+  const nights = await firestore
+    .collection('fightNights')
+    .orderBy('date', 'desc')
+    .get()
+  const out: FightNightPick[] = []
+  for (const night of nights.docs) {
+    const snap = await night.ref
+      .collection('picks')
+      .where('userId', '==', userId)
+      .get()
+    for (const d of snap.docs) {
+      out.push(d.data() as FightNightPick)
+      if (out.length >= max) return out
+    }
+  }
+  return out
+}
+
 export async function getPicksForBout(
   fightNightId: string,
   boutNumber: number

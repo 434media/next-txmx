@@ -8,8 +8,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: baseUrl, lastModified: now, changeFrequency: 'weekly', priority: 1 },
     { url: `${baseUrl}/fighters`, lastModified: now, changeFrequency: 'daily', priority: 0.9 },
     { url: `${baseUrl}/fight-nights`, lastModified: now, changeFrequency: 'daily', priority: 0.95 },
-    { url: `${baseUrl}/picks`, lastModified: now, changeFrequency: 'daily', priority: 0.8 },
-    { url: `${baseUrl}/polls`, lastModified: now, changeFrequency: 'daily', priority: 0.8 },
     { url: `${baseUrl}/leaderboard`, lastModified: now, changeFrequency: 'daily', priority: 0.8 },
     { url: `${baseUrl}/compare`, lastModified: now, changeFrequency: 'weekly', priority: 0.75 },
     { url: `${baseUrl}/pledge`, lastModified: now, changeFrequency: 'weekly', priority: 0.75 },

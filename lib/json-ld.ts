@@ -156,8 +156,6 @@ export function generateSiteNavigationJsonLd() {
     { name: 'Fight Nights', url: `${SITE_URL}/fight-nights` },
     { name: 'Fighters', url: `${SITE_URL}/fighters` },
     { name: 'Compare', url: `${SITE_URL}/compare` },
-    { name: 'Polls', url: `${SITE_URL}/polls` },
-    { name: 'Prop Picks', url: `${SITE_URL}/picks` },
     { name: 'Gym Pledge', url: `${SITE_URL}/pledge` },
     { name: 'Leaderboard', url: `${SITE_URL}/leaderboard` },
     { name: 'Black Card', url: `${SITE_URL}/checkout` },
@@ -212,6 +210,58 @@ export function generateFighterJsonLd(fighter: FighterLike, slug: string) {
     ),
     affiliation: { '@id': `${SITE_URL}#organization` },
     birthDate: fighter.dateOfBirth || undefined,
+  }
+}
+
+type FightNightLike = {
+  slug?: string
+  id?: string
+  title?: string
+  subtitle?: string
+  venue?: string
+  city?: string
+  address?: string
+  date?: string
+  doorsAt?: string
+  firstBellAt?: string
+  flyerUrl?: string
+}
+
+/**
+ * SportsEvent structured data for a single fight night's public page.
+ * Mixed attendance mode — fans play in person or online.
+ */
+export function generateFightNightJsonLd(fn: FightNightLike) {
+  const url = `${SITE_URL}/fight-nights/${fn.slug || fn.id || ''}`
+  const startDate = fn.firstBellAt || fn.doorsAt || fn.date || undefined
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'SportsEvent',
+    '@id': `${url}#event`,
+    name: fn.title || 'Fight Night',
+    sport: 'Boxing',
+    url,
+    ...(startDate ? { startDate } : {}),
+    eventStatus: 'https://schema.org/EventScheduled',
+    eventAttendanceMode: 'https://schema.org/MixedEventAttendanceMode',
+    ...(fn.flyerUrl ? { image: [fn.flyerUrl] } : {}),
+    ...(fn.subtitle ? { description: fn.subtitle } : {}),
+    location: {
+      '@type': 'Place',
+      name: fn.venue || fn.city || 'TBA',
+      address: {
+        '@type': 'PostalAddress',
+        ...(fn.address ? { streetAddress: fn.address } : {}),
+        ...(fn.city ? { addressLocality: fn.city } : {}),
+        addressRegion: 'TX',
+        addressCountry: 'US',
+      },
+    },
+    organizer: {
+      '@type': 'Organization',
+      name: 'TXMX Boxing',
+      url: SITE_URL,
+    },
   }
 }
 

@@ -5,7 +5,7 @@ import { getUserByUid } from './users'
 import { getSPAccount } from './skill-points'
 import { getCreditAccount } from './credits'
 import { getLPAccount } from './loyalty-points'
-import { getUserPicks } from './props'
+import { getAllUserPicks } from './fightnight-picks'
 import { getUserBadges, getUserQuestProgress, getBadges, getActiveQuests, type BadgeDefinition, type UserBadge, type QuestDefinition, type QuestProgress } from './quests'
 
 /* ── Resolve gym ID → name ── */
@@ -60,7 +60,7 @@ export async function getFanCardData(userId: string): Promise<FanCardData | null
       getSPAccount(userId),
       getCreditAccount(userId),
       getLPAccount(userId),
-      getUserPicks(userId, 500),
+      getAllUserPicks(userId, 500),
       getUserBadges(userId),
       getBadges(),
       getUserQuestProgress(userId),
@@ -151,7 +151,7 @@ export async function getFanCardSummary(userId: string): Promise<FanCardSummary 
     getSPAccount(userId),
     getCreditAccount(userId),
     getLPAccount(userId),
-    getUserPicks(userId, 500),
+    getAllUserPicks(userId, 500),
     getUserBadges(userId),
   ])
 
