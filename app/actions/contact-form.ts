@@ -1,5 +1,7 @@
 'use server'
 
+import { firestore } from '../../lib/firebase-admin'
+
 export async function submitCustomPackageInquiry(formData: {
   name: string
   company: string
@@ -7,11 +9,14 @@ export async function submitCustomPackageInquiry(formData: {
   phone: string
   message: string
 }) {
-  // In a real application, this would save to a database or send an email
-  console.log('Custom package inquiry received:', formData)
-  
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000))
-  
+  await firestore.collection('customPackageInquiries').add({
+    name: formData.name || '',
+    company: formData.company || '',
+    email: (formData.email || '').trim().toLowerCase(),
+    phone: formData.phone || '',
+    message: formData.message || '',
+    createdAt: new Date().toISOString(),
+  })
+
   return { success: true }
 }

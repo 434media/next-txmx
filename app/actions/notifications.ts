@@ -39,7 +39,7 @@ export async function getVapidPublicKey() {
 export async function sendPushToAll(title: string, body: string, url: string = '/') {
   const vapidPublic = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
   const vapidPrivate = process.env.VAPID_PRIVATE_KEY
-  const vapidEmail = process.env.VAPID_EMAIL || 'mailto:admin@txmxboxing.com'
+  const vapidEmail = process.env.VAPID_EMAIL || 'mailto:guna@434media.com'
 
   if (!vapidPublic || !vapidPrivate) {
     return { success: false, error: 'VAPID keys not configured' }
@@ -97,7 +97,7 @@ export async function sendPushToUsers(
 ) {
   const vapidPublic = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
   const vapidPrivate = process.env.VAPID_PRIVATE_KEY
-  const vapidEmail = process.env.VAPID_EMAIL || 'mailto:admin@txmxboxing.com'
+  const vapidEmail = process.env.VAPID_EMAIL || 'mailto:guna@434media.com'
 
   if (!vapidPublic || !vapidPrivate) {
     return { success: false, sent: 0, failed: 0, error: 'VAPID keys not configured' }

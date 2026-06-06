@@ -3,10 +3,28 @@ import type { GalleryImage, GalleryCategory } from './gallery-images'
 
 const isDev = process.env.NODE_ENV === 'development'
 
-// Shared Google Auth — used by all Drive operations
+// Shared Google Auth — used by all Drive operations.
+// Preferred: the consolidated GOOGLE_SERVICE_ACCOUNT_KEY (full SA JSON).
+// Fallback (transitional): the legacy GOOGLE_SERVICE_ACCOUNT_EMAIL + GOOGLE_PRIVATE_KEY.
 export const getAuth = () => {
-  const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL
-  const privateKey = process.env.GOOGLE_PRIVATE_KEY
+  let email: string | undefined
+  let privateKey: string | undefined
+
+  const json = process.env.GOOGLE_SERVICE_ACCOUNT_KEY
+  if (json) {
+    try {
+      const sa = JSON.parse(json)
+      email = sa.client_email
+      privateKey = sa.private_key
+    } catch {
+      // Malformed JSON — fall through to the legacy vars below.
+    }
+  }
+
+  if (!email || !privateKey) {
+    email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL
+    privateKey = process.env.GOOGLE_PRIVATE_KEY
+  }
 
   if (!email || !privateKey) {
     throw new Error('Missing Google service account credentials')
@@ -15,6 +33,8 @@ export const getAuth = () => {
   return new google.auth.GoogleAuth({
     credentials: {
       client_email: email,
+      // No-op when the key already has real newlines (JSON path); converts
+      // escaped \n for the legacy env-var path.
       private_key: privateKey.replace(/\\n/g, '\n'),
     },
     scopes: ['https://www.googleapis.com/auth/drive.readonly'],

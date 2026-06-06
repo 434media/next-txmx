@@ -1,83 +1,42 @@
 import { NextResponse } from "next/server"
-import Airtable from "airtable"
+import { firestore } from "../../../lib/firebase-admin"
 
-const airtableBaseId = process.env.AIRTABLE_ICONIC_SERIES_BASE_ID
-const airtableApiKey = process.env.AIRTABLE_API_KEY
-
-let base: any = null
-
-if (airtableBaseId && airtableApiKey) {
-  base = new Airtable({ apiKey: airtableApiKey }).base(airtableBaseId)
-}
-
+/**
+ * Gallery unlock capture → `txmx` Firestore. Shares the `iconicSeriesRsvps`
+ * collection (keyed by normalized email) with the RSVP flow: an existing RSVP
+ * just gets its 8 Count subscription flag set; otherwise a new record is made.
+ */
 export async function POST(request: Request) {
   try {
     const { firstName, lastName, email, subscribeToNewsletter } = await request.json()
-
-    console.log("[Gallery Access] Received submission:", { firstName, lastName, email, subscribeToNewsletter })
 
     if (!firstName || !lastName || !email) {
       return NextResponse.json({ error: "Please fill in all required fields" }, { status: 400 })
     }
 
-    if (!base) {
-      console.error("Airtable configuration is missing")
-      return NextResponse.json(
-        { error: "Server configuration error. Please check Airtable settings." },
-        { status: 500 },
-      )
-    }
+    const normalized = email.trim().toLowerCase()
+    const ref = firestore.collection("iconicSeriesRsvps").doc(normalized)
+    const now = new Date().toISOString()
+    const snap = await ref.get()
+    const isExistingUser = snap.exists
 
-    console.log("[Gallery Access] Checking for existing RSVP record...")
-
-    // Properly escape email for Airtable formula: escape backslashes first, then single quotes
-    const escapedEmail = email.replace(/\\/g, "\\\\").replace(/'/g, "\\'")
-
-    const existingRecords = await base("RSVP")
-      .select({
-        filterByFormula: `{Email} = '${escapedEmail}'`,
-        maxRecords: 1,
-      })
-      .firstPage()
-
-    if (existingRecords && existingRecords.length > 0) {
-      console.log("[Gallery Access] Found existing RSVP record:", existingRecords[0].id)
-
+    if (isExistingUser) {
       if (subscribeToNewsletter) {
-        await base("RSVP").update([
-          {
-            id: existingRecords[0].id,
-            fields: {
-              "Subscribe to 8 Count": "Yes",
-            },
-          },
-        ])
-        console.log("[Gallery Access] Updated existing RSVP record with 8 Count subscription")
+        await ref.set({ subscribeTo8Count: "Yes", updatedAt: now }, { merge: true })
       }
     } else {
-      console.log("[Gallery Access] Creating new RSVP record...")
-
-      await base("RSVP").create([
-        {
-          fields: {
-            "First Name": firstName,
-            "Last Name": lastName,
-            Email: email,
-            "Subscribe to 8 Count": subscribeToNewsletter ? "Yes" : "No",
-          },
-        },
-      ])
-
-      console.log("[Gallery Access] Created new RSVP record")
+      await ref.set({
+        firstName,
+        lastName,
+        email: normalized,
+        subscribeTo8Count: subscribeToNewsletter ? "Yes" : "No",
+        createdAt: now,
+        updatedAt: now,
+      })
     }
 
-    console.log("[Gallery Access] Successfully processed gallery access request")
-
     return NextResponse.json(
-      {
-        message: "Access granted successfully",
-        isExistingUser: existingRecords && existingRecords.length > 0,
-      },
+      { message: "Access granted successfully", isExistingUser },
       { status: 200 },
     )
   } catch (error) {
