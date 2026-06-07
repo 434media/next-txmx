@@ -1,12 +1,12 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { getLeaderboard } from "../actions/users"
+import { getSeasonStandings } from "../actions/season-standings"
 import LeaderboardClient from "./leaderboard-client"
 
 export const metadata: Metadata = {
   title: "Leaderboard | Top-Ranked TXMX Fans",
   description:
-    "See who's climbing the ranks on TXMX Boxing. Skill Points leaderboard — the best pickers in Texas boxing, ranked by accuracy and engagement.",
+    "The all-time TXMX Boxing fan game leaderboard — the best pickers across every fight night, ranked by points earned from winning picks and props.",
   openGraph: {
     title: "Leaderboard | TXMX Boxing",
     description:
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 }
 
 export default async function LeaderboardPage() {
-  const leaderboard = await getLeaderboard(100)
+  const leaderboard = await getSeasonStandings(100)
 
   return (
     <main className="relative min-h-screen bg-black font-sans pt-24 pb-16">
@@ -48,8 +48,8 @@ export default async function LeaderboardPage() {
             Leaderboard
           </h1>
           <p className="text-white/50 text-sm sm:text-base leading-relaxed max-w-xl">
-            The best pickers in Texas boxing — ranked by Skill Points earned
-            through accurate predictions.
+            The best pickers in Texas boxing — ranked by points earned across
+            every fight night from winning picks and props.
           </p>
         </div>
         <LeaderboardClient entries={leaderboard} />

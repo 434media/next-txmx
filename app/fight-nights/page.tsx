@@ -1,12 +1,21 @@
 import type { Metadata } from "next"
-import Link from "next/link"
 import {
   getActiveFightNight,
   getUpcomingFightNights,
   getPastFightNights,
+  getLastCompletedFightNight,
 } from "../actions/fightnight"
-import { getLeaderboard } from "../actions/users"
+import { getSeasonStandings } from "../actions/season-standings"
+import { getStandings } from "../actions/fightnight-standings"
 import FightNightCard from "../../components/fight-nights/fight-night-card"
+import HubAccountCta from "../../components/fight-nights/hub-account-cta"
+import HubHowItWorks from "../../components/fight-nights/hub-how-it-works"
+import IntroHero from "../../components/fight-nights/intro-hero"
+import HeroFeatured from "../../components/fight-nights/hero-featured"
+import PrizeReveal from "../../components/fight-nights/prize-reveal"
+import RecapSpotlight from "../../components/fight-nights/recap-spotlight"
+import SeasonBoard from "../../components/fight-nights/season-board"
+import HubFaq from "../../components/fight-nights/hub-faq"
 
 export const metadata: Metadata = {
   title: "Fight Nights | TXMX Boxing",
@@ -35,129 +44,88 @@ export const metadata: Metadata = {
 export const revalidate = 300
 
 export default async function FightNightsHubPage() {
-  const [featured, upcomingRaw, pastRaw, leaders] = await Promise.all([
+  const [featured, upcomingRaw, pastRaw, leaders, lastEvent] = await Promise.all([
     getActiveFightNight(),
     getUpcomingFightNights(),
     getPastFightNights(),
-    getLeaderboard(10),
+    getSeasonStandings(10),
+    getLastCompletedFightNight(),
   ])
+
+  // Winner of the most recent completed event — powers the recap spotlight.
+  const lastWinner = lastEvent
+    ? (await getStandings(lastEvent.id, { limit: 1 }))[0] ?? null
+    : null
 
   // Don't repeat the featured night in the calendar/archive grids.
   const upcoming = upcomingRaw.filter((f) => f.id !== featured?.id)
-  const past = pastRaw.filter((f) => f.id !== featured?.id)
+  const past = pastRaw.filter((f) => f.id !== featured?.id && f.id !== lastEvent?.id)
 
   return (
-    <main className="relative min-h-dvh bg-black font-sans">
-      <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 pt-28 sm:pt-32 pb-20">
-        {/* Header */}
-        <header className="mb-12 sm:mb-16">
-          <div className="flex items-center gap-2 mb-5">
-            <span className="inline-block w-2 h-2 bg-amber-500" />
-            <p className="text-amber-500 text-[10px] font-bold tracking-[0.3em] uppercase">
-              The Fan Game
-            </p>
-          </div>
-          <h1 className="text-white text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[0.9] uppercase mb-6">
-            Fight Nights
-          </h1>
-          <p className="text-white/65 text-base sm:text-lg font-semibold leading-7 max-w-xl">
-            The skill-based fan game played live at local fight cards. Pick
-            winners, call props, vote polls, and climb the leaderboard — in
-            person or online. Free to play.
-          </p>
-        </header>
+    <main className="relative min-h-dvh bg-white font-sans pb-24">
+      {/* 1 — INTRO HERO: brand intro to the fan game (text left / video right). */}
+      <IntroHero />
 
-        {/* Featured night */}
-        {featured ? (
-          <section className="mb-16">
-            <SectionLabel>
-              {featured.status === "completed" ? "Latest Event" : "Happening Next"}
-            </SectionLabel>
-            <FightNightCard fightNight={featured} featured />
-          </section>
-        ) : (
-          <section className="mb-16 border border-dashed border-white/15 rounded-xl px-6 py-12 text-center">
-            <p className="text-white/40 text-sm font-medium">
-              No fight night announced yet — follow TXMX for the next drop.
-            </p>
-          </section>
-        )}
+      {/* 2 — HAPPENING NEXT: the featured event as a full-width image band. */}
+      <HeroFeatured featured={featured} />
 
-        {/* Upcoming calendar */}
-        {upcoming.length > 0 && (
-          <section className="mb-16">
-            <SectionLabel>Upcoming</SectionLabel>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {upcoming.map((fn) => (
-                <FightNightCard key={fn.id} fightNight={fn} />
-              ))}
-            </div>
-          </section>
-        )}
+      {/* 3 — PRIZE REVEAL: the #1 motivator, full width. */}
+      {featured && <PrizeReveal featured={featured} />}
 
-        {/* Past fight nights — only renders once there are completed events */}
-        {past.length > 0 && (
-          <section className="mb-16">
-            <SectionLabel>Past Fight Nights</SectionLabel>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {past.map((fn) => (
-                <FightNightCard key={fn.id} fightNight={fn} />
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Global leaderboard teaser */}
-        <section>
-          <div className="flex items-end justify-between mb-5">
-            <SectionLabel className="mb-0">Global Leaderboard</SectionLabel>
-            <Link
-              href="/leaderboard"
-              className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/50 hover:text-white transition-colors"
-            >
-              View all →
-            </Link>
-          </div>
-
-          {leaders.length === 0 ? (
-            <div className="border border-dashed border-white/15 rounded-xl px-6 py-10 text-center">
-              <p className="text-white/40 text-sm font-medium">
-                The all-time board fills up as fans play. Be the first.
-              </p>
-            </div>
-          ) : (
-            <div className="rounded-xl overflow-hidden border border-white/10">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="bg-white/5 text-white/40 text-[10px] font-bold tracking-[0.15em] uppercase">
-                    <th className="px-4 py-3 w-12">#</th>
-                    <th className="px-4 py-3">Player</th>
-                    <th className="px-4 py-3 text-right w-28">Skill Points</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {leaders.map((p, i) => (
-                    <tr
-                      key={p.uid}
-                      className={`border-t border-white/5 ${i === 0 ? "bg-amber-500/5" : ""}`}
-                    >
-                      <td className="px-4 py-3 text-white/50 text-sm font-bold tabular-nums">
-                        {i + 1}
-                      </td>
-                      <td className="px-4 py-3 text-white text-sm font-semibold truncate">
-                        {p.displayName?.trim() || "Fan"}
-                      </td>
-                      <td className="px-4 py-3 text-right text-white text-sm font-bold tabular-nums">
-                        {(p.skillPoints || 0).toLocaleString()}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </section>
+      {/* 3 — HOW IT WORKS + scoring. */}
+      <div
+        id="how-it-works"
+        className="scroll-mt-24 max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 mt-16 sm:mt-20"
+      >
+        <HubHowItWorks />
       </div>
+
+      {/* 4 — PROOF: last event recap + winner spotlight. */}
+      <RecapSpotlight event={lastEvent} winner={lastWinner} />
+
+      {/* 5 — COMPETITION: all-time board. */}
+      <SeasonBoard leaders={leaders} />
+
+      {/* 6 — BROWSE: upcoming + past. */}
+      {(upcoming.length > 0 || past.length > 0) && (
+        <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 mt-16 sm:mt-20 space-y-14">
+          {upcoming.length > 0 && (
+            <section>
+              <SectionLabel>Upcoming</SectionLabel>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {upcoming.map((fn) => (
+                  <FightNightCard key={fn.id} fightNight={fn} />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {past.length > 0 && (
+            <section>
+              <SectionLabel>Past Fight Nights</SectionLabel>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {past.map((fn) => (
+                  <FightNightCard key={fn.id} fightNight={fn} />
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
+      )}
+
+      {/* 7 — THE ASK: account on-ramp, now after the value. */}
+      <div id="join" className="scroll-mt-24 max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 mt-16 sm:mt-20">
+        <HubAccountCta
+          featured={
+            featured
+              ? { slug: featured.slug, title: featured.title, status: featured.status }
+              : null
+          }
+        />
+      </div>
+
+      {/* 8 — FAQ. */}
+      <HubFaq />
     </main>
   )
 }
@@ -170,7 +138,7 @@ function SectionLabel({
   className?: string
 }) {
   return (
-    <p className={`text-white/40 text-[10px] font-bold tracking-[0.3em] uppercase mb-5 ${className}`}>
+    <p className={`text-neutral-400 text-[10px] font-bold tracking-[0.3em] uppercase mb-5 ${className}`}>
       {children}
     </p>
   )

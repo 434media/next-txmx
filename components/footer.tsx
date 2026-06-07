@@ -153,13 +153,22 @@ export default function Footer() {
 
         {/* ── SITEMAP COLUMNS ───────────────────────────────────── */}
         <section className="grid grid-cols-2 sm:grid-cols-4 gap-8 lg:gap-12 py-14 border-b border-white/10">
-          {/* Events */}
+          {/* Fight Nights */}
           <div>
             <p className="text-white text-[11px] font-bold tracking-[0.25em] uppercase mb-4">
-              Events
+              Fight Nights
             </p>
             <ul className="space-y-2.5">
-              <FooterLink href="/fight-nights">Fight Nights</FooterLink>
+              <FooterLink href="/fight-nights">Upcoming Cards</FooterLink>
+            </ul>
+          </div>
+
+          {/* Icon Talks */}
+          <div>
+            <p className="text-white text-[11px] font-bold tracking-[0.25em] uppercase mb-4">
+              Icon Talks
+            </p>
+            <ul className="space-y-2.5">
               <FooterLink href="/icon-talks/rise-of-a-champion">Rise of a Champion</FooterLink>
             </ul>
           </div>

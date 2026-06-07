@@ -5,6 +5,7 @@ import {
   incrementStandingPoints,
   incrementPicksMade,
 } from './fightnight-standings'
+import { DEFAULT_PROP_POINTS, UNDERDOG_MULTIPLIER } from '../../lib/scoring'
 
 // ── Types ────────────────────────────────────────────────
 
@@ -43,8 +44,6 @@ export interface FightNightPropPick {
   won: boolean | null
   pointsAwarded: number
 }
-
-const UNDERDOG_MULTIPLIER = 1.25
 
 function propsCol(fightNightId: string) {
   return firestore.collection('fightNights').doc(fightNightId).collection('props')
@@ -109,7 +108,7 @@ export async function createProp(
     })),
     status: 'open' as PropStatus,
     correctOptionId: null,
-    pointsReward: data.pointsReward ?? 500,
+    pointsReward: data.pointsReward ?? DEFAULT_PROP_POINTS,
     isUnderdog: data.isUnderdog === true,
     boutNumber: typeof data.boutNumber === 'number' ? data.boutNumber : null,
     createdAt: now,

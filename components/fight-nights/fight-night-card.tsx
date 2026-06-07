@@ -12,26 +12,26 @@ const STATUS_META: Record<
   announced: {
     label: "Upcoming",
     cta: "View details",
-    dot: "bg-sky-400",
-    pill: "text-sky-300 border-sky-400/30 bg-sky-400/10",
+    dot: "bg-sky-500",
+    pill: "text-sky-700 border-sky-200 bg-sky-50",
   },
   doors_open: {
     label: "Doors Open",
     cta: "Join now",
-    dot: "bg-amber-400",
-    pill: "text-amber-300 border-amber-400/30 bg-amber-400/10",
+    dot: "bg-amber-500",
+    pill: "text-amber-700 border-amber-200 bg-amber-50",
   },
   live: {
     label: "Live Now",
     cta: "Watch live",
     dot: "bg-red-500",
-    pill: "text-red-300 border-red-500/30 bg-red-500/10",
+    pill: "text-red-700 border-red-200 bg-red-50",
   },
   completed: {
     label: "Final",
     cta: "View recap",
     dot: "bg-emerald-500",
-    pill: "text-emerald-300 border-emerald-500/30 bg-emerald-500/10",
+    pill: "text-emerald-700 border-emerald-200 bg-emerald-50",
   },
 }
 
@@ -65,13 +65,13 @@ export default function FightNightCard({
   return (
     <Link
       href={href}
-      className={`group relative flex overflow-hidden rounded-xl border border-white/10 bg-black transition-colors hover:border-white/25 ${
+      className={`group relative flex overflow-hidden rounded-xl border border-neutral-200 bg-white transition-all hover:border-neutral-300 hover:shadow-md ${
         featured ? "flex-col sm:flex-row" : "flex-col"
       }`}
     >
       {/* Flyer */}
       <div
-        className={`relative shrink-0 overflow-hidden bg-white/5 ${
+        className={`relative shrink-0 overflow-hidden bg-neutral-100 ${
           featured ? "sm:w-2/5 aspect-[16/10] sm:aspect-auto" : "aspect-[16/10]"
         }`}
       >
@@ -94,18 +94,18 @@ export default function FightNightCard({
             <span className={`h-1.5 w-1.5 rounded-full ${meta.dot}`} />
             {meta.label}
           </span>
-          <span className="text-[11px] font-medium text-white/40 tabular-nums">
+          <span className="text-[11px] font-medium text-neutral-400 tabular-nums">
             {formatDate(fightNight.date)}
           </span>
         </div>
 
         {fightNight.subtitle && (
-          <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.25em] text-amber-500/80">
+          <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.25em] text-amber-600">
             {fightNight.subtitle}
           </p>
         )}
         <h3
-          className={`font-black uppercase leading-[0.95] tracking-tight text-white ${
+          className={`font-black uppercase leading-[0.95] tracking-tight text-neutral-900 ${
             featured ? "text-2xl sm:text-3xl" : "text-xl"
           }`}
         >
@@ -113,10 +113,10 @@ export default function FightNightCard({
         </h3>
 
         {where && (
-          <p className="mt-2 text-sm font-medium text-white/55">{where}</p>
+          <p className="mt-2 text-sm font-medium text-neutral-600">{where}</p>
         )}
 
-        <span className="mt-5 inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-white transition-colors group-hover:text-amber-400">
+        <span className="mt-5 inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-neutral-900 transition-colors group-hover:text-amber-600">
           {meta.cta}
           <svg
             className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-1"

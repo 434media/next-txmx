@@ -5,6 +5,7 @@ import { getFightNight } from './fightnight'
 import { incrementStandingPoints, incrementPicksMade } from './fightnight-standings'
 import { lockPropsForBout, unlockPropsForBout } from './fightnight-props'
 import { sendPushToUsers } from './notifications'
+import { MATCH_WIN_POINTS } from '../../lib/scoring'
 
 // ── Types ────────────────────────────────────────────────
 
@@ -24,8 +25,6 @@ export interface FightNightPick {
   updatedAt?: string
   settledAt: string | null
 }
-
-const MATCH_WIN_POINTS = 100
 
 function picksCol(fightNightId: string) {
   return firestore.collection('fightNights').doc(fightNightId).collection('picks')

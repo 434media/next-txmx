@@ -1,6 +1,7 @@
 'use server'
 
 import { firestore } from '../../lib/firebase-admin'
+import { bumpSeasonStanding } from './season-standings'
 
 export interface FightNightStanding {
   userId: string
@@ -45,6 +46,7 @@ export async function incrementStandingPoints(
   if (!fightNightId || !userId || amount <= 0) return
 
   const ref = entryRef(fightNightId, userId)
+  let createdStanding = false
   await firestore.runTransaction(async (tx) => {
     const snap = await tx.get(ref)
     const now = new Date().toISOString()
@@ -63,6 +65,7 @@ export async function incrementStandingPoints(
         updatedAt: now,
       })
     } else {
+      createdStanding = true
       tx.set(ref, {
         userId,
         displayName: meta.displayName,
@@ -76,6 +79,15 @@ export async function incrementStandingPoints(
       } as FightNightStanding)
     }
   })
+
+  // Mirror into the cross-event season aggregate. eventsPlayed only bumps when
+  // this settlement created the per-event standing (i.e. their first action in
+  // this fight night was a winning pick).
+  await bumpSeasonStanding(
+    userId,
+    { points: amount, picksWon: 1, eventsPlayed: createdStanding ? 1 : 0 },
+    meta
+  )
 }
 
 /**
@@ -94,6 +106,7 @@ export async function incrementPicksMade(
   if (!fightNightId || !userId) return
 
   const ref = entryRef(fightNightId, userId)
+  let createdStanding = false
   await firestore.runTransaction(async (tx) => {
     const snap = await tx.get(ref)
     const now = new Date().toISOString()
@@ -110,6 +123,7 @@ export async function incrementPicksMade(
         updatedAt: now,
       })
     } else {
+      createdStanding = true
       tx.set(ref, {
         userId,
         displayName: meta.displayName,
@@ -123,6 +137,14 @@ export async function incrementPicksMade(
       } as FightNightStanding)
     }
   })
+
+  // Mirror into the cross-event season aggregate (picks count toward lifetime
+  // activity; eventsPlayed bumps only when this is their first action here).
+  await bumpSeasonStanding(
+    userId,
+    { picksMade: 1, eventsPlayed: createdStanding ? 1 : 0 },
+    meta
+  )
 }
 
 /**
@@ -158,6 +180,18 @@ export async function ensureStanding(
       joinedAt: now,
       updatedAt: now,
     } as FightNightStanding)
+
+    // First time joining this fight night — count the participation in the
+    // season aggregate so joined-but-not-yet-picked fans appear all-time too.
+    await bumpSeasonStanding(
+      userId,
+      { eventsPlayed: 1 },
+      {
+        displayName: meta?.displayName || null,
+        photoURL: meta?.photoURL || null,
+        email: meta?.email || null,
+      }
+    )
   }
 }
 
@@ -291,6 +325,25 @@ export async function removeFightNightParticipant(
   const standingSnap = await standingRef.get()
   let standingDeleted = false
   if (standingSnap.exists) {
+    // Reverse this event's contribution from the season aggregate before
+    // deleting, so the all-time board doesn't keep phantom totals for removed
+    // (test) participants. bumpSeasonStanding clamps each counter at 0.
+    const s = standingSnap.data() as FightNightStanding
+    await bumpSeasonStanding(
+      userId,
+      {
+        points: -(s.points || 0),
+        picksMade: -(s.picksMade || 0),
+        picksWon: -(s.picksWon || 0),
+        eventsPlayed: -1,
+      },
+      {
+        displayName: s.displayName || null,
+        photoURL: s.photoURL || null,
+        email: s.email || null,
+      }
+    )
+
     await standingRef.delete()
     standingDeleted = true
   }
