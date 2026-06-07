@@ -59,7 +59,9 @@ export default function FightCard({ fightNightId, initialBouts }: FightCardProps
       orderBy("boutNumber", "asc")
     )
     const unsub = onSnapshot(q, (snap) => {
-      const data = snap.docs.map((d) => d.data() as FightNightBout)
+      const data = snap.docs
+        .map((d) => d.data() as FightNightBout)
+        .sort((a, b) => (a.order ?? a.boutNumber) - (b.order ?? b.boutNumber))
       if (data.length > 0) setBouts(data)
     })
     return () => unsub()

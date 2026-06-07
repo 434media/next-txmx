@@ -41,6 +41,31 @@ export async function addFighter(data: Omit<Fighter, 'id' | 'slug' | 'createdAt'
   return { success: true, id: docRef.id, slug }
 }
 
+/**
+ * Quick-create a fighter from the fight-card flow — minimal required fields
+ * with sensible defaults (region TX, active, empty record). The admin can
+ * fill in the rest later in the Fighters section. Reuses addFighter so the
+ * slug + duplicate guard behave identically.
+ */
+export async function quickAddFighter(input: {
+  firstName: string
+  lastName: string
+  sex: 'male' | 'female'
+  gym?: string
+  weightClass?: string
+}) {
+  return addFighter({
+    firstName: input.firstName,
+    lastName: input.lastName,
+    sex: input.sex,
+    region: 'TX',
+    weightClass: input.weightClass || '',
+    status: 'active',
+    record: { wins: 0, losses: 0, draws: 0, knockouts: 0 },
+    gym: input.gym || '',
+  })
+}
+
 export async function updateFighter(id: string, data: Partial<Fighter>) {
   const now = new Date().toISOString()
 

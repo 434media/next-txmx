@@ -6,7 +6,7 @@ import type { Fighter } from '../../lib/types/fighter'
 import { updateEvent, deleteEvent, addEvent, getAdminEventBouts, updateBout, deleteBout, addBout } from '../actions/events'
 
 const inputClass =
-  'w-full bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800] focus:ring-1 focus:ring-[#FFB800]/30 placeholder:text-gray-400 rounded-md'
+  'w-full bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900/30 placeholder:text-gray-400 rounded-md'
 const labelClass = 'text-[10px] font-semibold text-gray-400 tracking-[0.15em] block mb-1'
 
 interface EventListProps {
@@ -243,13 +243,13 @@ export default function EventList({ events, fighters, onAdd, onUpdate, onDelete 
             placeholder="Search events by promoter, venue, city, date, or event #..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight pl-10 pr-4 py-2.5 focus:outline-none focus:border-[#FFB800] focus:ring-1 focus:ring-[#FFB800]/30 placeholder:text-gray-400 rounded-md"
+            className="w-full bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight pl-10 pr-4 py-2.5 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900/30 placeholder:text-gray-400 rounded-md"
           />
         </div>
         <select
           value={sortBy}
           onChange={e => setSortBy(e.target.value as typeof sortBy)}
-          className="bg-gray-50 border border-gray-200 text-gray-600 text-[13px] leading-tight px-3 py-2.5 focus:outline-none focus:border-[#FFB800] rounded-md appearance-none cursor-pointer"
+          className="bg-gray-50 border border-gray-200 text-gray-600 text-[13px] leading-tight px-3 py-2.5 focus:outline-none focus:border-gray-900 rounded-md appearance-none cursor-pointer"
         >
           <option value="date">Sort by Date</option>
           <option value="promoter">Sort by Promoter</option>
@@ -267,12 +267,12 @@ export default function EventList({ events, fighters, onAdd, onUpdate, onDelete 
       {!showAddEvent ? (
         <button
           onClick={() => setShowAddEvent(true)}
-          className="mb-5 flex items-center gap-2 px-4 py-2.5 border border-dashed border-gray-200 rounded-lg text-[12px] font-semibold text-gray-400 hover:border-[#FFB800] hover:text-[#FFB800] transition-colors w-full justify-center"
+          className="mb-5 flex items-center gap-2 px-4 py-2.5 border border-dashed border-gray-200 rounded-lg text-[12px] font-semibold text-gray-400 hover:border-gray-900 hover:text-gray-900 transition-colors w-full justify-center"
         >
           <span className="text-lg leading-none">+</span> Add Event
         </button>
       ) : (
-        <div className="mb-5 border border-[#FFB800]/40 rounded-lg bg-amber-50/30 p-4">
+        <div className="mb-5 border border-gray-900/40 rounded-lg bg-amber-50/30 p-4">
           <p className="text-[10px] font-semibold text-gray-400 tracking-[0.2em] mb-3">NEW EVENT</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
@@ -332,7 +332,7 @@ export default function EventList({ events, fighters, onAdd, onUpdate, onDelete 
                 }
               }}
               disabled={!newEvent.eventNumber || !newEvent.date || addingEvent}
-              className="px-5 py-2 bg-[#FFB800] text-white text-[12px] font-semibold tracking-wider rounded-md hover:bg-[#E5A600] transition-colors disabled:opacity-50"
+              className="px-5 py-2 bg-gray-900 text-white text-[12px] font-semibold tracking-wider rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50"
             >
               {addingEvent ? 'Creating...' : 'Create Event & Add Bouts'}
             </button>
@@ -353,7 +353,7 @@ export default function EventList({ events, fighters, onAdd, onUpdate, onDelete 
           const isDeleting = deleting === event.id
 
           return (
-            <div key={event.id} className={`border rounded-lg transition-colors ${isExpanded ? 'border-[#FFB800]/40 bg-amber-50/30' : 'border-gray-100 hover:border-gray-200'}`}>
+            <div key={event.id} className={`border rounded-lg transition-colors ${isExpanded ? 'border-gray-900/40 bg-amber-50/30' : 'border-gray-100 hover:border-gray-200'}`}>
               {/* Summary row */}
               <button
                 onClick={() => handleExpand(event)}
@@ -438,7 +438,7 @@ export default function EventList({ events, fighters, onAdd, onUpdate, onDelete 
 
                   {/* Event actions */}
                   <div className="mt-5 flex items-center gap-3">
-                    <button onClick={() => handleSave(event)} disabled={saving} className="px-5 py-2 bg-[#FFB800] text-white text-[12px] font-semibold tracking-wider rounded-md hover:bg-[#E5A600] transition-colors disabled:opacity-50">
+                    <button onClick={() => handleSave(event)} disabled={saving} className="px-5 py-2 bg-gray-900 text-white text-[12px] font-semibold tracking-wider rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50">
                       {saving ? 'Saving...' : 'Save Changes'}
                     </button>
                     <button onClick={() => { setExpandedId(null); setEditData({}); setBouts([]); setEditingBoutIdx(null); setAddingBout(false) }} className="px-4 py-2 text-gray-400 text-[12px] font-medium tracking-wider hover:text-gray-600 transition-colors">
@@ -459,7 +459,7 @@ export default function EventList({ events, fighters, onAdd, onUpdate, onDelete 
                       {!addingBout && (
                         <button
                           onClick={() => { setAddingBout(true); setEditingBoutIdx(null) }}
-                          className="text-[11px] font-semibold text-[#FFB800] hover:text-[#E5A600] tracking-wider transition-colors"
+                          className="text-[11px] font-semibold text-gray-900 hover:text-gray-800 tracking-wider transition-colors"
                         >
                           + Add Bout
                         </button>
@@ -482,7 +482,7 @@ export default function EventList({ events, fighters, onAdd, onUpdate, onDelete 
                           const isDeletingThis = boutDeleting === idx
 
                           return (
-                            <div key={`${bout.docId}-${idx}`} className={`border rounded-md transition-colors ${isEditingThis ? 'border-[#FFB800]/30 bg-amber-50/20' : 'border-gray-100'}`}>
+                            <div key={`${bout.docId}-${idx}`} className={`border rounded-md transition-colors ${isEditingThis ? 'border-gray-900/30 bg-amber-50/20' : 'border-gray-100'}`}>
                               {/* Bout summary row */}
                               <div className="flex items-center gap-3 px-3 py-2">
                                 <span className="text-[10px] font-mono text-gray-300 w-5 shrink-0">#{bout.boutNumber}</span>
@@ -498,7 +498,7 @@ export default function EventList({ events, fighters, onAdd, onUpdate, onDelete 
                                 {bout.result && <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded shrink-0 ${bout.result === 'W' ? 'bg-green-50 text-green-600' : bout.result === 'L' ? 'bg-red-50 text-red-500' : 'bg-gray-100 text-gray-500'}`}>{bout.result}</span>}
                                 {bout.titleFight && <span className="text-[10px] bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded shrink-0">TITLE</span>}
                                 <div className="flex items-center gap-1 shrink-0">
-                                  <button onClick={() => isEditingThis ? setEditingBoutIdx(null) : handleBoutEdit(idx)} className="text-[10px] text-gray-400 hover:text-[#FFB800] px-1.5 py-1 transition-colors">
+                                  <button onClick={() => isEditingThis ? setEditingBoutIdx(null) : handleBoutEdit(idx)} className="text-[10px] text-gray-400 hover:text-gray-900 px-1.5 py-1 transition-colors">
                                     {isEditingThis ? 'Close' : 'Edit'}
                                   </button>
                                   <button onClick={() => handleBoutDelete(idx)} disabled={isDeletingThis} className="text-[10px] text-gray-300 hover:text-red-500 px-1.5 py-1 transition-colors disabled:opacity-50">
@@ -547,13 +547,13 @@ export default function EventList({ events, fighters, onAdd, onUpdate, onDelete 
                                     </div>
                                     <div className="flex items-end pb-1">
                                       <label className="flex items-center gap-2 cursor-pointer">
-                                        <input type="checkbox" checked={boutEdit.titleFight || false} onChange={e => setBoutEdit(d => ({ ...d, titleFight: e.target.checked }))} className="accent-[#FFB800]" />
+                                        <input type="checkbox" checked={boutEdit.titleFight || false} onChange={e => setBoutEdit(d => ({ ...d, titleFight: e.target.checked }))} className="accent-gray-900" />
                                         <span className="text-[11px] text-gray-600">Title Fight</span>
                                       </label>
                                     </div>
                                   </div>
                                   <div className="mt-3 flex items-center gap-2">
-                                    <button onClick={() => handleBoutSave(idx)} disabled={boutSaving} className="px-4 py-1.5 bg-[#FFB800] text-white text-[11px] font-semibold tracking-wider rounded-md hover:bg-[#E5A600] transition-colors disabled:opacity-50">
+                                    <button onClick={() => handleBoutSave(idx)} disabled={boutSaving} className="px-4 py-1.5 bg-gray-900 text-white text-[11px] font-semibold tracking-wider rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50">
                                       {boutSaving ? 'Saving...' : 'Save Bout'}
                                     </button>
                                     <button onClick={() => setEditingBoutIdx(null)} className="px-3 py-1.5 text-gray-400 text-[11px] tracking-wider hover:text-gray-600 transition-colors">
@@ -573,7 +573,7 @@ export default function EventList({ events, fighters, onAdd, onUpdate, onDelete 
 
                     {/* Add bout form */}
                     {addingBout && (
-                      <div className="mt-3 border border-[#FFB800]/30 rounded-md bg-amber-50/20 p-4">
+                      <div className="mt-3 border border-gray-900/30 rounded-md bg-amber-50/20 p-4">
                         <p className="text-[10px] font-semibold text-gray-400 tracking-[0.15em] mb-3">NEW BOUT</p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                           {/* Fighter 1 search */}
@@ -686,7 +686,7 @@ export default function EventList({ events, fighters, onAdd, onUpdate, onDelete 
                           </div>
                           <div className="flex items-end pb-1">
                             <label className="flex items-center gap-2 cursor-pointer">
-                              <input type="checkbox" checked={newBout.titleFight} onChange={e => setNewBout(n => ({ ...n, titleFight: e.target.checked }))} className="accent-[#FFB800]" />
+                              <input type="checkbox" checked={newBout.titleFight} onChange={e => setNewBout(n => ({ ...n, titleFight: e.target.checked }))} className="accent-gray-900" />
                               <span className="text-[11px] text-gray-600">Title Fight</span>
                             </label>
                           </div>
@@ -696,7 +696,7 @@ export default function EventList({ events, fighters, onAdd, onUpdate, onDelete 
                           <button
                             onClick={() => handleAddBout(event)}
                             disabled={!newBout.fighter1Id || !newBout.fighter2Id || newBoutSaving}
-                            className="px-5 py-2 bg-[#FFB800] text-white text-[11px] font-semibold tracking-wider rounded-md hover:bg-[#E5A600] transition-colors disabled:opacity-50"
+                            className="px-5 py-2 bg-gray-900 text-white text-[11px] font-semibold tracking-wider rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50"
                           >
                             {newBoutSaving ? 'Adding...' : 'Add Bout'}
                           </button>

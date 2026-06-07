@@ -11,10 +11,10 @@ interface AddFighterFormProps {
 }
 
 const inputClass =
-  'w-full bg-gray-50 border border-gray-300 text-gray-900 px-4 py-2.5 text-sm font-medium leading-5 focus:outline-none focus:border-[#FFB800] focus:ring-1 focus:ring-[#FFB800] placeholder:text-gray-400 rounded-md'
+  'w-full bg-gray-50 border border-gray-300 text-gray-900 px-4 py-2.5 text-sm font-medium leading-5 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 placeholder:text-gray-400 rounded-md'
 const labelClass = 'block text-[11px] leading-4 font-semibold text-gray-600 tracking-[0.12em] mb-1.5 uppercase'
 const sectionClass = 'border border-gray-200 rounded-lg p-6 space-y-4'
-const sectionTitleClass = 'text-lg leading-6 font-semibold text-[#FFB800] tracking-[0.14em] mb-4 uppercase'
+const sectionTitleClass = 'text-lg leading-6 font-semibold text-gray-900 tracking-[0.14em] mb-4 uppercase'
 
 function GymComboboxAdd({ existingGyms, inputClass: cls }: { existingGyms: string[]; inputClass: string }) {
   const [value, setValue] = useState('')
@@ -392,7 +392,7 @@ export default function AddFighterForm({ onSuccess, existingGyms = [] }: AddFigh
           <button
             type="button"
             onClick={addTitle}
-            className="text-xs font-bold tracking-widest text-[#FFB800] hover:text-amber-600 transition-colors"
+            className="text-xs font-bold tracking-widest text-gray-900 hover:text-amber-600 transition-colors"
           >
             + ADD TITLE
           </button>
@@ -429,7 +429,7 @@ export default function AddFighterForm({ onSuccess, existingGyms = [] }: AddFigh
                   type="checkbox"
                   checked={title.current}
                   onChange={e => updateTitle(i, 'current', e.target.checked)}
-                  className="accent-[#FFB800]"
+                  className="accent-gray-900"
                 />
                 Current
               </label>
@@ -517,12 +517,12 @@ export default function AddFighterForm({ onSuccess, existingGyms = [] }: AddFigh
               <img
                 src={uploadedImageUrl}
                 alt="Profile preview"
-                className="w-20 h-20 rounded-full object-cover border-2 border-[#FFB800]/50"
+                className="w-20 h-20 rounded-full object-cover border-2 border-gray-900/50"
               />
             )}
             <div className="flex-1 space-y-2">
               {/* File Upload */}
-              <label className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 border border-dashed border-gray-300 rounded-md cursor-pointer hover:border-[#FFB800]/50 hover:bg-gray-100 transition-colors">
+              <label className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 border border-dashed border-gray-300 rounded-md cursor-pointer hover:border-gray-900/50 hover:bg-gray-100 transition-colors">
                 <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
@@ -564,7 +564,7 @@ export default function AddFighterForm({ onSuccess, existingGyms = [] }: AddFigh
           <input
             name="featuredOnTXMX"
             type="checkbox"
-            className="accent-[#FFB800] w-4 h-4"
+            className="accent-gray-900 w-4 h-4"
           />
           <span className="text-sm text-gray-700 font-medium tracking-wide">Featured on TXMX Boxing</span>
         </label>
@@ -575,7 +575,7 @@ export default function AddFighterForm({ onSuccess, existingGyms = [] }: AddFigh
         <button
           type="submit"
           disabled={isSubmitting}
-          className="bg-[#FFB800] text-black px-8 py-3 font-bold text-sm tracking-widest hover:bg-[#FFB800]/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors rounded-md"
+          className="bg-gray-900 text-black px-8 py-3 font-bold text-sm tracking-widest hover:bg-gray-900/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors rounded-md"
         >
           {isSubmitting ? 'ADDING...' : 'ADD FIGHTER'}
         </button>

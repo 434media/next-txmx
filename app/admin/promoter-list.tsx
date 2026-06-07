@@ -6,7 +6,7 @@ import type { PromoterData } from '../actions/events'
 import { upsertPromoter, updatePromoter, deletePromoter } from '../actions/events'
 
 const inputClass =
-  'w-full bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800] focus:ring-1 focus:ring-[#FFB800]/30 placeholder:text-gray-400 rounded-md'
+  'w-full bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900/30 placeholder:text-gray-400 rounded-md'
 const labelClass = 'text-[10px] font-semibold text-gray-400 tracking-[0.15em] block mb-1'
 
 interface PromoterListProps {
@@ -169,12 +169,12 @@ export default function PromoterList({ fighters, eventPromoters, promoterDocs, o
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Search promoters, companies, or fighters..."
-          className="flex-1 bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-4 py-2.5 focus:outline-none focus:border-[#FFB800] focus:ring-1 focus:ring-[#FFB800]/30 placeholder:text-gray-400 rounded-md"
+          className="flex-1 bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-4 py-2.5 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900/30 placeholder:text-gray-400 rounded-md"
         />
         <select
           value={sortBy}
           onChange={e => setSortBy(e.target.value as 'name' | 'fighters' | 'events')}
-          className="bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800] rounded-md"
+          className="bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-gray-900 rounded-md"
         >
           <option value="events">Sort: Most Events</option>
           <option value="fighters">Sort: Most Fighters</option>
@@ -209,7 +209,7 @@ export default function PromoterList({ fighters, eventPromoters, promoterDocs, o
                 </div>
                 <div className="flex gap-6 shrink-0 text-right">
                   <div>
-                    <span className="text-[#FFB800] font-mono text-lg font-semibold tabular-nums">{promoter.eventCount}</span>
+                    <span className="text-gray-900 font-mono text-lg font-semibold tabular-nums">{promoter.eventCount}</span>
                     <p className="text-gray-400 text-[10px] font-medium tracking-[0.15em]">EVENT{promoter.eventCount !== 1 ? 'S' : ''}</p>
                   </div>
                   <div>
@@ -328,7 +328,7 @@ export default function PromoterList({ fighters, eventPromoters, promoterDocs, o
                       <button
                         onClick={() => handleSave(promoter)}
                         disabled={saving}
-                        className="bg-[#FFB800] text-black text-[11px] font-semibold tracking-[0.15em] px-4 py-1.5 rounded hover:bg-[#FFB800]/90 transition-colors disabled:opacity-50"
+                        className="bg-gray-900 text-black text-[11px] font-semibold tracking-[0.15em] px-4 py-1.5 rounded hover:bg-gray-900/90 transition-colors disabled:opacity-50"
                       >
                         {saving ? 'SAVING...' : 'SAVE CHANGES'}
                       </button>

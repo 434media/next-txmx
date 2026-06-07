@@ -60,7 +60,7 @@ function GymCombobox({ value, onChange, gymNames, className }: { value: string; 
 }
 
 const inputClass =
-  'w-full bg-gray-50 border border-gray-200 text-gray-900 text-[13px] font-medium leading-5 px-3 py-2 focus:outline-none focus:border-[#FFB800] focus:ring-1 focus:ring-[#FFB800]/30 placeholder:text-gray-400 rounded-md'
+  'w-full bg-gray-50 border border-gray-200 text-gray-900 text-[13px] font-medium leading-5 px-3 py-2 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900/30 placeholder:text-gray-400 rounded-md'
 const labelClass = 'block text-[11px] leading-4 font-semibold text-gray-500 tracking-[0.12em] mb-1'
 
 export default function FighterList({ fighters, onDelete, onUpdate, gymNames = [], gymDocs = [] }: FighterListProps) {
@@ -291,14 +291,14 @@ export default function FighterList({ fighters, onDelete, onUpdate, gymNames = [
             value={search}
             onChange={e => { setSearch(e.target.value); setCurrentPage(1) }}
             placeholder="Search by name, nickname, or city..."
-            className="flex-1 bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-4 py-2.5 focus:outline-none focus:border-[#FFB800] focus:ring-1 focus:ring-[#FFB800]/30 placeholder:text-gray-400 rounded-md"
+            className="flex-1 bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-4 py-2.5 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900/30 placeholder:text-gray-400 rounded-md"
           />
         </div>
         <div className="flex flex-wrap gap-2">
           <select
             value={filterWeight}
             onChange={e => { setFilterWeight(e.target.value); setCurrentPage(1) }}
-            className="bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800] rounded-md"
+            className="bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-gray-900 rounded-md"
           >
             <option value="all">All Weight Classes</option>
             {activeWeightClasses.map(wc => (
@@ -308,7 +308,7 @@ export default function FighterList({ fighters, onDelete, onUpdate, gymNames = [
           <select
             value={filterRegion}
             onChange={e => { setFilterRegion(e.target.value); setCurrentPage(1) }}
-            className="bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800] rounded-md"
+            className="bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-gray-900 rounded-md"
           >
             <option value="all">All Regions</option>
             <option value="TX">TX</option>
@@ -318,7 +318,7 @@ export default function FighterList({ fighters, onDelete, onUpdate, gymNames = [
           <select
             value={filterStatus}
             onChange={e => { setFilterStatus(e.target.value); setCurrentPage(1) }}
-            className="bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800] rounded-md"
+            className="bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-gray-900 rounded-md"
           >
             <option value="all">All Status</option>
             <option value="active">Active</option>
@@ -328,7 +328,7 @@ export default function FighterList({ fighters, onDelete, onUpdate, gymNames = [
           <select
             value={filterSex}
             onChange={e => { setFilterSex(e.target.value); setCurrentPage(1) }}
-            className="bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800] rounded-md"
+            className="bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-gray-900 rounded-md"
           >
             <option value="all">All Divisions</option>
             <option value="male">Men</option>
@@ -337,7 +337,7 @@ export default function FighterList({ fighters, onDelete, onUpdate, gymNames = [
           <select
             value={sortBy}
             onChange={e => setSortBy(e.target.value)}
-            className="bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800] rounded-md"
+            className="bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-gray-900 rounded-md"
           >
             <option value="name">Sort: Name</option>
             <option value="wins">Sort: Most Wins</option>
@@ -470,7 +470,7 @@ export default function FighterList({ fighters, onDelete, onUpdate, gymNames = [
                         )}
 
                         <div className="absolute inset-0 rounded-full bg-black/55 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1">
-                          <label className="text-[10px] font-semibold tracking-widest text-white cursor-pointer hover:text-[#FFB800] transition-colors uppercase">
+                          <label className="text-[10px] font-semibold tracking-widest text-white cursor-pointer hover:text-gray-900 transition-colors uppercase">
                             {isUploadingImage ? 'Uploading...' : editData.profileImageUrl ? 'Change' : 'Add'}
                             <input
                               type="file"
@@ -668,7 +668,7 @@ export default function FighterList({ fighters, onDelete, onUpdate, gymNames = [
                             ...d,
                             record: { ...d.record!, knockouts: Number(e.target.value) || 0 }
                           }))}
-                          className={inputClass + ' font-mono text-[#FFB800]'}
+                          className={inputClass + ' font-mono text-gray-900'}
                         />
                       </div>
                     </div>
@@ -858,7 +858,7 @@ export default function FighterList({ fighters, onDelete, onUpdate, gymNames = [
                             key={i}
                             className={`text-xs px-2 py-1 rounded ${
                               t.current
-                                ? 'bg-amber-100 text-[#FFB800] border border-amber-300'
+                                ? 'bg-amber-100 text-gray-900 border border-amber-300'
                                 : 'bg-gray-50 text-gray-500 border border-gray-200'
                             }`}
                           >
@@ -896,7 +896,7 @@ export default function FighterList({ fighters, onDelete, onUpdate, gymNames = [
                       <button
                         onClick={handleSave}
                         disabled={savingId === fighter.id || isUploadingImage}
-                        className="text-[11px] font-semibold tracking-[0.15em] bg-[#FFB800] text-black px-5 py-1.5 rounded hover:bg-[#FFB800]/90 disabled:opacity-50 transition-colors"
+                        className="text-[11px] font-semibold tracking-[0.15em] bg-gray-900 text-black px-5 py-1.5 rounded hover:bg-gray-900/90 disabled:opacity-50 transition-colors"
                       >
                         {isUploadingImage ? 'UPLOADING IMAGE...' : savingId === fighter.id ? 'SAVING...' : 'SAVE CHANGES'}
                       </button>
@@ -936,7 +936,7 @@ export default function FighterList({ fighters, onDelete, onUpdate, gymNames = [
                     onClick={() => { setCurrentPage(item); setEditingId(null) }}
                     className={`text-[11px] font-semibold w-8 h-8 rounded-md transition-colors ${
                       currentPage === item
-                        ? 'bg-[#FFB800] text-black'
+                        ? 'bg-gray-900 text-black'
                         : 'text-gray-500 hover:bg-gray-100'
                     }`}
                   >

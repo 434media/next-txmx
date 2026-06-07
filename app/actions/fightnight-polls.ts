@@ -73,6 +73,13 @@ export async function closePoll(fightNightId: string, pollId: string): Promise<v
   })
 }
 
+export async function reopenPoll(fightNightId: string, pollId: string): Promise<void> {
+  await pollsCol(fightNightId).doc(pollId).update({
+    status: 'open',
+    closedAt: null,
+  })
+}
+
 /**
  * Edit a poll's content. Vote handling:
  *   - If option count is unchanged, vote tallies are preserved by index

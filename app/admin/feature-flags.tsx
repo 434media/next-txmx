@@ -85,7 +85,7 @@ export default function FeatureFlagsManager() {
         </p>
         <button
           onClick={() => setShowAdd(!showAdd)}
-          className="text-xs font-semibold tracking-widest uppercase px-3 py-1.5 rounded bg-[#FFB800] hover:bg-amber-500 text-black transition-colors"
+          className="text-xs font-semibold tracking-widest uppercase px-3 py-1.5 rounded bg-gray-900 hover:bg-amber-500 text-black transition-colors"
         >
           {showAdd ? 'Cancel' : '+ Add Flag'}
         </button>
@@ -99,14 +99,14 @@ export default function FeatureFlagsManager() {
             placeholder="Flag name (e.g. myNewFeature)"
             value={newFlagName}
             onChange={e => setNewFlagName(e.target.value)}
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#FFB800]/40"
+            className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/40"
           />
           <input
             type="text"
             placeholder="Description"
             value={newFlagDesc}
             onChange={e => setNewFlagDesc(e.target.value)}
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#FFB800]/40"
+            className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/40"
           />
           <button
             onClick={handleAdd}
@@ -173,7 +173,7 @@ export default function FeatureFlagsManager() {
                   onChange={e =>
                     handleUpdate(name, { rolloutPercent: Math.min(100, Math.max(0, Number(e.target.value))) })
                   }
-                  className="w-16 border border-gray-300 rounded px-2 py-1 text-sm text-center focus:outline-none focus:ring-2 focus:ring-[#FFB800]/40"
+                  className="w-16 border border-gray-300 rounded px-2 py-1 text-sm text-center focus:outline-none focus:ring-2 focus:ring-gray-900/40"
                 />
               </label>
 
@@ -183,7 +183,7 @@ export default function FeatureFlagsManager() {
                   type="checkbox"
                   checked={flag.blackCardOnly}
                   onChange={e => handleUpdate(name, { blackCardOnly: e.target.checked })}
-                  className="rounded border-gray-300 text-[#FFB800] focus:ring-[#FFB800]/40"
+                  className="rounded border-gray-300 text-gray-900 focus:ring-gray-900/40"
                 />
                 <span className="font-medium">Black Card Only</span>
               </label>

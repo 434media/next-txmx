@@ -42,7 +42,11 @@ export default function LiveRibbon({ activeFightNight }: LiveRibbonProps) {
       orderBy("boutNumber", "asc")
     )
     const unsub = onSnapshot(q, (snap) => {
-      setBouts(snap.docs.map((d) => d.data() as FightNightBout))
+      setBouts(
+        snap.docs
+          .map((d) => d.data() as FightNightBout)
+          .sort((a, b) => (a.order ?? a.boutNumber) - (b.order ?? b.boutNumber))
+      )
     })
     return () => unsub()
   }, [activeFightNight])

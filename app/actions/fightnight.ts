@@ -49,8 +49,11 @@ export interface FightNight {
 }
 
 export interface FightNightBout {
-  /** 1-indexed bout number (also the doc ID) */
+  /** 1-indexed bout number (also the doc ID, and the key picks/props use). */
   boutNumber: number
+  /** Display order on the card; defaults to boutNumber. Lets the admin
+   * reorder bouts without renumbering (which would orphan picks/props). */
+  order: number
   fighter1Name: string
   fighter1Gym: string
   fighter2Name: string
@@ -348,8 +351,10 @@ export async function getLastCompletedFightNight(): Promise<FightNight | null> {
 
 function mapBout(doc: FirebaseFirestore.DocumentSnapshot): FightNightBout {
   const data = doc.data() || {}
+  const boutNumber = data.boutNumber || parseInt(doc.id) || 0
   return {
-    boutNumber: data.boutNumber || parseInt(doc.id) || 0,
+    boutNumber,
+    order: typeof data.order === 'number' ? data.order : boutNumber,
     fighter1Name: data.fighter1Name || '',
     fighter1Gym: data.fighter1Gym || '',
     fighter2Name: data.fighter2Name || '',
@@ -368,7 +373,7 @@ function mapBout(doc: FirebaseFirestore.DocumentSnapshot): FightNightBout {
 export async function getBouts(fightNightId: string): Promise<FightNightBout[]> {
   if (!fightNightId) return []
   const snap = await boutsCol(fightNightId).orderBy('boutNumber', 'asc').get()
-  return snap.docs.map(mapBout)
+  return snap.docs.map(mapBout).sort((a, b) => a.order - b.order)
 }
 
 export async function upsertBout(
@@ -387,6 +392,7 @@ export async function upsertBout(
   } else {
     const payload = {
       boutNumber,
+      order: boutNumber,
       fighter1Name: '',
       fighter1Gym: '',
       fighter2Name: '',

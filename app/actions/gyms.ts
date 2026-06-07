@@ -75,6 +75,29 @@ export async function addGym(data: Omit<GymData, 'id' | 'createdAt' | 'updatedAt
   return { success: true, id: docRef.id }
 }
 
+/**
+ * Quick-create a gym from the fight-card flow — name only, other fields blank.
+ * Fill in details later in the Gyms section. Callers guard against duplicates
+ * (only offered when there's no name match), so no dedupe here.
+ */
+export async function quickAddGym(name: string) {
+  return addGym({
+    name,
+    address: '',
+    city: '',
+    state: '',
+    country: '',
+    phone: '',
+    website: '',
+    instagram: '',
+    facebook: '',
+    twitter: '',
+    tiktok: '',
+    youtube: '',
+    notes: '',
+  })
+}
+
 export async function updateGym(id: string, data: Partial<Omit<GymData, 'id' | 'createdAt'>>) {
   await firestore.collection('gyms').doc(id).update({
     ...data,

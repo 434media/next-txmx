@@ -106,7 +106,8 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
   const [promoterDocs, setPromoterDocs] = useState<PromoterData[]>(initialPromoterDocs)
   const [gymDocs, setGymDocs] = useState<GymData[]>(initialGyms)
   const [eventDocs, setEventDocs] = useState<TXMXEvent[]>(initialEvents)
-  const [activeTab, setActiveTab] = useState<Tab>('list')
+  // Fight Nights is the primary workflow — open there on load.
+  const [activeTab, setActiveTab] = useState<Tab>('fnights')
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const { user, signOut: handleSignOut } = useAdminAuth()
 

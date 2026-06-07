@@ -6,7 +6,7 @@ import type { GymData } from '../actions/gyms'
 import { addGym, updateGym, deleteGym } from '../actions/gyms'
 
 const inputClass =
-  'w-full bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800] focus:ring-1 focus:ring-[#FFB800]/30 placeholder:text-gray-400 rounded-md'
+  'w-full bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900/30 placeholder:text-gray-400 rounded-md'
 const labelClass = 'text-[10px] font-semibold text-gray-400 tracking-[0.15em] block mb-1'
 
 interface GymListProps {
@@ -154,19 +154,19 @@ export default function GymList({ fighters, gymDocs, onAdd, onUpdate, onDelete }
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Search gyms by name, city, or state..."
-          className="flex-1 bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-4 py-2.5 focus:outline-none focus:border-[#FFB800] focus:ring-1 focus:ring-[#FFB800]/30 placeholder:text-gray-400 rounded-md"
+          className="flex-1 bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-4 py-2.5 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900/30 placeholder:text-gray-400 rounded-md"
         />
         <select
           value={sortBy}
           onChange={e => setSortBy(e.target.value as 'name' | 'fighters')}
-          className="bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800] rounded-md"
+          className="bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-gray-900 rounded-md"
         >
           <option value="name">Sort: Name</option>
           <option value="fighters">Sort: Most Fighters</option>
         </select>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
-          className="bg-[#FFB800] text-black text-[11px] font-semibold tracking-[0.15em] px-4 py-2 rounded-md hover:bg-[#FFB800]/90 transition-colors whitespace-nowrap"
+          className="bg-gray-900 text-black text-[11px] font-semibold tracking-[0.15em] px-4 py-2 rounded-md hover:bg-gray-900/90 transition-colors whitespace-nowrap"
         >
           {showAddForm ? 'CANCEL' : '+ ADD GYM'}
         </button>
@@ -263,7 +263,7 @@ export default function GymList({ fighters, gymDocs, onAdd, onUpdate, onDelete }
             <button
               onClick={handleAdd}
               disabled={adding || !addData.name.trim()}
-              className="bg-[#FFB800] text-black text-[11px] font-semibold tracking-[0.15em] px-5 py-1.5 rounded hover:bg-[#FFB800]/90 transition-colors disabled:opacity-50"
+              className="bg-gray-900 text-black text-[11px] font-semibold tracking-[0.15em] px-5 py-1.5 rounded hover:bg-gray-900/90 transition-colors disabled:opacity-50"
             >
               {adding ? 'ADDING...' : 'ADD GYM'}
             </button>
@@ -285,7 +285,7 @@ export default function GymList({ fighters, gymDocs, onAdd, onUpdate, onDelete }
           </p>
           <button
             onClick={() => setShowAddForm(true)}
-            className="bg-[#FFB800] text-black text-[11px] font-semibold tracking-[0.15em] px-5 py-2 rounded-md hover:bg-[#FFB800]/90 transition-colors"
+            className="bg-gray-900 text-black text-[11px] font-semibold tracking-[0.15em] px-5 py-2 rounded-md hover:bg-gray-900/90 transition-colors"
           >
             + ADD FIRST GYM
           </button>
@@ -326,7 +326,7 @@ export default function GymList({ fighters, gymDocs, onAdd, onUpdate, onDelete }
                     )}
                   </div>
                   <div className="text-right shrink-0">
-                    <span className="text-[#FFB800] font-mono text-lg font-semibold tabular-nums">{gymFighters.length}</span>
+                    <span className="text-gray-900 font-mono text-lg font-semibold tabular-nums">{gymFighters.length}</span>
                     <p className="text-gray-400 text-[10px] font-medium tracking-[0.15em]">FIGHTER{gymFighters.length !== 1 ? 'S' : ''}</p>
                   </div>
                   <svg
@@ -451,7 +451,7 @@ export default function GymList({ fighters, gymDocs, onAdd, onUpdate, onDelete }
                         <button
                           onClick={() => handleSave(gym)}
                           disabled={saving}
-                          className="bg-[#FFB800] text-black text-[11px] font-semibold tracking-[0.15em] px-4 py-1.5 rounded hover:bg-[#FFB800]/90 transition-colors disabled:opacity-50"
+                          className="bg-gray-900 text-black text-[11px] font-semibold tracking-[0.15em] px-4 py-1.5 rounded hover:bg-gray-900/90 transition-colors disabled:opacity-50"
                         >
                           {saving ? 'SAVING...' : 'SAVE CHANGES'}
                         </button>

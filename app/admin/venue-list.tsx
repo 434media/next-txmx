@@ -7,7 +7,7 @@ import { updateVenue, deleteVenue } from '../actions/venues'
 const VENUE_TYPES = ['Arena', 'Convention Center', 'Casino', 'Hotel Ballroom', 'Outdoor', 'Civic Center', 'Stadium', 'Other']
 
 const inputClass =
-  'w-full bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800] focus:ring-1 focus:ring-[#FFB800]/30 placeholder:text-gray-400 rounded-md'
+  'w-full bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900/30 placeholder:text-gray-400 rounded-md'
 const labelClass = 'text-[10px] font-semibold text-gray-400 tracking-[0.15em] block mb-1'
 
 interface VenueListProps {
@@ -106,12 +106,12 @@ export default function VenueList({ venues, onUpdate, onDelete }: VenueListProps
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Search venues by name, city, or address..."
-          className="flex-1 bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-4 py-2.5 focus:outline-none focus:border-[#FFB800] focus:ring-1 focus:ring-[#FFB800]/30 placeholder:text-gray-400 rounded-md"
+          className="flex-1 bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-4 py-2.5 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900/30 placeholder:text-gray-400 rounded-md"
         />
         <select
           value={sortBy}
           onChange={e => setSortBy(e.target.value as 'name' | 'events' | 'city')}
-          className="bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800] rounded-md"
+          className="bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-gray-900 rounded-md"
         >
           <option value="name">Sort: Name</option>
           <option value="events">Sort: Most Events</option>
@@ -150,7 +150,7 @@ export default function VenueList({ venues, onUpdate, onDelete }: VenueListProps
                   )}
                 </div>
                 <div className="text-right shrink-0">
-                  <span className="text-[#FFB800] font-mono text-lg font-semibold tabular-nums">{venue.eventCount}</span>
+                  <span className="text-gray-900 font-mono text-lg font-semibold tabular-nums">{venue.eventCount}</span>
                   <p className="text-gray-400 text-[10px] font-medium tracking-[0.15em]">EVENT{venue.eventCount !== 1 ? 'S' : ''}</p>
                 </div>
                 <svg
@@ -248,7 +248,7 @@ export default function VenueList({ venues, onUpdate, onDelete }: VenueListProps
                       <button
                         onClick={() => handleSave(venue)}
                         disabled={saving}
-                        className="bg-[#FFB800] text-black text-[11px] font-semibold tracking-[0.15em] px-4 py-1.5 rounded hover:bg-[#FFB800]/90 transition-colors disabled:opacity-50"
+                        className="bg-gray-900 text-black text-[11px] font-semibold tracking-[0.15em] px-4 py-1.5 rounded hover:bg-gray-900/90 transition-colors disabled:opacity-50"
                       >
                         {saving ? 'SAVING...' : 'SAVE CHANGES'}
                       </button>

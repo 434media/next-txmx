@@ -130,7 +130,7 @@ export default function FlyerUploader({
           onClick={() => inputRef.current?.click()}
           className={`relative border-2 border-dashed rounded-lg px-6 py-10 text-center cursor-pointer transition-colors ${
             dragOver
-              ? "border-[#FFB800] bg-amber-50/40"
+              ? "border-gray-900 bg-amber-50/40"
               : "border-gray-200 hover:border-gray-300 bg-gray-50/50 hover:bg-gray-50"
           }`}
         >
@@ -176,7 +176,7 @@ export default function FlyerUploader({
           </div>
           <div className="w-full h-1 bg-gray-100 rounded-full overflow-hidden">
             <div
-              className="h-full bg-[#FFB800] transition-all duration-200"
+              className="h-full bg-gray-900 transition-all duration-200"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -197,7 +197,7 @@ export default function FlyerUploader({
             value={manualUrl}
             onChange={(e) => setManualUrl(e.target.value)}
             placeholder="https://..."
-            className="flex-1 bg-gray-50 border border-gray-200 text-gray-900 text-[13px] px-3 py-2 rounded-md focus:outline-none focus:border-[#FFB800]"
+            className="flex-1 bg-gray-50 border border-gray-200 text-gray-900 text-[13px] px-3 py-2 rounded-md focus:outline-none focus:border-gray-900"
           />
           <button
             type="button"

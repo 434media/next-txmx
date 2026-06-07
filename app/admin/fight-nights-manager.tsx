@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import {
   collection,
   limit as fbLimit,
@@ -27,7 +28,6 @@ import {
   recordFightNightBoutResult,
   markBoutLive,
   reopenFightNightBout,
-  getPickCount,
   getPicksForBout,
   type FightNightPick,
 } from "../actions/fightnight-picks"
@@ -51,6 +51,7 @@ import {
   createPoll,
   getPolls,
   closePoll,
+  reopenPoll,
   deletePoll,
   updatePoll,
 } from "../actions/fightnight-polls"
@@ -72,9 +73,15 @@ import {
 import { useAdminAuth } from "./admin-auth-gate"
 import FlyerUploader from "./flyer-uploader"
 import UserActivityDrawer from "./user-activity-drawer"
+import Combobox, { type ComboboxOption } from "./combobox"
+import FighterPicker from "./fighter-picker"
+import GymPicker from "./gym-picker"
+import { getFighters } from "../actions/fighters"
+import { getGyms, type GymData } from "../actions/gyms"
+import { type Fighter, WEIGHT_CLASSES } from "../../lib/types/fighter"
 
 const inputClass =
-  "w-full bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-[#FFB800] focus:ring-1 focus:ring-[#FFB800]/30 placeholder:text-gray-400 rounded-md"
+  "w-full bg-gray-50 border border-gray-200 text-gray-900 text-[13px] leading-tight px-3 py-2 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900/30 placeholder:text-gray-400 rounded-md"
 const labelClass =
   "text-[10px] font-semibold text-gray-400 tracking-[0.15em] block mb-1"
 
@@ -92,35 +99,219 @@ const STATUS_STYLES: Record<FightNightStatus, string> = {
   completed: "bg-green-50 text-green-700 border-green-200",
 }
 
+// Solid status dots for the combobox picker.
+const STATUS_DOT: Record<FightNightStatus, string> = {
+  announced: "bg-blue-500",
+  doors_open: "bg-amber-500",
+  live: "bg-red-500",
+  completed: "bg-green-500",
+}
+
+// Active-cell styling for the status segmented control.
+const SEG_ACTIVE: Record<FightNightStatus, string> = {
+  announced: "bg-blue-50 text-blue-700",
+  doors_open: "bg-amber-50 text-amber-700",
+  live: "bg-red-50 text-red-700",
+  completed: "bg-green-50 text-green-700",
+}
+
+/** Section header with an optional one-line description (Vercel settings style). */
+function SectionHead({ title, desc }: { title: string; desc?: string }) {
+  return (
+    <div className="mb-3">
+      <p className="text-[11px] font-semibold text-gray-500 tracking-[0.15em] uppercase">
+        {title}
+      </p>
+      {desc && <p className="text-[12px] text-gray-400 mt-0.5">{desc}</p>}
+    </div>
+  )
+}
+
+const ONBOARDING_KEY = "txmx-fn-onboarding-dismissed"
+
+const ONBOARDING_STEPS: { title: string; desc: string }[] = [
+  { title: "Set up the event", desc: "Title, venue, date, prize, and flyer in the Details tab." },
+  { title: "Build the fight card", desc: "Add each bout in the Fight Card tab." },
+  { title: "Add engagement", desc: "Optional polls and props fans play along with." },
+  { title: "Run it live", desc: "Start each bout and declare winners in the Live tab." },
+  { title: "Award prizes", desc: "Watch Standings, then award winners and send the recap." },
+]
+
+/** Dismissible "how it works" card. Replaces the static description and the
+ * header stepper — explains the workflow + lifecycle, then gets out of the way.
+ * Dismissal is remembered in localStorage with a small re-open affordance. */
+function FightNightsOnboarding() {
+  const [mounted, setMounted] = useState(false)
+  const [dismissed, setDismissed] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+    setDismissed(localStorage.getItem(ONBOARDING_KEY) === "1")
+  }, [])
+
+  if (!mounted) return null
+
+  if (dismissed) {
+    return (
+      <button
+        onClick={() => {
+          localStorage.removeItem(ONBOARDING_KEY)
+          setDismissed(false)
+        }}
+        className="mb-5 inline-flex items-center gap-1.5 text-[12px] text-gray-400 hover:text-gray-700 transition-colors"
+      >
+        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+        </svg>
+        How it works
+      </button>
+    )
+  }
+
+  return (
+    <div className="relative border border-gray-200 rounded-xl bg-gray-50/60 p-5 mb-5">
+      <button
+        onClick={() => {
+          localStorage.setItem(ONBOARDING_KEY, "1")
+          setDismissed(true)
+        }}
+        aria-label="Dismiss"
+        className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 transition-colors"
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      <p className="text-sm font-bold text-gray-800 mb-1">How Fight Nights work</p>
+      <p className="text-[12px] text-gray-500 mb-4 max-w-2xl">
+        Each fight night is the live fan game for one event — build it, run it
+        live, and award prizes. Fans play along on its public page.
+      </p>
+
+      <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {ONBOARDING_STEPS.map((s, i) => (
+          <li key={s.title} className="flex gap-2.5">
+            <span className="shrink-0 w-5 h-5 rounded-full bg-gray-900 text-white text-[10px] font-bold tabular-nums inline-flex items-center justify-center">
+              {i + 1}
+            </span>
+            <span className="min-w-0">
+              <span className="block text-[12px] font-semibold text-gray-800 leading-tight">
+                {s.title}
+              </span>
+              <span className="block text-[11px] text-gray-500 leading-snug mt-0.5">
+                {s.desc}
+              </span>
+            </span>
+          </li>
+        ))}
+      </ol>
+
+      <p className="text-[11px] text-gray-400 mt-4">
+        Status moves Announced → Doors Open → Live → Completed (set it in
+        Details). Completed events show a recap on the public page.
+      </p>
+    </div>
+  )
+}
+
 export default function FightNightsManager() {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const fnParam = searchParams.get("fn")
+
   const [fightNights, setFightNights] = useState<FightNight[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedId, setSelectedId] = useState<string>("")
+  const [activeId, setActiveId] = useState<string>("")
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState("")
+
+  // Write `fn`/`tab` query params so the selected night + tab survive a
+  // refresh and are shareable. Pass null to clear a param.
+  const updateUrl = useCallback(
+    (next: { fn?: string | null; tab?: string | null }) => {
+      const params = new URLSearchParams(searchParams.toString())
+      if (next.fn !== undefined) {
+        if (next.fn) params.set("fn", next.fn)
+        else params.delete("fn")
+      }
+      if (next.tab !== undefined) {
+        if (next.tab) params.set("tab", next.tab)
+        else params.delete("tab")
+      }
+      const qs = params.toString()
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
+    },
+    [router, pathname, searchParams]
+  )
 
   const load = useCallback(async () => {
     setLoading(true)
     try {
       // Use the SAME selection logic as the public landing page so admin
       // and the featured night on `/fight-nights` resolve to the same event.
-      // Only seeds the selection on first load — admin can switch manually.
+      // A `?fn=` in the URL wins; otherwise seed from the active night.
       const [data, active] = await Promise.all([
         getFightNights(),
         getActiveFightNight(),
       ])
       setFightNights(data)
-      setSelectedId((current) => current || active?.id || data[0]?.id || "")
+      setActiveId(active?.id || "")
+      const fromUrl = fnParam
+        ? data.find((f) => f.slug === fnParam || f.id === fnParam)
+        : null
+      setSelectedId(
+        (current) => current || fromUrl?.id || active?.id || data[0]?.id || ""
+      )
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [fnParam])
+
+  function selectNight(id: string) {
+    setSelectedId(id)
+    const fn = fightNights.find((f) => f.id === id)
+    // Clear `tab` so the newly selected night opens on its status default.
+    updateUrl({ fn: fn ? fn.slug || fn.id : null, tab: null })
+  }
 
   useEffect(() => {
     load()
   }, [load])
 
   const selected = fightNights.find((f) => f.id === selectedId) || null
+
+  // Group the picker so it's obvious what's current vs finished. The active
+  // night (what the public site features) is pinned to the top of Upcoming.
+  const upcoming = fightNights
+    .filter((f) => f.status !== "completed")
+    .sort((a, b) => {
+      if (a.id === activeId) return -1
+      if (b.id === activeId) return 1
+      return (a.date || "").localeCompare(b.date || "")
+    })
+  const past = fightNights
+    .filter((f) => f.status === "completed")
+    .sort((a, b) => (b.date || "").localeCompare(a.date || ""))
+
+  const nightOptions: ComboboxOption[] = [
+    ...upcoming.map((fn) => ({
+      value: fn.id,
+      label: fn.title || "(untitled)",
+      hint: `${fn.date || "TBD"}${fn.id === activeId ? " · Active" : ""}`,
+      dotClass: STATUS_DOT[fn.status],
+      group: "Live / Upcoming",
+    })),
+    ...past.map((fn) => ({
+      value: fn.id,
+      label: fn.title || "(untitled)",
+      hint: fn.date || "TBD",
+      dotClass: STATUS_DOT[fn.status],
+      group: "Past",
+    })),
+  ]
 
   async function handleCreate() {
     setCreating(true)
@@ -133,6 +324,7 @@ export default function FightNightsManager() {
       })
       await load()
       setSelectedId(fn.id)
+      updateUrl({ fn: fn.slug || fn.id, tab: null })
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to create")
     } finally {
@@ -142,24 +334,24 @@ export default function FightNightsManager() {
 
   return (
     <div>
-      {/* List of fight nights + create button */}
-      <div className="flex items-center justify-between mb-5">
-        <select
+      {/* What this page does — dismissible onboarding */}
+      <FightNightsOnboarding />
+
+      {/* Fight-night picker (grouped, status dots) + create button */}
+      <div className="flex items-center gap-3 mb-5">
+        <Combobox
           value={selectedId}
-          onChange={(e) => setSelectedId(e.target.value)}
-          className="text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white text-gray-700 focus:outline-none focus:border-gray-400 max-w-md"
-        >
-          <option value="">Select a fight night…</option>
-          {fightNights.map((fn) => (
-            <option key={fn.id} value={fn.id}>
-              {fn.date} — {fn.title || "(untitled)"} · {STATUS_LABELS[fn.status]}
-            </option>
-          ))}
-        </select>
+          onSelect={selectNight}
+          options={nightOptions}
+          placeholder="Select a fight night…"
+          searchPlaceholder="Search fight nights…"
+          ariaLabel="Select fight night"
+          className="max-w-md flex-1"
+        />
         <button
           onClick={handleCreate}
           disabled={creating}
-          className="text-sm font-semibold px-4 py-2 rounded-lg bg-gray-900 text-white hover:bg-gray-800 transition-colors disabled:opacity-50"
+          className="text-sm font-semibold px-4 py-2 rounded-lg bg-gray-900 text-white hover:bg-gray-800 transition-colors disabled:opacity-50 shrink-0"
         >
           {creating ? "Creating…" : "+ New Fight Night"}
         </button>
@@ -195,7 +387,7 @@ export default function FightNightsManager() {
 // ── Detail view (metadata + bouts + live control) ───────────
 
 type DetailTab =
-  | "overview"
+  | "details"
   | "card"
   | "polls"
   | "props"
@@ -204,7 +396,7 @@ type DetailTab =
   | "prizes"
 
 const TABS: { key: DetailTab; label: string }[] = [
-  { key: "overview", label: "Overview" },
+  { key: "details", label: "Details" },
   { key: "card", label: "Fight Card" },
   { key: "polls", label: "Polls" },
   { key: "props", label: "Props" },
@@ -213,6 +405,61 @@ const TABS: { key: DetailTab; label: string }[] = [
   { key: "prizes", label: "Prizes" },
 ]
 
+/** The tab to open by default for a given lifecycle stage — so a new event
+ * lands on setup, and a running event lands on the command center. Overridden
+ * by an explicit `?tab=` in the URL. */
+function defaultTabForStatus(status: FightNightStatus): DetailTab {
+  switch (status) {
+    case "announced":
+      return "details"
+    case "doors_open":
+    case "live":
+      return "live"
+    case "completed":
+      return "standings"
+    default:
+      return "details"
+  }
+}
+
+function Switch({
+  checked,
+  onChange,
+  label,
+  hint,
+}: {
+  checked: boolean
+  onChange: (v: boolean) => void
+  label: string
+  hint?: string
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      onClick={() => onChange(!checked)}
+      className="flex items-center justify-between gap-4 w-full text-left"
+    >
+      <span>
+        <span className="block text-[13px] font-medium text-gray-800">{label}</span>
+        {hint && <span className="block text-[11px] text-gray-400 mt-0.5">{hint}</span>}
+      </span>
+      <span
+        className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${
+          checked ? "bg-gray-900" : "bg-gray-200"
+        }`}
+      >
+        <span
+          className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+            checked ? "translate-x-[18px]" : "translate-x-0.5"
+          }`}
+        />
+      </span>
+    </button>
+  )
+}
+
 function FightNightDetail({
   fightNight,
   onChange,
@@ -220,7 +467,27 @@ function FightNightDetail({
   fightNight: FightNight
   onChange: () => void
 }) {
-  const [tab, setTab] = useState<DetailTab>("overview")
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const urlTab = searchParams.get("tab")
+  const initialTab: DetailTab =
+    urlTab && TABS.some((t) => t.key === urlTab)
+      ? (urlTab as DetailTab)
+      : defaultTabForStatus(fightNight.status)
+  const [tab, setTabState] = useState<DetailTab>(initialTab)
+
+  // Switching a tab writes `?tab=` (preserving `fn`) so refresh / back-forward
+  // / shared links land on the same tab.
+  const setTab = useCallback(
+    (next: DetailTab) => {
+      setTabState(next)
+      const params = new URLSearchParams(searchParams.toString())
+      params.set("tab", next)
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+    },
+    [router, pathname, searchParams]
+  )
   // When set, the user-activity drawer renders over everything. Cleared
   // by closing the drawer (backdrop, X, or Escape). Drives drill-down
   // from both the Participants feed and the Leaderboard preview.
@@ -264,11 +531,24 @@ function FightNightDetail({
               {fightNight.city ? ` · ${fightNight.city}` : ""}
             </p>
           </div>
-          <span
-            className={`text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full border shrink-0 ${STATUS_STYLES[fightNight.status]}`}
-          >
-            {STATUS_LABELS[fightNight.status]}
-          </span>
+          <div className="flex items-center gap-2 shrink-0">
+            <a
+              href={`/fight-nights/${fightNight.slug || fightNight.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-[11px] font-semibold text-gray-500 hover:text-gray-900 border border-gray-200 hover:border-gray-300 rounded-md px-2 py-1 transition-colors"
+            >
+              View live page
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+              </svg>
+            </a>
+            <span
+              className={`text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full border ${STATUS_STYLES[fightNight.status]}`}
+            >
+              {STATUS_LABELS[fightNight.status]}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -315,11 +595,8 @@ function FightNightDetail({
 
       {/* Tab content */}
       <div>
-        {tab === "overview" && (
-          <div className="space-y-6">
-            <OverviewPanel fightNight={fightNight} onTabChange={setTab} />
-            <MetadataPanel fightNight={fightNight} onChange={onChange} />
-          </div>
+        {tab === "details" && (
+          <MetadataPanel fightNight={fightNight} onChange={onChange} />
         )}
         {tab === "card" && <BoutsPanel fightNight={fightNight} />}
         {tab === "polls" && <PollsPanel fightNight={fightNight} />}
@@ -355,144 +632,6 @@ function FightNightDetail({
 }
 
 // ── Overview Panel ─────────────────────────────────────────
-
-function OverviewPanel({
-  fightNight,
-  onTabChange,
-}: {
-  fightNight: FightNight
-  onTabChange: (tab: DetailTab) => void
-}) {
-  const [stats, setStats] = useState({
-    bouts: 0,
-    boutsCompleted: 0,
-    participants: 0,
-    picksPlaced: 0,
-    topPoints: 0,
-    topName: "",
-    pollsCount: 0,
-    propsCount: 0,
-  })
-  const [loading, setLoading] = useState(true)
-
-  const load = useCallback(async () => {
-    setLoading(true)
-    try {
-      const [bouts, top, polls, props, picksPlaced] = await Promise.all([
-        getBouts(fightNight.id),
-        getStandings(fightNight.id, { limit: 1 }),
-        getPolls(fightNight.id, "all"),
-        getProps(fightNight.id),
-        getPickCount(fightNight.id),
-      ])
-      const participantCount = (await getStandings(fightNight.id, { limit: 1000 })).length
-      const topPlayer = top[0]
-      setStats({
-        bouts: bouts.length,
-        boutsCompleted: bouts.filter((b) => b.status === "completed").length,
-        participants: participantCount,
-        picksPlaced,
-        topPoints: topPlayer?.points || 0,
-        topName: topPlayer?.displayName || (topPlayer ? "Anonymous" : ""),
-        pollsCount: polls.length,
-        propsCount: props.length,
-      })
-    } finally {
-      setLoading(false)
-    }
-  }, [fightNight.id])
-
-  useEffect(() => {
-    load()
-  }, [load])
-
-  const avgPicks =
-    stats.participants > 0
-      ? (stats.picksPlaced / stats.participants).toFixed(1)
-      : "0"
-
-  const cards = [
-    {
-      label: "Bouts settled",
-      value: `${stats.boutsCompleted}/${stats.bouts}`,
-      hint: stats.bouts === 0 ? "Add bouts" : null,
-      tab: "card" as DetailTab,
-    },
-    {
-      label: "Participants",
-      value: stats.participants.toLocaleString(),
-      hint: stats.participants === 0 ? "Nobody signed up yet" : null,
-      tab: "standings" as DetailTab,
-    },
-    {
-      label: "Picks placed",
-      value: stats.picksPlaced.toLocaleString(),
-      hint:
-        stats.picksPlaced === 0
-          ? "No picks yet"
-          : stats.participants > 0
-            ? `${avgPicks} per player`
-            : null,
-      tab: "live" as DetailTab,
-    },
-    {
-      label: "Top player",
-      value: stats.topPoints > 0 ? stats.topPoints.toLocaleString() + " pts" : "—",
-      hint: stats.topName || null,
-      tab: "standings" as DetailTab,
-    },
-    {
-      label: "Polls",
-      value: stats.pollsCount.toString(),
-      hint: stats.pollsCount === 0 ? "Create polls" : null,
-      tab: "polls" as DetailTab,
-    },
-    {
-      label: "Props",
-      value: stats.propsCount.toString(),
-      hint: stats.propsCount === 0 ? "Create props" : null,
-      tab: "props" as DetailTab,
-    },
-  ]
-
-  return (
-    <section className="border border-gray-200 rounded-xl p-5 bg-white">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-bold text-gray-800 tracking-wide uppercase">
-          Overview
-        </h3>
-        <button
-          onClick={load}
-          disabled={loading}
-          className="text-[10px] text-gray-500 hover:text-gray-800 px-2 py-1 border border-gray-200 rounded disabled:opacity-50"
-        >
-          {loading ? "…" : "Refresh"}
-        </button>
-      </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-px bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
-        {cards.map((c) => (
-          <button
-            key={c.label}
-            onClick={() => onTabChange(c.tab)}
-            className="bg-white text-left px-4 py-4 hover:bg-gray-50 transition-colors group"
-          >
-            <p className="text-[10px] font-semibold text-gray-400 tracking-[0.15em] uppercase mb-1">
-              {c.label}
-            </p>
-            <p className="text-2xl font-bold text-gray-900 tabular-nums leading-tight">
-              {loading ? "…" : c.value}
-            </p>
-            {c.hint && (
-              <p className="text-[11px] text-gray-400 font-medium mt-0.5 truncate group-hover:text-gray-600 transition-colors">
-                {c.hint}
-              </p>
-            )}
-          </button>
-        ))}
-      </div>
-    </section>
-  )
-}
 
 // ── Check-Ins Panel (track users) ──────────────────────────
 
@@ -902,6 +1041,7 @@ function LeaderboardPreviewPanel({
 
 function PropsPanel({ fightNight }: { fightNight: FightNight }) {
   const [props, setProps] = useState<FightNightProp[]>([])
+  const [bouts, setBouts] = useState<FightNightBout[]>([])
   const [loading, setLoading] = useState(true)
   const [showCreate, setShowCreate] = useState(false)
   const [title, setTitle] = useState("")
@@ -927,8 +1067,12 @@ function PropsPanel({ fightNight }: { fightNight: FightNight }) {
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const data = await getProps(fightNight.id)
-      setProps(data)
+      const [propData, boutData] = await Promise.all([
+        getProps(fightNight.id),
+        getBouts(fightNight.id),
+      ])
+      setProps(propData)
+      setBouts(boutData)
     } finally {
       setLoading(false)
     }
@@ -1080,15 +1224,15 @@ function PropsPanel({ fightNight }: { fightNight: FightNight }) {
         </h3>
         <button
           onClick={() => setShowCreate(!showCreate)}
-          className="text-[12px] font-semibold text-[#FFB800] hover:text-[#E5A600] tracking-wider transition-colors"
+          className="text-[12px] font-semibold text-gray-900 hover:text-gray-800 tracking-wider transition-colors"
         >
           {showCreate ? "Cancel" : "+ New Prop"}
         </button>
       </div>
 
       {showCreate && (
-        <div className="border border-amber-200 bg-amber-50/40 rounded-lg p-3 mb-4">
-          <p className="text-[10px] font-bold text-amber-700 tracking-[0.2em] uppercase mb-2">
+        <div className="border border-gray-200 bg-gray-50 rounded-lg p-3 mb-4">
+          <p className="text-[10px] font-bold text-gray-500 tracking-[0.2em] uppercase mb-2">
             New Prop
           </p>
           {error && <p className="text-red-600 text-xs mb-2">{error}</p>}
@@ -1133,18 +1277,8 @@ function PropsPanel({ fightNight }: { fightNight: FightNight }) {
               />
             </div>
             <div>
-              <label className={labelClass}>BOUT # (optional)</label>
-              <input
-                type="number"
-                min={1}
-                value={boutNumber}
-                onChange={(e) => {
-                  const v = e.target.value
-                  setBoutNumber(v === "" ? "" : Number(v))
-                }}
-                placeholder="—"
-                className={inputClass}
-              />
+              <label className={labelClass}>LINKED BOUT (optional)</label>
+              <BoutSelect bouts={bouts} value={boutNumber} onChange={setBoutNumber} />
             </div>
             <div className="sm:col-span-2 flex items-center pt-1">
               <label className="flex items-center gap-2 cursor-pointer">
@@ -1152,7 +1286,7 @@ function PropsPanel({ fightNight }: { fightNight: FightNight }) {
                   type="checkbox"
                   checked={isUnderdog}
                   onChange={(e) => setIsUnderdog(e.target.checked)}
-                  className="accent-[#FFB800]"
+                  className="accent-gray-900"
                 />
                 <span className="text-[11px] text-gray-700 font-medium">
                   Underdog (1.25× payout)
@@ -1163,7 +1297,7 @@ function PropsPanel({ fightNight }: { fightNight: FightNight }) {
           <button
             onClick={handleCreate}
             disabled={creating}
-            className="px-4 py-1.5 bg-[#FFB800] text-white text-[11px] font-semibold rounded-md disabled:opacity-50"
+            className="px-4 py-1.5 bg-gray-900 text-white text-[11px] font-semibold rounded-md disabled:opacity-50"
           >
             {creating ? "Creating…" : "Create Prop"}
           </button>
@@ -1181,9 +1315,9 @@ function PropsPanel({ fightNight }: { fightNight: FightNight }) {
               return (
                 <div
                   key={prop.id}
-                  className="border border-amber-300 bg-amber-50/30 rounded-lg p-3"
+                  className="border border-gray-200 bg-gray-50 rounded-lg p-3"
                 >
-                  <p className="text-[10px] font-bold text-amber-700 tracking-[0.2em] uppercase mb-2">
+                  <p className="text-[10px] font-bold text-gray-500 tracking-[0.2em] uppercase mb-2">
                     Editing Prop
                   </p>
                   {editError && (
@@ -1218,7 +1352,7 @@ function PropsPanel({ fightNight }: { fightNight: FightNight }) {
                         rows={Math.max(3, editOptionsText.split("\n").length)}
                         className={inputClass + " resize-none"}
                       />
-                      <p className="text-[10px] text-amber-700 mt-1">
+                      <p className="text-[10px] text-gray-500 mt-1">
                         Order matters: each line maps to the existing option in the same
                         slot, so picks survive label edits. Adding lines creates new
                         options; removing lines orphans any picks on them.
@@ -1237,17 +1371,11 @@ function PropsPanel({ fightNight }: { fightNight: FightNight }) {
                       />
                     </div>
                     <div>
-                      <label className={labelClass}>BOUT # (optional)</label>
-                      <input
-                        type="number"
-                        min={1}
+                      <label className={labelClass}>LINKED BOUT (optional)</label>
+                      <BoutSelect
+                        bouts={bouts}
                         value={editBoutNumber}
-                        onChange={(e) => {
-                          const v = e.target.value
-                          setEditBoutNumber(v === "" ? "" : Number(v))
-                        }}
-                        placeholder="—"
-                        className={inputClass}
+                        onChange={setEditBoutNumber}
                       />
                     </div>
                     <div className="sm:col-span-2 flex items-center pt-1">
@@ -1256,7 +1384,7 @@ function PropsPanel({ fightNight }: { fightNight: FightNight }) {
                           type="checkbox"
                           checked={editIsUnderdog}
                           onChange={(e) => setEditIsUnderdog(e.target.checked)}
-                          className="accent-[#FFB800]"
+                          className="accent-gray-900"
                         />
                         <span className="text-[11px] text-gray-700 font-medium">
                           Underdog (1.25× payout)
@@ -1268,7 +1396,7 @@ function PropsPanel({ fightNight }: { fightNight: FightNight }) {
                     <button
                       onClick={() => saveEdit(prop.id)}
                       disabled={savingEdit}
-                      className="px-4 py-1.5 bg-[#FFB800] text-white text-[11px] font-semibold rounded-md disabled:opacity-50"
+                      className="px-4 py-1.5 bg-gray-900 text-white text-[11px] font-semibold rounded-md disabled:opacity-50"
                     >
                       {savingEdit ? "Saving…" : "Save"}
                     </button>
@@ -1326,7 +1454,7 @@ function PropsPanel({ fightNight }: { fightNight: FightNight }) {
                 <div className="flex items-center gap-2 text-[10px] text-gray-400 mb-2">
                   <span>{prop.pointsReward} pts</span>
                   {prop.isUnderdog && (
-                    <span className="text-amber-600 font-semibold">Underdog 1.25×</span>
+                    <span className="text-gray-900 font-semibold">Underdog 1.25×</span>
                   )}
                   {prop.boutNumber && <span>· Bout {prop.boutNumber}</span>}
                 </div>
@@ -1342,7 +1470,7 @@ function PropsPanel({ fightNight }: { fightNight: FightNight }) {
                     </button>
                     <button
                       onClick={() => handleLock(prop.id)}
-                      className="text-[11px] px-3 py-1 rounded-md border border-amber-200 text-amber-700 hover:bg-amber-50"
+                      className="text-[11px] px-3 py-1 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50"
                     >
                       Lock
                     </button>
@@ -1381,7 +1509,7 @@ function PropsPanel({ fightNight }: { fightNight: FightNight }) {
                     </button>
                     <button
                       onClick={() => handleUnlock(prop.id, prop.boutNumber)}
-                      className="text-[11px] px-3 py-1 rounded-md text-gray-500 hover:text-amber-700"
+                      className="text-[11px] px-3 py-1 rounded-md text-gray-500 hover:text-gray-900"
                     >
                       Reopen
                     </button>
@@ -1430,11 +1558,86 @@ function PropsPanel({ fightNight }: { fightNight: FightNight }) {
 
 // ── Polls Panel ────────────────────────────────────────────
 
+/** Links a poll/prop to a real bout on the card (or none). */
+function BoutSelect({
+  bouts,
+  value,
+  onChange,
+}: {
+  bouts: FightNightBout[]
+  value: number | ""
+  onChange: (v: number | "") => void
+}) {
+  const options: ComboboxOption[] = [
+    { value: "", label: "Not tied to a bout" },
+    ...bouts.map((b) => ({
+      value: String(b.boutNumber),
+      label: `Bout ${b.boutNumber} — ${b.fighter1Name || "TBA"} vs ${b.fighter2Name || "TBA"}`,
+    })),
+  ]
+  return (
+    <Combobox
+      value={value === "" ? "" : String(value)}
+      options={options}
+      onSelect={(v) => onChange(v === "" ? "" : Number(v))}
+      placeholder="Not tied to a bout"
+      searchPlaceholder="Search bouts…"
+      ariaLabel="Linked bout"
+    />
+  )
+}
+
+/** Editable list of option strings with add/remove (min 2). */
+function OptionRows({
+  options,
+  onChange,
+}: {
+  options: string[]
+  onChange: (next: string[]) => void
+}) {
+  return (
+    <div className="space-y-1.5">
+      {options.map((opt, i) => (
+        <div key={i} className="flex items-center gap-1.5">
+          <input
+            type="text"
+            value={opt}
+            onChange={(e) => onChange(options.map((o, j) => (j === i ? e.target.value : o)))}
+            placeholder={`Option ${i + 1}`}
+            className={inputClass}
+          />
+          <button
+            type="button"
+            onClick={() => onChange(options.filter((_, j) => j !== i))}
+            disabled={options.length <= 2}
+            aria-label="Remove option"
+            className="shrink-0 w-7 h-7 inline-flex items-center justify-center text-gray-400 hover:text-red-500 disabled:opacity-30 disabled:hover:text-gray-400 transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      ))}
+      <button
+        type="button"
+        onClick={() => onChange([...options, ""])}
+        className="text-[11px] font-semibold text-gray-600 hover:text-gray-900 transition-colors"
+      >
+        + Add option
+      </button>
+    </div>
+  )
+}
+
 function PollsPanel({ fightNight }: { fightNight: FightNight }) {
   const [polls, setPolls] = useState<FightNightPoll[]>([])
+  const [bouts, setBouts] = useState<FightNightBout[]>([])
   const [loading, setLoading] = useState(true)
+  const [showCreate, setShowCreate] = useState(false)
+
   const [question, setQuestion] = useState("")
-  const [optionsText, setOptionsText] = useState("")
+  const [options, setOptions] = useState<string[]>(["", ""])
   const [boutNumber, setBoutNumber] = useState<number | "">("")
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState("")
@@ -1442,7 +1645,7 @@ function PollsPanel({ fightNight }: { fightNight: FightNight }) {
   // Inline-edit state — when set, the matching poll row swaps to a form.
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editQuestion, setEditQuestion] = useState("")
-  const [editOptionsText, setEditOptionsText] = useState("")
+  const [editOptions, setEditOptions] = useState<string[]>([])
   const [editBoutNumber, setEditBoutNumber] = useState<number | "">("")
   const [editError, setEditError] = useState("")
   const [savingEdit, setSavingEdit] = useState(false)
@@ -1450,12 +1653,23 @@ function PollsPanel({ fightNight }: { fightNight: FightNight }) {
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const data = await getPolls(fightNight.id, "all")
-      setPolls(data)
+      const [pollData, boutData] = await Promise.all([
+        getPolls(fightNight.id, "all"),
+        getBouts(fightNight.id),
+      ])
+      setPolls(pollData)
+      setBouts(boutData)
     } finally {
       setLoading(false)
     }
   }, [fightNight.id])
+
+  function resetCreate() {
+    setQuestion("")
+    setOptions(["", ""])
+    setBoutNumber("")
+    setError("")
+  }
 
   useEffect(() => {
     load()
@@ -1463,28 +1677,24 @@ function PollsPanel({ fightNight }: { fightNight: FightNight }) {
 
   async function handleCreate() {
     setError("")
-    const options = optionsText
-      .split("\n")
-      .map((l) => l.trim())
-      .filter(Boolean)
+    const opts = options.map((o) => o.trim()).filter(Boolean)
     if (!question.trim()) {
       setError("Question required")
       return
     }
-    if (options.length < 2) {
-      setError("At least 2 options required (one per line)")
+    if (opts.length < 2) {
+      setError("At least 2 options required")
       return
     }
     setCreating(true)
     try {
       await createPoll(fightNight.id, {
         question,
-        options,
+        options: opts,
         boutNumber: typeof boutNumber === "number" ? boutNumber : null,
       })
-      setQuestion("")
-      setOptionsText("")
-      setBoutNumber("")
+      resetCreate()
+      setShowCreate(false)
       await load()
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to create poll")
@@ -1498,16 +1708,25 @@ function PollsPanel({ fightNight }: { fightNight: FightNight }) {
     await load()
   }
 
-  async function handleDelete(pollId: string) {
-    if (!confirm("Delete this poll? Votes will also be orphaned.")) return
-    await deletePoll(fightNight.id, pollId)
+  async function handleReopen(pollId: string) {
+    await reopenPoll(fightNight.id, pollId)
+    await load()
+  }
+
+  async function handleDelete(poll: FightNightPoll) {
+    const warn =
+      poll.totalVotes > 0
+        ? ` ${poll.totalVotes} vote${poll.totalVotes === 1 ? "" : "s"} will be orphaned.`
+        : ""
+    if (!confirm(`Delete this poll?${warn}`)) return
+    await deletePoll(fightNight.id, poll.id)
     await load()
   }
 
   function startEdit(poll: FightNightPoll) {
     setEditingId(poll.id)
     setEditQuestion(poll.question)
-    setEditOptionsText(poll.options.map((o) => o.label).join("\n"))
+    setEditOptions(poll.options.map((o) => o.label))
     setEditBoutNumber(poll.boutNumber ?? "")
     setEditError("")
   }
@@ -1519,21 +1738,18 @@ function PollsPanel({ fightNight }: { fightNight: FightNight }) {
 
   async function saveEdit(pollId: string) {
     setEditError("")
-    const options = editOptionsText
-      .split("\n")
-      .map((l) => l.trim())
-      .filter(Boolean)
+    const opts = editOptions.map((o) => o.trim()).filter(Boolean)
     if (!editQuestion.trim()) {
       setEditError("Question required")
       return
     }
-    if (options.length < 2) {
-      setEditError("At least 2 options required (one per line)")
+    if (opts.length < 2) {
+      setEditError("At least 2 options required")
       return
     }
     const original = polls.find((p) => p.id === pollId)
     const optionCountChanged =
-      !!original && options.length !== original.options.length
+      !!original && opts.length !== original.options.length
     if (
       optionCountChanged &&
       original &&
@@ -1548,7 +1764,7 @@ function PollsPanel({ fightNight }: { fightNight: FightNight }) {
     try {
       await updatePoll(fightNight.id, pollId, {
         question: editQuestion,
-        options,
+        options: opts,
         boutNumber: typeof editBoutNumber === "number" ? editBoutNumber : null,
       })
       setEditingId(null)
@@ -1562,59 +1778,69 @@ function PollsPanel({ fightNight }: { fightNight: FightNight }) {
 
   return (
     <section className="border border-gray-200 rounded-xl p-5 bg-white">
-      <h3 className="text-sm font-bold text-gray-800 tracking-wide uppercase mb-4">
-        Polls
-      </h3>
-
-      <div className="border border-amber-200 bg-amber-50/40 rounded-lg p-3 mb-4">
-        <p className="text-[10px] font-bold text-amber-700 tracking-[0.2em] uppercase mb-2">
-          New Poll
-        </p>
-        {error && <p className="text-red-600 text-xs mb-2">{error}</p>}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
-          <div className="sm:col-span-2">
-            <label className={labelClass}>QUESTION</label>
-            <input
-              type="text"
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
-              placeholder='e.g. "Will the main event go to decision?"'
-              className={inputClass}
-            />
-          </div>
-          <div className="sm:col-span-2">
-            <label className={labelClass}>OPTIONS (one per line, 2+ required)</label>
-            <textarea
-              value={optionsText}
-              onChange={(e) => setOptionsText(e.target.value)}
-              rows={3}
-              placeholder={"Yes — decision\nNo — KO/TKO\nDraw"}
-              className={inputClass + " resize-none"}
-            />
-          </div>
-          <div>
-            <label className={labelClass}>BOUT # (optional)</label>
-            <input
-              type="number"
-              min={1}
-              value={boutNumber}
-              onChange={(e) => {
-                const v = e.target.value
-                setBoutNumber(v === "" ? "" : Number(v))
-              }}
-              placeholder="—"
-              className={inputClass}
-            />
-          </div>
-        </div>
-        <button
-          onClick={handleCreate}
-          disabled={creating}
-          className="px-4 py-1.5 bg-[#FFB800] text-white text-[11px] font-semibold rounded-md disabled:opacity-50"
-        >
-          {creating ? "Creating…" : "Create Poll"}
-        </button>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-sm font-bold text-gray-800 tracking-wide uppercase">
+          Polls
+        </h3>
+        {!showCreate && (
+          <button
+            onClick={() => setShowCreate(true)}
+            className="text-[12px] font-semibold text-gray-700 hover:text-gray-900 transition-colors"
+          >
+            + New poll
+          </button>
+        )}
       </div>
+
+      {showCreate && (
+        <div className="border border-gray-200 bg-gray-50 rounded-lg p-3 mb-4">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[10px] font-bold text-gray-500 tracking-[0.2em] uppercase">
+              New Poll
+            </p>
+            <button
+              onClick={() => {
+                setShowCreate(false)
+                resetCreate()
+              }}
+              aria-label="Cancel"
+              className="text-gray-400 hover:text-gray-700 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          {error && <p className="text-red-600 text-xs mb-2">{error}</p>}
+          <div className="space-y-2 mb-2">
+            <div>
+              <label className={labelClass}>QUESTION</label>
+              <input
+                type="text"
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                placeholder='e.g. "Will the main event go to decision?"'
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label className={labelClass}>OPTIONS (2+ required)</label>
+              <OptionRows options={options} onChange={setOptions} />
+            </div>
+            <div>
+              <label className={labelClass}>LINKED BOUT (optional)</label>
+              <BoutSelect bouts={bouts} value={boutNumber} onChange={setBoutNumber} />
+            </div>
+          </div>
+          <button
+            onClick={handleCreate}
+            disabled={creating}
+            className="px-4 py-1.5 bg-gray-900 hover:bg-gray-800 text-white text-[11px] font-semibold rounded-md disabled:opacity-50"
+          >
+            {creating ? "Creating…" : "Create Poll"}
+          </button>
+        </div>
+      )}
 
       {loading ? (
         <p className="text-gray-400 text-sm">Loading polls…</p>
@@ -1628,16 +1854,16 @@ function PollsPanel({ fightNight }: { fightNight: FightNight }) {
               return (
                 <div
                   key={poll.id}
-                  className="border border-amber-300 bg-amber-50/30 rounded-lg p-3"
+                  className="border border-gray-200 bg-gray-50 rounded-lg p-3"
                 >
-                  <p className="text-[10px] font-bold text-amber-700 tracking-[0.2em] uppercase mb-2">
+                  <p className="text-[10px] font-bold text-gray-500 tracking-[0.2em] uppercase mb-2">
                     Editing Poll
                   </p>
                   {editError && (
                     <p className="text-red-600 text-xs mb-2">{editError}</p>
                   )}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
-                    <div className="sm:col-span-2">
+                  <div className="space-y-2 mb-2">
+                    <div>
                       <label className={labelClass}>QUESTION</label>
                       <input
                         type="text"
@@ -1646,35 +1872,22 @@ function PollsPanel({ fightNight }: { fightNight: FightNight }) {
                         className={inputClass}
                       />
                     </div>
-                    <div className="sm:col-span-2">
-                      <label className={labelClass}>
-                        OPTIONS (one per line, 2+ required)
-                      </label>
-                      <textarea
-                        value={editOptionsText}
-                        onChange={(e) => setEditOptionsText(e.target.value)}
-                        rows={Math.max(3, editOptionsText.split("\n").length)}
-                        className={inputClass + " resize-none"}
-                      />
+                    <div>
+                      <label className={labelClass}>OPTIONS (2+ required)</label>
+                      <OptionRows options={editOptions} onChange={setEditOptions} />
                       {poll.totalVotes > 0 && (
-                        <p className="text-[10px] text-amber-700 mt-1">
+                        <p className="text-[10px] text-gray-500 mt-1">
                           {poll.totalVotes} vote{poll.totalVotes === 1 ? "" : "s"} cast.
-                          Edits to labels keep tallies; adding/removing options resets them.
+                          Editing labels keeps tallies; adding/removing options resets them.
                         </p>
                       )}
                     </div>
                     <div>
-                      <label className={labelClass}>BOUT # (optional)</label>
-                      <input
-                        type="number"
-                        min={1}
+                      <label className={labelClass}>LINKED BOUT (optional)</label>
+                      <BoutSelect
+                        bouts={bouts}
                         value={editBoutNumber}
-                        onChange={(e) => {
-                          const v = e.target.value
-                          setEditBoutNumber(v === "" ? "" : Number(v))
-                        }}
-                        placeholder="—"
-                        className={inputClass}
+                        onChange={setEditBoutNumber}
                       />
                     </div>
                   </div>
@@ -1682,7 +1895,7 @@ function PollsPanel({ fightNight }: { fightNight: FightNight }) {
                     <button
                       onClick={() => saveEdit(poll.id)}
                       disabled={savingEdit}
-                      className="px-4 py-1.5 bg-[#FFB800] text-white text-[11px] font-semibold rounded-md disabled:opacity-50"
+                      className="px-4 py-1.5 bg-gray-900 text-white text-[11px] font-semibold rounded-md disabled:opacity-50"
                     >
                       {savingEdit ? "Saving…" : "Save"}
                     </button>
@@ -1697,6 +1910,11 @@ function PollsPanel({ fightNight }: { fightNight: FightNight }) {
                 </div>
               )
             }
+
+            const linkedBout =
+              poll.boutNumber != null
+                ? bouts.find((b) => b.boutNumber === poll.boutNumber)
+                : null
 
             return (
               <div key={poll.id} className="border border-gray-200 rounded-lg p-3">
@@ -1726,28 +1944,39 @@ function PollsPanel({ fightNight }: { fightNight: FightNight }) {
                   ))}
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] text-gray-400">
+                  <span className="text-[10px] text-gray-400 truncate min-w-0">
                     {poll.totalVotes} votes
-                    {poll.boutNumber && ` · Bout ${poll.boutNumber}`}
+                    {linkedBout
+                      ? ` · Bout ${linkedBout.boutNumber}: ${linkedBout.fighter1Name || "TBA"} vs ${linkedBout.fighter2Name || "TBA"}`
+                      : poll.boutNumber != null
+                        ? ` · Bout ${poll.boutNumber}`
+                        : ""}
                   </span>
                   <div className="flex-1" />
                   <button
                     onClick={() => startEdit(poll)}
-                    className="text-[10px] text-blue-600 hover:text-blue-700 font-semibold"
+                    className="text-[10px] text-blue-600 hover:text-blue-700 font-semibold shrink-0"
                   >
                     Edit
                   </button>
-                  {poll.status === "open" && (
+                  {poll.status === "open" ? (
                     <button
                       onClick={() => handleClose(poll.id)}
-                      className="text-[10px] text-amber-600 hover:text-amber-700 font-semibold"
+                      className="text-[10px] text-gray-600 hover:text-gray-900 font-semibold shrink-0"
                     >
                       Close
                     </button>
+                  ) : (
+                    <button
+                      onClick={() => handleReopen(poll.id)}
+                      className="text-[10px] text-gray-600 hover:text-gray-900 font-semibold shrink-0"
+                    >
+                      Reopen
+                    </button>
                   )}
                   <button
-                    onClick={() => handleDelete(poll.id)}
-                    className="text-[10px] text-gray-300 hover:text-red-500 font-semibold"
+                    onClick={() => handleDelete(poll)}
+                    className="text-[10px] text-gray-300 hover:text-red-500 font-semibold shrink-0"
                   >
                     Delete
                   </button>
@@ -1781,7 +2010,7 @@ function MetadataPanel({
   fightNight: FightNight
   onChange: () => void
 }) {
-  const [edit, setEdit] = useState({
+  const initial = {
     slug: fightNight.slug,
     title: fightNight.title,
     subtitle: fightNight.subtitle,
@@ -1789,8 +2018,6 @@ function MetadataPanel({
     city: fightNight.city,
     address: fightNight.address,
     date: fightNight.date,
-    doorsAt: fightNight.doorsAt,
-    firstBellAt: fightNight.firstBellAt,
     status: fightNight.status,
     flyerUrl: fightNight.flyerUrl,
     prizeLabel: fightNight.prizeLabel,
@@ -1798,14 +2025,22 @@ function MetadataPanel({
     promoCopy: fightNight.promoCopy,
     propsEnabled: fightNight.propsEnabled,
     pollsEnabled: fightNight.pollsEnabled,
-  })
+  }
+  const [edit, setEdit] = useState(initial)
+  // Saved baseline — drives the dirty state (and updates on save / flyer upload).
+  const [baseline, setBaseline] = useState(initial)
   const [saving, setSaving] = useState(false)
   const [savedAt, setSavedAt] = useState<string | null>(null)
 
+  const dirty = JSON.stringify(edit) !== JSON.stringify(baseline)
+  const canSave = edit.title.trim().length > 0
+
   async function handleSave() {
+    if (!canSave) return
     setSaving(true)
     try {
       await updateFightNight(fightNight.id, edit)
+      setBaseline(edit)
       setSavedAt(new Date().toLocaleTimeString())
       onChange()
     } finally {
@@ -1824,129 +2059,162 @@ function MetadataPanel({
     onChange()
   }
 
-  return (
-    <section className="border border-gray-200 rounded-xl p-5 bg-white">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-bold text-gray-800 tracking-wide uppercase">
-          Event Metadata
-        </h3>
-        <span
-          className={`text-[9px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full border ${STATUS_STYLES[fightNight.status]}`}
-        >
-          {STATUS_LABELS[fightNight.status]}
-        </span>
-      </div>
+  const sectionClass = "border border-gray-200 rounded-xl p-5 bg-white"
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div className="sm:col-span-2">
-          <label className={labelClass}>TITLE</label>
-          <input
-            type="text"
-            value={edit.title}
-            onChange={(e) => setEdit((d) => ({ ...d, title: e.target.value }))}
-            placeholder="e.g. Members Only Fight Night"
-            className={inputClass}
-          />
-        </div>
-        <div className="sm:col-span-2">
-          <label className={labelClass}>PUBLIC URL SLUG</label>
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              value={edit.slug}
-              onChange={(e) =>
-                setEdit((d) => ({ ...d, slug: clientSlugify(e.target.value) }))
-              }
-              placeholder="auto-generated from title + date"
-              className={inputClass}
-            />
-            <button
-              type="button"
-              onClick={() =>
-                setEdit((d) => ({
-                  ...d,
-                  slug: clientSlugify([d.title, d.date].filter(Boolean).join(" ")),
-                }))
-              }
-              className="shrink-0 px-3 py-2 text-[11px] font-semibold text-gray-600 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors whitespace-nowrap"
-            >
-              Suggest
-            </button>
-          </div>
-          <p className="mt-1 text-[11px] text-gray-400">
-            /fight-nights/
-            <span className="text-gray-600 font-medium">{edit.slug || "…"}</span>
-            {" · "}must be unique; clearing it regenerates from the title on save.
+  return (
+    <div className="space-y-5">
+      {/* Header */}
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h3 className="text-sm font-bold text-gray-800 tracking-wide uppercase">
+            Event Details
+          </h3>
+          <p className="text-[12px] text-gray-400 mt-0.5">
+            How this fight night appears on its public page.
           </p>
         </div>
-        <div>
-          <label className={labelClass}>SUBTITLE / EYEBROW</label>
-          <input
-            type="text"
-            value={edit.subtitle}
-            onChange={(e) => setEdit((d) => ({ ...d, subtitle: e.target.value }))}
-            placeholder="e.g. BOXR Station Presents"
-            className={inputClass}
-          />
+        {savedAt && !dirty && (
+          <p className="text-[11px] text-green-600 font-medium shrink-0">Saved {savedAt}</p>
+        )}
+      </div>
+
+      {/* Basics */}
+      <div className={sectionClass}>
+        <SectionHead title="Basics" desc="What this event is and where it lives in the URL." />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="sm:col-span-2">
+            <label className={labelClass}>
+              TITLE <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={edit.title}
+              onChange={(e) => setEdit((d) => ({ ...d, title: e.target.value }))}
+              placeholder="e.g. Members Only Fight Night"
+              className={inputClass}
+            />
+          </div>
+          <div className="sm:col-span-2">
+            <label className={labelClass}>PUBLIC URL SLUG</label>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={edit.slug}
+                onChange={(e) =>
+                  setEdit((d) => ({ ...d, slug: clientSlugify(e.target.value) }))
+                }
+                placeholder="auto-generated from title + date"
+                className={inputClass}
+              />
+              <button
+                type="button"
+                onClick={() =>
+                  setEdit((d) => ({
+                    ...d,
+                    slug: clientSlugify([d.title, d.date].filter(Boolean).join(" ")),
+                  }))
+                }
+                className="shrink-0 px-3 py-2 text-[11px] font-semibold text-gray-600 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors whitespace-nowrap"
+              >
+                Suggest
+              </button>
+            </div>
+            <p className="mt-1 text-[11px] text-gray-400">
+              /fight-nights/
+              <span className="text-gray-600 font-medium">{edit.slug || "…"}</span>
+              {" · "}must be unique; clearing it regenerates from the title on save.
+            </p>
+          </div>
+          <div className="sm:col-span-2">
+            <label className={labelClass}>SUBTITLE / EYEBROW</label>
+            <input
+              type="text"
+              value={edit.subtitle}
+              onChange={(e) => setEdit((d) => ({ ...d, subtitle: e.target.value }))}
+              placeholder="e.g. BOXR Station Presents"
+              className={inputClass}
+            />
+          </div>
+          <div className="sm:col-span-2">
+            <label className={labelClass}>STATUS</label>
+            <div className="flex rounded-md border border-gray-200 overflow-hidden">
+              {(["announced", "doors_open", "live", "completed"] as FightNightStatus[]).map(
+                (s, i) => {
+                  const active = edit.status === s
+                  return (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => setEdit((d) => ({ ...d, status: s }))}
+                      className={`flex-1 px-2 py-2 text-[10px] sm:text-[11px] font-semibold uppercase tracking-wide whitespace-nowrap transition-colors ${
+                        i > 0 ? "border-l border-gray-200" : ""
+                      } ${active ? SEG_ACTIVE[s] : "bg-white text-gray-500 hover:bg-gray-50"}`}
+                    >
+                      {STATUS_LABELS[s]}
+                    </button>
+                  )
+                }
+              )}
+            </div>
+          </div>
         </div>
-        <div>
-          <label className={labelClass}>STATUS</label>
-          <select
-            value={edit.status}
-            onChange={(e) =>
-              setEdit((d) => ({ ...d, status: e.target.value as FightNightStatus }))
-            }
-            className={inputClass}
-          >
-            <option value="announced">Announced</option>
-            <option value="doors_open">Doors Open</option>
-            <option value="live">Live</option>
-            <option value="completed">Completed</option>
-          </select>
+      </div>
+
+      {/* When & where */}
+      <div className={sectionClass}>
+        <SectionHead title="When & where" desc="Date and location shown on the public page." />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label className={labelClass}>DATE</label>
+            <input
+              type="date"
+              value={edit.date}
+              onChange={(e) => setEdit((d) => ({ ...d, date: e.target.value }))}
+              className={inputClass}
+            />
+          </div>
+          <div>
+            <label className={labelClass}>VENUE</label>
+            <input
+              type="text"
+              value={edit.venue}
+              onChange={(e) => setEdit((d) => ({ ...d, venue: e.target.value }))}
+              className={inputClass}
+            />
+          </div>
+          <div>
+            <label className={labelClass}>CITY</label>
+            <input
+              type="text"
+              value={edit.city}
+              onChange={(e) => setEdit((d) => ({ ...d, city: e.target.value }))}
+              className={inputClass}
+            />
+          </div>
+          <div>
+            <label className={labelClass}>ADDRESS</label>
+            <input
+              type="text"
+              value={edit.address}
+              onChange={(e) => setEdit((d) => ({ ...d, address: e.target.value }))}
+              className={inputClass}
+            />
+          </div>
         </div>
-        <div>
-          <label className={labelClass}>VENUE</label>
-          <input
-            type="text"
-            value={edit.venue}
-            onChange={(e) => setEdit((d) => ({ ...d, venue: e.target.value }))}
-            className={inputClass}
-          />
-        </div>
-        <div>
-          <label className={labelClass}>CITY</label>
-          <input
-            type="text"
-            value={edit.city}
-            onChange={(e) => setEdit((d) => ({ ...d, city: e.target.value }))}
-            className={inputClass}
-          />
-        </div>
-        <div className="sm:col-span-2">
-          <label className={labelClass}>ADDRESS</label>
-          <input
-            type="text"
-            value={edit.address}
-            onChange={(e) => setEdit((d) => ({ ...d, address: e.target.value }))}
-            className={inputClass}
-          />
-        </div>
-        <div>
-          <label className={labelClass}>DATE</label>
-          <input
-            type="date"
-            value={edit.date}
-            onChange={(e) => setEdit((d) => ({ ...d, date: e.target.value }))}
-            className={inputClass}
-          />
-        </div>
-        <div className="sm:col-span-2">
+      </div>
+
+      {/* Promotion */}
+      <div className={sectionClass}>
+        <SectionHead title="Promotion" desc="Flyer, prize, and copy shown on the public page and in emails." />
+        <div className="space-y-3">
           <FlyerUploader
             fightNightId={fightNight.id}
             currentUrl={edit.flyerUrl}
             onUploaded={async (url) => {
+              // Flyer persists immediately, so update the baseline too — it
+              // shouldn't register as an unsaved change.
               setEdit((d) => ({ ...d, flyerUrl: url }))
-              // Persist immediately so the upload isn't lost if admin doesn't click Save
+              setBaseline((b) => ({ ...b, flyerUrl: url }))
               try {
                 await updateFightNight(fightNight.id, { flyerUrl: url })
                 onChange()
@@ -1955,123 +2223,155 @@ function MetadataPanel({
               }
             }}
           />
-        </div>
-        <div>
-          <label className={labelClass}>DOORS AT (ISO)</label>
-          <input
-            type="datetime-local"
-            value={edit.doorsAt ? edit.doorsAt.slice(0, 16) : ""}
-            onChange={(e) =>
-              setEdit((d) => ({
-                ...d,
-                doorsAt: e.target.value ? new Date(e.target.value).toISOString() : "",
-              }))
-            }
-            className={inputClass}
-          />
-        </div>
-        <div>
-          <label className={labelClass}>FIRST BELL (ISO)</label>
-          <input
-            type="datetime-local"
-            value={edit.firstBellAt ? edit.firstBellAt.slice(0, 16) : ""}
-            onChange={(e) =>
-              setEdit((d) => ({
-                ...d,
-                firstBellAt: e.target.value
-                  ? new Date(e.target.value).toISOString()
-                  : "",
-              }))
-            }
-            className={inputClass}
-          />
-        </div>
-        <div>
-          <label className={labelClass}>PRIZE LABEL</label>
-          <input
-            type="text"
-            value={edit.prizeLabel}
-            onChange={(e) => setEdit((d) => ({ ...d, prizeLabel: e.target.value }))}
-            placeholder="e.g. BOXR Station prize pack"
-            className={inputClass}
-          />
-        </div>
-        <div>
-          <label className={labelClass}>PRIZE DETAILS</label>
-          <input
-            type="text"
-            value={edit.prizeDetails}
-            onChange={(e) =>
-              setEdit((d) => ({ ...d, prizeDetails: e.target.value }))
-            }
-            placeholder="Long-form details for the landing"
-            className={inputClass}
-          />
-        </div>
-        <div className="sm:col-span-2">
-          <label className={labelClass}>PROMO COPY</label>
-          <textarea
-            rows={3}
-            value={edit.promoCopy}
-            onChange={(e) => setEdit((d) => ({ ...d, promoCopy: e.target.value }))}
-            placeholder="Short copy shown on the landing page"
-            className={inputClass + " resize-none"}
-          />
-        </div>
-        <div className="flex items-end gap-4">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={edit.propsEnabled}
-              onChange={(e) =>
-                setEdit((d) => ({ ...d, propsEnabled: e.target.checked }))
-              }
-              className="accent-[#FFB800]"
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className={labelClass}>PRIZE LABEL</label>
+              <input
+                type="text"
+                value={edit.prizeLabel}
+                onChange={(e) => setEdit((d) => ({ ...d, prizeLabel: e.target.value }))}
+                placeholder="e.g. BOXR Station prize pack"
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label className={labelClass}>PRIZE DETAILS</label>
+              <input
+                type="text"
+                value={edit.prizeDetails}
+                onChange={(e) =>
+                  setEdit((d) => ({ ...d, prizeDetails: e.target.value }))
+                }
+                placeholder="Long-form details for the landing"
+                className={inputClass}
+              />
+            </div>
+          </div>
+          <div>
+            <label className={labelClass}>PROMO COPY</label>
+            <textarea
+              rows={3}
+              value={edit.promoCopy}
+              onChange={(e) => setEdit((d) => ({ ...d, promoCopy: e.target.value }))}
+              placeholder="Short copy shown on the landing page"
+              className={inputClass + " resize-none"}
             />
-            <span className="text-[12px] text-gray-700 font-medium">Props enabled</span>
-          </label>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={edit.pollsEnabled}
-              onChange={(e) =>
-                setEdit((d) => ({ ...d, pollsEnabled: e.target.checked }))
-              }
-              className="accent-[#FFB800]"
-            />
-            <span className="text-[12px] text-gray-700 font-medium">Polls enabled</span>
-          </label>
+          </div>
         </div>
       </div>
 
-      <div className="mt-5 flex items-center gap-3">
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="px-5 py-2 bg-[#FFB800] text-white text-[12px] font-semibold tracking-wider rounded-md hover:bg-[#E5A600] transition-colors disabled:opacity-50"
-        >
-          {saving ? "Saving…" : "Save"}
-        </button>
-        {savedAt && (
-          <p className="text-[11px] text-green-600 font-medium">Saved at {savedAt}</p>
-        )}
-        <div className="flex-1" />
-        <button
-          onClick={handleDelete}
-          className="px-4 py-2 text-red-500 text-[12px] font-medium hover:bg-red-50 rounded-md transition-colors"
-        >
-          Delete
-        </button>
+      {/* Features */}
+      <div className={sectionClass}>
+        <SectionHead title="Features" desc="Toggle the engagement modules fans see during the event." />
+        <div className="space-y-3">
+          <Switch
+            checked={edit.propsEnabled}
+            onChange={(v) => setEdit((d) => ({ ...d, propsEnabled: v }))}
+            label="Prop picks"
+            hint="Show prediction props on the fight night page."
+          />
+          <div className="border-t border-gray-100" />
+          <Switch
+            checked={edit.pollsEnabled}
+            onChange={(v) => setEdit((d) => ({ ...d, pollsEnabled: v }))}
+            label="Fan polls"
+            hint="Show live polls on the fight night page."
+          />
+        </div>
       </div>
-    </section>
+
+      {/* Danger zone */}
+      <div className="border border-red-200 rounded-xl p-5 bg-red-50/40">
+        <p className="text-[11px] font-semibold text-red-600 tracking-[0.15em] uppercase mb-1">
+          Danger zone
+        </p>
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <p className="text-[12px] text-gray-600 max-w-md">
+            Permanently delete this fight night. Bouts, picks, standings, and
+            prizes are not auto-removed.
+          </p>
+          <button
+            onClick={handleDelete}
+            className="shrink-0 px-4 py-2 text-[12px] font-semibold text-red-600 border border-red-300 hover:bg-red-100 rounded-md transition-colors"
+          >
+            Delete fight night
+          </button>
+        </div>
+      </div>
+
+      {/* Unsaved-changes bar — appears only when there are pending edits */}
+      {dirty && (
+        <div className="sticky bottom-4 z-10 flex items-center justify-between gap-3 border border-gray-200 rounded-xl bg-white shadow-lg px-4 py-3">
+          <p className="text-[12px] text-gray-600 font-medium">
+            {canSave ? "You have unsaved changes" : "Title is required to save"}
+          </p>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => setEdit(baseline)}
+              disabled={saving}
+              className="px-3 py-2 text-[12px] font-semibold text-gray-600 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50"
+            >
+              Discard
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={saving || !canSave}
+              className="px-5 py-2 bg-gray-900 text-white text-[12px] font-semibold tracking-wider rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50"
+            >
+              {saving ? "Saving…" : "Save changes"}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
 
 // ── Bouts Panel ────────────────────────────────────────────
 
+/** Weight-class picker: the 18 standard boxing divisions, with the Combobox's
+ * create row handling catchweights / custom values (type it, then "Use …"). */
+function WeightClassField({
+  value,
+  onChange,
+}: {
+  value: string
+  onChange: (v: string) => void
+}) {
+  const options: ComboboxOption[] = WEIGHT_CLASSES.map((w) => ({ value: w, label: w }))
+
+  return (
+    <Combobox
+      value={value}
+      options={options}
+      onSelect={onChange}
+      placeholder="Select weight class"
+      searchPlaceholder="Search or type a catchweight…"
+      ariaLabel="Weight class"
+      createSlot={(query, close) => (
+        <button
+          type="button"
+          onClick={() => {
+            onChange(query)
+            close()
+          }}
+          className="px-2.5 py-1 text-[11px] font-semibold text-gray-700 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+        >
+          Use &ldquo;{query}&rdquo;
+        </button>
+      )}
+    />
+  )
+}
+
 function BoutsPanel({ fightNight }: { fightNight: FightNight }) {
   const [bouts, setBouts] = useState<FightNightBout[]>([])
+  const [fighters, setFighters] = useState<Fighter[]>([])
+  const [gyms, setGyms] = useState<GymData[]>([])
   const [loading, setLoading] = useState(true)
+  // Bout number to auto-open in edit mode (the one just added).
+  const [openBout, setOpenBout] = useState<number | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -2083,13 +2383,39 @@ function BoutsPanel({ fightNight }: { fightNight: FightNight }) {
     }
   }, [fightNight.id])
 
+  const loadFighters = useCallback(async () => {
+    setFighters(await getFighters())
+  }, [])
+
+  const loadGyms = useCallback(async () => {
+    setGyms(await getGyms())
+  }, [])
+
   useEffect(() => {
     load()
-  }, [load])
+    loadFighters()
+    loadGyms()
+  }, [load, loadFighters, loadGyms])
 
   async function handleAdd() {
     const next = bouts.length === 0 ? 1 : Math.max(...bouts.map((b) => b.boutNumber)) + 1
     await upsertBout(fightNight.id, next, {})
+    setOpenBout(next)
+    await load()
+  }
+
+  // Reorder by swapping the `order` of two adjacent bouts (bouts is already
+  // sorted by order). boutNumber — the picks/props key — never changes.
+  async function handleMove(boutNumber: number, dir: -1 | 1) {
+    const i = bouts.findIndex((b) => b.boutNumber === boutNumber)
+    const j = i + dir
+    if (i < 0 || j < 0 || j >= bouts.length) return
+    const a = bouts[i]
+    const b = bouts[j]
+    await Promise.all([
+      upsertBout(fightNight.id, a.boutNumber, { order: b.order }),
+      upsertBout(fightNight.id, b.boutNumber, { order: a.order }),
+    ])
     await load()
   }
 
@@ -2101,7 +2427,7 @@ function BoutsPanel({ fightNight }: { fightNight: FightNight }) {
         </h3>
         <button
           onClick={handleAdd}
-          className="text-[12px] font-semibold text-[#FFB800] hover:text-[#E5A600] tracking-wider transition-colors"
+          className="text-[12px] font-semibold text-gray-900 hover:text-gray-800 tracking-wider transition-colors"
         >
           + Add Bout
         </button>
@@ -2115,11 +2441,19 @@ function BoutsPanel({ fightNight }: { fightNight: FightNight }) {
         </p>
       ) : (
         <div className="space-y-2">
-          {bouts.map((bout) => (
+          {bouts.map((bout, index) => (
             <BoutRow
               key={bout.boutNumber}
               fightNightId={fightNight.id}
               bout={bout}
+              fighters={fighters}
+              gyms={gyms}
+              onFightersChanged={loadFighters}
+              onGymsChanged={loadGyms}
+              defaultEdit={bout.boutNumber === openBout}
+              onMove={handleMove}
+              isFirst={index === 0}
+              isLast={index === bouts.length - 1}
               onChange={load}
             />
           ))}
@@ -2132,13 +2466,29 @@ function BoutsPanel({ fightNight }: { fightNight: FightNight }) {
 function BoutRow({
   fightNightId,
   bout,
+  fighters,
+  gyms,
+  onFightersChanged,
+  onGymsChanged,
+  defaultEdit = false,
+  onMove,
+  isFirst,
+  isLast,
   onChange,
 }: {
   fightNightId: string
   bout: FightNightBout
+  fighters: Fighter[]
+  gyms: GymData[]
+  onFightersChanged: () => void
+  onGymsChanged: () => void
+  defaultEdit?: boolean
+  onMove: (boutNumber: number, dir: -1 | 1) => void
+  isFirst: boolean
+  isLast: boolean
   onChange: () => void
 }) {
-  const [edit, setEdit] = useState(false)
+  const [edit, setEdit] = useState(defaultEdit)
   const [data, setData] = useState({
     fighter1Name: bout.fighter1Name,
     fighter1Gym: bout.fighter1Gym,
@@ -2149,7 +2499,11 @@ function BoutRow({
   })
   const [saving, setSaving] = useState(false)
 
+  const canSave =
+    data.fighter1Name.trim() !== "" && data.fighter2Name.trim() !== ""
+
   async function handleSave() {
+    if (!canSave) return
     setSaving(true)
     try {
       await upsertBout(fightNightId, bout.boutNumber, data)
@@ -2157,6 +2511,17 @@ function BoutRow({
       onChange()
     } finally {
       setSaving(false)
+    }
+  }
+
+  // Cancelling a bout that was never given fighters removes the empty stub
+  // (the "+ Add Bout" placeholder) rather than leaving a TBA row behind.
+  async function handleCancel() {
+    if (!bout.fighter1Name && !bout.fighter2Name) {
+      await deleteBout(fightNightId, bout.boutNumber)
+      onChange()
+    } else {
+      setEdit(false)
     }
   }
 
@@ -2184,7 +2549,7 @@ function BoutRow({
           <p className="text-[10px] text-gray-400">
             {bout.weightClass || "—"}
             {bout.isMainEvent && (
-              <span className="ml-2 text-amber-600 font-semibold">MAIN EVENT</span>
+              <span className="ml-2 text-gray-900 font-semibold">MAIN EVENT</span>
             )}
           </p>
         </div>
@@ -2199,9 +2564,33 @@ function BoutRow({
         >
           {bout.status}
         </span>
+        <div className="flex flex-col -my-1">
+          <button
+            type="button"
+            onClick={() => onMove(bout.boutNumber, -1)}
+            disabled={isFirst}
+            aria-label="Move up"
+            className="text-gray-300 hover:text-gray-700 disabled:opacity-30 disabled:hover:text-gray-300 leading-none transition-colors"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={() => onMove(bout.boutNumber, 1)}
+            disabled={isLast}
+            aria-label="Move down"
+            className="text-gray-300 hover:text-gray-700 disabled:opacity-30 disabled:hover:text-gray-300 leading-none transition-colors"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+        </div>
         <button
           onClick={() => setEdit(true)}
-          className="text-[10px] text-gray-400 hover:text-[#FFB800] px-1.5 py-1"
+          className="text-[10px] text-gray-400 hover:text-gray-900 px-1.5 py-1"
         >
           Edit
         </button>
@@ -2209,65 +2598,77 @@ function BoutRow({
           onClick={handleDelete}
           className="text-[10px] text-gray-300 hover:text-red-500 px-1.5 py-1"
         >
-          Del
+          Delete
         </button>
       </div>
     )
   }
 
   return (
-    <div className="border border-[#FFB800]/30 rounded-lg p-3 bg-amber-50/30">
+    <div className="border border-gray-300 rounded-lg p-3 bg-gray-50">
       <p className="text-[10px] font-semibold text-gray-400 tracking-[0.15em] mb-2">
         BOUT #{bout.boutNumber}
       </p>
       <div className="grid grid-cols-2 gap-2 mb-2">
         <div>
           <label className={labelClass}>FIGHTER 1</label>
-          <input
-            type="text"
+          <FighterPicker
+            fighters={fighters}
             value={data.fighter1Name}
-            onChange={(e) => setData((d) => ({ ...d, fighter1Name: e.target.value }))}
-            placeholder="Name"
-            className={inputClass}
+            onPick={({ name, gym, weightClass }) =>
+              setData((d) => ({
+                ...d,
+                fighter1Name: name,
+                fighter1Gym: gym || d.fighter1Gym,
+                weightClass: weightClass || d.weightClass,
+              }))
+            }
+            defaultGym={data.fighter1Gym}
+            defaultWeightClass={data.weightClass}
+            onFightersChanged={onFightersChanged}
           />
         </div>
         <div>
           <label className={labelClass}>F1 GYM</label>
-          <input
-            type="text"
+          <GymPicker
+            gyms={gyms}
             value={data.fighter1Gym}
-            onChange={(e) => setData((d) => ({ ...d, fighter1Gym: e.target.value }))}
-            placeholder="Gym"
-            className={inputClass}
+            onChange={(name) => setData((d) => ({ ...d, fighter1Gym: name }))}
+            onGymsChanged={onGymsChanged}
           />
         </div>
         <div>
           <label className={labelClass}>FIGHTER 2</label>
-          <input
-            type="text"
+          <FighterPicker
+            fighters={fighters}
             value={data.fighter2Name}
-            onChange={(e) => setData((d) => ({ ...d, fighter2Name: e.target.value }))}
-            placeholder="Name"
-            className={inputClass}
+            onPick={({ name, gym, weightClass }) =>
+              setData((d) => ({
+                ...d,
+                fighter2Name: name,
+                fighter2Gym: gym || d.fighter2Gym,
+                weightClass: weightClass || d.weightClass,
+              }))
+            }
+            defaultGym={data.fighter2Gym}
+            defaultWeightClass={data.weightClass}
+            onFightersChanged={onFightersChanged}
           />
         </div>
         <div>
           <label className={labelClass}>F2 GYM</label>
-          <input
-            type="text"
+          <GymPicker
+            gyms={gyms}
             value={data.fighter2Gym}
-            onChange={(e) => setData((d) => ({ ...d, fighter2Gym: e.target.value }))}
-            placeholder="Gym"
-            className={inputClass}
+            onChange={(name) => setData((d) => ({ ...d, fighter2Gym: name }))}
+            onGymsChanged={onGymsChanged}
           />
         </div>
         <div>
           <label className={labelClass}>WEIGHT CLASS</label>
-          <input
-            type="text"
+          <WeightClassField
             value={data.weightClass}
-            onChange={(e) => setData((d) => ({ ...d, weightClass: e.target.value }))}
-            className={inputClass}
+            onChange={(v) => setData((d) => ({ ...d, weightClass: v }))}
           />
         </div>
         <div className="flex items-end pb-1">
@@ -2278,7 +2679,7 @@ function BoutRow({
               onChange={(e) =>
                 setData((d) => ({ ...d, isMainEvent: e.target.checked }))
               }
-              className="accent-[#FFB800]"
+              className="accent-gray-900"
             />
             <span className="text-[11px] text-gray-600">Main Event</span>
           </label>
@@ -2287,17 +2688,20 @@ function BoutRow({
       <div className="flex items-center gap-2">
         <button
           onClick={handleSave}
-          disabled={saving}
-          className="px-3 py-1.5 bg-[#FFB800] text-white text-[11px] font-semibold rounded-md disabled:opacity-50"
+          disabled={saving || !canSave}
+          className="px-3 py-1.5 bg-gray-900 text-white text-[11px] font-semibold rounded-md disabled:opacity-50"
         >
           {saving ? "Saving…" : "Save"}
         </button>
         <button
-          onClick={() => setEdit(false)}
+          onClick={handleCancel}
           className="px-3 py-1.5 text-gray-500 text-[11px]"
         >
           Cancel
         </button>
+        {!canSave && (
+          <span className="text-[10px] text-gray-400">Both fighters are required</span>
+        )}
       </div>
     </div>
   )
@@ -2349,7 +2753,7 @@ function CheckInPanel({ fightNight }: { fightNight: FightNight }) {
       {code ? (
         <div
           className={`rounded-xl px-4 py-5 mb-4 text-center border-2 ${
-            expired ? "bg-red-50 border-red-200" : "bg-amber-50 border-[#FFB800]/40"
+            expired ? "bg-red-50 border-red-200" : "bg-gray-50 border-gray-300"
           }`}
         >
           <p
@@ -2389,7 +2793,7 @@ function CheckInPanel({ fightNight }: { fightNight: FightNight }) {
         <button
           onClick={handleRotate}
           disabled={rotating}
-          className="flex-1 px-4 py-2 bg-[#FFB800] text-white text-[12px] font-semibold rounded-md disabled:opacity-50"
+          className="flex-1 px-4 py-2 bg-gray-900 text-white text-[12px] font-semibold rounded-md disabled:opacity-50"
         >
           {rotating ? "Rotating…" : code ? "Rotate Code" : "Generate Code"}
         </button>
@@ -2417,7 +2821,11 @@ function LivePanel({ fightNight }: { fightNight: FightNight }) {
       orderBy("boutNumber", "asc")
     )
     const unsub = onSnapshot(q, (snap) => {
-      setBouts(snap.docs.map((d) => d.data() as FightNightBout))
+      setBouts(
+        snap.docs
+          .map((d) => d.data() as FightNightBout)
+          .sort((a, b) => (a.order ?? a.boutNumber) - (b.order ?? b.boutNumber))
+      )
     })
     return () => unsub()
   }, [fightNight.id])
@@ -2613,7 +3021,7 @@ function BoutControlCard({
     : isLive
       ? "border-red-300 bg-red-50/40 ring-2 ring-red-100"
       : isFocused
-        ? "border-amber-300 bg-amber-50/30 ring-2 ring-amber-100"
+        ? "border-gray-300 bg-gray-50 ring-2 ring-gray-100"
         : "border-gray-200"
 
   return (
@@ -2688,7 +3096,7 @@ function BoutControlCard({
               <button
                 onClick={onReopen}
                 disabled={isBusy}
-                className="text-[11px] text-gray-500 hover:text-amber-700 font-medium tracking-wide transition-colors disabled:opacity-50"
+                className="text-[11px] text-gray-500 hover:text-gray-900 font-medium tracking-wide transition-colors disabled:opacity-50"
               >
                 {isBusy ? "Reopening…" : "Reopen bout"}
               </button>
@@ -2711,7 +3119,7 @@ function BoutControlCard({
                   <button
                     onClick={onStart}
                     disabled={isBusy}
-                    className="w-full px-4 py-2.5 rounded-md bg-amber-500 hover:bg-amber-600 text-white text-[12px] font-bold tracking-wide transition-colors disabled:opacity-50"
+                    className="w-full px-4 py-2.5 rounded-md bg-gray-900 hover:bg-gray-800 text-white text-[12px] font-bold tracking-wide transition-colors disabled:opacity-50"
                   >
                     {isBusy ? "Starting…" : "Start Bout · Lock Picks"}
                   </button>
@@ -2801,7 +3209,7 @@ function PickMeter({
           {total === 0
             ? "No picks"
             : `${total} pick${total === 1 ? "" : "s"}${locked ? " · locked" : ""}`}
-          {upset && <span className="ml-1 text-amber-600 font-bold">· upset</span>}
+          {upset && <span className="ml-1 text-gray-900 font-bold">· upset</span>}
         </span>
         <span className="font-semibold text-gray-700 truncate flex items-center gap-1.5 min-w-0 justify-end">
           {f2Won && <WonBadge />}
@@ -2879,7 +3287,7 @@ function WinnerButtons({
           : 0
 
     return (
-      <div className="border border-amber-300 bg-amber-50 rounded-md p-3">
+      <div className="border border-gray-200 bg-gray-50 rounded-md p-3">
         <p className="text-[12px] text-gray-900 mb-1">
           Settle bout #{bout.boutNumber} — <span className="font-bold">{target}</span>?
         </p>
@@ -2891,7 +3299,7 @@ function WinnerButtons({
           <button
             onClick={() => onConfirmDeclare(confirming)}
             disabled={isBusy}
-            className="px-3 py-1.5 rounded-md bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-bold disabled:opacity-50"
+            className="px-3 py-1.5 rounded-md bg-gray-900 hover:bg-gray-800 text-white text-[11px] font-bold disabled:opacity-50"
           >
             {isBusy ? "Settling…" : "Yes, settle"}
           </button>
@@ -3069,8 +3477,8 @@ function PrizesPanel({ fightNight }: { fightNight: FightNight }) {
       </h3>
 
       {/* Award top N */}
-      <div className="border border-amber-200 bg-amber-50/40 rounded-lg p-3 mb-4">
-        <p className="text-[10px] font-bold text-amber-700 tracking-[0.2em] uppercase mb-2">
+      <div className="border border-gray-200 bg-gray-50 rounded-lg p-3 mb-4">
+        <p className="text-[10px] font-bold text-gray-500 tracking-[0.2em] uppercase mb-2">
           Award Top N
         </p>
         <div className="grid grid-cols-3 gap-2 mb-2">
@@ -3101,7 +3509,7 @@ function PrizesPanel({ fightNight }: { fightNight: FightNight }) {
               type="checkbox"
               checked={atEventOnly}
               onChange={(e) => setAtEventOnly(e.target.checked)}
-              className="accent-[#FFB800]"
+              className="accent-gray-900"
             />
             <span className="text-[11px] text-gray-700 font-medium">
               On-premises only (atEvent=true)
@@ -3111,7 +3519,7 @@ function PrizesPanel({ fightNight }: { fightNight: FightNight }) {
           <button
             onClick={handleAward}
             disabled={busy}
-            className="px-4 py-1.5 bg-[#FFB800] text-white text-[11px] font-semibold rounded-md disabled:opacity-50"
+            className="px-4 py-1.5 bg-gray-900 text-white text-[11px] font-semibold rounded-md disabled:opacity-50"
           >
             {busy ? "Awarding…" : `Award Top ${topN}`}
           </button>
@@ -3165,13 +3573,13 @@ function PrizesPanel({ fightNight }: { fightNight: FightNight }) {
           <div
             className={`mb-3 border rounded px-2.5 py-1.5 ${
               recapResult.errors > 0
-                ? "border-amber-200 bg-amber-50"
+                ? "border-gray-200 bg-gray-50"
                 : "border-green-200 bg-green-50"
             }`}
           >
             <p
               className={`text-[11px] font-medium ${
-                recapResult.errors > 0 ? "text-amber-700" : "text-green-700"
+                recapResult.errors > 0 ? "text-gray-700" : "text-green-700"
               }`}
             >
               Sent {recapResult.sent} · Skipped {recapResult.skipped} · Errors{" "}
@@ -3199,7 +3607,7 @@ function PrizesPanel({ fightNight }: { fightNight: FightNight }) {
             <div key={prize.id} className="border border-gray-200 rounded-lg p-3">
               <div className="flex items-start justify-between gap-2 mb-2">
                 <div>
-                  <p className="text-[10px] text-[#FFB800] font-bold tracking-[0.2em] uppercase">
+                  <p className="text-[10px] text-gray-900 font-bold tracking-[0.2em] uppercase">
                     #{prize.position} · {prize.status}
                   </p>
                   <p className="text-[13px] font-bold text-gray-900">

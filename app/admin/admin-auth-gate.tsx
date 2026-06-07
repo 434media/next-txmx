@@ -60,7 +60,7 @@ export default function AdminAuthGate({ children }: AdminAuthGateProps) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center pt-16">
         <div className="text-center space-y-4">
-          <div className="animate-spin w-8 h-8 border-2 border-[#FFB800] border-t-transparent rounded-full mx-auto" />
+          <div className="animate-spin w-8 h-8 border-2 border-gray-900 border-t-transparent rounded-full mx-auto" />
           <p className="text-gray-400 text-xs tracking-widest">LOADING</p>
         </div>
       </div>
@@ -79,7 +79,7 @@ export default function AdminAuthGate({ children }: AdminAuthGateProps) {
               <h1 className="text-gray-900 text-2xl font-bold tracking-[0.15em]">
                 ADMIN PORTAL
               </h1>
-              <div className="mt-2 h-px w-10 bg-[#FFB800]/60 mx-auto" />
+              <div className="mt-2 h-px w-10 bg-gray-900/60 mx-auto" />
             </div>
 
             <p className="text-gray-400 text-sm leading-relaxed tracking-tight">
@@ -99,7 +99,7 @@ export default function AdminAuthGate({ children }: AdminAuthGateProps) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#FFB800] focus:ring-1 focus:ring-[#FFB800]/30 transition-colors"
+                className="w-full px-4 py-3 rounded-lg border border-gray-200 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900/30 transition-colors"
               />
               <input
                 type="password"
@@ -107,12 +107,12 @@ export default function AdminAuthGate({ children }: AdminAuthGateProps) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#FFB800] focus:ring-1 focus:ring-[#FFB800]/30 transition-colors"
+                className="w-full px-4 py-3 rounded-lg border border-gray-200 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900/30 transition-colors"
               />
               <button
                 type="submit"
                 disabled={signingIn}
-                className="w-full bg-[#FFB800] text-white font-medium text-sm tracking-wide px-6 py-3 rounded-lg hover:bg-[#E5A600] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-gray-900 text-white font-medium text-sm tracking-wide px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {signingIn ? (
                   <span className="flex items-center justify-center gap-2">
