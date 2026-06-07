@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
-import { useFeatureFlag } from '@/lib/use-feature-flag'
 import {
   getActiveSeason,
   getSeasonalLeaderboard,
@@ -37,9 +36,9 @@ function formatDate(iso: string): string {
 }
 
 export default function SeasonsClient() {
-  const { user, profile } = useAuth()
-  const isBlackCard = profile?.subscriptionStatus === 'active'
-  const enabled = useFeatureFlag('seasons', { isBlackCard })
+  const { user } = useAuth()
+  // Feature flag system decommissioned — this surface stays "Coming Soon".
+  const enabled: boolean = false
 
   const [season, setSeason] = useState<Season | null>(null)
   const [leaderboard, setLeaderboard] = useState<SeasonalEntry[]>([])

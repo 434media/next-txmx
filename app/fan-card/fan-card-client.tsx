@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { useAuth } from '@/lib/auth-context'
-import { useFeatureFlag } from '@/lib/use-feature-flag'
 import { getFanCardData, type FanCardData } from '@/app/actions/fan-card'
 import { updateUserPhoto } from '@/app/actions/users'
 import QuestBoard from '@/components/quest-board'
@@ -171,10 +170,8 @@ function PhotoUpload({
 
 export default function FanCardClient() {
   const { user, profile } = useAuth()
-  const fanCardEnabled = useFeatureFlag('fanCard', {
-    isBlackCard: profile?.subscriptionStatus === 'active',
-    userId: user?.uid,
-  })
+  // Feature flag system decommissioned — this surface stays "Coming Soon".
+  const fanCardEnabled: boolean = false
 
   const [data, setData] = useState<FanCardData | null>(null)
   const [loading, setLoading] = useState(true)

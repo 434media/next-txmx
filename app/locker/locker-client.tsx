@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
-import { useFeatureFlag } from '@/lib/use-feature-flag'
 import {
   getUserLocker,
   getLockerItemDefs,
@@ -39,11 +38,9 @@ function formatTimeLeft(isoDate: string): string | null {
 }
 
 export default function LockerClient() {
-  const { user, profile } = useAuth()
-  const lockerEnabled = useFeatureFlag('locker', {
-    isBlackCard: profile?.subscriptionStatus === 'active',
-    userId: user?.uid,
-  })
+  const { user } = useAuth()
+  // Feature flag system decommissioned — this surface stays "Coming Soon".
+  const lockerEnabled: boolean = false
 
   const [defs, setDefs] = useState<LockerItemDef[]>([])
   const [userItems, setUserItems] = useState<UserLockerItem[]>([])

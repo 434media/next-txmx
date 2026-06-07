@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
-import { useFeatureFlag } from '@/lib/use-feature-flag'
 import {
   getAvailableRewards,
   redeemReward,
@@ -46,10 +45,8 @@ function formatTimeLeft(until: string): string | null {
 
 export default function RewardsStoreClient() {
   const { user, profile } = useAuth()
-  const storeEnabled = useFeatureFlag('rewardsStore', {
-    isBlackCard: profile?.subscriptionStatus === 'active',
-    userId: user?.uid,
-  })
+  // Feature flag system decommissioned — this surface stays "Coming Soon".
+  const storeEnabled: boolean = false
 
   const [rewards, setRewards] = useState<RewardItem[]>([])
   const [redemptions, setRedemptions] = useState<Redemption[]>([])

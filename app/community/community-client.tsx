@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from '@/lib/auth-context'
-import { useFeatureFlag } from '@/lib/use-feature-flag'
 import {
   getFeed,
   createPost,
@@ -57,8 +56,8 @@ function timeAgo(iso: string): string {
 
 export default function CommunityClient() {
   const { user, profile } = useAuth()
-  const isBlackCard = profile?.subscriptionStatus === 'active'
-  const enabled = useFeatureFlag('community', { isBlackCard })
+  // Feature flag system decommissioned — this surface stays "Coming Soon".
+  const enabled: boolean = false
 
   const [posts, setPosts] = useState<CommunityPost[]>([])
   const [likedSet, setLikedSet] = useState<Set<string>>(new Set())

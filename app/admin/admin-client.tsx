@@ -9,8 +9,6 @@ import VenueList from './venue-list'
 import GymList from './gym-list'
 import PromoterList from './promoter-list'
 import EventList from './event-list'
-import NotificationSender from './notification-sender'
-import FeatureFlagsManager from './feature-flags'
 import FightNightsManager from './fight-nights-manager'
 import type { VenueData } from '../actions/venues'
 import type { EventPromoter, PromoterData, TXMXEvent } from '../actions/events'
@@ -25,7 +23,7 @@ interface AdminClientProps {
   initialEvents: TXMXEvent[]
 }
 
-type Tab = 'list' | 'add' | 'venues' | 'gyms' | 'promoters' | 'events' | 'notifications' | 'flags' | 'fnights'
+type Tab = 'list' | 'add' | 'venues' | 'gyms' | 'promoters' | 'events' | 'fnights'
 
 interface NavItem {
   key: Tab
@@ -33,30 +31,25 @@ interface NavItem {
 }
 
 interface NavSection {
-  label: string
+  /** Section header; omit for a standalone primary link with no header. */
+  label?: string
   items: NavItem[]
 }
 
 const NAV_SECTIONS: NavSection[] = [
   {
-    label: 'Fight Nights',
+    label: 'The Fan Game',
     items: [{ key: 'fnights', label: 'Fight Nights' }],
   },
   {
-    label: 'Scorecard',
+    label: 'Database',
     items: [
       { key: 'list', label: 'Fighters' },
       { key: 'venues', label: 'Venues' },
       { key: 'gyms', label: 'Gyms' },
       { key: 'promoters', label: 'Promoters' },
-      { key: 'events', label: 'Events' },
-    ],
-  },
-  {
-    label: 'System',
-    items: [
-      { key: 'flags', label: 'Feature Flags' },
-      { key: 'notifications', label: 'Push Notifications' },
+      // Sourced from the Texas Dept. of Licensing & Regulation feed.
+      { key: 'events', label: 'TDLR Events' },
     ],
   },
 ]
@@ -180,9 +173,7 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
     ]).size,
     events: eventDocs.length,
     fnights: 0,
-    notifications: 0,
     add: 0,
-    flags: 0,
   }
 
   const pageTitle: Record<Tab, string> = {
@@ -190,11 +181,9 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
     venues: 'Venues',
     gyms: 'Gyms',
     promoters: 'Promoters',
-    events: 'Events',
+    events: 'TDLR Events',
     fnights: 'Fight Nights',
-    notifications: 'Push Notifications',
     add: 'Add Fighter',
-    flags: 'Feature Flags',
   }
 
   const handleNav = (key: Tab) => {
@@ -243,10 +232,12 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
           <nav className="px-3 pb-8 flex flex-col h-[calc(100%-3.5rem)]">
             <div className="flex-1 space-y-6">
               {NAV_SECTIONS.map((section) => (
-                <div key={section.label}>
-                  <p className="px-2 mb-2 text-[11px] font-semibold text-gray-500 tracking-tight leading-none">
-                    {section.label}
-                  </p>
+                <div key={section.label ?? section.items[0].key}>
+                  {section.label && (
+                    <p className="px-2 mb-2 text-[11px] font-semibold text-gray-500 tracking-tight leading-none">
+                      {section.label}
+                    </p>
+                  )}
                   <div className="space-y-0.5">
                     {section.items.map((item) => (
                       <NavLink
@@ -314,12 +305,8 @@ export default function AdminClient({ initialFighters, initialVenues, eventPromo
               <PromoterList fighters={fighters} eventPromoters={promoters} promoterDocs={promoterDocs} onUpdate={handlePromoterDocUpdated} onDelete={handlePromoterDocDeleted} />
             ) : activeTab === 'events' ? (
               <EventList events={eventDocs} fighters={fighters} onAdd={handleEventAdded} onUpdate={handleEventUpdated} onDelete={handleEventDeleted} />
-            ) : activeTab === 'fnights' ? (
-              <FightNightsManager />
-            ) : activeTab === 'notifications' ? (
-              <NotificationSender />
             ) : (
-              <FeatureFlagsManager />
+              <FightNightsManager />
             )}
           </div>
         </main>

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
-import { useFeatureFlag } from '@/lib/use-feature-flag'
 import {
   getActiveQuests,
   getUserQuestProgress,
@@ -35,11 +34,9 @@ const RARITY_COLORS: Record<string, string> = {
 }
 
 export default function QuestBoard() {
-  const { user, profile } = useAuth()
-  const questsEnabled = useFeatureFlag('quests', {
-    isBlackCard: profile?.subscriptionStatus === 'active',
-    userId: user?.uid,
-  })
+  const { user } = useAuth()
+  // Feature flag system decommissioned — this surface stays "Coming Soon".
+  const questsEnabled: boolean = false
 
   const [quests, setQuests] = useState<QuestDefinition[]>([])
   const [progress, setProgress] = useState<Map<string, QuestProgress>>(new Map())
