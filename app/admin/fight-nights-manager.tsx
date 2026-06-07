@@ -2660,6 +2660,31 @@ function LivePanel({ fightNight }: { fightNight: FightNight }) {
           <span className="font-semibold text-gray-900">Declare a winner</span>{" "}
           when it&apos;s over — picks settle and points hit the leaderboard.
         </p>
+
+        {bouts.length > 0 && (
+          <div className="mt-2.5">
+            {liveBout ? (
+              <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-red-700">
+                <span className="relative flex w-1.5 h-1.5">
+                  <span className="absolute inline-flex w-full h-full rounded-full bg-red-500 opacity-75 animate-ping" />
+                  <span className="relative inline-flex rounded-full w-1.5 h-1.5 bg-red-500" />
+                </span>
+                Live now · #{liveBout.boutNumber} {liveBout.fighter1Name || "TBA"}{" "}
+                vs {liveBout.fighter2Name || "TBA"}
+              </span>
+            ) : nextScheduled ? (
+              <span className="text-[11px] font-semibold text-gray-700">
+                Up next · #{nextScheduled.boutNumber}{" "}
+                {nextScheduled.fighter1Name || "TBA"} vs{" "}
+                {nextScheduled.fighter2Name || "TBA"}
+              </span>
+            ) : (
+              <span className="text-[11px] font-semibold text-green-700">
+                All bouts settled — head to the Prizes tab to award winners.
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {error && (
@@ -2727,6 +2752,12 @@ function BoutControlCard({
   const isScheduled = bout.status === "scheduled"
   const isLive = bout.status === "live"
   const isCompleted = bout.status === "completed"
+
+  // Settled bouts collapse to a one-line tally so the live/next bout stays
+  // prominent on a long card. Expand to see the meter + reopen.
+  const [expanded, setExpanded] = useState(false)
+  // Scheduled bouts can reveal the "declare without starting" path on demand.
+  const [declareOpen, setDeclareOpen] = useState(false)
 
   const f1Picks = picks.filter((p) => p.pickedCorner === "fighter1").length
   const f2Picks = picks.filter((p) => p.pickedCorner === "fighter2").length
@@ -2799,33 +2830,97 @@ function BoutControlCard({
       <div className="px-4 py-4">
         {isCompleted ? (
           <>
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-[12px] text-gray-700">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-[12px] text-gray-700 min-w-0 truncate">
                 <span className="text-gray-500">Winner:</span>{" "}
                 <span className="font-bold text-green-700">{winnerName}</span>
+                <span className="text-gray-400 ml-2 tabular-nums">
+                  · {totalPicks} pick{totalPicks === 1 ? "" : "s"}
+                </span>
               </p>
-              <p className="text-[10px] text-gray-400 font-medium tracking-wider uppercase">
-                Final tally
-              </p>
-            </div>
-            <PickMeter
-              f1Name={bout.fighter1Name || "Red"}
-              f2Name={bout.fighter2Name || "Blue"}
-              f1Picks={f1Picks}
-              f2Picks={f2Picks}
-              total={totalPicks}
-              locked={true}
-              winnerCorner={bout.winnerCorner ?? null}
-            />
-            <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-end">
               <button
-                onClick={onReopen}
-                disabled={isBusy}
-                className="text-[11px] text-gray-500 hover:text-gray-900 font-medium tracking-wide transition-colors disabled:opacity-50"
+                onClick={() => setExpanded((v) => !v)}
+                className="text-[11px] text-gray-500 hover:text-gray-900 font-medium tracking-wide transition-colors shrink-0"
               >
-                {isBusy ? "Reopening…" : "Reopen bout"}
+                {expanded ? "Hide tally" : "Show tally"}
               </button>
             </div>
+            {expanded && (
+              <div className="mt-3">
+                <PickMeter
+                  f1Name={bout.fighter1Name || "Red"}
+                  f2Name={bout.fighter2Name || "Blue"}
+                  f1Picks={f1Picks}
+                  f2Picks={f2Picks}
+                  total={totalPicks}
+                  locked={true}
+                  winnerCorner={bout.winnerCorner ?? null}
+                />
+                <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-end">
+                  <button
+                    onClick={onReopen}
+                    disabled={isBusy}
+                    className="text-[11px] text-gray-500 hover:text-gray-900 font-medium tracking-wide transition-colors disabled:opacity-50"
+                  >
+                    {isBusy ? "Reopening…" : "Reopen bout"}
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
+        ) : isScheduled ? (
+          <>
+            {/* Desktop: meter fills the width, action sits at natural size on
+                the right. Mobile: stacks, button goes full-width. */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5">
+              <div className="flex-1 min-w-0">
+                <PickMeter
+                  f1Name={bout.fighter1Name || "Red"}
+                  f2Name={bout.fighter2Name || "Blue"}
+                  f1Picks={f1Picks}
+                  f2Picks={f2Picks}
+                  total={totalPicks}
+                  locked={false}
+                />
+              </div>
+              <div className="shrink-0 flex flex-col gap-1.5 sm:items-end">
+                <button
+                  onClick={onStart}
+                  disabled={isBusy}
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-md bg-gray-900 hover:bg-gray-800 text-white text-[12px] font-bold tracking-wide transition-colors disabled:opacity-50"
+                >
+                  {isBusy ? "Starting…" : "Start Bout"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (declareOpen) onCancelConfirm()
+                    setDeclareOpen((v) => !v)
+                  }}
+                  className="text-[11px] text-gray-500 hover:text-gray-800 transition-colors"
+                >
+                  {declareOpen ? "Cancel" : "Already over? Declare winner →"}
+                </button>
+              </div>
+            </div>
+
+            {declareOpen && (
+              <div className="mt-3 pt-3 border-t border-gray-100">
+                <p className="text-[11px] font-bold text-gray-600 mb-2 tracking-wide uppercase">
+                  Declare winner now
+                </p>
+                <WinnerButtons
+                  bout={bout}
+                  confirming={confirming}
+                  isBusy={isBusy}
+                  f1Picks={f1Picks}
+                  f2Picks={f2Picks}
+                  onAskConfirm={onAskConfirm}
+                  onCancelConfirm={onCancelConfirm}
+                  onConfirmDeclare={onConfirmDeclare}
+                />
+              </div>
+            )}
           </>
         ) : (
           <>
@@ -2839,50 +2934,19 @@ function BoutControlCard({
             />
 
             <div className="mt-4">
-              {isScheduled ? (
-                <>
-                  <button
-                    onClick={onStart}
-                    disabled={isBusy}
-                    className="w-full px-4 py-2.5 rounded-md bg-gray-900 hover:bg-gray-800 text-white text-[12px] font-bold tracking-wide transition-colors disabled:opacity-50"
-                  >
-                    {isBusy ? "Starting…" : "Start Bout · Lock Picks"}
-                  </button>
-                  <details className="mt-2">
-                    <summary className="text-[11px] text-gray-500 hover:text-gray-800 cursor-pointer">
-                      Already over? Skip ahead and declare a winner →
-                    </summary>
-                    <div className="mt-2">
-                      <WinnerButtons
-                        bout={bout}
-                        confirming={confirming}
-                        isBusy={isBusy}
-                        f1Picks={f1Picks}
-                        f2Picks={f2Picks}
-                        onAskConfirm={onAskConfirm}
-                        onCancelConfirm={onCancelConfirm}
-                        onConfirmDeclare={onConfirmDeclare}
-                      />
-                    </div>
-                  </details>
-                </>
-              ) : (
-                <>
-                  <p className="text-[11px] font-bold text-gray-600 mb-2 tracking-wide uppercase">
-                    Declare winner
-                  </p>
-                  <WinnerButtons
-                    bout={bout}
-                    confirming={confirming}
-                    isBusy={isBusy}
-                    f1Picks={f1Picks}
-                    f2Picks={f2Picks}
-                    onAskConfirm={onAskConfirm}
-                    onCancelConfirm={onCancelConfirm}
-                    onConfirmDeclare={onConfirmDeclare}
-                  />
-                </>
-              )}
+              <p className="text-[11px] font-bold text-gray-600 mb-2 tracking-wide uppercase">
+                Declare winner
+              </p>
+              <WinnerButtons
+                bout={bout}
+                confirming={confirming}
+                isBusy={isBusy}
+                f1Picks={f1Picks}
+                f2Picks={f2Picks}
+                onAskConfirm={onAskConfirm}
+                onCancelConfirm={onCancelConfirm}
+                onConfirmDeclare={onConfirmDeclare}
+              />
             </div>
           </>
         )}
