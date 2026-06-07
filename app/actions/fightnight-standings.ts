@@ -14,8 +14,6 @@ export interface FightNightStanding {
   picksMade: number
   /** Picks won after settlement */
   picksWon: number
-  /** Whether the user has checked in at the venue */
-  atEvent: boolean
   joinedAt: string
   updatedAt: string
   /** ISO timestamp set when the post-event recap email is sent — used to
@@ -73,7 +71,6 @@ export async function incrementStandingPoints(
         points: amount,
         picksMade: 0,
         picksWon: 1,
-        atEvent: false,
         joinedAt: now,
         updatedAt: now,
       } as FightNightStanding)
@@ -121,7 +118,6 @@ export async function incrementPicksMade(
         points: 0,
         picksMade: 1,
         picksWon: 0,
-        atEvent: false,
         joinedAt: now,
         updatedAt: now,
       } as FightNightStanding)
@@ -130,12 +126,13 @@ export async function incrementPicksMade(
 }
 
 /**
- * Mark a user as checked in at the venue. Creates a stub if no standing exists yet.
+ * Ensure a standing exists for a user — used when someone joins the fight night
+ * (the public "Start Playing" form) so they appear on the leaderboard right
+ * away, before they've placed any picks. No-op if a standing already exists.
  */
-export async function setAtEvent(
+export async function ensureStanding(
   fightNightId: string,
   userId: string,
-  atEvent: boolean,
   meta?: {
     displayName: string | null
     photoURL: string | null
@@ -148,7 +145,7 @@ export async function setAtEvent(
   const now = new Date().toISOString()
 
   if (snap.exists) {
-    await ref.update({ atEvent, updatedAt: now })
+    await ref.update({ updatedAt: now })
   } else {
     await ref.set({
       userId,
@@ -158,7 +155,6 @@ export async function setAtEvent(
       points: 0,
       picksMade: 0,
       picksWon: 0,
-      atEvent,
       joinedAt: now,
       updatedAt: now,
     } as FightNightStanding)
@@ -167,22 +163,18 @@ export async function setAtEvent(
 
 export async function getStandings(
   fightNightId: string,
-  opts: { atEventOnly?: boolean; limit?: number } = {}
+  opts: { limit?: number } = {}
 ): Promise<FightNightStanding[]> {
   if (!fightNightId) return []
   const limit = opts.limit ?? 100
 
   // Single-field order by `points` desc — avoids needing a composite index.
-  // When atEventOnly is requested, fetch extra and filter client-side.
-  const fetchSize = opts.atEventOnly ? Math.max(limit * 4, 200) : limit
   const snap = await standingsCol(fightNightId)
     .orderBy('points', 'desc')
-    .limit(fetchSize)
+    .limit(limit)
     .get()
 
-  const all = snap.docs.map((d) => d.data() as FightNightStanding)
-  const filtered = opts.atEventOnly ? all.filter((e) => e.atEvent === true) : all
-  return filtered.slice(0, limit)
+  return snap.docs.map((d) => d.data() as FightNightStanding)
 }
 
 export async function getUserStanding(

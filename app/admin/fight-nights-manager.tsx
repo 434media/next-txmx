@@ -32,12 +32,6 @@ import {
   type FightNightPick,
 } from "../actions/fightnight-picks"
 import {
-  rotateCheckInCode,
-  getCheckInCode,
-  getCheckIns,
-  type CheckInCode,
-} from "../actions/fightnight-checkin"
-import {
   awardTopFinishers,
   getPrizes,
   markPrizeClaimed,
@@ -45,7 +39,7 @@ import {
   notifyFightNightWinners,
   type FightNightPrize,
 } from "../actions/fightnight-prizes"
-import { sendFightNightRecap } from "../actions/fightnight-recap"
+import { sendFightNightRecap, getRecapEmailPreview } from "../actions/fightnight-recap"
 import {
   type FightNightPoll,
   createPoll,
@@ -66,10 +60,7 @@ import {
   voidProp,
   deleteProp,
 } from "../actions/fightnight-props"
-import {
-  type FightNightStanding,
-  getStandings,
-} from "../actions/fightnight-standings"
+import { type FightNightStanding } from "../actions/fightnight-standings"
 import { useAdminAuth } from "./admin-auth-gate"
 import FlyerUploader from "./flyer-uploader"
 import UserActivityDrawer from "./user-activity-drawer"
@@ -603,16 +594,10 @@ function FightNightDetail({
         {tab === "props" && <PropsPanel fightNight={fightNight} />}
         {tab === "live" && <LivePanel fightNight={fightNight} />}
         {tab === "standings" && (
-          <div className="space-y-6">
-            <LeaderboardPreviewPanel
-              fightNight={fightNight}
-              onDrillDown={setDrilldownUserId}
-            />
-            <ParticipantsPanel
-              fightNight={fightNight}
-              onDrillDown={setDrilldownUserId}
-            />
-          </div>
+          <StandingsPanel
+            fightNight={fightNight}
+            onDrillDown={setDrilldownUserId}
+          />
         )}
         {tab === "prizes" && <PrizesPanel fightNight={fightNight} />}
       </div>
@@ -631,105 +616,16 @@ function FightNightDetail({
   )
 }
 
-// ── Overview Panel ─────────────────────────────────────────
-
-// ── Check-Ins Panel (track users) ──────────────────────────
-
-interface CheckInRecord {
-  userId: string
-  displayName: string | null
-  email: string | null
-  checkedInAt: string
-  codeUsed: string
-}
-
-function CheckInsPanel({ fightNight }: { fightNight: FightNight }) {
-  const [records, setRecords] = useState<CheckInRecord[]>([])
-  const [loading, setLoading] = useState(true)
-
-  const load = useCallback(async () => {
-    setLoading(true)
-    try {
-      const data = await getCheckIns(fightNight.id)
-      setRecords(data)
-    } finally {
-      setLoading(false)
-    }
-  }, [fightNight.id])
-
-  useEffect(() => {
-    load()
-  }, [load])
-
-  return (
-    <section className="border border-gray-200 rounded-xl p-5 bg-white">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-bold text-gray-800 tracking-wide uppercase">
-          Check-Ins ({records.length})
-        </h3>
-        <button
-          onClick={load}
-          disabled={loading}
-          className="text-[10px] text-gray-500 hover:text-gray-800 px-2 py-1 border border-gray-200 rounded disabled:opacity-50"
-        >
-          {loading ? "…" : "Refresh"}
-        </button>
-      </div>
-
-      {loading ? (
-        <p className="text-gray-400 text-sm">Loading…</p>
-      ) : records.length === 0 ? (
-        <p className="text-gray-400 text-sm">
-          No one has checked in yet. Rotate a code in Check-In Code above and announce it from the ring.
-        </p>
-      ) : (
-        <div className="border border-gray-100 rounded-lg overflow-hidden max-h-80 overflow-y-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-200 sticky top-0">
-              <tr>
-                <th className="text-left px-3 py-2 text-[10px] font-semibold text-gray-400 tracking-[0.15em] uppercase">
-                  User
-                </th>
-                <th className="text-left px-3 py-2 text-[10px] font-semibold text-gray-400 tracking-[0.15em] uppercase">
-                  Email
-                </th>
-                <th className="text-right px-3 py-2 text-[10px] font-semibold text-gray-400 tracking-[0.15em] uppercase">
-                  Checked In
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {records.map((r) => (
-                <tr key={r.userId} className="border-b border-gray-100 last:border-0">
-                  <td className="px-3 py-2 text-[12px] text-gray-800 font-semibold truncate">
-                    {r.displayName || "Anonymous"}
-                  </td>
-                  <td className="px-3 py-2 text-[11px] text-gray-500 truncate">
-                    {r.email || "—"}
-                  </td>
-                  <td className="px-3 py-2 text-[11px] text-gray-500 text-right tabular-nums">
-                    {new Date(r.checkedInAt).toLocaleTimeString()}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </section>
-  )
-}
-
-// ── Participants Panel (live signup feed) ──────────────────
+// ── Standings Panel (one live board: ranked + roster) ──────
 
 /**
- * Live feed of everyone who's joined the fight night, ordered by most
- * recent. Real-time via onSnapshot so the admin can watch fans stream in
- * during the event. Distinguishes walk-in (custom-token guest UID prefix
- * `guest_`) from authenticated accounts (Google sign-in or any other
- * provider that produced a regular Firebase Auth UID).
+ * The single Standings view. One live subscription feeds a ranked leaderboard
+ * (default) and a "just joined" roster behind a sort toggle — so the admin gets
+ * who's-winning, who's-joining, total, velocity, and search without two stacked
+ * scroll areas. The indicator follows event status: Live only during
+ * doors/live, Final once completed, Not started before.
  */
-function ParticipantsPanel({
+function StandingsPanel({
   fightNight,
   onDrillDown,
 }: {
@@ -739,19 +635,22 @@ function ParticipantsPanel({
   const [participants, setParticipants] = useState<FightNightStanding[]>([])
   const [loading, setLoading] = useState(true)
   const [tick, setTick] = useState(0)
+  const [search, setSearch] = useState("")
+  const [sort, setSort] = useState<"rank" | "joined">("rank")
 
-  // Re-render once a minute so relative timestamps stay accurate without
-  // each row managing its own timer.
+  // Minute tick keeps "joined Xm ago" + the velocity count fresh.
   useEffect(() => {
     const id = window.setInterval(() => setTick((t) => t + 1), 60_000)
     return () => window.clearInterval(id)
   }, [])
 
+  // One live subscription drives both views. Ordered by joinedAt so the roster
+  // + velocity are correct; ranking is a client-side sort over the same set.
   useEffect(() => {
     const q = query(
       collection(db, "fightNights", fightNight.id, "standings"),
       orderBy("joinedAt", "desc"),
-      fbLimit(200)
+      fbLimit(500)
     )
     const unsub = onSnapshot(
       q,
@@ -765,50 +664,117 @@ function ParticipantsPanel({
   }, [fightNight.id])
 
   const total = participants.length
-  // useMemo on the same dep set as `tick` so it recomputes minute-over-minute
-  const counts = (() => {
+
+  const last10m = (() => {
     void tick
     const now = Date.now()
-    let last10m = 0
-    let walkIn = 0
-    let google = 0
+    let n = 0
     for (const p of participants) {
-      const joined = new Date(p.joinedAt).getTime()
-      if (now - joined < 10 * 60_000) last10m++
-      if (p.userId.startsWith("guest_")) walkIn++
-      else google++
+      if (now - new Date(p.joinedAt).getTime() < 10 * 60_000) n++
     }
-    return { last10m, walkIn, google }
+    return n
   })()
+
+  // True leaderboard position by points over everyone (not the filtered view),
+  // so the rank shown stays correct even while searching.
+  const rankByUser = (() => {
+    const ranked = [...participants].sort((a, b) => (b.points || 0) - (a.points || 0))
+    const m = new Map<string, number>()
+    ranked.forEach((p, i) => m.set(p.userId, i + 1))
+    return m
+  })()
+
+  // Status-aware live indicator.
+  const live =
+    fightNight.status === "doors_open" || fightNight.status === "live"
+  const liveLabel = live
+    ? "Live"
+    : fightNight.status === "completed"
+      ? "Final"
+      : "Not started"
+
+  const term = search.trim().toLowerCase()
+  const filtered = term
+    ? participants.filter(
+        (p) =>
+          (p.displayName || "").toLowerCase().includes(term) ||
+          (p.email || "").toLowerCase().includes(term)
+      )
+    : participants
+  const rows =
+    sort === "rank"
+      ? [...filtered].sort((a, b) => (b.points || 0) - (a.points || 0))
+      : [...filtered].sort(
+          (a, b) =>
+            new Date(b.joinedAt).getTime() - new Date(a.joinedAt).getTime()
+        )
 
   return (
     <section className="border border-gray-200 rounded-xl bg-white">
       <div className="border-b border-gray-200 px-5 py-4">
         <div className="flex items-center justify-between mb-3">
-          <div>
+          <div className="flex items-center gap-2.5">
             <h3 className="text-sm font-bold text-gray-900 tracking-wide uppercase">
-              Participants
+              Standings
             </h3>
-            <p className="text-[11px] text-gray-500 font-medium mt-0.5">
-              Live signup feed · most recent first
-            </p>
+            <span
+              className={`inline-flex items-center gap-1.5 text-[10px] font-bold tracking-wider uppercase ${
+                live ? "text-emerald-700" : "text-gray-400"
+              }`}
+            >
+              {live && (
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              )}
+              {liveLabel}
+            </span>
           </div>
           <div className="text-right">
             <p className="text-gray-900 text-lg font-bold tabular-nums leading-none">
               {total.toLocaleString()}
             </p>
             <p className="text-[10px] text-gray-500 font-medium tracking-wider uppercase mt-1">
-              Total
+              Players
             </p>
           </div>
         </div>
 
-        {/* Quick counts strip */}
-        <div className="grid grid-cols-3 gap-2">
-          <CountTile label="Last 10 min" value={counts.last10m} accent="emerald" />
-          <CountTile label="Walk-in" value={counts.walkIn} accent="amber" />
-          <CountTile label="Google" value={counts.google} accent="blue" />
+        <div className="flex items-center gap-2 mb-3">
+          <div className="inline-flex rounded-md border border-gray-200 overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setSort("rank")}
+              className={`px-3 py-1.5 text-[11px] font-semibold transition-colors ${
+                sort === "rank"
+                  ? "bg-gray-900 text-white"
+                  : "bg-white text-gray-600 hover:bg-gray-50"
+              }`}
+            >
+              Rank
+            </button>
+            <button
+              type="button"
+              onClick={() => setSort("joined")}
+              className={`px-3 py-1.5 text-[11px] font-semibold border-l border-gray-200 transition-colors ${
+                sort === "joined"
+                  ? "bg-gray-900 text-white"
+                  : "bg-white text-gray-600 hover:bg-gray-50"
+              }`}
+            >
+              Just joined
+            </button>
+          </div>
+          {last10m > 0 && (
+            <CountTile label="Joined · last 10 min" value={last10m} />
+          )}
         </div>
+
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search by name or email…"
+          className={inputClass}
+        />
       </div>
 
       <div className="divide-y divide-gray-100 max-h-[600px] overflow-y-auto">
@@ -816,13 +782,21 @@ function ParticipantsPanel({
           <p className="px-5 py-8 text-gray-400 text-sm text-center">Loading…</p>
         ) : participants.length === 0 ? (
           <p className="px-5 py-8 text-gray-400 text-sm text-center">
-            No signups yet. The feed updates live as fans join.
+            {fightNight.status === "completed"
+              ? "No one played this fight night."
+              : "No players yet. Standings fill in live as fans join and pick winners."}
+          </p>
+        ) : rows.length === 0 ? (
+          <p className="px-5 py-8 text-gray-400 text-sm text-center">
+            No one matches &ldquo;{search}&rdquo;.
           </p>
         ) : (
-          participants.map((p) => (
-            <ParticipantRow
+          rows.map((p) => (
+            <StandingRow
               key={p.userId}
               entry={p}
+              rank={rankByUser.get(p.userId) ?? 0}
+              mode={sort}
               onClick={() => onDrillDown(p.userId)}
             />
           ))
@@ -832,83 +806,63 @@ function ParticipantsPanel({
   )
 }
 
-function CountTile({
-  label,
-  value,
-  accent,
-}: {
-  label: string
-  value: number
-  accent: "emerald" | "amber" | "blue"
-}) {
-  const palette =
-    accent === "emerald"
-      ? "text-emerald-700 bg-emerald-50 border-emerald-200"
-      : accent === "amber"
-        ? "text-amber-700 bg-amber-50 border-amber-200"
-        : "text-blue-700 bg-blue-50 border-blue-200"
-  return (
-    <div className={`border rounded-md px-2.5 py-1.5 ${palette}`}>
-      <p className="text-base font-bold tabular-nums leading-none">{value}</p>
-      <p className="text-[9px] font-bold tracking-wider uppercase mt-1 opacity-80">
-        {label}
-      </p>
-    </div>
-  )
-}
-
-function ParticipantRow({
+function StandingRow({
   entry,
+  rank,
+  mode,
   onClick,
 }: {
   entry: FightNightStanding
+  rank: number
+  mode: "rank" | "joined"
   onClick: () => void
 }) {
-  const isWalkIn = entry.userId.startsWith("guest_")
-  const method = isWalkIn ? "Walk-in" : "Google"
-  const methodClass = isWalkIn
-    ? "text-amber-700 bg-amber-50 border-amber-200"
-    : "text-blue-700 bg-blue-50 border-blue-200"
-  const joinedAgo = formatRelativeTime(entry.joinedAt)
-
   return (
     <button
       type="button"
       onClick={onClick}
       className="w-full text-left px-5 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors focus:outline-none focus:bg-gray-50"
     >
-      <div className="w-16 shrink-0">
-        <p className="text-[11px] text-gray-500 font-medium tabular-nums">
-          {joinedAgo}
-        </p>
+      <div className="w-14 shrink-0">
+        {mode === "rank" ? (
+          <p className="text-[13px] font-bold tabular-nums text-gray-400">#{rank}</p>
+        ) : (
+          <p className="text-[11px] text-gray-500 font-medium tabular-nums">
+            {formatRelativeTime(entry.joinedAt)}
+          </p>
+        )}
       </div>
 
       <div className="min-w-0 flex-1">
         <p className="text-[13px] font-semibold text-gray-900 truncate">
           {entry.displayName || "Anonymous"}
         </p>
-        <p className="text-[11px] text-gray-500 truncate">
-          {entry.email || "—"}
-        </p>
+        <p className="text-[11px] text-gray-500 truncate">{entry.email || "—"}</p>
       </div>
 
-      <span
-        className={`inline-flex items-center text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full border shrink-0 ${methodClass}`}
-      >
-        {method}
-      </span>
-
-      <div className="text-right w-20 shrink-0">
-        <p className="text-[11px] text-gray-700 font-medium tabular-nums">
-          {entry.picksMade || 0} pick{(entry.picksMade || 0) === 1 ? "" : "s"}
+      <div className="text-right w-24 shrink-0">
+        <p className="text-[13px] text-gray-900 font-bold tabular-nums">
+          {(entry.points || 0).toLocaleString()}
+          <span className="text-gray-400 text-[11px] font-medium ml-1">pts</span>
         </p>
-        {(entry.points || 0) > 0 && (
-          <p className="text-[10px] text-gray-500 tabular-nums">
-            {(entry.points || 0).toLocaleString()} pts
-          </p>
-        )}
+        <p className="text-[10px] text-gray-500 tabular-nums">
+          {entry.picksWon || 0}/{entry.picksMade || 0} picks
+        </p>
       </div>
     </button>
+  )
+}
+
+function CountTile({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="inline-flex items-center gap-2 border border-emerald-200 bg-emerald-50 rounded-md px-3 py-1.5">
+      <span className="text-base font-bold tabular-nums leading-none text-emerald-700">
+        {value}
+      </span>
+      <span className="text-[9px] font-bold tracking-wider uppercase text-emerald-700/80">
+        {label}
+      </span>
+    </div>
   )
 }
 
@@ -922,121 +876,6 @@ function formatRelativeTime(iso: string): string {
   return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" })
 }
 
-// ── Leaderboard Preview Panel (read-only) ──────────────────
-
-function LeaderboardPreviewPanel({
-  fightNight,
-  onDrillDown,
-}: {
-  fightNight: FightNight
-  onDrillDown: (userId: string) => void
-}) {
-  const [standings, setStandings] = useState<FightNightStanding[]>([])
-  const [loading, setLoading] = useState(true)
-
-  const load = useCallback(async () => {
-    setLoading(true)
-    try {
-      const data = await getStandings(fightNight.id, { limit: 25 })
-      setStandings(data)
-    } finally {
-      setLoading(false)
-    }
-  }, [fightNight.id])
-
-  useEffect(() => {
-    load()
-  }, [load])
-
-  return (
-    <section className="border border-gray-200 rounded-xl p-5 bg-white">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-bold text-gray-800 tracking-wide uppercase">
-          Leaderboard Preview
-        </h3>
-        <button
-          onClick={load}
-          disabled={loading}
-          className="text-[10px] text-gray-500 hover:text-gray-800 px-2 py-1 border border-gray-200 rounded disabled:opacity-50"
-        >
-          {loading ? "…" : "Refresh"}
-        </button>
-      </div>
-
-      {loading ? (
-        <p className="text-gray-400 text-sm">Loading…</p>
-      ) : standings.length === 0 ? (
-        <p className="text-gray-400 text-sm">
-          No standings yet. Once users pick winners, entries appear here.
-        </p>
-      ) : (
-        <div className="border border-gray-100 rounded-lg overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="text-left px-3 py-2 text-[10px] font-semibold text-gray-400 tracking-[0.15em] uppercase">
-                  #
-                </th>
-                <th className="text-left px-3 py-2 text-[10px] font-semibold text-gray-400 tracking-[0.15em] uppercase">
-                  User
-                </th>
-                <th className="text-center px-3 py-2 text-[10px] font-semibold text-gray-400 tracking-[0.15em] uppercase">
-                  Picks
-                </th>
-                <th className="text-center px-3 py-2 text-[10px] font-semibold text-gray-400 tracking-[0.15em] uppercase">
-                  At Event
-                </th>
-                <th className="text-right px-3 py-2 text-[10px] font-semibold text-gray-400 tracking-[0.15em] uppercase">
-                  Points
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {standings.map((s, i) => (
-                <tr
-                  key={s.userId}
-                  onClick={() => onDrillDown(s.userId)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault()
-                      onDrillDown(s.userId)
-                    }
-                  }}
-                  tabIndex={0}
-                  role="button"
-                  aria-label={`Open activity for ${s.displayName || "Anonymous"}`}
-                  className="border-b border-gray-100 last:border-0 hover:bg-gray-50 cursor-pointer focus:outline-none focus:bg-gray-50"
-                >
-                  <td className="px-3 py-2 text-[12px] tabular-nums text-gray-400">{i + 1}</td>
-                  <td className="px-3 py-2 text-[12px]">
-                    <p className="text-gray-800 font-semibold truncate">
-                      {s.displayName || "Anonymous"}
-                    </p>
-                    <p className="text-gray-400 text-[11px] truncate">{s.email || "—"}</p>
-                  </td>
-                  <td className="px-3 py-2 text-[12px] text-center tabular-nums text-gray-700">
-                    {s.picksWon}/{s.picksMade}
-                  </td>
-                  <td className="px-3 py-2 text-center">
-                    {s.atEvent ? (
-                      <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
-                    ) : (
-                      <span className="text-gray-300 text-[10px]">—</span>
-                    )}
-                  </td>
-                  <td className="px-3 py-2 text-[12px] text-right tabular-nums font-bold text-gray-900">
-                    {s.points.toLocaleString()}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </section>
-  )
-}
-
 // ── Props Panel ────────────────────────────────────────────
 
 function PropsPanel({ fightNight }: { fightNight: FightNight }) {
@@ -1046,7 +885,7 @@ function PropsPanel({ fightNight }: { fightNight: FightNight }) {
   const [showCreate, setShowCreate] = useState(false)
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
-  const [optionsText, setOptionsText] = useState("")
+  const [options, setOptions] = useState<string[]>(["", ""])
   const [pointsReward, setPointsReward] = useState(500)
   const [isUnderdog, setIsUnderdog] = useState(false)
   const [boutNumber, setBoutNumber] = useState<number | "">("")
@@ -1057,7 +896,7 @@ function PropsPanel({ fightNight }: { fightNight: FightNight }) {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editTitle, setEditTitle] = useState("")
   const [editDescription, setEditDescription] = useState("")
-  const [editOptionsText, setEditOptionsText] = useState("")
+  const [editOptions, setEditOptions] = useState<string[]>([])
   const [editPointsReward, setEditPointsReward] = useState(500)
   const [editIsUnderdog, setEditIsUnderdog] = useState(false)
   const [editBoutNumber, setEditBoutNumber] = useState<number | "">("")
@@ -1084,16 +923,13 @@ function PropsPanel({ fightNight }: { fightNight: FightNight }) {
 
   async function handleCreate() {
     setError("")
-    const options = optionsText
-      .split("\n")
-      .map((l) => l.trim())
-      .filter(Boolean)
+    const opts = options.map((o) => o.trim()).filter(Boolean)
     if (!title.trim()) {
       setError("Title required")
       return
     }
-    if (options.length < 2) {
-      setError("At least 2 options required (one per line)")
+    if (opts.length < 2) {
+      setError("At least 2 options required")
       return
     }
     setCreating(true)
@@ -1101,14 +937,14 @@ function PropsPanel({ fightNight }: { fightNight: FightNight }) {
       await createProp(fightNight.id, {
         title,
         description,
-        options: options.map((label) => ({ label })),
+        options: opts.map((label) => ({ label })),
         pointsReward,
         isUnderdog,
         boutNumber: typeof boutNumber === "number" ? boutNumber : null,
       })
       setTitle("")
       setDescription("")
-      setOptionsText("")
+      setOptions(["", ""])
       setIsUnderdog(false)
       setBoutNumber("")
       setShowCreate(false)
@@ -1155,7 +991,7 @@ function PropsPanel({ fightNight }: { fightNight: FightNight }) {
     setEditingId(prop.id)
     setEditTitle(prop.title)
     setEditDescription(prop.description)
-    setEditOptionsText(prop.options.map((o) => o.label).join("\n"))
+    setEditOptions(prop.options.map((o) => o.label))
     setEditPointsReward(prop.pointsReward)
     setEditIsUnderdog(prop.isUnderdog)
     setEditBoutNumber(prop.boutNumber ?? "")
@@ -1169,16 +1005,13 @@ function PropsPanel({ fightNight }: { fightNight: FightNight }) {
 
   async function saveEdit(propId: string) {
     setEditError("")
-    const lines = editOptionsText
-      .split("\n")
-      .map((l) => l.trim())
-      .filter(Boolean)
+    const lines = editOptions.map((l) => l.trim()).filter(Boolean)
     if (!editTitle.trim()) {
       setEditError("Title required")
       return
     }
     if (lines.length < 2) {
-      setEditError("At least 2 options required (one per line)")
+      setEditError("At least 2 options required")
       return
     }
     const original = props.find((p) => p.id === propId)
@@ -1257,14 +1090,8 @@ function PropsPanel({ fightNight }: { fightNight: FightNight }) {
               />
             </div>
             <div className="sm:col-span-2">
-              <label className={labelClass}>OPTIONS (one per line, 2+ required)</label>
-              <textarea
-                value={optionsText}
-                onChange={(e) => setOptionsText(e.target.value)}
-                rows={3}
-                placeholder={"KO/TKO\nDecision\nDraw"}
-                className={inputClass + " resize-none"}
-              />
+              <label className={labelClass}>OPTIONS (2+ required)</label>
+              <OptionRows options={options} onChange={setOptions} />
             </div>
             <div>
               <label className={labelClass}>POINTS</label>
@@ -1343,19 +1170,12 @@ function PropsPanel({ fightNight }: { fightNight: FightNight }) {
                       />
                     </div>
                     <div className="sm:col-span-2">
-                      <label className={labelClass}>
-                        OPTIONS (one per line, 2+ required)
-                      </label>
-                      <textarea
-                        value={editOptionsText}
-                        onChange={(e) => setEditOptionsText(e.target.value)}
-                        rows={Math.max(3, editOptionsText.split("\n").length)}
-                        className={inputClass + " resize-none"}
-                      />
+                      <label className={labelClass}>OPTIONS (2+ required)</label>
+                      <OptionRows options={editOptions} onChange={setEditOptions} />
                       <p className="text-[10px] text-gray-500 mt-1">
-                        Order matters: each line maps to the existing option in the same
-                        slot, so picks survive label edits. Adding lines creates new
-                        options; removing lines orphans any picks on them.
+                        Order matters: each row maps to the existing option in the same
+                        slot, so picks survive label edits. Adding rows creates new
+                        options; removing rows orphans any picks on them.
                       </p>
                     </div>
                     <div>
@@ -2707,101 +2527,6 @@ function BoutRow({
   )
 }
 
-// ── Check-In Panel ─────────────────────────────────────────
-
-function CheckInPanel({ fightNight }: { fightNight: FightNight }) {
-  const { user: adminUser } = useAdminAuth()
-  const [code, setCode] = useState<CheckInCode | null>(null)
-  const [ttl, setTtl] = useState(10)
-  const [rotating, setRotating] = useState(false)
-  const [, setTick] = useState(0)
-
-  const load = useCallback(async () => {
-    const c = await getCheckInCode(fightNight.id)
-    setCode(c)
-  }, [fightNight.id])
-
-  useEffect(() => {
-    load()
-  }, [load])
-
-  useEffect(() => {
-    const id = setInterval(() => setTick((t) => t + 1), 1000)
-    return () => clearInterval(id)
-  }, [])
-
-  async function handleRotate() {
-    setRotating(true)
-    try {
-      const next = await rotateCheckInCode(fightNight.id, ttl, adminUser?.uid || "")
-      setCode(next)
-    } finally {
-      setRotating(false)
-    }
-  }
-
-  const ms = code ? new Date(code.validUntil).getTime() - Date.now() : 0
-  const expired = code ? ms <= 0 : false
-  const mm = Math.max(0, Math.floor(ms / 60000))
-  const ss = Math.max(0, Math.floor((ms % 60000) / 1000))
-
-  return (
-    <section className="border border-gray-200 rounded-xl p-5 bg-white">
-      <h3 className="text-sm font-bold text-gray-800 tracking-wide uppercase mb-4">
-        Check-In Code
-      </h3>
-      {code ? (
-        <div
-          className={`rounded-xl px-4 py-5 mb-4 text-center border-2 ${
-            expired ? "bg-red-50 border-red-200" : "bg-gray-50 border-gray-300"
-          }`}
-        >
-          <p
-            className="text-5xl sm:text-6xl font-black tabular-nums tracking-[0.3em] leading-none mb-2"
-            style={{ color: expired ? "#b91c1c" : "#0a0a0a" }}
-          >
-            {code.currentCode}
-          </p>
-          <p
-            className={`text-[10px] font-bold tracking-[0.25em] uppercase ${expired ? "text-red-600" : "text-emerald-700"}`}
-          >
-            {expired
-              ? "Expired — Rotate Now"
-              : `Valid · ${mm}:${ss.toString().padStart(2, "0")} left`}
-          </p>
-          <p className="text-[10px] text-gray-500 mt-2">
-            Total check-ins: {code.totalCheckIns}
-          </p>
-        </div>
-      ) : (
-        <div className="rounded-xl px-4 py-8 mb-4 text-center border-2 border-dashed border-gray-200 bg-gray-50">
-          <p className="text-sm text-gray-400">No active code.</p>
-        </div>
-      )}
-      <div className="flex items-end gap-2">
-        <div>
-          <label className={labelClass}>TTL (min)</label>
-          <input
-            type="number"
-            min={1}
-            max={60}
-            value={ttl}
-            onChange={(e) => setTtl(parseInt(e.target.value) || 10)}
-            className="w-20 bg-white border border-gray-200 text-gray-900 text-[13px] px-2 py-2 rounded-md"
-          />
-        </div>
-        <button
-          onClick={handleRotate}
-          disabled={rotating}
-          className="flex-1 px-4 py-2 bg-gray-900 text-white text-[12px] font-semibold rounded-md disabled:opacity-50"
-        >
-          {rotating ? "Rotating…" : code ? "Rotate Code" : "Generate Code"}
-        </button>
-      </div>
-    </section>
-  )
-}
-
 // ── Live Control Panel ─────────────────────────────────────
 
 function LivePanel({ fightNight }: { fightNight: FightNight }) {
@@ -3361,16 +3086,22 @@ function PrizesPanel({ fightNight }: { fightNight: FightNight }) {
   const [loading, setLoading] = useState(true)
   const [topN, setTopN] = useState(1)
   const [prizeLabel, setPrizeLabel] = useState(fightNight.prizeLabel || "BOXR Station prize")
-  const [atEventOnly, setAtEventOnly] = useState(true)
   const [busy, setBusy] = useState(false)
   const [notesById, setNotesById] = useState<Record<string, string>>({})
+  const [methodById, setMethodById] = useState<Record<string, string>>({})
   const [claimInstructions, setClaimInstructions] = useState(
     "Reply to this email by Sunday to claim. We'll coordinate pickup at the venue.",
   )
+  const [previewing, setPreviewing] = useState(false)
   const [notifyResult, setNotifyResult] = useState<{
     sent: number
     skipped: number
     errors: number
+    results: Array<{
+      displayName: string | null
+      email: string | null
+      status: "sent" | "skipped" | "error"
+    }>
   } | null>(null)
 
   const load = useCallback(async () => {
@@ -3391,22 +3122,54 @@ function PrizesPanel({ fightNight }: { fightNight: FightNight }) {
     if (!confirm(`Award the top ${topN} on the leaderboard?`)) return
     setBusy(true)
     try {
-      await awardTopFinishers(fightNight.id, { topN, prizeLabel, atEventOnly })
+      await awardTopFinishers(fightNight.id, { topN, prizeLabel })
       await load()
     } finally {
       setBusy(false)
     }
   }
 
+  // Bulk: award the top N then immediately email those winners.
+  async function handleAwardAndNotify() {
+    if (
+      !confirm(
+        `Award the top ${topN} and email the winners now? This sends real emails via Resend.`
+      )
+    )
+      return
+    setBusy(true)
+    setNotifyResult(null)
+    try {
+      await awardTopFinishers(fightNight.id, { topN, prizeLabel })
+      const res = await notifyFightNightWinners(fightNight.id, claimInstructions)
+      setNotifyResult(res)
+      await load()
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function handlePreviewRecap() {
+    setPreviewing(true)
+    try {
+      const html = await getRecapEmailPreview(fightNight.id, { claimInstructions })
+      const w = window.open("", "_blank")
+      if (w) {
+        w.document.write(html)
+        w.document.close()
+      }
+    } finally {
+      setPreviewing(false)
+    }
+  }
+
   async function handleClaim(prizeId: string) {
     setBusy(true)
     try {
-      await markPrizeClaimed(
-        fightNight.id,
-        prizeId,
-        adminUser?.uid || "",
-        notesById[prizeId] || ""
-      )
+      const composed = [methodById[prizeId] || "", notesById[prizeId] || ""]
+        .filter(Boolean)
+        .join(" · ")
+      await markPrizeClaimed(fightNight.id, prizeId, adminUser?.uid || "", composed)
       await load()
     } finally {
       setBusy(false)
@@ -3476,14 +3239,18 @@ function PrizesPanel({ fightNight }: { fightNight: FightNight }) {
         Prizes
       </h3>
 
-      {/* Award top N */}
+      {/* Award winners */}
       <div className="border border-gray-200 bg-gray-50 rounded-lg p-3 mb-4">
-        <p className="text-[10px] font-bold text-gray-500 tracking-[0.2em] uppercase mb-2">
-          Award Top N
+        <p className="text-[10px] font-bold text-gray-500 tracking-[0.2em] uppercase mb-1">
+          Award Winners
         </p>
-        <div className="grid grid-cols-3 gap-2 mb-2">
+        <p className="text-[12px] text-gray-500 leading-relaxed mb-3">
+          Reads the final leaderboard and records a prize for the top finishers.
+          Set how many places win and what they get, then award.
+        </p>
+        <div className="grid grid-cols-3 gap-2 mb-3">
           <div>
-            <label className={labelClass}>TOP N</label>
+            <label className={labelClass}>PLACES PAID</label>
             <input
               type="number"
               min={1}
@@ -3492,44 +3259,45 @@ function PrizesPanel({ fightNight }: { fightNight: FightNight }) {
               onChange={(e) => setTopN(parseInt(e.target.value) || 1)}
               className={inputClass}
             />
+            <p className="text-[10px] text-gray-400 mt-1">Top {topN} on the board</p>
           </div>
           <div className="col-span-2">
-            <label className={labelClass}>PRIZE LABEL</label>
+            <label className={labelClass}>PRIZE</label>
             <input
               type="text"
               value={prizeLabel}
               onChange={(e) => setPrizeLabel(e.target.value)}
               className={inputClass}
+              placeholder="e.g. BOXR Station gear pack"
             />
+            <p className="text-[10px] text-gray-400 mt-1">Shown to each winner</p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={atEventOnly}
-              onChange={(e) => setAtEventOnly(e.target.checked)}
-              className="accent-gray-900"
-            />
-            <span className="text-[11px] text-gray-700 font-medium">
-              On-premises only (atEvent=true)
-            </span>
-          </label>
-          <div className="flex-1" />
+        <div className="flex items-center gap-2">
           <button
             onClick={handleAward}
             disabled={busy}
-            className="px-4 py-1.5 bg-gray-900 text-white text-[11px] font-semibold rounded-md disabled:opacity-50"
+            className="px-4 py-1.5 border border-gray-200 text-gray-700 hover:bg-gray-100 text-[11px] font-semibold rounded-md disabled:opacity-50"
           >
-            {busy ? "Awarding…" : `Award Top ${topN}`}
+            {busy ? "Awarding…" : `Award only`}
           </button>
+          <button
+            onClick={handleAwardAndNotify}
+            disabled={busy}
+            className="px-4 py-1.5 bg-gray-900 hover:bg-gray-800 text-white text-[11px] font-semibold rounded-md disabled:opacity-50"
+          >
+            {busy ? "Working…" : "Award & email"}
+          </button>
+          <span className="text-[10px] text-gray-400 leading-tight">
+            “Award only” records winners. “Award &amp; email” also sends each their prize email.
+          </span>
         </div>
       </div>
 
       {/* Notify winners */}
       {prizes.some((p) => p.status === "pending") && (
-        <div className="border border-blue-200 bg-blue-50/40 rounded-lg p-3 mb-4">
-          <p className="text-[10px] font-bold text-blue-700 tracking-[0.2em] uppercase mb-2">
+        <div className="border border-gray-200 bg-gray-50 rounded-lg p-3 mb-4">
+          <p className="text-[10px] font-bold text-gray-500 tracking-[0.2em] uppercase mb-2">
             Email Winners
           </p>
           <div className="mb-2">
@@ -3542,17 +3310,42 @@ function PrizesPanel({ fightNight }: { fightNight: FightNight }) {
             />
           </div>
           {notifyResult && (
-            <div className="mb-2 border border-green-200 bg-green-50 rounded px-2.5 py-1.5">
-              <p className="text-[11px] text-green-700 font-medium">
+            <div className="mb-2 border border-gray-200 bg-white rounded px-2.5 py-2">
+              <p className="text-[11px] text-gray-700 font-medium mb-1">
                 Sent {notifyResult.sent} · Skipped {notifyResult.skipped} (no email) · Errors{" "}
                 {notifyResult.errors}
               </p>
+              {notifyResult.results.length > 0 && (
+                <ul className="space-y-0.5">
+                  {notifyResult.results.map((r, i) => (
+                    <li key={i} className="flex items-center justify-between gap-2 text-[10px]">
+                      <span className="truncate text-gray-600 min-w-0">
+                        {r.displayName || "Anonymous"}
+                        <span className="text-gray-400">
+                          {r.email ? ` · ${r.email}` : " · no email"}
+                        </span>
+                      </span>
+                      <span
+                        className={`shrink-0 font-bold uppercase tracking-wide ${
+                          r.status === "sent"
+                            ? "text-green-600"
+                            : r.status === "error"
+                              ? "text-red-500"
+                              : "text-gray-400"
+                        }`}
+                      >
+                        {r.status}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           )}
           <button
             onClick={handleNotify}
             disabled={busy}
-            className="px-4 py-1.5 bg-blue-600 text-white text-[11px] font-semibold rounded-md disabled:opacity-50"
+            className="px-4 py-1.5 bg-gray-900 hover:bg-gray-800 text-white text-[11px] font-semibold rounded-md disabled:opacity-50"
           >
             {busy ? "Sending…" : "Send Winner Emails"}
           </button>
@@ -3588,13 +3381,22 @@ function PrizesPanel({ fightNight }: { fightNight: FightNight }) {
             </p>
           </div>
         )}
-        <button
-          onClick={handleRecap}
-          disabled={busy}
-          className="px-4 py-1.5 bg-gray-900 text-white text-[11px] font-semibold rounded-md disabled:opacity-50"
-        >
-          {busy ? "Sending…" : "Send Recap to All Participants"}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleRecap}
+            disabled={busy}
+            className="px-4 py-1.5 bg-gray-900 hover:bg-gray-800 text-white text-[11px] font-semibold rounded-md disabled:opacity-50"
+          >
+            {busy ? "Sending…" : "Send Recap to All Participants"}
+          </button>
+          <button
+            onClick={handlePreviewRecap}
+            disabled={previewing}
+            className="px-4 py-1.5 border border-gray-200 text-gray-700 hover:bg-gray-100 text-[11px] font-semibold rounded-md disabled:opacity-50"
+          >
+            {previewing ? "Opening…" : "Preview email"}
+          </button>
+        </div>
       </div>
 
       {loading ? (
@@ -3621,15 +3423,37 @@ function PrizesPanel({ fightNight }: { fightNight: FightNight }) {
               </div>
               {prize.status === "pending" ? (
                 <div>
-                  <input
-                    type="text"
-                    value={notesById[prize.id] || ""}
-                    onChange={(e) =>
-                      setNotesById((m) => ({ ...m, [prize.id]: e.target.value }))
-                    }
-                    placeholder="Notes (e.g. picked up 9:32pm)"
-                    className={inputClass + " mb-2"}
-                  />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
+                    <div>
+                      <label className={labelClass}>METHOD</label>
+                      <Combobox
+                        value={methodById[prize.id] || ""}
+                        options={[
+                          { value: "Picked up at venue", label: "Picked up at venue" },
+                          { value: "Shipped", label: "Shipped" },
+                          { value: "Other", label: "Other" },
+                        ]}
+                        onSelect={(v) =>
+                          setMethodById((m) => ({ ...m, [prize.id]: v }))
+                        }
+                        placeholder="Select method"
+                        searchable={false}
+                        ariaLabel="Claim method"
+                      />
+                    </div>
+                    <div>
+                      <label className={labelClass}>NOTE</label>
+                      <input
+                        type="text"
+                        value={notesById[prize.id] || ""}
+                        onChange={(e) =>
+                          setNotesById((m) => ({ ...m, [prize.id]: e.target.value }))
+                        }
+                        placeholder="e.g. picked up 9:32pm"
+                        className={inputClass}
+                      />
+                    </div>
+                  </div>
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleClaim(prize.id)}

@@ -14,7 +14,6 @@ import type { FightNightStanding } from "../../../actions/fightnight-standings"
 
 interface LeaderboardLiveProps {
   fightNightId: string
-  atEventOnly?: boolean
 }
 
 const TOP_N = 3
@@ -22,7 +21,6 @@ const NEIGHBORS = 2
 
 export default function LeaderboardLive({
   fightNightId,
-  atEventOnly = false,
 }: LeaderboardLiveProps) {
   const { user } = useAuth()
   const [entries, setEntries] = useState<FightNightStanding[]>([])
@@ -38,7 +36,7 @@ export default function LeaderboardLive({
       q,
       (snap) => {
         const data = snap.docs.map((d) => d.data() as FightNightStanding)
-        setEntries(atEventOnly ? data.filter((e) => e.atEvent) : data)
+        setEntries(data)
         setLoading(false)
         setError(null)
       },
@@ -48,7 +46,7 @@ export default function LeaderboardLive({
       }
     )
     return () => unsub()
-  }, [fightNightId, atEventOnly])
+  }, [fightNightId])
 
   if (loading) {
     return (
@@ -219,11 +217,6 @@ function Row({
           {entry.displayName || "Anonymous"}
           {isMe && <span className="text-amber-400 ml-1.5">· you</span>}
         </p>
-        {entry.atEvent && (
-          <p className="text-emerald-400/70 text-[9px] font-bold tracking-wider uppercase leading-tight mt-0.5">
-            At Event
-          </p>
-        )}
       </div>
 
       <div className="text-right shrink-0">

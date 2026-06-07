@@ -35,8 +35,8 @@ interface UserActivityDrawerProps {
 /**
  * Slide-in drawer that surfaces one user's complete per-event activity:
  * standing, every bout pick (made or skipped), every poll vote, every
- * prop pick. Opens from clicking a row in the Participants feed or the
- * Leaderboard Preview. Closes via backdrop click, X button, or Escape.
+ * prop pick. Opens from clicking a row in the Standings panel. Closes via
+ * backdrop click, X button, or Escape.
  *
  * Standing is a live `onSnapshot` subscription so points update in real
  * time while the drawer is open. The bulkier collections (picks, polls,
@@ -146,12 +146,6 @@ export default function UserActivityDrawer({
     }
   }
 
-  const isWalkIn = userId.startsWith("guest_")
-  const method = isWalkIn ? "Walk-in" : "Google"
-  const methodClass = isWalkIn
-    ? "text-amber-700 bg-amber-50 border-amber-200"
-    : "text-blue-700 bg-blue-50 border-blue-200"
-
   const picksByBout = new Map(picks.map((p) => [p.boutNumber, p]))
   const votesByPoll = new Map(pollVotes.map((v) => [v.pollId, v]))
   const propPicksByProp = new Map(propPicks.map((p) => [p.propId, p]))
@@ -200,11 +194,6 @@ export default function UserActivityDrawer({
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <span
-              className={`inline-flex items-center text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full border ${methodClass}`}
-            >
-              {method}
-            </span>
             <span className="text-[11px] text-gray-500 font-medium">
               Joined {formatJoinedAt(standing?.joinedAt)}
             </span>
@@ -227,14 +216,8 @@ export default function UserActivityDrawer({
                 label="Points"
                 value={(standing?.points || 0).toLocaleString()}
               />
-              <Stat
-                label="Picks"
-                value={`${standing?.picksWon || 0}/${standing?.picksMade || 0}`}
-              />
-              <Stat
-                label="Won"
-                value={wonPicks > 0 ? wonPicks.toString() : "—"}
-              />
+              <Stat label="Made" value={(standing?.picksMade || 0).toString()} />
+              <Stat label="Won" value={(standing?.picksWon || 0).toString()} />
             </div>
           )}
         </div>

@@ -83,7 +83,6 @@ export async function awardTopFinishers(
   opts: {
     topN: number
     prizeLabel: string
-    atEventOnly?: boolean
   }
 ): Promise<FightNightPrize[]> {
   if (!fightNightId) return []
@@ -92,7 +91,6 @@ export async function awardTopFinishers(
   if (!fightNight) return []
 
   const standings = await getStandings(fightNightId, {
-    atEventOnly: opts.atEventOnly,
     limit: opts.topN,
   })
 
@@ -155,22 +153,33 @@ export async function markPrizeForfeited(
 export async function notifyFightNightWinners(
   fightNightId: string,
   claimInstructions: string
-): Promise<{ sent: number; skipped: number; errors: number }> {
+): Promise<{
+  sent: number
+  skipped: number
+  errors: number
+  results: Array<{
+    displayName: string | null
+    email: string | null
+    status: 'sent' | 'skipped' | 'error'
+  }>
+}> {
   const fightNight = await getFightNight(fightNightId)
-  if (!fightNight) return { sent: 0, skipped: 0, errors: 0 }
+  if (!fightNight) return { sent: 0, skipped: 0, errors: 0, results: [] }
 
   const prizes = await getPrizes(fightNightId)
   const pending = prizes.filter((p) => p.status === 'pending')
-  if (pending.length === 0) return { sent: 0, skipped: 0, errors: 0 }
+  if (pending.length === 0) return { sent: 0, skipped: 0, errors: 0, results: [] }
 
   const ctx: EventEmailContext = {
-    eventId: fightNight.id,
+    // The public page is /fight-nights/{slug}; fall back to the doc id if a
+    // slug hasn't been backfilled. ("events/*" paths now 301-redirect.)
+    eventId: fightNight.slug || fightNight.id,
     eventName: fightNight.title || 'Fight Night',
     venue: fightNight.venue,
     city: fightNight.city,
     date: fightNight.date,
     promoter: fightNight.subtitle || 'TXMX Boxing',
-    urlPath: 'events/fight-night',
+    urlPath: 'fight-nights',
   }
   const winners = pending.map((p) => ({
     userId: p.userId,

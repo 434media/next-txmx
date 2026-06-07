@@ -4,7 +4,7 @@ import { useState } from "react"
 import { signInWithCustomToken, updateProfile } from "firebase/auth"
 import { auth } from "../../../lib/firebase-client"
 import { getOrCreateUser } from "../../actions/users"
-import { setAtEvent } from "../../actions/fightnight-standings"
+import { ensureStanding } from "../../actions/fightnight-standings"
 import { createGuestSessionToken } from "../../actions/guest-session"
 
 const EMAIL_PATTERN = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
@@ -41,7 +41,7 @@ export default function WalkInForm({ fightNightId }: WalkInFormProps) {
       const cred = await signInWithCustomToken(auth, session.token)
       await updateProfile(cred.user, { displayName: trimmedName })
       await getOrCreateUser(cred.user.uid, trimmedEmail, trimmedName, null)
-      await setAtEvent(fightNightId, cred.user.uid, true, {
+      await ensureStanding(fightNightId, cred.user.uid, {
         displayName: trimmedName,
         photoURL: null,
         email: trimmedEmail,

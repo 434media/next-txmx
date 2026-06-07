@@ -107,8 +107,9 @@ export interface EventEmailContext {
   city: string
   date: string
   promoter: string
-  /** Optional URL path override (default "events"). Use "events/fight-night" for the new public flow. */
-  urlPath?: "events" | "events/fight-night"
+  /** URL path segment for the public event page. Use "fight-nights" (the live
+   * slug-based pages); "events" is legacy and 301-redirects. */
+  urlPath?: "events" | "events/fight-night" | "fight-nights"
 }
 
 /**
@@ -323,14 +324,29 @@ export async function sendEventWinnerEmailsBatch(
     prizeLabel: string
     claimInstructions: string
   }>
-): Promise<{ sent: number; skipped: number; errors: number }> {
+): Promise<{
+  sent: number
+  skipped: number
+  errors: number
+  results: Array<{
+    displayName: string | null
+    email: string | null
+    status: 'sent' | 'skipped' | 'error'
+  }>
+}> {
   let sent = 0
   let skipped = 0
   let errors = 0
+  const results: Array<{
+    displayName: string | null
+    email: string | null
+    status: 'sent' | 'skipped' | 'error'
+  }> = []
 
   for (const w of winners) {
     if (!w.email) {
       skipped++
+      results.push({ displayName: w.displayName, email: null, status: 'skipped' })
       continue
     }
     try {
@@ -341,10 +357,12 @@ export async function sendEventWinnerEmailsBatch(
         claimInstructions: w.claimInstructions,
       })
       sent++
+      results.push({ displayName: w.displayName, email: w.email, status: 'sent' })
     } catch {
       errors++
+      results.push({ displayName: w.displayName, email: w.email, status: 'error' })
     }
   }
 
-  return { sent, skipped, errors }
+  return { sent, skipped, errors, results }
 }

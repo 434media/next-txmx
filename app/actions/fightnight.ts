@@ -6,7 +6,7 @@ import { firestore } from '../../lib/firebase-admin'
 
 export type FightNightStatus =
   | 'announced'      // visible on landing, not started
-  | 'doors_open'     // check-in is live, picks open
+  | 'doors_open'     // doors open, picks open
   | 'live'           // first bell has rung
   | 'completed'      // all bouts done
 

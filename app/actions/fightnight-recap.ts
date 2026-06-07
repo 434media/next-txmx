@@ -125,6 +125,82 @@ export async function sendFightNightRecap(
   return { sent, skipped, errors, firstError }
 }
 
+/**
+ * Render the recap email HTML for preview (shown as the #1 finisher, with the
+ * event's prize block included). Does NOT send anything.
+ */
+export async function getRecapEmailPreview(
+  fightNightId: string,
+  options?: { claimInstructions?: string }
+): Promise<string> {
+  const fightNight = await getFightNight(fightNightId)
+  if (!fightNight) {
+    return '<p style="font-family:sans-serif;padding:24px">Fight night not found.</p>'
+  }
+
+  const standings = await getStandings(fightNightId, { limit: 3 })
+  const prizes = await getPrizes(fightNightId)
+  const prizesByUser = new Map(prizes.map((p) => [p.userId, p]))
+
+  const top3 = standings.length
+    ? standings.slice(0, 3).map((s, i) => ({
+        position: i + 1,
+        displayName: s.displayName || 'Anonymous',
+        points: s.points || 0,
+        prizeLabel: prizesByUser.get(s.userId)?.prizeLabel || null,
+      }))
+    : [{ position: 1, displayName: 'Sample Fan', points: 1200, prizeLabel: fightNight.prizeLabel || null }]
+
+  const sample = standings[0]
+  const claimInstructions =
+    options?.claimInstructions ||
+    "Reply to this email by Sunday to claim. We'll coordinate pickup at the venue."
+
+  const emailHtml = renderRecapEmail({
+    firstName: sample?.displayName?.split(' ')[0] || 'Champ',
+    eventName: fightNight.title || 'Fight Night',
+    subtitle: fightNight.subtitle || null,
+    date: fightNight.date || null,
+    venue: fightNight.venue || null,
+    city: fightNight.city || null,
+    recapUrl: `https://www.txmxboxing.com/fight-nights/${fightNight.slug || fightNightId}`,
+    position: 1,
+    totalPlayers: standings.length || top3.length,
+    points: sample?.points ?? top3[0].points,
+    picksWon: sample?.picksWon ?? 5,
+    picksMade: sample?.picksMade ?? 8,
+    top3,
+    prize: { label: fightNight.prizeLabel || 'Prize pack', claimInstructions },
+  })
+
+  // Render the real email inside an iframe capped at inbox width. The iframe
+  // is a replaced element fixed to width:100% of a 768px container, so the
+  // email physically cannot stretch past inbox width — independent of its own
+  // CSS or the preview tab's rendering mode. srcdoc keeps it same-origin so we
+  // can auto-size the height to the content.
+  const srcdoc = emailHtml.replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recap email preview</title>
+  <style>
+    html, body { margin: 0; background: #0a0a0a; }
+    .bar { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #8a8a8a; font-size: 12px; letter-spacing: 0.3px; text-align: center; padding: 14px 16px; border-bottom: 1px solid #1f1f1f; }
+    .wrap { max-width: 768px; margin: 0 auto; }
+    iframe { width: 100%; border: 0; display: block; background: #000; min-height: 600px; }
+  </style>
+</head>
+<body>
+  <div class="bar">Recap email preview — shown at inbox width (this is exactly what recipients receive)</div>
+  <div class="wrap">
+    <iframe srcdoc="${srcdoc}" onload="try{this.style.height=this.contentWindow.document.documentElement.scrollHeight+'px'}catch(e){this.style.height='2000px'}"></iframe>
+  </div>
+</body>
+</html>`
+}
+
 function sleep(ms: number) {
   return new Promise((res) => setTimeout(res, ms))
 }
@@ -205,7 +281,8 @@ function renderRecapEmail(d: RecapEmailData): string {
   <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#000;padding:40px 20px;">
     <tr>
       <td align="center">
-        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;">
+        <div style="max-width:768px;margin:0 auto;text-align:left;">
+        <table width="100%" cellpadding="0" cellspacing="0">
           <!-- Header -->
           <tr>
             <td style="padding-bottom:24px;border-bottom:1px solid rgba(255,255,255,0.1);">
@@ -298,6 +375,7 @@ function renderRecapEmail(d: RecapEmailData): string {
             </td>
           </tr>
         </table>
+        </div>
       </td>
     </tr>
   </table>
