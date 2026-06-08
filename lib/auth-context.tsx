@@ -12,11 +12,13 @@ import {
   signInWithPopup,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  updateProfile,
   signOut as firebaseSignOut,
   GoogleAuthProvider,
   type User,
 } from "firebase/auth"
 import { auth } from "./firebase-client"
+import { getOrCreateUser } from "../app/actions/users"
 
 export interface UserProfile {
   uid: string
@@ -39,7 +41,11 @@ interface AuthContextType {
   loading: boolean
   signInWithGoogle: () => Promise<void>
   signInWithEmail: (email: string, password: string) => Promise<void>
-  signUpWithEmail: (email: string, password: string) => Promise<void>
+  signUpWithEmail: (
+    email: string,
+    password: string,
+    displayName?: string
+  ) => Promise<void>
   signOut: () => Promise<void>
   refreshProfile: () => Promise<void>
 }
@@ -117,8 +123,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await signInWithEmailAndPassword(auth, email, password)
   }
 
-  const signUpWithEmail = async (email: string, password: string) => {
-    await createUserWithEmailAndPassword(auth, email, password)
+  const signUpWithEmail = async (
+    email: string,
+    password: string,
+    displayName?: string
+  ) => {
+    const cred = await createUserWithEmailAndPassword(auth, email, password)
+    const name = displayName?.trim()
+    if (name) {
+      await updateProfile(cred.user, { displayName: name })
+    }
+    // Seed/backfill the Firestore users record so the name reaches the
+    // leaderboard — picks snapshot users/{uid}.displayName, and getOrCreateUser
+    // backfills if /api/auth/profile already created the record with a null name.
+    await getOrCreateUser(cred.user.uid, email, name ?? null, null)
   }
 
   const signOut = async () => {

@@ -113,18 +113,16 @@ export default async function FightNightsHubPage() {
         </Section>
       )}
 
-      {/* 7 — THE ASK: account on-ramp, now after the value. */}
-      <Section id="join">
-        <HubAccountCta
-          featured={
-            featured
-              ? { slug: featured.slug, title: featured.title, status: featured.status }
-              : null
-          }
-        />
-      </Section>
+      {/* 7 — THE ASK: account on-ramp as a full-bleed band (renders its own section). */}
+      <HubAccountCta
+        featured={
+          featured
+            ? { slug: featured.slug, title: featured.title, status: featured.status }
+            : null
+        }
+      />
 
-      {/* 8 — FAQ. */}
+      {/* 8 — FAQ: full-bleed band that closes the page + re-CTAs to #join. */}
       <HubFaq />
     </main>
   )
