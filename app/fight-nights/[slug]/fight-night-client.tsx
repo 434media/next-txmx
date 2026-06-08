@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react"
 import { Swords, Trophy, Zap } from "lucide-react"
-import { collection, doc, onSnapshot, query } from "firebase/firestore"
+import { collection, doc, onSnapshot, query, where } from "firebase/firestore"
 import { db } from "../../../lib/firebase-client"
 import { useAuth } from "../../../lib/auth-context"
 import SignUpForm from "../../../components/fight-nights/sign-up-form"
@@ -28,6 +28,9 @@ export default function FightNightClient({ fightNight, bouts, flyerUrl }: FightN
   // side-by-side and the bar is hidden, so this only drives the mobile view.
   const [tab, setTab] = useState<"fights" | "board" | "extras">("fights")
   const gameRef = useRef<HTMLElement | null>(null)
+  // Count of OPEN props the signed-in user hasn't picked yet — drives the badge
+  // on the Props tab so the highest-value action (props = 5× a pick) is surfaced.
+  const [openPropCount, setOpenPropCount] = useState(0)
 
   // When any bout is live, push the Fight Card section to the top so the
   // action lands first in the scroll. The sticky StatusStrip persists
@@ -77,6 +80,51 @@ export default function FightNightClient({ fightNight, bouts, flyerUrl }: FightN
     if (!active) return
     document.body.classList.add("fn-game-active")
     return () => document.body.classList.remove("fn-game-active")
+  }, [user, fightNight])
+
+  // Live count of OPEN props the user hasn't picked yet (Props-tab badge).
+  useEffect(() => {
+    if (!user || !fightNight || !fightNight.propsEnabled) {
+      setOpenPropCount(0)
+      return
+    }
+    const fid = fightNight.id
+    let openIds = new Set<string>()
+    let pickedIds = new Set<string>()
+    const recompute = () => {
+      let n = 0
+      openIds.forEach((id) => {
+        if (!pickedIds.has(id)) n++
+      })
+      setOpenPropCount(n)
+    }
+    const unsubProps = onSnapshot(
+      collection(db, "fightNights", fid, "props"),
+      (snap) => {
+        openIds = new Set(
+          snap.docs
+            .filter((d) => (d.data() as { status?: string }).status === "open")
+            .map((d) => d.id)
+        )
+        recompute()
+      }
+    )
+    const unsubPicks = onSnapshot(
+      query(
+        collection(db, "fightNights", fid, "propPicks"),
+        where("userId", "==", user.uid)
+      ),
+      (snap) => {
+        pickedIds = new Set(
+          snap.docs.map((d) => (d.data() as { propId: string }).propId)
+        )
+        recompute()
+      }
+    )
+    return () => {
+      unsubProps()
+      unsubPicks()
+    }
   }, [user, fightNight])
 
   // No active fight night yet — pre-event state
@@ -247,7 +295,12 @@ export default function FightNightClient({ fightNight, bouts, flyerUrl }: FightN
             <Trophy className="w-5 h-5" strokeWidth={2} />
           </GameTab>
           {hasExtras && (
-            <GameTab label={extrasLabel} active={tab === "extras"} onClick={() => switchTab("extras")}>
+            <GameTab
+              label={extrasLabel}
+              active={tab === "extras"}
+              onClick={() => switchTab("extras")}
+              count={openPropCount}
+            >
               <Zap className="w-5 h-5" strokeWidth={2} />
             </GameTab>
           )}
@@ -263,11 +316,13 @@ function GameTab({
   label,
   active,
   onClick,
+  count,
   children,
 }: {
   label: string
   active: boolean
   onClick: () => void
+  count?: number
   children: ReactNode
 }) {
   return (
@@ -281,7 +336,14 @@ function GameTab({
       {active && (
         <span className="absolute top-0 inset-x-5 h-0.5 bg-amber-500 rounded-full" />
       )}
-      {children}
+      <span className="relative">
+        {children}
+        {!!count && count > 0 && (
+          <span className="absolute -top-1.5 -right-2.5 min-w-4 h-4 px-1 rounded-full bg-neutral-900 text-white text-[9px] font-bold flex items-center justify-center tabular-nums leading-none">
+            {count > 9 ? "9+" : count}
+          </span>
+        )}
+      </span>
       <span className="text-[10px] font-bold tracking-[0.15em] uppercase">{label}</span>
     </button>
   )

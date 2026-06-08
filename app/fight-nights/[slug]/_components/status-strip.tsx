@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import {
   collection,
   doc,
@@ -32,6 +32,12 @@ export default function StatusStrip({ fightNightId, hasLiveBout }: StatusStripPr
   const { user } = useAuth()
   const [entry, setEntry] = useState<FightNightStanding | null>(null)
   const [rank, setRank] = useState<{ position: number; total: number } | null>(null)
+  // Settlement payoff — flash the points gained and the rank change when a bout
+  // settles, so the "you called it" moment lands instead of slipping by.
+  const [gain, setGain] = useState<number | null>(null)
+  const [rankMove, setRankMove] = useState<number | null>(null)
+  const prevPoints = useRef<number | null>(null)
+  const prevRank = useRef<number | null>(null)
 
   // The user's own standing — single doc subscription, cheap.
   useEffect(() => {
@@ -65,6 +71,38 @@ export default function StatusStrip({ fightNightId, hasLiveBout }: StatusStripPr
     return () => unsub()
   }, [user, fightNightId, entry])
 
+  // Flash the points just gained (clears after a few seconds).
+  useEffect(() => {
+    const pts = entry?.points ?? null
+    if (pts == null) {
+      prevPoints.current = null
+      return
+    }
+    if (prevPoints.current != null && pts > prevPoints.current) {
+      setGain(pts - prevPoints.current)
+      prevPoints.current = pts
+      const t = setTimeout(() => setGain(null), 4000)
+      return () => clearTimeout(t)
+    }
+    prevPoints.current = pts
+  }, [entry?.points])
+
+  // Flash the rank change (positive = climbed toward #1).
+  useEffect(() => {
+    const pos = rank?.position ?? null
+    if (pos == null) {
+      prevRank.current = null
+      return
+    }
+    if (prevRank.current != null && pos !== prevRank.current) {
+      setRankMove(prevRank.current - pos)
+      prevRank.current = pos
+      const t = setTimeout(() => setRankMove(null), 4000)
+      return () => clearTimeout(t)
+    }
+    prevRank.current = pos
+  }, [rank?.position])
+
   if (!user) return null
 
   const hasPicks = !!entry && (entry.picksMade || 0) > 0
@@ -78,11 +116,41 @@ export default function StatusStrip({ fightNightId, hasLiveBout }: StatusStripPr
       <div className="py-3 px-4 sm:px-5 bg-white/90 backdrop-blur-md border border-neutral-200 rounded-xl shadow-lg">
         {hasPicks ? (
           <div className="flex items-center gap-5 sm:gap-8 overflow-x-auto">
-            <Stat value={(entry!.points || 0).toLocaleString()} label="pts" />
-            <Stat
-              value={rank ? `#${rank.position}` : "#—"}
-              label={rank ? `of ${rank.total}` : "ranked soon"}
-            />
+            {/* Points + settlement gain flash */}
+            <div className="flex items-baseline gap-1.5 shrink-0">
+              <span className="text-neutral-900 text-lg sm:text-xl font-black tabular-nums leading-none">
+                {(entry!.points || 0).toLocaleString()}
+              </span>
+              <span className="text-neutral-500 text-[10px] font-bold tracking-[0.15em] uppercase leading-none">
+                pts
+              </span>
+              {gain != null && (
+                <span className="ml-1 text-emerald-600 text-xs font-black tabular-nums animate-pulse leading-none">
+                  +{gain.toLocaleString()}
+                </span>
+              )}
+            </div>
+
+            {/* Rank + change flash */}
+            <div className="flex items-baseline gap-1.5 shrink-0">
+              <span className="text-neutral-900 text-lg sm:text-xl font-black tabular-nums leading-none">
+                {rank ? `#${rank.position}` : "#—"}
+              </span>
+              <span className="text-neutral-500 text-[10px] font-bold tracking-[0.15em] uppercase leading-none">
+                {rank ? `of ${rank.total}` : "ranked soon"}
+              </span>
+              {!!rankMove && rankMove !== 0 && (
+                <span
+                  className={`ml-0.5 text-xs font-black tabular-nums leading-none ${
+                    rankMove > 0 ? "text-emerald-600" : "text-red-600"
+                  }`}
+                >
+                  {rankMove > 0 ? "↑" : "↓"}
+                  {Math.abs(rankMove)}
+                </span>
+              )}
+            </div>
+
             <Stat
               value={`${entry!.picksWon || 0}/${entry!.picksMade}`}
               label="picks"

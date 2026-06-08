@@ -141,7 +141,7 @@ export default function PropsSection({ fightNightId }: PropsSectionProps) {
                   : isSettled
                     ? "border-neutral-200 bg-neutral-50 opacity-70"
                     : isLocked
-                      ? "border-amber-200 bg-amber-50"
+                      ? "border-neutral-300 bg-neutral-50"
                       : "border-neutral-200 bg-neutral-50"
               }`}
             >
@@ -158,7 +158,7 @@ export default function PropsSection({ fightNightId }: PropsSectionProps) {
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 {prop.isUnderdog && (
-                  <span className="text-amber-600 text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full bg-amber-100 border border-amber-200">
+                  <span className="text-amber-700 text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full border border-amber-300">
                     Underdog
                   </span>
                 )}
@@ -168,7 +168,7 @@ export default function PropsSection({ fightNightId }: PropsSectionProps) {
                   </span>
                 )}
                 {isLocked && !isSettled && (
-                  <span className="text-amber-600 text-[10px] font-bold tracking-wider uppercase">
+                  <span className="text-neutral-500 text-[10px] font-bold tracking-wider uppercase">
                     Locked
                   </span>
                 )}
@@ -240,14 +240,14 @@ export default function PropsSection({ fightNightId }: PropsSectionProps) {
                       key={opt.id}
                       className={`relative overflow-hidden px-4 py-3 rounded-lg border text-sm font-semibold ${
                         isMyPick
-                          ? "border-amber-200 bg-amber-50 text-amber-700"
+                          ? "border-neutral-900 bg-neutral-100 text-neutral-700"
                           : "border-neutral-200 bg-neutral-50 text-neutral-400"
                       }`}
                     >
                       {showStakes && optPct > 0 && (
                         <span
                           className={`absolute inset-y-0 left-0 ${
-                            isMyPick ? "bg-amber-100" : "bg-neutral-200"
+                            isMyPick ? "bg-neutral-300" : "bg-neutral-200"
                           } transition-all duration-500`}
                           style={{ width: `${optPct}%` }}
                         />
@@ -286,14 +286,14 @@ export default function PropsSection({ fightNightId }: PropsSectionProps) {
                     disabled={submitting === prop.id}
                     className={`relative overflow-hidden text-left px-4 py-3 rounded-lg border text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                       isMyPick
-                        ? "border-amber-300 bg-amber-100 text-amber-700 hover:bg-amber-100"
+                        ? "border-neutral-900 bg-neutral-100 text-neutral-900 hover:bg-neutral-100"
                         : "border-neutral-200 bg-neutral-50 text-neutral-700 hover:border-neutral-300 hover:bg-neutral-100 hover:text-neutral-900"
                     }`}
                   >
                     {showStakes && optPct > 0 && (
                       <span
                         className={`absolute inset-y-0 left-0 ${
-                          isMyPick ? "bg-amber-200" : "bg-neutral-200"
+                          isMyPick ? "bg-neutral-300" : "bg-neutral-200"
                         } transition-all duration-500 pointer-events-none`}
                         style={{ width: `${optPct}%` }}
                       />

@@ -140,13 +140,13 @@ export default function PollsSection({
                   key={i}
                   className={`relative border rounded-lg px-4 py-3 overflow-hidden ${
                     isMyPick
-                      ? "border-amber-200 bg-amber-50"
+                      ? "border-neutral-900 bg-neutral-50"
                       : "border-neutral-200 bg-neutral-50"
                   }`}
                 >
                   <div
                     className={`absolute inset-y-0 left-0 ${
-                      isMyPick ? "bg-amber-200" : "bg-neutral-200"
+                      isMyPick ? "bg-neutral-300" : "bg-neutral-200"
                     } transition-all duration-500`}
                     style={{ width: `${pct}%` }}
                   />
