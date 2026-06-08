@@ -179,8 +179,8 @@ export default function FightCard({ fightNightId, initialBouts }: FightCardProps
 
   if (bouts.length === 0) {
     return (
-      <div className="text-center py-16 border border-white/8 rounded-xl bg-white/2">
-        <p className="text-white/40 text-sm font-medium">
+      <div className="text-center py-16 border border-neutral-200 rounded-xl bg-neutral-50">
+        <p className="text-neutral-400 text-sm font-medium">
           Fight card TBA. Bouts will appear here when announced.
         </p>
       </div>
@@ -305,27 +305,27 @@ function BoutCard({
     <div
       className={`border rounded-xl overflow-hidden transition-colors ${
         isCompleted && userWon
-          ? "border-emerald-500/30 bg-emerald-500/5"
+          ? "border-emerald-200 bg-emerald-50"
           : isCompleted && pick && !userWon
-            ? "border-white/8 bg-white/2 opacity-70"
+            ? "border-neutral-200 bg-neutral-50 opacity-70"
             : bout.status === "live"
-              ? "border-red-500/30 bg-red-500/5"
-              : "border-white/8 bg-white/2"
+              ? "border-red-200 bg-red-50"
+              : "border-neutral-200 bg-neutral-50"
       }`}
     >
       {/* Header */}
-      <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between gap-3">
+      <div className="px-4 py-3 border-b border-neutral-200 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 min-w-0">
-          <span className="text-white/30 text-[10px] font-bold tabular-nums">
+          <span className="text-neutral-400 text-[10px] font-bold tabular-nums">
             #{bout.boutNumber}
           </span>
           {bout.isMainEvent && (
-            <span className="text-amber-400 text-[9px] font-bold tracking-wider uppercase px-1.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20">
+            <span className="text-amber-600 text-[9px] font-bold tracking-wider uppercase px-1.5 py-0.5 rounded-full bg-amber-100 border border-amber-200">
               Main Event
             </span>
           )}
           {bout.weightClass && (
-            <span className="text-white/35 text-[10px] font-medium">
+            <span className="text-neutral-400 text-[10px] font-medium">
               {bout.weightClass}
             </span>
           )}
@@ -336,48 +336,48 @@ function BoutCard({
               <span className="absolute inline-flex w-full h-full rounded-full bg-red-500 opacity-75 animate-ping" />
               <span className="relative inline-flex rounded-full w-1.5 h-1.5 bg-red-500" />
             </span>
-            <span className="text-red-400 text-[10px] font-bold tracking-wider uppercase">
+            <span className="text-red-600 text-[10px] font-bold tracking-wider uppercase">
               Live · Locked
             </span>
           </span>
         )}
         {isCompleted && winnerName && (
-          <span className="text-emerald-400 text-[10px] font-bold tracking-wider uppercase">
+          <span className="text-emerald-600 text-[10px] font-bold tracking-wider uppercase">
             Winner: {winnerName}
           </span>
         )}
       </div>
 
       {/* Fighter buttons */}
-      <div className="grid grid-cols-2 divide-x divide-white/5">
+      <div className="grid grid-cols-2 divide-x divide-neutral-200">
         <button
           onClick={() => handlePick("fighter1")}
           disabled={isLocked || !!submitting}
           className={`text-left px-4 py-4 transition-all relative ${
             f1Selected && f1Won
-              ? "bg-emerald-500/10"
+              ? "bg-emerald-100"
               : f1Selected
-                ? "bg-amber-500/10"
+                ? "bg-amber-100"
                 : f1Won
-                  ? "bg-emerald-500/5"
+                  ? "bg-emerald-50"
                   : isLocked
                     ? "opacity-60"
-                    : "hover:bg-white/4 cursor-pointer"
+                    : "hover:bg-neutral-100 cursor-pointer"
           } ${submitting === "fighter1" ? "opacity-50" : ""}`}
         >
           {f1Selected && (
-            <span className="absolute top-2 right-2 text-amber-400 text-[9px] font-bold tracking-wider uppercase">
+            <span className="absolute top-2 right-2 text-amber-600 text-[9px] font-bold tracking-wider uppercase">
               · Your Pick
             </span>
           )}
-          <p className="text-white/35 text-[10px] font-bold tracking-wider uppercase mb-1">
+          <p className="text-neutral-400 text-[10px] font-bold tracking-wider uppercase mb-1">
             Red Corner
           </p>
-          <p className={`text-base font-bold leading-tight ${f1Won ? "text-emerald-400" : "text-white"} truncate`}>
+          <p className={`text-base font-bold leading-tight ${f1Won ? "text-emerald-600" : "text-neutral-900"} truncate`}>
             {bout.fighter1Name || "TBA"}
           </p>
           {bout.fighter1Gym && (
-            <p className="text-white/40 text-xs font-medium leading-5 truncate mt-0.5">
+            <p className="text-neutral-400 text-xs font-medium leading-5 truncate mt-0.5">
               {bout.fighter1Gym}
             </p>
           )}
@@ -387,29 +387,29 @@ function BoutCard({
           disabled={isLocked || !!submitting}
           className={`text-left px-4 py-4 transition-all relative ${
             f2Selected && f2Won
-              ? "bg-emerald-500/10"
+              ? "bg-emerald-100"
               : f2Selected
-                ? "bg-amber-500/10"
+                ? "bg-amber-100"
                 : f2Won
-                  ? "bg-emerald-500/5"
+                  ? "bg-emerald-50"
                   : isLocked
                     ? "opacity-60"
-                    : "hover:bg-white/4 cursor-pointer"
+                    : "hover:bg-neutral-100 cursor-pointer"
           } ${submitting === "fighter2" ? "opacity-50" : ""}`}
         >
           {f2Selected && (
-            <span className="absolute top-2 right-2 text-amber-400 text-[9px] font-bold tracking-wider uppercase">
+            <span className="absolute top-2 right-2 text-amber-600 text-[9px] font-bold tracking-wider uppercase">
               · Your Pick
             </span>
           )}
-          <p className="text-white/35 text-[10px] font-bold tracking-wider uppercase mb-1">
+          <p className="text-neutral-400 text-[10px] font-bold tracking-wider uppercase mb-1">
             Blue Corner
           </p>
-          <p className={`text-base font-bold leading-tight ${f2Won ? "text-emerald-400" : "text-white"} truncate`}>
+          <p className={`text-base font-bold leading-tight ${f2Won ? "text-emerald-600" : "text-neutral-900"} truncate`}>
             {bout.fighter2Name || "TBA"}
           </p>
           {bout.fighter2Gym && (
-            <p className="text-white/40 text-xs font-medium leading-5 truncate mt-0.5">
+            <p className="text-neutral-400 text-xs font-medium leading-5 truncate mt-0.5">
               {bout.fighter2Gym}
             </p>
           )}
@@ -425,13 +425,13 @@ function BoutCard({
       )}
 
       {error && (
-        <div className="px-4 py-2 border-t border-red-500/20 bg-red-500/5">
-          <p className="text-red-400 text-xs font-medium">{error}</p>
+        <div className="px-4 py-2 border-t border-red-200 bg-red-50">
+          <p className="text-red-600 text-xs font-medium">{error}</p>
         </div>
       )}
       {!error && !isCompleted && !isLocked && (
-        <div className="px-4 py-2 border-t border-white/5">
-          <p className="text-white/45 text-[11px] font-medium">
+        <div className="px-4 py-2 border-t border-neutral-200">
+          <p className="text-neutral-500 text-[11px] font-medium">
             {userPicked
               ? "Tap the other corner to switch · locks at the bell."
               : "Tap a corner to pick · locks at the bell."}
@@ -439,13 +439,13 @@ function BoutCard({
         </div>
       )}
       {!error && userPicked && isCompleted && (
-        <div className="px-4 py-2 border-t border-white/5">
+        <div className="px-4 py-2 border-t border-neutral-200">
           {userWon ? (
-            <p className="text-emerald-400 text-[11px] font-bold tracking-wider uppercase">
+            <p className="text-emerald-600 text-[11px] font-bold tracking-wider uppercase">
               ✓ Pick won · +{pick?.pointsAwarded || 0} pts
             </p>
           ) : (
-            <p className="text-white/35 text-[11px] font-medium">
+            <p className="text-neutral-400 text-[11px] font-medium">
               Pick lost.
             </p>
           )}
@@ -459,17 +459,17 @@ function CrowdStakeMeter({ stake }: { stake: BoutStake }) {
   const f1Pct = stake.total > 0 ? Math.round((stake.fighter1 / stake.total) * 100) : 0
   const f2Pct = stake.total > 0 ? 100 - f1Pct : 0
   return (
-    <div className="px-4 py-2.5 border-t border-white/5">
-      <div className="flex items-center justify-between text-[10px] text-white/45 font-medium tabular-nums mb-1.5">
+    <div className="px-4 py-2.5 border-t border-neutral-200">
+      <div className="flex items-center justify-between text-[10px] text-neutral-500 font-medium tabular-nums mb-1.5">
         <span>{f1Pct}% picked red</span>
-        <span className="text-white/35">
+        <span className="text-neutral-400">
           {stake.total} pick{stake.total === 1 ? "" : "s"}
         </span>
         <span>{f2Pct}% picked blue</span>
       </div>
-      <div className="h-1 rounded-full bg-white/5 overflow-hidden flex">
-        <div className="bg-red-400/70" style={{ width: `${f1Pct}%` }} />
-        <div className="bg-blue-400/70" style={{ width: `${f2Pct}%` }} />
+      <div className="h-1 rounded-full bg-neutral-200 overflow-hidden flex">
+        <div className="bg-red-500" style={{ width: `${f1Pct}%` }} />
+        <div className="bg-blue-500" style={{ width: `${f2Pct}%` }} />
       </div>
     </div>
   )
@@ -544,12 +544,12 @@ function BoutProgressStrip({
           const stateClass = isLive
             ? "bg-red-500 text-white border border-red-400 ring-2 ring-red-500/40 animate-pulse"
             : wonIt
-              ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/50"
+              ? "bg-emerald-100 text-emerald-700 border border-emerald-300"
               : lostIt
-                ? "bg-white/8 text-white/45 border border-white/15"
+                ? "bg-neutral-100 text-neutral-500 border border-neutral-200"
                 : isCompleted
-                  ? "bg-white/10 text-white/55 border border-white/15"
-                  : "bg-transparent text-white/40 border border-white/15 hover:border-white/30 hover:text-white/70"
+                  ? "bg-neutral-200 text-neutral-600 border border-neutral-200"
+                  : "bg-transparent text-neutral-400 border border-neutral-300 hover:border-neutral-500 hover:text-neutral-700"
 
           const stateText = isLive
             ? "live now"
@@ -578,10 +578,10 @@ function BoutProgressStrip({
       <p
         className={`text-xs font-semibold shrink-0 tabular-nums ${
           statusTone === "live"
-            ? "text-red-400"
+            ? "text-red-600"
             : statusTone === "neutral"
-              ? "text-white/70"
-              : "text-white/45"
+              ? "text-neutral-700"
+              : "text-neutral-500"
         }`}
       >
         {statusLabel}

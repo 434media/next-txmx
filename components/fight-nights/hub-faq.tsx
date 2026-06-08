@@ -1,3 +1,5 @@
+import { Section, Eyebrow } from "./section"
+
 /**
  * Short FAQ answering the first-timer's blocking questions. Uses native
  * <details>/<summary> so it works without any client JS.
@@ -27,13 +29,8 @@ const FAQS = [
 
 export default function HubFaq() {
   return (
-    <section className="max-w-3xl mx-auto px-6 sm:px-8 lg:px-12 mt-16 sm:mt-20">
-      <div className="flex items-center gap-2 mb-6">
-        <span className="inline-block w-2 h-2 bg-amber-500" />
-        <p className="text-amber-600 text-[10px] font-bold tracking-[0.3em] uppercase">
-          Questions
-        </p>
-      </div>
+    <Section width="narrow">
+      <Eyebrow tone="amber">Questions</Eyebrow>
 
       <div className="divide-y divide-neutral-200 border-t border-b border-neutral-200">
         {FAQS.map((f) => (
@@ -52,6 +49,6 @@ export default function HubFaq() {
           </details>
         ))}
       </div>
-    </section>
+    </Section>
   )
 }

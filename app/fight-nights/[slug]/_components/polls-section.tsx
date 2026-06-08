@@ -78,15 +78,15 @@ export default function PollsSection({
   if (loading) {
     return (
       <div className="text-center py-8">
-        <p className="text-white/30 text-sm">Loading polls…</p>
+        <p className="text-neutral-400 text-sm">Loading polls…</p>
       </div>
     )
   }
 
   if (polls.length === 0) {
     return (
-      <div className="text-center py-12 border border-white/8 rounded-xl bg-white/2">
-        <p className="text-white/40 text-sm font-medium">
+      <div className="text-center py-12 border border-neutral-200 rounded-xl bg-neutral-50">
+        <p className="text-neutral-400 text-sm font-medium">
           No polls yet for this event.
         </p>
       </div>
@@ -107,22 +107,22 @@ export default function PollsSection({
         key={poll.id}
         className={`snap-start shrink-0 w-[85vw] sm:w-[360px] border rounded-xl p-5 ${
           isClosed
-            ? "border-white/5 bg-white/2 opacity-70"
-            : "border-white/8 bg-white/2"
+            ? "border-neutral-200 bg-neutral-50 opacity-70"
+            : "border-neutral-200 bg-neutral-50"
         }`}
       >
         <div className="flex items-start justify-between gap-3 mb-4">
-          <h3 className="text-white text-[15px] font-bold leading-snug flex-1">
+          <h3 className="text-neutral-900 text-[15px] font-bold leading-snug flex-1">
             {poll.question}
           </h3>
           <div className="flex items-center gap-2 shrink-0">
             {poll.boutNumber && (
-              <span className="text-white/55 text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full bg-white/5 border border-white/10">
+              <span className="text-neutral-500 text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full bg-neutral-100 border border-neutral-200">
                 Bout {poll.boutNumber}
               </span>
             )}
             {isClosed && (
-              <span className="text-white/55 text-[10px] font-bold tracking-wider uppercase">
+              <span className="text-neutral-500 text-[10px] font-bold tracking-wider uppercase">
                 Closed
               </span>
             )}
@@ -140,13 +140,13 @@ export default function PollsSection({
                   key={i}
                   className={`relative border rounded-lg px-4 py-3 overflow-hidden ${
                     isMyPick
-                      ? "border-amber-500/30 bg-amber-500/5"
-                      : "border-white/5 bg-white/2"
+                      ? "border-amber-200 bg-amber-50"
+                      : "border-neutral-200 bg-neutral-50"
                   }`}
                 >
                   <div
                     className={`absolute inset-y-0 left-0 ${
-                      isMyPick ? "bg-amber-500/15" : "bg-white/5"
+                      isMyPick ? "bg-amber-200" : "bg-neutral-200"
                     } transition-all duration-500`}
                     style={{ width: `${pct}%` }}
                   />
@@ -154,7 +154,7 @@ export default function PollsSection({
                     <div className="flex items-center gap-2 min-w-0">
                       {isMyPick && (
                         <svg
-                          className="w-3.5 h-3.5 text-amber-400 shrink-0"
+                          className="w-3.5 h-3.5 text-amber-600 shrink-0"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -169,7 +169,7 @@ export default function PollsSection({
                       )}
                       <p
                         className={`text-sm font-semibold leading-snug truncate ${
-                          isMyPick ? "text-white" : "text-white/70"
+                          isMyPick ? "text-neutral-900" : "text-neutral-600"
                         }`}
                       >
                         {opt.label}
@@ -177,12 +177,12 @@ export default function PollsSection({
                     </div>
                     <p
                       className={`text-xs font-bold tabular-nums shrink-0 ${
-                        isMyPick ? "text-amber-400" : "text-white/55"
+                        isMyPick ? "text-amber-600" : "text-neutral-500"
                       }`}
                     >
                       {pct.toFixed(0)}%
-                      <span className="text-white/40 ml-1.5">·</span>
-                      <span className="text-white/40 ml-1.5">{opt.votes}</span>
+                      <span className="text-neutral-400 ml-1.5">·</span>
+                      <span className="text-neutral-400 ml-1.5">{opt.votes}</span>
                     </p>
                   </div>
                 </div>
@@ -194,9 +194,9 @@ export default function PollsSection({
                 key={i}
                 onClick={() => handleVote(poll.id, i)}
                 disabled={submitting === poll.id}
-                className="w-full text-left border border-white/8 rounded-lg px-4 py-3 hover:border-white/20 hover:bg-white/4 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full text-left border border-neutral-200 rounded-lg px-4 py-3 hover:border-neutral-300 hover:bg-neutral-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <p className="text-white text-sm font-semibold leading-snug">
+                <p className="text-neutral-900 text-sm font-semibold leading-snug">
                   {opt.label}
                 </p>
               </button>
@@ -205,18 +205,18 @@ export default function PollsSection({
         </div>
 
         {myError && (
-          <p className="mt-3 text-red-400 text-xs font-medium">{myError}</p>
+          <p className="mt-3 text-red-600 text-xs font-medium">{myError}</p>
         )}
 
-        <p className="mt-3 text-white/50 text-[10px] font-bold tracking-wider uppercase flex items-center gap-1.5">
+        <p className="mt-3 text-neutral-500 text-[10px] font-bold tracking-wider uppercase flex items-center gap-1.5">
           <span>
             {totalVotes} {totalVotes === 1 ? "vote" : "votes"}
             {hasVoted && !isClosed && !isSaving && " · you voted"}
           </span>
           {isSaving && (
             <>
-              <span className="text-white/20">·</span>
-              <span className="inline-flex items-center gap-1 text-amber-400/80">
+              <span className="text-neutral-300">·</span>
+              <span className="inline-flex items-center gap-1 text-amber-600">
                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
                 Saving…
               </span>

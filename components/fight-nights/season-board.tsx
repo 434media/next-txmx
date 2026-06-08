@@ -1,10 +1,11 @@
 import Link from "next/link"
 import type { SeasonStanding } from "../../app/actions/season-standings"
+import { Section, Eyebrow } from "./section"
 
 function rankColor(pos: number): string {
-  if (pos === 1) return "text-amber-500"
-  if (pos === 2) return "text-neutral-400"
-  if (pos === 3) return "text-amber-700"
+  if (pos === 1) return "text-neutral-900"
+  if (pos === 2) return "text-neutral-500"
+  if (pos === 3) return "text-neutral-400"
   return "text-neutral-300"
 }
 
@@ -34,14 +35,11 @@ function Avatar({ entry }: { entry: SeasonStanding }) {
  */
 export default function SeasonBoard({ leaders }: { leaders: SeasonStanding[] }) {
   return (
-    <section className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 mt-16 sm:mt-20">
+    <Section>
       <div className="flex items-end justify-between mb-5">
-        <div className="flex items-center gap-2">
-          <span className="inline-block w-2 h-2 bg-amber-500" />
-          <p className="text-amber-600 text-[10px] font-bold tracking-[0.3em] uppercase">
-            All-Time Leaderboard
-          </p>
-        </div>
+        <Eyebrow tone="neutral" mb="mb-0">
+          All-Time Leaderboard
+        </Eyebrow>
         <Link
           href="/leaderboard"
           className="text-[11px] font-bold uppercase tracking-[0.2em] text-neutral-500 hover:text-neutral-900 transition-colors"
@@ -64,7 +62,7 @@ export default function SeasonBoard({ leaders }: { leaders: SeasonStanding[] }) 
               <div
                 key={p.userId}
                 className={`flex items-center gap-4 px-4 sm:px-6 py-3.5 ${
-                  pos === 1 ? "bg-amber-50" : pos <= 3 ? "bg-neutral-50" : "bg-white"
+                  pos === 1 ? "bg-neutral-100" : pos <= 3 ? "bg-neutral-50" : "bg-white"
                 }`}
               >
                 <span className={`w-6 text-sm font-black tabular-nums ${rankColor(pos)}`}>
@@ -88,6 +86,6 @@ export default function SeasonBoard({ leaders }: { leaders: SeasonStanding[] }) 
           })}
         </div>
       )}
-    </section>
+    </Section>
   )
 }

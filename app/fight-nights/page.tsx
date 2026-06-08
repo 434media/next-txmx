@@ -4,18 +4,19 @@ import {
   getUpcomingFightNights,
   getPastFightNights,
   getLastCompletedFightNight,
+  getBouts,
 } from "../actions/fightnight"
 import { getSeasonStandings } from "../actions/season-standings"
 import { getStandings } from "../actions/fightnight-standings"
 import FightNightCard from "../../components/fight-nights/fight-night-card"
 import HubAccountCta from "../../components/fight-nights/hub-account-cta"
-import HubHowItWorks from "../../components/fight-nights/hub-how-it-works"
+import HowItWorks from "../../components/fight-nights/how-it-works"
 import IntroHero from "../../components/fight-nights/intro-hero"
 import HeroFeatured from "../../components/fight-nights/hero-featured"
-import PrizeReveal from "../../components/fight-nights/prize-reveal"
 import RecapSpotlight from "../../components/fight-nights/recap-spotlight"
 import SeasonBoard from "../../components/fight-nights/season-board"
 import HubFaq from "../../components/fight-nights/hub-faq"
+import { Section, Eyebrow } from "../../components/fight-nights/section"
 
 export const metadata: Metadata = {
   title: "Fight Nights | TXMX Boxing",
@@ -57,6 +58,11 @@ export default async function FightNightsHubPage() {
     ? (await getStandings(lastEvent.id, { limit: 1 }))[0] ?? null
     : null
 
+  // The featured night's card — surfaces the main event + matchups in the
+  // "Happening Next" band so the hub reads as an event page, not just a
+  // fan-game explainer. Empty when nothing is featured.
+  const featuredBouts = featured ? await getBouts(featured.id) : []
+
   // Don't repeat the featured night in the calendar/archive grids.
   const upcoming = upcomingRaw.filter((f) => f.id !== featured?.id)
   const past = pastRaw.filter((f) => f.id !== featured?.id && f.id !== lastEvent?.id)
@@ -66,19 +72,13 @@ export default async function FightNightsHubPage() {
       {/* 1 — INTRO HERO: brand intro to the fan game (text left / video right). */}
       <IntroHero />
 
-      {/* 2 — HAPPENING NEXT: the featured event as a full-width image band. */}
-      <HeroFeatured featured={featured} />
-
-      {/* 3 — PRIZE REVEAL: the #1 motivator, full width. */}
-      {featured && <PrizeReveal featured={featured} />}
+      {/* 2 — HAPPENING NEXT: the featured event as a full-bleed image band. */}
+      <HeroFeatured featured={featured} bouts={featuredBouts} />
 
       {/* 3 — HOW IT WORKS + scoring. */}
-      <div
-        id="how-it-works"
-        className="scroll-mt-24 max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 mt-16 sm:mt-20"
-      >
-        <HubHowItWorks />
-      </div>
+      <Section id="how-it-works">
+        <HowItWorks variant="hub" />
+      </Section>
 
       {/* 4 — PROOF: last event recap + winner spotlight. */}
       <RecapSpotlight event={lastEvent} winner={lastWinner} />
@@ -88,33 +88,33 @@ export default async function FightNightsHubPage() {
 
       {/* 6 — BROWSE: upcoming + past. */}
       {(upcoming.length > 0 || past.length > 0) && (
-        <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 mt-16 sm:mt-20 space-y-14">
+        <Section className="space-y-14">
           {upcoming.length > 0 && (
-            <section>
-              <SectionLabel>Upcoming</SectionLabel>
+            <div>
+              <Eyebrow tone="neutral">Upcoming</Eyebrow>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 {upcoming.map((fn) => (
                   <FightNightCard key={fn.id} fightNight={fn} />
                 ))}
               </div>
-            </section>
+            </div>
           )}
 
           {past.length > 0 && (
-            <section>
-              <SectionLabel>Past Fight Nights</SectionLabel>
+            <div>
+              <Eyebrow tone="neutral">Past Fight Nights</Eyebrow>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 {past.map((fn) => (
                   <FightNightCard key={fn.id} fightNight={fn} />
                 ))}
               </div>
-            </section>
+            </div>
           )}
-        </div>
+        </Section>
       )}
 
       {/* 7 — THE ASK: account on-ramp, now after the value. */}
-      <div id="join" className="scroll-mt-24 max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 mt-16 sm:mt-20">
+      <Section id="join">
         <HubAccountCta
           featured={
             featured
@@ -122,24 +122,10 @@ export default async function FightNightsHubPage() {
               : null
           }
         />
-      </div>
+      </Section>
 
       {/* 8 — FAQ. */}
       <HubFaq />
     </main>
-  )
-}
-
-function SectionLabel({
-  children,
-  className = "",
-}: {
-  children: React.ReactNode
-  className?: string
-}) {
-  return (
-    <p className={`text-neutral-400 text-[10px] font-bold tracking-[0.3em] uppercase mb-5 ${className}`}>
-      {children}
-    </p>
   )
 }

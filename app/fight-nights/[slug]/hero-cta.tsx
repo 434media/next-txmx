@@ -25,7 +25,7 @@ export default function HeroCta({ hasActiveEvent }: HeroCtaProps) {
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         <a
           href="#how-it-works"
-          className="inline-flex items-center justify-center gap-2 px-6 py-3.5 border border-white/30 text-white text-xs font-bold tracking-[0.2em] uppercase hover:border-white/60 hover:bg-white/5 transition-all rounded-md group"
+          className="inline-flex items-center justify-center gap-2 px-6 py-3.5 border border-neutral-300 text-neutral-900 text-xs font-bold tracking-[0.2em] uppercase hover:border-neutral-400 hover:bg-neutral-100 transition-all rounded-md group"
         >
           How It Works
           <ChevronIcon />
@@ -59,7 +59,7 @@ export default function HeroCta({ hasActiveEvent }: HeroCtaProps) {
       </a>
       <a
         href="#how-it-works"
-        className="inline-flex items-center justify-center gap-2 px-6 py-3.5 border border-white/30 text-white text-xs font-bold tracking-[0.2em] uppercase hover:border-white/60 hover:bg-white/5 transition-all rounded-md group"
+        className="inline-flex items-center justify-center gap-2 px-6 py-3.5 border border-neutral-300 text-neutral-900 text-xs font-bold tracking-[0.2em] uppercase hover:border-neutral-400 hover:bg-neutral-100 transition-all rounded-md group"
       >
         How It Works
         <ChevronIcon />

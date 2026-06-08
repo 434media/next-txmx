@@ -73,7 +73,7 @@ export default function Carousel({
       {/* Mobile-only swipe hint — sits above the scroller so first-time
           users see the affordance before they reach the cards. */}
       {showHint && (
-        <p className="lg:hidden flex items-center gap-1.5 text-amber-400/90 text-[11px] font-semibold mb-2.5 px-1">
+        <p className="lg:hidden flex items-center gap-1.5 text-amber-600 text-[11px] font-semibold mb-2.5 px-1">
           <ChevronRight
             className="w-3.5 h-3.5 shrink-0 animate-[swipe-nudge_1.4s_ease-in-out_infinite]"
             strokeWidth={2.5}
@@ -104,7 +104,7 @@ export default function Carousel({
         onClick={() => scrollBy(-scrollStep)}
         disabled={!canScrollLeft}
         aria-label="Scroll left"
-        className="hidden lg:flex absolute left-1 top-1/2 -translate-y-1/2 z-20 w-9 h-9 items-center justify-center rounded-full bg-black/85 backdrop-blur-sm border border-white/15 text-white shadow-lg hover:bg-black hover:border-white/30 transition-all disabled:opacity-0 disabled:pointer-events-none"
+        className="hidden lg:flex absolute left-1 top-1/2 -translate-y-1/2 z-20 w-9 h-9 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm border border-neutral-200 text-neutral-900 shadow-lg hover:bg-white hover:border-neutral-300 transition-all disabled:opacity-0 disabled:pointer-events-none"
       >
         <ChevronLeft className="w-4 h-4" strokeWidth={2.5} />
       </button>
@@ -115,7 +115,7 @@ export default function Carousel({
         onClick={() => scrollBy(scrollStep)}
         disabled={!canScrollRight}
         aria-label="Scroll right"
-        className="hidden lg:flex absolute right-1 top-1/2 -translate-y-1/2 z-20 w-9 h-9 items-center justify-center rounded-full bg-black/85 backdrop-blur-sm border border-white/15 text-white shadow-lg hover:bg-black hover:border-white/30 transition-all disabled:opacity-0 disabled:pointer-events-none"
+        className="hidden lg:flex absolute right-1 top-1/2 -translate-y-1/2 z-20 w-9 h-9 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm border border-neutral-200 text-neutral-900 shadow-lg hover:bg-white hover:border-neutral-300 transition-all disabled:opacity-0 disabled:pointer-events-none"
       >
         <ChevronRight className="w-4 h-4" strokeWidth={2.5} />
       </button>
@@ -124,7 +124,7 @@ export default function Carousel({
       {canScrollRight && (
         <div
           aria-hidden
-          className="pointer-events-none absolute right-0 top-0 bottom-4 w-12 bg-linear-to-l from-black to-transparent z-10"
+          className="pointer-events-none absolute right-0 top-0 bottom-4 w-12 bg-linear-to-l from-white to-transparent z-10"
         />
       )}
 
@@ -133,7 +133,7 @@ export default function Carousel({
         ref={scrollerRef}
         role="region"
         aria-label={ariaLabel}
-        className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-4 scroll-smooth [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:bg-white/15 [&::-webkit-scrollbar-thumb]:rounded-full"
+        className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-4 scroll-smooth [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:bg-neutral-300 [&::-webkit-scrollbar-thumb]:rounded-full"
       >
         {children}
       </div>

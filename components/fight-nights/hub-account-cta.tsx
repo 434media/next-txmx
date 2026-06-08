@@ -7,6 +7,7 @@ import {
   getUserSeasonStanding,
   type SeasonStanding,
 } from "../../app/actions/season-standings"
+import { Eyebrow } from "./section"
 
 interface FeaturedRef {
   slug: string
@@ -79,12 +80,9 @@ function SignedIn({
     <section className="rounded-xl border border-neutral-200 bg-neutral-50 p-6 sm:p-7">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
         <div className="min-w-0">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="inline-block w-2 h-2 bg-emerald-500" />
-            <p className="text-emerald-600 text-[10px] font-bold tracking-[0.25em] uppercase">
-              You&apos;re In
-            </p>
-          </div>
+          <Eyebrow tone="emerald" mb="mb-2">
+            You&apos;re In
+          </Eyebrow>
           <h2 className="text-neutral-900 text-2xl sm:text-3xl font-black uppercase tracking-tight leading-[0.95]">
             Welcome back, <span className="text-amber-600">{firstName}</span>.
           </h2>
@@ -171,12 +169,9 @@ function SignedOut({
 
   return (
     <section className="rounded-xl border border-neutral-200 bg-neutral-50 p-6 sm:p-8">
-      <div className="flex items-center gap-2 mb-3">
-        <span className="inline-block w-2 h-2 bg-amber-500" />
-        <p className="text-amber-600 text-[10px] font-bold tracking-[0.25em] uppercase">
-          Join the Game
-        </p>
-      </div>
+      <Eyebrow tone="amber" mb="mb-3">
+        Join the Game
+      </Eyebrow>
       <h2 className="text-neutral-900 text-2xl sm:text-3xl font-black uppercase tracking-tight leading-[0.95] mb-3">
         Create your free account.
       </h2>

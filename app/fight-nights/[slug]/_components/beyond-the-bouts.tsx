@@ -37,16 +37,16 @@ export default function BeyondTheBouts({
   return (
     <div>
       <div className="flex items-center justify-between mb-5">
-        <h3 className="text-white text-lg font-bold uppercase tracking-tight">
+        <h3 className="text-neutral-900 text-lg font-bold uppercase tracking-tight">
           Beyond the Bouts
         </h3>
-        <span className="text-white/30 text-[10px] font-bold tracking-[0.2em] uppercase">
+        <span className="text-neutral-400 text-[10px] font-bold tracking-[0.2em] uppercase">
           Extra picks · earn more
         </span>
       </div>
 
       {showTabs && (
-        <div className="flex items-center gap-1 mb-6 border-b border-white/10 overflow-x-auto">
+        <div className="flex items-center gap-1 mb-6 border-b border-neutral-200 overflow-x-auto">
           {visibleTabs.includes("props") && (
             <TabButton
               active={tab === "props"}
@@ -94,7 +94,7 @@ function TabButton({
       type="button"
       onClick={onClick}
       className={`relative px-4 py-3 text-sm font-bold tracking-tight transition-colors shrink-0 ${
-        active ? "text-white" : "text-white/45 hover:text-white/75"
+        active ? "text-neutral-900" : "text-neutral-500 hover:text-neutral-700"
       }`}
     >
       {children}

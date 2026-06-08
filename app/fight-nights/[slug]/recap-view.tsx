@@ -38,12 +38,12 @@ export default function RecapView({
   const where = [fightNight.venue, fightNight.city].filter(Boolean).join(" · ")
 
   return (
-    <main className="relative min-h-dvh bg-black font-sans">
+    <main className="relative min-h-dvh bg-white font-sans">
       <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 pt-28 sm:pt-32 pb-20">
         {/* Back link */}
         <Link
           href="/fight-nights"
-          className="inline-flex items-center gap-2 text-white/40 text-[11px] font-semibold tracking-widest uppercase hover:text-white/70 transition-colors mb-8 group"
+          className="inline-flex items-center gap-2 text-neutral-500 text-[11px] font-semibold tracking-widest uppercase hover:text-neutral-900 transition-colors mb-8 group"
         >
           <svg
             className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5"
@@ -60,36 +60,36 @@ export default function RecapView({
         <header className="mb-12">
           <div className="flex items-center gap-2 mb-4">
             <span className="inline-block w-2 h-2 bg-emerald-500" />
-            <p className="text-emerald-400 text-[10px] font-bold tracking-[0.25em] uppercase">
+            <p className="text-emerald-600 text-[10px] font-bold tracking-[0.25em] uppercase">
               Final Results
             </p>
           </div>
           {fightNight.subtitle && (
-            <p className="text-amber-500 text-[11px] font-bold tracking-[0.3em] uppercase mb-3">
+            <p className="text-amber-600 text-[11px] font-bold tracking-[0.3em] uppercase mb-3">
               {fightNight.subtitle}
             </p>
           )}
-          <h1 className="text-white text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[0.9] uppercase mb-4">
+          <h1 className="text-neutral-900 text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[0.9] uppercase mb-4">
             {fightNight.title || "Fight Night"}
           </h1>
-          <p className="text-white/50 text-sm font-medium">
+          <p className="text-neutral-500 text-sm font-medium">
             {[formatFullDate(fightNight.date), where].filter(Boolean).join(" · ")}
           </p>
         </header>
 
         {/* Champion callout */}
         {champion && (
-          <div className="mb-12 border border-amber-500/30 bg-amber-500/5 rounded-xl p-6 sm:p-8">
-            <p className="text-amber-400 text-[10px] font-bold tracking-[0.3em] uppercase mb-2">
+          <div className="mb-12 border border-amber-200 bg-amber-50 rounded-xl p-6 sm:p-8">
+            <p className="text-amber-600 text-[10px] font-bold tracking-[0.3em] uppercase mb-2">
               Night Champion
             </p>
             <div className="flex items-end justify-between gap-4">
-              <p className="text-white text-2xl sm:text-3xl font-black tracking-tight leading-none">
+              <p className="text-neutral-900 text-2xl sm:text-3xl font-black tracking-tight leading-none">
                 {standingName(champion)}
               </p>
-              <p className="text-amber-400 text-xl sm:text-2xl font-black tabular-nums leading-none">
+              <p className="text-amber-600 text-xl sm:text-2xl font-black tabular-nums leading-none">
                 {champion.points.toLocaleString()}
-                <span className="text-white/40 text-xs font-bold ml-1.5">PTS</span>
+                <span className="text-neutral-400 text-xs font-bold ml-1.5">PTS</span>
               </p>
             </div>
           </div>
@@ -98,10 +98,10 @@ export default function RecapView({
         {/* Bout results */}
         {bouts.length > 0 && (
           <section className="mb-12">
-            <h2 className="text-white text-lg font-bold uppercase tracking-tight mb-5">
+            <h2 className="text-neutral-900 text-lg font-bold uppercase tracking-tight mb-5">
               Card Results
             </h2>
-            <div className="space-y-px bg-white/10 rounded-xl overflow-hidden border border-white/10">
+            <div className="space-y-px bg-neutral-200 rounded-xl overflow-hidden border border-neutral-200">
               {bouts.map((b) => (
                 <BoutResultRow key={b.boutNumber} bout={b} />
               ))}
@@ -112,22 +112,22 @@ export default function RecapView({
         {/* Prize winners */}
         {prizes.length > 0 && (
           <section className="mb-12">
-            <h2 className="text-white text-lg font-bold uppercase tracking-tight mb-5">
+            <h2 className="text-neutral-900 text-lg font-bold uppercase tracking-tight mb-5">
               Prize Winners
             </h2>
-            <div className="space-y-px bg-white/10 rounded-xl overflow-hidden border border-white/10">
+            <div className="space-y-px bg-neutral-200 rounded-xl overflow-hidden border border-neutral-200">
               {prizes.map((p) => (
                 <div
                   key={p.id}
-                  className="bg-black px-4 py-3 flex items-center gap-4"
+                  className="bg-white px-4 py-3 flex items-center gap-4"
                 >
-                  <span className="text-amber-400 text-xs font-black tabular-nums w-6 shrink-0">
+                  <span className="text-amber-600 text-xs font-black tabular-nums w-6 shrink-0">
                     #{p.position}
                   </span>
-                  <span className="text-white text-sm font-semibold truncate flex-1">
+                  <span className="text-neutral-900 text-sm font-semibold truncate flex-1">
                     {p.displayName?.trim() || "Fan"}
                   </span>
-                  <span className="text-white/55 text-xs font-medium truncate text-right">
+                  <span className="text-neutral-500 text-xs font-medium truncate text-right">
                     {p.prizeLabel}
                   </span>
                 </div>
@@ -138,20 +138,20 @@ export default function RecapView({
 
         {/* Final leaderboard */}
         <section className="mb-12">
-          <h2 className="text-white text-lg font-bold uppercase tracking-tight mb-5">
+          <h2 className="text-neutral-900 text-lg font-bold uppercase tracking-tight mb-5">
             Final Leaderboard
           </h2>
           {standings.length === 0 ? (
-            <div className="border border-dashed border-white/15 rounded-xl px-6 py-10 text-center">
-              <p className="text-white/40 text-sm font-medium">
+            <div className="border border-dashed border-neutral-300 rounded-xl px-6 py-10 text-center">
+              <p className="text-neutral-400 text-sm font-medium">
                 No participants on this card.
               </p>
             </div>
           ) : (
-            <div className="rounded-xl overflow-hidden border border-white/10">
+            <div className="rounded-xl overflow-hidden border border-neutral-200">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="bg-white/5 text-white/40 text-[10px] font-bold tracking-[0.15em] uppercase">
+                  <tr className="bg-neutral-50 text-neutral-500 text-[10px] font-bold tracking-[0.15em] uppercase">
                     <th className="px-4 py-3 w-12">#</th>
                     <th className="px-4 py-3">Player</th>
                     <th className="px-4 py-3 text-right w-20">Picks</th>
@@ -162,20 +162,20 @@ export default function RecapView({
                   {standings.map((s, i) => (
                     <tr
                       key={s.userId}
-                      className={`border-t border-white/5 ${
-                        i === 0 ? "bg-amber-500/5" : ""
+                      className={`border-t border-neutral-200 ${
+                        i === 0 ? "bg-amber-50" : ""
                       }`}
                     >
-                      <td className="px-4 py-3 text-white/50 text-sm font-bold tabular-nums">
+                      <td className="px-4 py-3 text-neutral-500 text-sm font-bold tabular-nums">
                         {i + 1}
                       </td>
-                      <td className="px-4 py-3 text-white text-sm font-semibold truncate">
+                      <td className="px-4 py-3 text-neutral-900 text-sm font-semibold truncate">
                         {standingName(s)}
                       </td>
-                      <td className="px-4 py-3 text-right text-white/50 text-xs font-medium tabular-nums">
+                      <td className="px-4 py-3 text-right text-neutral-500 text-xs font-medium tabular-nums">
                         {s.picksWon}/{s.picksMade}
                       </td>
-                      <td className="px-4 py-3 text-right text-white text-sm font-bold tabular-nums">
+                      <td className="px-4 py-3 text-right text-neutral-900 text-sm font-bold tabular-nums">
                         {s.points.toLocaleString()}
                       </td>
                     </tr>
@@ -196,7 +196,7 @@ export default function RecapView({
           </Link>
           <Link
             href="/leaderboard"
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-white/20 text-white text-xs font-bold tracking-[0.2em] uppercase hover:bg-white/5 transition-colors rounded-md"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-neutral-300 text-neutral-900 text-xs font-bold tracking-[0.2em] uppercase hover:bg-neutral-100 transition-colors rounded-md"
           >
             Global Leaderboard
           </Link>
@@ -217,23 +217,23 @@ function BoutResultRow({ bout }: { bout: FightNightBout }) {
   const decided = bout.status === "completed" && (winner || isDraw)
 
   return (
-    <div className="bg-black px-4 py-3.5">
+    <div className="bg-white px-4 py-3.5">
       <div className="flex items-center gap-3 mb-1.5">
-        <span className="text-white/30 text-[10px] font-bold tabular-nums shrink-0">
+        <span className="text-neutral-400 text-[10px] font-bold tabular-nums shrink-0">
           {bout.boutNumber}
         </span>
         {bout.weightClass && (
-          <span className="text-white/35 text-[10px] font-medium uppercase tracking-wide">
+          <span className="text-neutral-400 text-[10px] font-medium uppercase tracking-wide">
             {bout.weightClass}
           </span>
         )}
         {bout.isMainEvent && (
-          <span className="text-amber-400 text-[9px] font-bold tracking-[0.2em] uppercase px-1.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/25">
+          <span className="text-amber-600 text-[9px] font-bold tracking-[0.2em] uppercase px-1.5 py-0.5 rounded-full bg-amber-100 border border-amber-200">
             Main
           </span>
         )}
         {!decided && (
-          <span className="text-white/30 text-[9px] font-bold tracking-[0.2em] uppercase ml-auto">
+          <span className="text-neutral-400 text-[9px] font-bold tracking-[0.2em] uppercase ml-auto">
             No result
           </span>
         )}
@@ -244,7 +244,7 @@ function BoutResultRow({ bout }: { bout: FightNightBout }) {
           won={winner === "fighter1"}
           dim={!!winner && winner !== "fighter1"}
         />
-        <span className="text-white/25 text-[11px] font-medium shrink-0">
+        <span className="text-neutral-300 text-[11px] font-medium shrink-0">
           {isDraw ? "draw" : "vs"}
         </span>
         <FighterName
@@ -277,13 +277,13 @@ function FighterName({
     >
       <span
         className={`text-sm font-bold truncate ${
-          won ? "text-emerald-400" : dim ? "text-white/40" : "text-white"
+          won ? "text-emerald-600" : dim ? "text-neutral-400" : "text-neutral-900"
         }`}
       >
         {name}
       </span>
       {won && (
-        <span className="text-emerald-400 text-[9px] font-bold tracking-[0.2em] uppercase shrink-0">
+        <span className="text-emerald-600 text-[9px] font-bold tracking-[0.2em] uppercase shrink-0">
           W
         </span>
       )}

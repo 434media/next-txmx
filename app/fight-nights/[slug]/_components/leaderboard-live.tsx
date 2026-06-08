@@ -50,16 +50,16 @@ export default function LeaderboardLive({
 
   if (loading) {
     return (
-      <div className="border border-white/8 rounded-xl bg-white/2 px-6 py-10 text-center">
-        <p className="text-white/40 text-sm font-medium">Loading leaderboard…</p>
+      <div className="border border-neutral-200 rounded-xl bg-neutral-50 px-6 py-10 text-center">
+        <p className="text-neutral-400 text-sm font-medium">Loading leaderboard…</p>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="border border-red-500/20 rounded-xl bg-red-500/5 px-6 py-6">
-        <p className="text-red-400 text-sm font-medium">
+      <div className="border border-red-200 rounded-xl bg-red-50 px-6 py-6">
+        <p className="text-red-600 text-sm font-medium">
           Leaderboard unavailable: {error}
         </p>
       </div>
@@ -68,11 +68,11 @@ export default function LeaderboardLive({
 
   if (entries.length === 0) {
     return (
-      <div className="border border-white/8 rounded-xl bg-white/2 px-6 py-10 text-center">
-        <p className="text-white/70 text-sm font-semibold leading-6 mb-1">
+      <div className="border border-neutral-200 rounded-xl bg-neutral-50 px-6 py-10 text-center">
+        <p className="text-neutral-700 text-sm font-semibold leading-6 mb-1">
           No picks yet.
         </p>
-        <p className="text-white/45 text-xs leading-5">
+        <p className="text-neutral-500 text-xs leading-5">
           Be the first — pick a bout to land on the board.
         </p>
       </div>
@@ -115,19 +115,19 @@ export default function LeaderboardLive({
   }
 
   return (
-    <div className="border border-white/8 rounded-xl overflow-hidden bg-white/2">
-      <div className="divide-y divide-white/5">
+    <div className="border border-neutral-200 rounded-xl overflow-hidden bg-neutral-50">
+      <div className="divide-y divide-neutral-200">
         {rows.map((row, i) => {
           if (row.kind === "divider") {
             return (
               <div
                 key={`div-${i}`}
-                className="px-4 sm:px-5 py-2 flex items-center gap-2 bg-white/2"
+                className="px-4 sm:px-5 py-2 flex items-center gap-2 bg-neutral-50"
               >
-                <span className="text-white/30 text-[9px] font-bold tracking-[0.3em] uppercase">
+                <span className="text-neutral-400 text-[9px] font-bold tracking-[0.3em] uppercase">
                   Your neighborhood
                 </span>
-                <span className="h-px flex-1 bg-white/8" />
+                <span className="h-px flex-1 bg-neutral-200" />
               </div>
             )
           }
@@ -146,7 +146,7 @@ export default function LeaderboardLive({
       {entries.length > rows.filter((r) => r.kind === "entry").length && (
         <button
           onClick={() => setExpanded((v) => !v)}
-          className="w-full px-4 sm:px-5 py-2.5 border-t border-white/8 bg-white/2 hover:bg-white/4 transition-colors text-white/55 hover:text-white text-[11px] font-bold tracking-[0.2em] uppercase"
+          className="w-full px-4 sm:px-5 py-2.5 border-t border-neutral-200 bg-neutral-50 hover:bg-neutral-100 transition-colors text-neutral-500 hover:text-neutral-900 text-[11px] font-bold tracking-[0.2em] uppercase"
         >
           {expanded
             ? "Collapse"
@@ -154,9 +154,9 @@ export default function LeaderboardLive({
         </button>
       )}
 
-      <div className="px-4 sm:px-5 py-2 border-t border-white/8 bg-white/2 flex items-center gap-2">
+      <div className="px-4 sm:px-5 py-2 border-t border-neutral-200 bg-neutral-50 flex items-center gap-2">
         <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-        <p className="text-emerald-400/70 text-[10px] font-bold tracking-widest uppercase">
+        <p className="text-emerald-600 text-[10px] font-bold tracking-widest uppercase">
           Live · Updates as bouts settle
         </p>
       </div>
@@ -175,19 +175,19 @@ function Row({
 }) {
   const rankColor =
     position === 1
-      ? "text-amber-400"
+      ? "text-amber-500"
       : position === 2
-        ? "text-white/70"
+        ? "text-neutral-400"
         : position === 3
-          ? "text-amber-600"
-          : "text-white/35"
+          ? "text-amber-700"
+          : "text-neutral-300"
 
   return (
     <div
       className={`flex items-center gap-3 px-4 sm:px-5 py-3 transition-colors ${
         isMe
-          ? "bg-amber-500/8 border-l-2 border-amber-500"
-          : "hover:bg-white/3"
+          ? "bg-amber-50 border-l-2 border-amber-500"
+          : "hover:bg-neutral-50"
       }`}
     >
       <span
@@ -196,7 +196,7 @@ function Row({
         {position}
       </span>
 
-      <div className="w-7 h-7 rounded-full bg-white/8 border border-white/10 flex items-center justify-center shrink-0 overflow-hidden">
+      <div className="w-7 h-7 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center shrink-0 overflow-hidden">
         {entry.photoURL ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -206,25 +206,25 @@ function Row({
             referrerPolicy="no-referrer"
           />
         ) : (
-          <span className="text-white/40 text-[11px] font-bold">
+          <span className="text-neutral-400 text-[11px] font-bold">
             {(entry.displayName || "?")[0].toUpperCase()}
           </span>
         )}
       </div>
 
       <div className="min-w-0 flex-1">
-        <p className="text-white text-sm font-semibold leading-tight truncate">
+        <p className="text-neutral-900 text-sm font-semibold leading-tight truncate">
           {entry.displayName || "Anonymous"}
-          {isMe && <span className="text-amber-400 ml-1.5">· you</span>}
+          {isMe && <span className="text-amber-600 ml-1.5">· you</span>}
         </p>
       </div>
 
       <div className="text-right shrink-0">
-        <p className="text-white text-sm font-bold tabular-nums leading-none">
+        <p className="text-neutral-900 text-sm font-bold tabular-nums leading-none">
           {(entry.points || 0).toLocaleString()}
-          <span className="text-white/35 text-xs font-medium ml-1">pts</span>
+          <span className="text-neutral-400 text-xs font-medium ml-1">pts</span>
         </p>
-        <p className="text-white/40 text-[10px] font-medium tabular-nums leading-tight mt-1">
+        <p className="text-neutral-400 text-[10px] font-medium tabular-nums leading-tight mt-1">
           {entry.picksWon || 0}/{entry.picksMade || 0} picks
         </p>
       </div>

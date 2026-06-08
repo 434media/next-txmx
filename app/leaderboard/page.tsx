@@ -31,23 +31,23 @@ export default async function LeaderboardPage() {
   const leaderboard = await getSeasonStandings(100)
 
   return (
-    <main className="relative min-h-screen bg-black font-sans pt-24 pb-16">
+    <main className="relative min-h-screen bg-white font-sans pt-24 pb-16">
       <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-white/30 text-[11px] font-semibold tracking-widest uppercase hover:text-white/60 transition-colors mb-8 group"
+          className="inline-flex items-center gap-2 text-neutral-400 text-[11px] font-semibold tracking-widest uppercase hover:text-neutral-700 transition-colors mb-8 group"
         >
           <svg className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
           Home
         </Link>
         <div className="mb-12">
-          <p className="text-white/50 text-xs font-semibold tracking-[0.3em] uppercase mb-4">
+          <p className="text-amber-600 text-xs font-semibold tracking-[0.3em] uppercase mb-4">
             TXMX Boxing
           </p>
-          <h1 className="text-white text-4xl sm:text-5xl font-bold tracking-wide leading-none mb-4 uppercase">
+          <h1 className="text-neutral-900 text-4xl sm:text-5xl font-bold tracking-wide leading-none mb-4 uppercase">
             Leaderboard
           </h1>
-          <p className="text-white/50 text-sm sm:text-base leading-relaxed max-w-xl">
+          <p className="text-neutral-500 text-sm sm:text-base leading-relaxed max-w-xl">
             The best pickers in Texas boxing — ranked by points earned across
             every fight night from winning picks and props.
           </p>

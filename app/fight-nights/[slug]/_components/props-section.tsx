@@ -104,15 +104,15 @@ export default function PropsSection({ fightNightId }: PropsSectionProps) {
   if (loading) {
     return (
       <div className="text-center py-8">
-        <p className="text-white/30 text-sm">Loading props…</p>
+        <p className="text-neutral-400 text-sm">Loading props…</p>
       </div>
     )
   }
 
   if (props.length === 0) {
     return (
-      <div className="text-center py-12 border border-white/8 rounded-xl bg-white/2">
-        <p className="text-white/40 text-sm font-medium">No props yet for this event.</p>
+      <div className="text-center py-12 border border-neutral-200 rounded-xl bg-neutral-50">
+        <p className="text-neutral-400 text-sm font-medium">No props yet for this event.</p>
       </div>
     )
   }
@@ -137,43 +137,43 @@ export default function PropsSection({ fightNightId }: PropsSectionProps) {
               key={prop.id}
               className={`snap-start shrink-0 w-[85vw] sm:w-[340px] border rounded-xl p-5 ${
                 isSettled && userWon
-                  ? "border-emerald-500/30 bg-emerald-500/5"
+                  ? "border-emerald-200 bg-emerald-50"
                   : isSettled
-                    ? "border-white/8 bg-white/2 opacity-70"
+                    ? "border-neutral-200 bg-neutral-50 opacity-70"
                     : isLocked
-                      ? "border-amber-500/20 bg-amber-500/3"
-                      : "border-white/8 bg-white/2"
+                      ? "border-amber-200 bg-amber-50"
+                      : "border-neutral-200 bg-neutral-50"
               }`}
             >
               <div className="flex items-start justify-between gap-3 mb-3">
               <div className="flex-1">
-                <h3 className="text-white text-[15px] font-bold leading-snug">
+                <h3 className="text-neutral-900 text-[15px] font-bold leading-snug">
                   {prop.title}
                 </h3>
                 {prop.description && (
-                  <p className="text-white/45 text-xs font-medium leading-5 mt-1">
+                  <p className="text-neutral-500 text-xs font-medium leading-5 mt-1">
                     {prop.description}
                   </p>
                 )}
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 {prop.isUnderdog && (
-                  <span className="text-amber-400 text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20">
+                  <span className="text-amber-600 text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full bg-amber-100 border border-amber-200">
                     Underdog
                   </span>
                 )}
                 {prop.boutNumber && (
-                  <span className="text-white/40 text-[10px] font-bold tracking-wider uppercase">
+                  <span className="text-neutral-400 text-[10px] font-bold tracking-wider uppercase">
                     Bout {prop.boutNumber}
                   </span>
                 )}
                 {isLocked && !isSettled && (
-                  <span className="text-amber-400 text-[10px] font-bold tracking-wider uppercase">
+                  <span className="text-amber-600 text-[10px] font-bold tracking-wider uppercase">
                     Locked
                   </span>
                 )}
                 {isSettled && (
-                  <span className="text-emerald-400 text-[10px] font-bold tracking-wider uppercase">
+                  <span className="text-emerald-600 text-[10px] font-bold tracking-wider uppercase">
                     Settled
                   </span>
                 )}
@@ -181,11 +181,11 @@ export default function PropsSection({ fightNightId }: PropsSectionProps) {
             </div>
 
             <div className="flex items-center gap-3 mb-4">
-              <span className="text-blue-400 text-xs font-semibold tabular-nums">
+              <span className="text-blue-600 text-xs font-semibold tabular-nums">
                 {prop.pointsReward} pts
               </span>
               {prop.isUnderdog && (
-                <span className="text-amber-400/60 text-xs font-medium">1.25× multiplier</span>
+                <span className="text-amber-600 text-xs font-medium">1.25× multiplier</span>
               )}
             </div>
 
@@ -201,12 +201,12 @@ export default function PropsSection({ fightNightId }: PropsSectionProps) {
                       key={opt.id}
                       className={`px-4 py-3 rounded-lg border text-sm font-semibold flex items-center justify-between ${
                         isCorrect && isMyPick
-                          ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
+                          ? "border-emerald-300 bg-emerald-100 text-emerald-700"
                           : isCorrect
-                            ? "border-emerald-500/20 bg-emerald-500/5 text-emerald-400"
+                            ? "border-emerald-200 bg-emerald-50 text-emerald-600"
                             : isMyPick
-                              ? "border-white/15 bg-white/5 text-white/60"
-                              : "border-white/5 bg-white/2 text-white/40"
+                              ? "border-neutral-200 bg-neutral-100 text-neutral-600"
+                              : "border-neutral-200 bg-neutral-50 text-neutral-400"
                       }`}
                     >
                       <span className="truncate">{opt.label}</span>
@@ -240,14 +240,14 @@ export default function PropsSection({ fightNightId }: PropsSectionProps) {
                       key={opt.id}
                       className={`relative overflow-hidden px-4 py-3 rounded-lg border text-sm font-semibold ${
                         isMyPick
-                          ? "border-amber-500/30 bg-amber-500/5 text-amber-200/80"
-                          : "border-white/5 bg-white/2 text-white/30"
+                          ? "border-amber-200 bg-amber-50 text-amber-700"
+                          : "border-neutral-200 bg-neutral-50 text-neutral-400"
                       }`}
                     >
                       {showStakes && optPct > 0 && (
                         <span
                           className={`absolute inset-y-0 left-0 ${
-                            isMyPick ? "bg-amber-500/10" : "bg-white/4"
+                            isMyPick ? "bg-amber-100" : "bg-neutral-200"
                           } transition-all duration-500`}
                           style={{ width: `${optPct}%` }}
                         />
@@ -256,7 +256,7 @@ export default function PropsSection({ fightNightId }: PropsSectionProps) {
                         <span className="truncate">
                           {opt.label}
                           {isMyPick && (
-                            <span className="ml-2 text-[9px] font-bold tracking-wider uppercase text-amber-400/70">
+                            <span className="ml-2 text-[9px] font-bold tracking-wider uppercase text-amber-600">
                               · Your Pick
                             </span>
                           )}
@@ -264,7 +264,7 @@ export default function PropsSection({ fightNightId }: PropsSectionProps) {
                         {showStakes && (
                           <span
                             className={`shrink-0 text-[10px] font-bold tabular-nums ${
-                              isMyPick ? "text-amber-400/70" : "text-white/35"
+                              isMyPick ? "text-amber-600" : "text-neutral-400"
                             }`}
                           >
                             {optPct.toFixed(0)}%
@@ -286,14 +286,14 @@ export default function PropsSection({ fightNightId }: PropsSectionProps) {
                     disabled={submitting === prop.id}
                     className={`relative overflow-hidden text-left px-4 py-3 rounded-lg border text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                       isMyPick
-                        ? "border-amber-500/40 bg-amber-500/10 text-amber-200 hover:bg-amber-500/15"
-                        : "border-white/10 bg-white/2 text-white/80 hover:border-white/25 hover:bg-white/5 hover:text-white"
+                        ? "border-amber-300 bg-amber-100 text-amber-700 hover:bg-amber-100"
+                        : "border-neutral-200 bg-neutral-50 text-neutral-700 hover:border-neutral-300 hover:bg-neutral-100 hover:text-neutral-900"
                     }`}
                   >
                     {showStakes && optPct > 0 && (
                       <span
                         className={`absolute inset-y-0 left-0 ${
-                          isMyPick ? "bg-amber-500/15" : "bg-white/5"
+                          isMyPick ? "bg-amber-200" : "bg-neutral-200"
                         } transition-all duration-500 pointer-events-none`}
                         style={{ width: `${optPct}%` }}
                       />
@@ -302,7 +302,7 @@ export default function PropsSection({ fightNightId }: PropsSectionProps) {
                       <span className="truncate">
                         {opt.label}
                         {isMyPick && (
-                          <span className="ml-2 text-[9px] font-bold tracking-wider uppercase text-amber-400">
+                          <span className="ml-2 text-[9px] font-bold tracking-wider uppercase text-amber-600">
                             · Your Pick
                           </span>
                         )}
@@ -310,7 +310,7 @@ export default function PropsSection({ fightNightId }: PropsSectionProps) {
                       {showStakes && (
                         <span
                           className={`shrink-0 text-[10px] font-bold tabular-nums ${
-                            isMyPick ? "text-amber-400" : "text-white/45"
+                            isMyPick ? "text-amber-600" : "text-neutral-500"
                           }`}
                         >
                           {optPct.toFixed(0)}%
@@ -324,9 +324,9 @@ export default function PropsSection({ fightNightId }: PropsSectionProps) {
 
             {!isSettled && !isLocked && (
               <div className="mt-3 flex items-center justify-between gap-3 text-[11px] font-medium">
-                <p className="text-white/45">
+                <p className="text-neutral-500">
                   {isSaving ? (
-                    <span className="inline-flex items-center gap-1.5 text-amber-400/85">
+                    <span className="inline-flex items-center gap-1.5 text-amber-600">
                       <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
                       Saving…
                     </span>
@@ -340,26 +340,26 @@ export default function PropsSection({ fightNightId }: PropsSectionProps) {
                   )}
                 </p>
                 {showStakes && stake && (
-                  <p className="text-white/35 tabular-nums shrink-0">
+                  <p className="text-neutral-400 tabular-nums shrink-0">
                     {stake.total} pick{stake.total === 1 ? "" : "s"}
                   </p>
                 )}
               </div>
             )}
             {isLocked && !isSettled && showStakes && stake && (
-              <p className="mt-3 text-white/35 text-[11px] font-medium tabular-nums">
+              <p className="mt-3 text-neutral-400 text-[11px] font-medium tabular-nums">
                 {stake.total} pick{stake.total === 1 ? "" : "s"} · locked
               </p>
             )}
 
             {myError && (
-              <p className="mt-3 text-red-400 text-xs font-medium">{myError}</p>
+              <p className="mt-3 text-red-600 text-xs font-medium">{myError}</p>
             )}
 
               {isSettled && myPick && (
                 <p
                   className={`mt-3 text-[11px] font-bold tracking-wider uppercase ${
-                    userWon ? "text-emerald-400" : "text-white/45"
+                    userWon ? "text-emerald-600" : "text-neutral-500"
                   }`}
                 >
                   {userWon

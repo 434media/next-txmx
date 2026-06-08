@@ -75,14 +75,14 @@ export default function FightNightClient({ fightNight, bouts }: FightNightClient
   // No active fight night yet — pre-event state
   if (!fightNight) {
     return (
-      <section className="border border-white/10 rounded-xl bg-white/2 px-6 py-12 text-center">
-        <p className="text-amber-500 text-[10px] font-bold tracking-[0.3em] uppercase mb-3">
+      <section className="border border-neutral-200 rounded-xl bg-neutral-50 px-6 py-12 text-center">
+        <p className="text-amber-600 text-[10px] font-bold tracking-[0.3em] uppercase mb-3">
           Setting Up
         </p>
-        <h3 className="text-white text-xl font-bold tracking-tight mb-2">
+        <h3 className="text-neutral-900 text-xl font-bold tracking-tight mb-2">
           Card not live yet
         </h3>
-        <p className="text-white/55 text-sm font-medium leading-6 max-w-md mx-auto">
+        <p className="text-neutral-500 text-sm font-medium leading-6 max-w-md mx-auto">
           The fight card is being prepped. Come back when doors open and you'll see
           the bouts, polls, and live leaderboard here.
         </p>
@@ -96,34 +96,34 @@ export default function FightNightClient({ fightNight, bouts }: FightNightClient
       <section id="play" className="scroll-mt-24">
         <div className="flex items-center gap-2 mb-4">
           <span className="inline-block w-2 h-2 bg-amber-500" />
-          <p className="text-amber-500 text-[10px] font-bold tracking-[0.25em] uppercase">
+          <p className="text-amber-600 text-[10px] font-bold tracking-[0.25em] uppercase">
             Get Started
           </p>
         </div>
-        <h2 className="text-white text-3xl sm:text-4xl font-black uppercase tracking-tight leading-[0.95] mb-3">
+        <h2 className="text-neutral-900 text-3xl sm:text-4xl font-black uppercase tracking-tight leading-[0.95] mb-3">
           Two ways in.
         </h2>
-        <p className="text-white/65 text-sm font-semibold leading-7 mb-8 max-w-lg">
+        <p className="text-neutral-600 text-sm font-semibold leading-7 mb-8 max-w-lg">
           One tap with Google, or quick sign up with your name and email. Either way, you're playing in 15 seconds.
         </p>
 
         {/* Mobile-first venue priority: walk-in shows ABOVE sign-in on phone.
             Desktop restores the natural left-right order (sign-in then walk-in). */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-white/10 rounded-xl overflow-hidden">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-neutral-200 rounded-xl overflow-hidden border border-neutral-200">
           {/* Sign in with Google */}
-          <div className="bg-black p-6 sm:p-7 order-2 md:order-1">
-            <p className="text-white/50 text-[10px] font-bold tracking-[0.25em] uppercase mb-3">
+          <div className="bg-white p-6 sm:p-7 order-2 md:order-1">
+            <p className="text-neutral-500 text-[10px] font-bold tracking-[0.25em] uppercase mb-3">
               Have a Google Account?
             </p>
-            <h3 className="text-white text-lg font-bold leading-tight mb-2">
+            <h3 className="text-neutral-900 text-lg font-bold leading-tight mb-2">
               Sign in with one tap
             </h3>
-            <p className="text-white/60 text-sm font-medium leading-6 mb-5">
+            <p className="text-neutral-600 text-sm font-medium leading-6 mb-5">
               Fastest way in. Your picks and points stick with you for every TXMX event after this one.
             </p>
             <button
               onClick={() => signInWithGoogle().catch(() => {})}
-              className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-black text-xs font-bold tracking-[0.2em] uppercase hover:bg-white/90 transition-colors rounded-md"
+              className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-neutral-300 text-neutral-900 text-xs font-bold tracking-[0.2em] uppercase hover:bg-neutral-50 transition-colors rounded-md"
             >
               <GoogleIcon className="w-4 h-4" />
               Sign in with Google
@@ -131,19 +131,19 @@ export default function FightNightClient({ fightNight, bouts }: FightNightClient
           </div>
 
           {/* Walk-in form — mobile-first priority for venue users */}
-          <div className="bg-black p-6 sm:p-7 order-1 md:order-2 relative">
+          <div className="bg-white p-6 sm:p-7 order-1 md:order-2 relative">
             {/* Mobile-only attention strip — emphasizes this is the venue path */}
             <span
               aria-hidden
               className="md:hidden absolute top-0 left-0 right-0 h-0.5 bg-amber-500"
             />
-            <p className="text-amber-400 text-[10px] font-bold tracking-[0.25em] uppercase mb-3">
+            <p className="text-amber-600 text-[10px] font-bold tracking-[0.25em] uppercase mb-3">
               New Here? Start Here
             </p>
-            <h3 className="text-white text-lg font-bold leading-tight mb-2">
+            <h3 className="text-neutral-900 text-lg font-bold leading-tight mb-2">
               Quick sign up
             </h3>
-            <p className="text-white/60 text-sm font-medium leading-6 mb-5">
+            <p className="text-neutral-600 text-sm font-medium leading-6 mb-5">
               Just your name and email — and you're playing.
             </p>
             <WalkInForm fightNightId={fightNight.id} />
@@ -162,12 +162,12 @@ export default function FightNightClient({ fightNight, bouts }: FightNightClient
         <div className="flex items-center flex-wrap gap-x-3 gap-y-1 mb-10">
           <div className="flex items-center gap-2">
             <span className="inline-block w-2 h-2 bg-emerald-500" />
-            <p className="text-emerald-400 text-[10px] font-bold tracking-[0.25em] uppercase">
+            <p className="text-emerald-600 text-[10px] font-bold tracking-[0.25em] uppercase">
               Tonight
             </p>
           </div>
-          <span className="text-white/20">·</span>
-          <p className="text-white text-base sm:text-lg font-bold tracking-tight leading-tight truncate">
+          <span className="text-neutral-300">·</span>
+          <p className="text-neutral-900 text-base sm:text-lg font-bold tracking-tight leading-tight truncate">
             {fightNight.title || "Fight Night"}
           </p>
         </div>
@@ -177,18 +177,18 @@ export default function FightNightClient({ fightNight, bouts }: FightNightClient
         <>
           <div className="flex items-center gap-2 mb-4">
             <span className="inline-block w-2 h-2 bg-emerald-500" />
-            <p className="text-emerald-400 text-[10px] font-bold tracking-[0.25em] uppercase">
+            <p className="text-emerald-600 text-[10px] font-bold tracking-[0.25em] uppercase">
               You&apos;re In
             </p>
           </div>
-          <h2 className="text-white text-3xl sm:text-4xl font-black uppercase tracking-tight leading-[0.95] mb-3">
+          <h2 className="text-neutral-900 text-3xl sm:text-4xl font-black uppercase tracking-tight leading-[0.95] mb-3">
             Welcome,{" "}
-            <span className="text-amber-400">
+            <span className="text-amber-600">
               {user.displayName?.split(" ")[0] || "Champ"}
             </span>
             .
           </h2>
-          <p className="text-white/65 text-sm font-medium leading-7 max-w-lg mb-10">
+          <p className="text-neutral-600 text-sm font-medium leading-7 max-w-lg mb-10">
             Tonight&apos;s prize goes to the top of the board. Start by picking winners
             on each bout below — every correct call earns Skill Points.
           </p>
@@ -210,15 +210,15 @@ export default function FightNightClient({ fightNight, bouts }: FightNightClient
         {/* Left col: Fight Card */}
         <div className="mb-12 xl:mb-0">
           <div className="flex items-center justify-between mb-5">
-            <h3 className="text-white text-lg font-bold uppercase tracking-tight">
+            <h3 className="text-neutral-900 text-lg font-bold uppercase tracking-tight">
               Fight Card
             </h3>
             {hasLiveBout ? (
-              <span className="text-red-400 text-[10px] font-bold tracking-[0.2em] uppercase">
+              <span className="text-red-600 text-[10px] font-bold tracking-[0.2em] uppercase">
                 · Live Now
               </span>
             ) : (
-              <span className="text-white/30 text-xs font-medium tabular-nums">
+              <span className="text-neutral-400 text-xs font-medium tabular-nums">
                 {bouts.length} bout{bouts.length !== 1 ? "s" : ""}
               </span>
             )}
@@ -236,10 +236,10 @@ export default function FightNightClient({ fightNight, bouts }: FightNightClient
         >
           <div>
             <div className="flex items-center justify-between mb-5">
-              <h3 className="text-white text-lg font-bold uppercase tracking-tight">
+              <h3 className="text-neutral-900 text-lg font-bold uppercase tracking-tight">
                 Leaderboard
               </h3>
-              <span className="text-white/30 text-[10px] font-bold tracking-[0.2em] uppercase">
+              <span className="text-neutral-400 text-[10px] font-bold tracking-[0.2em] uppercase">
                 Top 3 · Your neighborhood
               </span>
             </div>
@@ -270,17 +270,17 @@ function PrizeChip({ label, details }: { label: string; details?: string }) {
   const hasDetails = !!details?.trim()
 
   return (
-    <div className="mb-3 border border-amber-500/25 bg-amber-500/5 rounded-lg overflow-hidden">
+    <div className="mb-3 border border-amber-200 bg-amber-50 rounded-lg overflow-hidden">
       <button
         type="button"
         onClick={() => hasDetails && setOpen((v) => !v)}
         disabled={!hasDetails}
         className={`w-full flex items-center gap-2 px-3 py-2 text-left ${
-          hasDetails ? "hover:bg-amber-500/10 transition-colors cursor-pointer" : "cursor-default"
+          hasDetails ? "hover:bg-amber-100 transition-colors cursor-pointer" : "cursor-default"
         }`}
       >
         <svg
-          className="w-3.5 h-3.5 text-amber-400 shrink-0"
+          className="w-3.5 h-3.5 text-amber-600 shrink-0"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -292,16 +292,16 @@ function PrizeChip({ label, details }: { label: string; details?: string }) {
             d="M5 4h14l-1.5 9a3 3 0 01-3 2.5h-5a3 3 0 01-3-2.5L5 4zM9 20h6M12 16v4M8 4V3h8v1"
           />
         </svg>
-        <span className="text-amber-400 text-[9px] font-bold tracking-[0.25em] uppercase shrink-0">
+        <span className="text-amber-600 text-[9px] font-bold tracking-[0.25em] uppercase shrink-0">
           Tonight's Prize
         </span>
-        <span className="text-white/30">·</span>
-        <span className="text-white/85 text-xs font-semibold leading-snug truncate flex-1">
+        <span className="text-neutral-400">·</span>
+        <span className="text-neutral-800 text-xs font-semibold leading-snug truncate flex-1">
           {label}
         </span>
         {hasDetails && (
           <svg
-            className={`w-3 h-3 text-white/40 shrink-0 transition-transform ${open ? "rotate-180" : ""}`}
+            className={`w-3 h-3 text-neutral-400 shrink-0 transition-transform ${open ? "rotate-180" : ""}`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -312,7 +312,7 @@ function PrizeChip({ label, details }: { label: string; details?: string }) {
       </button>
       {hasDetails && open && (
         <div className="px-3 pb-3 -mt-1">
-          <p className="text-white/65 text-xs font-medium leading-5">{details}</p>
+          <p className="text-neutral-600 text-xs font-medium leading-5">{details}</p>
         </div>
       )}
     </div>

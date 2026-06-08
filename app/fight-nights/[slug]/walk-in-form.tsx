@@ -56,7 +56,7 @@ export default function WalkInForm({ fightNightId }: WalkInFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
       <div>
-        <label htmlFor="walkin-name" className="block text-white/45 text-[10px] font-bold tracking-[0.2em] uppercase mb-1.5">
+        <label htmlFor="walkin-name" className="block text-neutral-500 text-[10px] font-bold tracking-[0.2em] uppercase mb-1.5">
           Your Name
         </label>
         <input
@@ -70,12 +70,12 @@ export default function WalkInForm({ fightNightId }: WalkInFormProps) {
           placeholder="Alex"
           autoComplete="name"
           disabled={submitting}
-          className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-md text-white text-sm font-medium placeholder:text-white/30 focus:outline-none focus:border-white/30 focus:bg-white/8 transition-colors disabled:opacity-50"
+          className="w-full px-3 py-2.5 bg-white border border-neutral-300 rounded-md text-neutral-900 text-sm font-medium placeholder:text-neutral-400 focus:outline-none focus:border-amber-500 focus:bg-white transition-colors disabled:opacity-50"
         />
       </div>
 
       <div>
-        <label htmlFor="walkin-email" className="block text-white/45 text-[10px] font-bold tracking-[0.2em] uppercase mb-1.5">
+        <label htmlFor="walkin-email" className="block text-neutral-500 text-[10px] font-bold tracking-[0.2em] uppercase mb-1.5">
           Email
         </label>
         <input
@@ -89,7 +89,7 @@ export default function WalkInForm({ fightNightId }: WalkInFormProps) {
           placeholder="you@example.com"
           autoComplete="email"
           disabled={submitting}
-          className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-md text-white text-sm font-medium placeholder:text-white/30 focus:outline-none focus:border-white/30 focus:bg-white/8 transition-colors disabled:opacity-50"
+          className="w-full px-3 py-2.5 bg-white border border-neutral-300 rounded-md text-neutral-900 text-sm font-medium placeholder:text-neutral-400 focus:outline-none focus:border-amber-500 focus:bg-white transition-colors disabled:opacity-50"
         />
       </div>
 
@@ -102,12 +102,12 @@ export default function WalkInForm({ fightNightId }: WalkInFormProps) {
       </button>
 
       {error && (
-        <p role="alert" className="text-red-400 text-xs font-medium">
+        <p role="alert" className="text-red-600 text-xs font-medium">
           {error}
         </p>
       )}
 
-      <p className="text-white/35 text-[10px] leading-relaxed pt-1">
+      <p className="text-neutral-400 text-[10px] leading-relaxed pt-1">
         We use your email to notify you if you win — no spam, no follow-up unless you opt in.
       </p>
     </form>

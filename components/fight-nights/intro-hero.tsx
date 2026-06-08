@@ -112,6 +112,16 @@ export default function IntroHero() {
           )}
         </button>
       </div>
+
+      {/* Bottom fade — blends the black hero into the neutral-50 "Happening
+          Next" band directly below (which touches this section with no gap), so
+          the scroll transition reads as one continuous surface. Sits above the
+          video (z-10) but below the audio toggle (z-20), and never intercepts
+          clicks. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-40 z-10 bg-linear-to-b from-transparent to-neutral-950"
+      />
     </section>
   )
 }

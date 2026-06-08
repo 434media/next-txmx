@@ -1,7 +1,7 @@
 import Link from "next/link"
 import type { FightNight } from "../../app/actions/fightnight"
 import type { FightNightStanding } from "../../app/actions/fightnight-standings"
-import { PLACEHOLDER } from "../../lib/placeholder-media"
+import { Section, Eyebrow } from "./section"
 
 /**
  * Social proof: a spotlight on the most recent completed event and its winner.
@@ -26,43 +26,65 @@ export default function RecapSpotlight({
     : ""
 
   return (
-    <section className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 mt-16 sm:mt-20">
-      <div className="flex items-center gap-2 mb-5">
-        <span className="inline-block w-2 h-2 bg-emerald-500" />
-        <p className="text-emerald-600 text-[10px] font-bold tracking-[0.3em] uppercase">
-          How It Played Out
-        </p>
-      </div>
+    <Section>
+      <Eyebrow tone="emerald">How It Played Out</Eyebrow>
 
       <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-stretch">
-        {/* Winner spotlight */}
-        <div className="md:col-span-3 rounded-2xl border border-neutral-200 bg-neutral-50 overflow-hidden flex flex-col sm:flex-row">
-          <div className="relative sm:w-2/5 aspect-square sm:aspect-auto bg-neutral-100">
-            {/* Placeholder winner portrait — swap for the real champion photo. */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={winner?.photoURL || PLACEHOLDER.winnerImage}
-              alt={winner?.displayName || "Champion"}
-              className="absolute inset-0 h-full w-full object-cover"
-              referrerPolicy="no-referrer"
-            />
+        {/* Winner spotlight. The champion's photo is a small profile avatar
+            (often ~96px from Google), so we render it at avatar size instead of
+            a large panel — upscaling that source into a hero image looked
+            blurry. No photo → a crisp monogram. The card is filled out with the
+            night's stats instead of imagery. */}
+        <div className="md:col-span-3 rounded-xl border border-neutral-200 bg-neutral-50 p-6 sm:p-8 flex flex-col justify-center">
+          <p className="text-amber-600 text-[10px] font-bold tracking-[0.3em] uppercase mb-4">
+            Champion of the Night
+          </p>
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center shrink-0 overflow-hidden">
+              {winner?.photoURL ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={winner.photoURL}
+                  alt={winner.displayName || "Champion"}
+                  className="w-full h-full object-cover"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <span className="text-neutral-400 text-xl font-black">
+                  {(winner?.displayName?.trim() || "TXMX")[0].toUpperCase()}
+                </span>
+              )}
+            </div>
+            <div className="min-w-0">
+              <p className="text-neutral-900 text-2xl font-black uppercase tracking-tight leading-tight truncate">
+                {winner?.displayName?.trim() || "A TXMX Fan"}
+              </p>
+              {event.prizeLabel && (
+                <p className="text-neutral-500 text-sm font-semibold mt-1 truncate">
+                  Won {event.prizeLabel}
+                </p>
+              )}
+            </div>
           </div>
-          <div className="flex-1 p-6 sm:p-7 flex flex-col justify-center">
-            <p className="text-amber-600 text-[10px] font-bold tracking-[0.3em] uppercase mb-2">
-              Champion of the Night
-            </p>
-            <p className="text-neutral-900 text-2xl font-black uppercase tracking-tight leading-tight">
-              {winner?.displayName?.trim() || "A TXMX Fan"}
-            </p>
-            <p className="text-neutral-500 text-sm font-semibold mt-1">
-              {winner ? `${(winner.points || 0).toLocaleString()} pts` : "Top of the board"}
-              {event.prizeLabel ? ` · won ${event.prizeLabel}` : ""}
-            </p>
-          </div>
+
+          {winner && (
+            <div className="mt-6 grid grid-cols-3 gap-px bg-neutral-200 rounded-xl overflow-hidden border border-neutral-200">
+              <Stat value={(winner.points || 0).toLocaleString()} label="Points" />
+              <Stat value={`${winner.picksWon || 0}/${winner.picksMade || 0}`} label="Picks won" />
+              <Stat
+                value={
+                  (winner.picksMade || 0) > 0
+                    ? `${Math.round(((winner.picksWon || 0) / winner.picksMade) * 100)}%`
+                    : "—"
+                }
+                label="Accuracy"
+              />
+            </div>
+          )}
         </div>
 
         {/* Event recap card */}
-        <div className="md:col-span-2 rounded-2xl border border-neutral-200 bg-white p-6 sm:p-7 flex flex-col justify-between">
+        <div className="md:col-span-2 rounded-xl border border-neutral-200 bg-white p-6 sm:p-7 flex flex-col justify-between">
           <div>
             <p className="text-neutral-400 text-[10px] font-bold tracking-[0.3em] uppercase mb-2">
               Last Fight Night
@@ -85,6 +107,20 @@ export default function RecapSpotlight({
           </Link>
         </div>
       </div>
-    </section>
+    </Section>
+  )
+}
+
+/** One stat cell in the champion card — mirrors the hub's gap-px stat strips. */
+function Stat({ value, label }: { value: string; label: string }) {
+  return (
+    <div className="bg-white p-4 sm:p-5">
+      <p className="text-neutral-900 text-xl sm:text-2xl font-black tabular-nums leading-none">
+        {value}
+      </p>
+      <p className="text-neutral-500 text-[11px] font-medium leading-4 mt-1.5">
+        {label}
+      </p>
+    </div>
   )
 }

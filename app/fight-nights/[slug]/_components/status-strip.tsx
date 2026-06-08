@@ -75,7 +75,7 @@ export default function StatusStrip({ fightNightId, hasLiveBout }: StatusStripPr
         hasLiveBout ? "top-[108px]" : "top-16"
       }`}
     >
-      <div className="py-3 px-4 sm:px-5 bg-black/85 backdrop-blur-md border border-white/10 rounded-xl shadow-lg">
+      <div className="py-3 px-4 sm:px-5 bg-white/90 backdrop-blur-md border border-neutral-200 rounded-xl shadow-lg">
         {hasPicks ? (
           <div className="flex items-center gap-5 sm:gap-8 overflow-x-auto">
             <Stat value={(entry!.points || 0).toLocaleString()} label="pts" />
@@ -89,8 +89,8 @@ export default function StatusStrip({ fightNightId, hasLiveBout }: StatusStripPr
             />
           </div>
         ) : (
-          <p className="text-white/80 text-sm font-semibold flex items-center gap-2 leading-tight">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+          <p className="text-neutral-700 text-sm font-semibold flex items-center gap-2 leading-tight">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
             You&apos;re in — make your first pick below to land on the board.
           </p>
         )}
@@ -102,10 +102,10 @@ export default function StatusStrip({ fightNightId, hasLiveBout }: StatusStripPr
 function Stat({ value, label }: { value: string; label: string }) {
   return (
     <div className="flex items-baseline gap-1.5 shrink-0">
-      <span className="text-white text-lg sm:text-xl font-black tabular-nums leading-none">
+      <span className="text-neutral-900 text-lg sm:text-xl font-black tabular-nums leading-none">
         {value}
       </span>
-      <span className="text-white/45 text-[10px] font-bold tracking-[0.15em] uppercase leading-none">
+      <span className="text-neutral-500 text-[10px] font-bold tracking-[0.15em] uppercase leading-none">
         {label}
       </span>
     </div>
