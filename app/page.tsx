@@ -7,16 +7,16 @@ import {
 } from "../lib/json-ld"
 
 export const metadata: Metadata = {
-  title: 'TXMX Boxing | Boxing Media Platform',
-  description: 'TXMX Boxing is a dynamic media platform connecting brands with passionate fight fans. Celebrating the rich cultural heritage of Texas and Mexico through exclusive boxing events, sponsorship opportunities, and champion storytelling.',
+  title: 'TXMX Boxing | Texas–Mexico Boxing & Fight Nights',
+  description: 'TXMX Boxing is the home of Texas–Mexico boxing. Play Fight Nights — the free fan game at every fight card: pick winners, call props, and climb the live leaderboard. Plus verified fighter records and event coverage.',
   openGraph: {
-    title: 'TXMX Boxing | Boxing Media Platform',
-    description: 'Connecting brands with passionate fight fans. Exclusive boxing events, sponsorship opportunities, and champion storytelling celebrating Texas and Mexico heritage.',
+    title: 'TXMX Boxing | Texas–Mexico Boxing & Fight Nights',
+    description: 'Play Fight Nights — the free fan game at every TXMX fight card. Pick winners, call props, and climb the live leaderboard, in person or online.',
     url: 'https://www.txmxboxing.com',
   },
   twitter: {
-    title: 'TXMX Boxing | Boxing Media Platform',
-    description: 'Connecting brands with passionate fight fans through exclusive boxing events and champion storytelling.',
+    title: 'TXMX Boxing | Texas–Mexico Boxing & Fight Nights',
+    description: 'The free fan game at every TXMX fight card — pick winners, climb the leaderboard. Live, in person or online.',
   },
   alternates: {
     canonical: 'https://www.txmxboxing.com',

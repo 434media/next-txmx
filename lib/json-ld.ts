@@ -124,7 +124,7 @@ export function generateOrganizationJsonLd() {
       'https://twitter.com/txmx',
     ],
     description:
-      'TXMX Boxing is a dynamic media platform designed to connect brands with a passionate fight fan audience. By celebrating the rich cultural heritage of Texas and Mexico, TXMX Boxing offers unique opportunities for brands to authentically engage with a community that is deeply rooted in both sport and culture.',
+      'TXMX Boxing is the home of Texas–Mexico boxing — Fight Nights, the free skill-based fan game played live at fight cards, plus verified TDLR-sourced fighter records and live event coverage celebrating the heritage of Texas and Mexico.',
   }
 }
 
@@ -137,7 +137,7 @@ export function generateWebSiteJsonLd() {
     name: 'TXMX Boxing',
     alternateName: 'TXMX',
     description:
-      'Texas-Mexico boxing media platform — fighter records, TDLR-sanctioned event results, ringside news, and fan engagement.',
+      'Texas–Mexico boxing — Fight Nights fan game, verified fighter records, TDLR-sanctioned event results, and live leaderboards.',
     publisher: { '@id': `${SITE_URL}#organization` },
     inLanguage: 'en-US',
     potentialAction: {
@@ -155,10 +155,7 @@ export function generateSiteNavigationJsonLd() {
   const items: Array<{ name: string; url: string }> = [
     { name: 'Fight Nights', url: `${SITE_URL}/fight-nights` },
     { name: 'Fighters', url: `${SITE_URL}/fighters` },
-    { name: 'Compare', url: `${SITE_URL}/compare` },
-    { name: 'Gym Pledge', url: `${SITE_URL}/pledge` },
     { name: 'Leaderboard', url: `${SITE_URL}/leaderboard` },
-    { name: 'Black Card', url: `${SITE_URL}/checkout` },
     { name: 'Rise of a Champion', url: `${SITE_URL}/icon-talks/rise-of-a-champion` },
   ]
   return {
@@ -262,37 +259,5 @@ export function generateFightNightJsonLd(fn: FightNightLike) {
       name: 'TXMX Boxing',
       url: SITE_URL,
     },
-  }
-}
-
-type NewsLike = {
-  title: string
-  excerpt: string
-  slug: string
-  publishedAt?: string
-  updatedAt?: string
-  imageUrl?: string
-  author?: string
-}
-
-export function generateNewsArticleJsonLd(post: NewsLike) {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'NewsArticle',
-    '@id': `${SITE_URL}/8count/${post.slug}#article`,
-    headline: post.title,
-    description: post.excerpt,
-    url: `${SITE_URL}/8count/${post.slug}`,
-    datePublished: post.publishedAt,
-    dateModified: post.updatedAt || post.publishedAt,
-    image: post.imageUrl ? [post.imageUrl] : undefined,
-    author: {
-      '@type': 'Organization',
-      name: post.author || 'TXMX Boxing',
-      url: SITE_URL,
-    },
-    publisher: { '@id': `${SITE_URL}#organization` },
-    articleSection: 'The 8 Count',
-    isAccessibleForFree: true,
   }
 }

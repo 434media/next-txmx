@@ -1,67 +1,51 @@
 # TXMX Boxing
 
-> TXMX Boxing is the official media and fan-engagement platform for Texas–Mexico
-> boxing. We cover TDLR-sanctioned events across Texas, maintain verified fighter
-> records, publish ringside news, and run a skill-based prediction economy
-> (Prop Picks, Polls, Gym Pledge, Leaderboard) for fight fans.
+> TXMX Boxing is the home of Texas–Mexico boxing: **Fight Nights** — a free,
+> skill-based fan game played live at fight cards — alongside verified fighter
+> records and live event coverage.
 
 The platform is built by TXMX Boxing and operates at https://www.txmxboxing.com.
-Public APIs and dashboards are not exposed to crawlers; only the consumer-facing
-pages listed below are intended for indexing or summarization.
+Admin dashboards, JSON APIs, and server actions are not exposed to crawlers; only
+the consumer-facing pages listed below are intended for indexing or summarization.
 
 ## What TXMX is
 
-- **Texas-licensed boxing data.** Fighter records and event results are sourced
+- **Fight Nights — the fan game.** Free to play. At each fight card, fans pick
+  bout winners, call prop bets, and vote in polls. Correct calls earn points and
+  move a live leaderboard that updates as bouts are settled. Play in person at the
+  venue or online from anywhere — everyone competes on the same board. Points
+  carry across events into an all-time season standing, and the top of each
+  night's board wins a prize from the venue.
+- **Texas-licensed fighter data.** Fighter records and bout results are sourced
   from the Texas Department of Licensing and Regulation (TDLR) and verified
   against published bout sheets before being indexed.
-- **A fan engagement platform.** Fans can predict bouts (Prop Picks), vote in
-  polls, back a Texas boxing gym for a 16-week season (Gym Pledge), and earn
-  Skill Points and TX-Credits.
-- **A media outlet.** "The 8 Count" is the in-house ringside news feed
-  covering Texas boxing stories, fight breakdowns, and behind-the-scenes
-  coverage.
-- **A premium membership.** The TXMX Black Card unlocks Prop Picks, exclusive
-  events, and platform-wide perks.
+- **Live event coverage.** Every fight night has its own page with the card and
+  matchups, the prize, a countdown to first bell, and a real-time leaderboard.
 
 ## Key pages
 
 - [Home](https://www.txmxboxing.com/): Platform overview and hero.
-- [The 8 Count](https://www.txmxboxing.com/8count): Ringside news feed for Texas
-  boxing. Post slugs live at `/8count/{slug}`.
-- [Fighter Directory](https://www.txmxboxing.com/fighters): Searchable directory
-  of TDLR-licensed boxers. Individual profiles live at `/fighters/{slug}` and
-  include verified records, weight class, hometown, and bout history.
-- [Events](https://www.txmxboxing.com/events): TDLR-sanctioned events,
-  upcoming cards, and past results. Event detail pages live at
-  `/events/{eventId}`.
-- [Compare Fighters](https://www.txmxboxing.com/compare): Side-by-side fighter
-  comparison (records, KO percentages, career stats).
-- [Prop Picks](https://www.txmxboxing.com/picks): Black Card prediction game —
-  call winners, methods, and rounds. Scored against verified bout results.
-- [Fan Polls](https://www.txmxboxing.com/polls): Recurring fan polls on Texas
-  boxing topics. Voting earns TX-Credits.
-- [Gym Pledge](https://www.txmxboxing.com/pledge): Fans pledge to a Texas
-  boxing gym for a 16-week season and earn Loyalty Points tied to gym
-  performance.
-- [Leaderboard](https://www.txmxboxing.com/leaderboard): Skill Points
-  leaderboard ranking users by prediction accuracy.
-- [Black Card](https://www.txmxboxing.com/checkout): TXMX Black Card
-  subscription via Stripe.
-- [Rise of a Champion](https://www.txmxboxing.com/events/rise-of-a-champion):
-  Iconic Series invitation-only event in San Antonio, TX, presented by TXMX
-  Boxing × Icon Talks.
-- [Scorecard](https://www.txmxboxing.com/scorecard): Platform overview for the
-  TXMX engagement system.
-- [FanOS](https://www.txmxboxing.com/fanos): Investor- and partner-facing
-  overview of TXMX as a "fandom operating system."
+- [Fight Nights](https://www.txmxboxing.com/fight-nights): The fan-game hub — the
+  next event, how the game works, the all-time leaderboard, and past nights.
+  Individual events live at `/fight-nights/{slug}` with that night's card, prize,
+  countdown, and live game.
+- [Fighters](https://www.txmxboxing.com/fighters): Searchable directory of
+  TDLR-licensed boxers. Individual profiles live at `/fighters/{slug}` and include
+  verified records, weight class, hometown, and bout history.
+- [Leaderboard](https://www.txmxboxing.com/leaderboard): All-time fan leaderboard,
+  ranking players by points earned from winning picks and props across every fight
+  night.
+- [Rise of a Champion](https://www.txmxboxing.com/icon-talks/rise-of-a-champion):
+  An Iconic Series event in San Antonio, TX, presented by TXMX Boxing × Icon Talks
+  (an archived past event).
 
 ## Brand and entity
 
 - Legal/Operating name: TXMX Boxing
 - Site: https://www.txmxboxing.com
 - Region: Texas, USA — with cultural coverage extending to Mexico
-- Sanctioning context: All event records are tied to TDLR (Texas Department of
-  Licensing and Regulation) Combative Sports filings.
+- Sanctioning context: Fighter records and event results are tied to TDLR (Texas
+  Department of Licensing and Regulation) Combative Sports filings.
 - Social: Instagram [@txmxboxing](https://www.instagram.com/txmxboxing/),
   YouTube [@txmxboxing](https://www.youtube.com/@txmxboxing/shorts),
   TikTok [@txmxboxing](https://www.tiktok.com/@txmxboxing)

@@ -126,15 +126,9 @@ export default function ClientLayout({
           async
         />
 
-        <title>TXMX Boxing</title>
-        <meta
-          name="description"
-          content="TXMX Boxing is a dynamic media platform designed to connect brands with a passionate fight fan audience. By celebrating the rich cultural heritage of Texas and Mexico, TXMX Boxing offers unique opportunities for brands to authentically engage with a community that is deeply rooted in both sport and culture."
-        />
-        <meta name="keywords" content="boxing, fitness, Mexican boxing, TXMX, training, equipment" />
-        {/* Note: Meta tags are now handled by Next.js Metadata API in layout.tsx and page.tsx files */}
-        {/* Verification */}
-        <meta name="google-site-verification" content="your-google-verification-code" />
+        {/* Title, description, keywords, and OpenGraph/Twitter tags are owned by
+            the Next.js Metadata API (app/layout.tsx + per-page metadata) — don't
+            duplicate them here. */}
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} ${bebasNeue.variable} ${orbitron.variable} ${GeistPixelSquare.variable} ${GeistPixelGrid.variable} ${GeistPixelCircle.variable} ${GeistPixelTriangle.variable} ${GeistPixelLine.variable} antialiased bg-black text-white`} style={{ overflowY: 'auto', height: 'auto', minHeight: '100vh' }}>
         <Analytics />
