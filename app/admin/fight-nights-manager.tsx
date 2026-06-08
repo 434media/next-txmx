@@ -2672,7 +2672,7 @@ function FighterMini({
 }) {
   if (!name?.trim()) {
     return (
-      <div className="flex items-center justify-center rounded-md border border-dashed border-gray-200 bg-white p-2 text-[11px] text-gray-300 min-h-[64px]">
+      <div className="flex items-center justify-center rounded-md border border-dashed border-gray-200 bg-white p-2 text-[11px] text-gray-300 min-h-16">
         Pick a fighter
       </div>
     )

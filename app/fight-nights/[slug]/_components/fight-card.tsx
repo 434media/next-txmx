@@ -483,8 +483,8 @@ function FighterCell({
       } ${submitting ? "opacity-50" : ""}`}
     >
       {selected && (
-        <span className="absolute top-2 right-2 z-10 text-amber-600 text-[9px] font-bold tracking-wider uppercase">
-          · Your Pick
+        <span className="absolute top-2 right-2 z-10 bg-neutral-900 text-amber-400 text-[9px] font-bold tracking-wider uppercase px-1.5 py-0.5 rounded shadow-sm">
+          Your Pick
         </span>
       )}
 
@@ -496,7 +496,9 @@ function FighterCell({
             src={photoUrl}
             alt={name || ""}
             referrerPolicy="no-referrer"
-            className="absolute inset-0"
+            className={`absolute inset-0 transition-[filter] duration-300 ${
+              won ? "" : "grayscale"
+            }`}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
         ) : (
