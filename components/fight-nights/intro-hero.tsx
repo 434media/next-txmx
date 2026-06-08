@@ -40,7 +40,7 @@ export default function IntroHero() {
         />
         <div className="relative z-10 max-w-lg">
           <p className="text-amber-500 text-xs font-bold tracking-[0.3em] uppercase mb-4">
-            TXMX Boxing · The Fan Game
+            Fight Night · The Fan Game
           </p>
           <h1 className="text-white text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[0.9] mb-6 uppercase">
             Don&apos;t just watch.{" "}
@@ -48,7 +48,7 @@ export default function IntroHero() {
           </h1>
           <p className="text-white/75 text-sm sm:text-base font-semibold leading-7 max-w-md mb-4">
             Pick winners, call props, and climb the leaderboard live at every
-            TXMX fight night — in person or online.
+            fight night event — in person or online.
           </p>
           <p className="text-white/55 text-xs font-semibold tracking-wide mb-8">
             Free to play · No experience needed

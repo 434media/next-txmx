@@ -1,15 +1,16 @@
 import Link from "next/link"
-import { Section, Eyebrow } from "./section"
+import { Section } from "./section"
 
-// Real TXMX fight-night photography for the full-bleed band.
+// Real TXMX fight-night photography for the background.
 const FAQ_IMAGE =
-  "https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2Fjune15th-9.jpg?alt=media"
+  "https://firebasestorage.googleapis.com/v0/b/groovy-ego-462522-v2.firebasestorage.app/o/txmx%2Fsolution.jpg?alt=media"
 
 /**
- * Short FAQ answering the first-timer's blocking questions, rendered as a
- * full-bleed band (photo left / questions right) to close the page. Uses native
- * <details>/<summary> so it works without any client JS. Ends with a re-CTA back
- * to the account form so a now-convinced reader can act without scrolling up.
+ * Short FAQ answering the first-timer's blocking questions, closing the page as
+ * an image-as-background card: the photo fills the card, a left-weighted scrim
+ * keeps the overlaid questions legible (so this card is a dark treatment — white
+ * text over the darkened image). Uses native <details>/<summary> so it works
+ * without client JS. Ends with a re-CTA back to the account form.
  */
 const FAQS = [
   {
@@ -37,35 +38,46 @@ const FAQS = [
 export default function HubFaq() {
   return (
     <Section>
-      <div className="grid grid-cols-1 md:grid-cols-2 overflow-hidden rounded-xl border border-neutral-200 bg-neutral-50 md:min-h-[460px]">
-        {/* Photo — left */}
-        <div className="relative order-1 min-h-80 md:min-h-0 bg-neutral-100">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={FAQ_IMAGE}
-            alt="TXMX fighters in the ring on fight night"
-            className="absolute inset-0"
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
-          />
-        </div>
+      <div className="relative overflow-hidden rounded-xl border border-neutral-200 bg-neutral-900 md:min-h-[480px]">
+        {/* Background photo */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={FAQ_IMAGE}
+          alt=""
+          aria-hidden
+          className="absolute inset-0"
+          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+        />
+        {/* Legibility scrim — darkest on the left where the questions sit, fading
+            right so the photo still reads. */}
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-linear-to-r from-black/90 via-black/70 to-black/40"
+        />
 
-        {/* Questions — right */}
-        <div className="order-2 p-8 sm:p-10 flex flex-col justify-center">
-          <div className="w-full">
-            <Eyebrow tone="amber">Questions</Eyebrow>
+        {/* Questions, overlaid */}
+        <div className="relative px-6 sm:px-10 lg:px-16 py-12 lg:py-16">
+          <div className="w-full max-w-xl">
+            {/* Dark-treatment eyebrow (amber pops brighter over the photo). */}
+            <div className="flex items-center gap-2 mb-5">
+              <span className="inline-block w-2 h-2 bg-amber-500" />
+              <p className="text-amber-400 text-[10px] font-bold tracking-[0.3em] uppercase">
+                Fight Night Questions
+              </p>
+            </div>
 
-            <div className="divide-y divide-neutral-200 border-t border-b border-neutral-200">
+            <div className="divide-y divide-white/15 border-t border-b border-white/15">
               {FAQS.map((f) => (
                 <details key={f.q} className="group py-4">
                   <summary className="flex items-center justify-between cursor-pointer list-none">
-                    <span className="text-neutral-900 text-sm sm:text-base font-bold pr-6">
+                    <span className="text-white text-sm sm:text-base font-bold pr-6">
                       {f.q}
                     </span>
-                    <span className="text-neutral-400 text-xl font-light shrink-0 transition-transform group-open:rotate-45">
+                    <span className="text-white/50 text-xl font-light shrink-0 transition-transform group-open:rotate-45">
                       +
                     </span>
                   </summary>
-                  <p className="text-neutral-600 text-sm font-medium leading-7 mt-3 pr-8">
+                  <p className="text-white/70 text-sm font-medium leading-7 mt-3 pr-8">
                     {f.a}
                   </p>
                 </details>
@@ -75,7 +87,7 @@ export default function HubFaq() {
             {/* Closing re-CTA — back to the account form. */}
             <Link
               href="#join"
-              className="mt-8 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-neutral-900 hover:text-amber-600 transition-colors self-start"
+              className="mt-8 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-white hover:text-amber-400 transition-colors"
             >
               Still in? Create your free account
               <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24" aria-hidden>

@@ -117,12 +117,20 @@ export default async function FightNightSlugPage({ params }: PageProps) {
         <div className="fn-page-grid lg:grid lg:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_440px] lg:gap-12 xl:gap-16 lg:items-start">
           {/* ── LEFT / Mobile first — scrolling content */}
           <div className="lg:order-1 space-y-16 lg:space-y-20">
-            <div className="fn-page-marketing space-y-16 lg:space-y-20">
+            <div className="fn-page-marketing">
               <HeroIntro fightNight={fightNight} bouts={bouts} />
-              <HowItWorks variant="event" id="how-it-works" />
             </div>
 
+            {/* Action first — the sign-up form / live game sits right under the
+                hero so a visitor (especially at the venue) can act without
+                scrolling past the explainer. */}
             <FightNightClient fightNight={fightNight} bouts={bouts} />
+
+            {/* How it works moved below the game — reference, not a gate. Still
+                tagged fn-page-marketing so it hides once the user is engaged. */}
+            <div className="fn-page-marketing">
+              <HowItWorks variant="event" id="how-it-works" />
+            </div>
           </div>
 
           {/* ── RIGHT (desktop) / Mobile second — sticky flyer */}
@@ -167,26 +175,22 @@ function HeroIntro({
   const moreCount = Math.max(0, bouts.length - (main ? 1 : 0) - undercard.length)
 
   return (
-    <section className="min-h-[80dvh] flex flex-col justify-center">
+    <section className="pt-4 pb-6">
       <p className="text-amber-600 text-[11px] font-bold tracking-[0.3em] uppercase mb-3">
         {subtitle}
       </p>
-      <h1 className="text-neutral-900 text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[0.9] uppercase mb-6">
+      <h1 className="text-neutral-900 text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[0.9] uppercase mb-5">
         {title}
       </h1>
 
-      <p className="text-neutral-700 text-base sm:text-lg font-semibold leading-7 max-w-xl mb-3">
-        A free fan game for tonight&apos;s card. Pick the winners, climb the
-        leaderboard, win a prize from the venue.
-      </p>
-
-      <p className="text-neutral-500 text-sm sm:text-base font-medium leading-7 max-w-xl mb-8">
-        The skill-based fan experience powered by TXMX Boxing
+      <p className="text-neutral-700 text-base sm:text-lg font-semibold leading-7 max-w-xl mb-8">
+        A free fan game for tonight&apos;s card — pick the winners, climb the
+        leaderboard, and win a prize from the venue.
       </p>
 
       {/* Countdown to first bell */}
       {showCountdown && (
-        <div className="mb-8">
+        <div className="mb-6">
           <p className="text-neutral-400 text-[10px] font-bold tracking-[0.3em] uppercase mb-2.5">
             First bell in
           </p>
@@ -195,7 +199,7 @@ function HeroIntro({
       )}
 
       {/* Tonight's prize */}
-      <div className="mb-8 max-w-xl">
+      <div className="mb-6 max-w-xl">
         <p className="text-amber-600 text-[10px] font-bold tracking-[0.3em] uppercase mb-2">
           Tonight&apos;s Prize
         </p>
