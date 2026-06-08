@@ -286,9 +286,17 @@ export default function Navbar({ onMenuClick, activeFightNight = null }: NavbarP
                       )}
                     </div>
 
-                    {/* Notifications */}
-                    <div className="px-4 py-2.5 border-b border-white/5 flex items-center justify-between">
-                      <p className="text-white/45 text-[11px] font-medium leading-relaxed">Notifications</p>
+                    {/* Fight night alerts (web push). The bell turns amber with a
+                        dot when alerts are on. */}
+                    <div className="px-4 py-2.5 border-b border-white/5 flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-white/80 text-[11px] font-semibold leading-tight">
+                          Fight night alerts
+                        </p>
+                        <p className="text-white/40 text-[10px] font-medium leading-snug mt-0.5">
+                          Get pinged when bouts go live and settle.
+                        </p>
+                      </div>
                       <NotificationBell />
                     </div>
 
