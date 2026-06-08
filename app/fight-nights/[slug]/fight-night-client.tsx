@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState, type ReactNode } from "react"
+import { Swords, Trophy, Zap } from "lucide-react"
 import { collection, doc, onSnapshot, query } from "firebase/firestore"
 import { db } from "../../../lib/firebase-client"
 import { useAuth } from "../../../lib/auth-context"
@@ -15,12 +16,18 @@ import type { FightNightStanding } from "../../actions/fightnight-standings"
 interface FightNightClientProps {
   fightNight: FightNight | null
   bouts: FightNightBout[]
+  /** Resolved flyer URL (with fallback) for the compact event header. */
+  flyerUrl?: string
 }
 
-export default function FightNightClient({ fightNight, bouts }: FightNightClientProps) {
+export default function FightNightClient({ fightNight, bouts, flyerUrl }: FightNightClientProps) {
   const { user } = useAuth()
   const [hasLiveBout, setHasLiveBout] = useState(false)
   const [hasPicks, setHasPicks] = useState(false)
+  // Mobile section switcher (fixed bottom tab bar). On xl+ all sections show
+  // side-by-side and the bar is hidden, so this only drives the mobile view.
+  const [tab, setTab] = useState<"fights" | "board" | "extras">("fights")
+  const gameRef = useRef<HTMLElement | null>(null)
 
   // When any bout is live, push the Fight Card section to the top so the
   // action lands first in the scroll. The sticky StatusStrip persists
@@ -115,46 +122,47 @@ export default function FightNightClient({ fightNight, bouts }: FightNightClient
   }
 
   // Signed in — render the game grid
+  const hasExtras = !!(fightNight.propsEnabled || fightNight.pollsEnabled)
+  const extrasLabel = fightNight.propsEnabled ? "Props" : "Polls"
+  const switchTab = (t: "fights" | "board" | "extras") => {
+    setTab(t)
+    // Jump to the top of the game so the newly-shown section starts in view.
+    gameRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
+  }
   return (
-    <section id="game" className="scroll-mt-24">
-      {hasPicks ? (
-        /* Return-visit compact hero — single line that orients the user
-           in the night without re-teaching the game every reload. */
-        <div className="flex items-center flex-wrap gap-x-3 gap-y-1 mb-10">
-          <div className="flex items-center gap-2">
-            <span className="inline-block w-2 h-2 bg-emerald-500" />
+    <section id="game" ref={gameRef} className="scroll-mt-24 pb-24 xl:pb-0">
+      {/* Compact event header — persistent identity (small poster + title)
+          for signed-in users, since the marketing hero and flyer aside are now
+          hidden once you're in the game. */}
+      <div className="flex items-center gap-4 mb-8">
+        {flyerUrl && (
+          <div className="relative w-12 h-16 sm:w-14 sm:h-18 shrink-0 rounded-md overflow-hidden border border-neutral-200 bg-neutral-100">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={flyerUrl}
+              alt=""
+              aria-hidden
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          </div>
+        )}
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500" />
             <p className="text-emerald-600 text-[10px] font-bold tracking-[0.25em] uppercase">
-              Tonight
+              {hasPicks ? "Tonight" : "You're In"}
             </p>
           </div>
-          <span className="text-neutral-300">·</span>
-          <p className="text-neutral-900 text-base sm:text-lg font-bold tracking-tight leading-tight truncate">
+          <h2 className="text-neutral-900 text-xl sm:text-2xl font-black uppercase tracking-tight leading-[1.05] truncate">
             {fightNight.title || "Fight Night"}
+          </h2>
+          <p className="text-neutral-500 text-xs font-medium mt-0.5 truncate">
+            {[fightNight.venue, `${bouts.length} bout${bouts.length !== 1 ? "s" : ""}`]
+              .filter(Boolean)
+              .join(" · ")}
           </p>
         </div>
-      ) : (
-        /* First-visit full hero — orients new users with the "what is this"
-           framing + how-to-play sentence. */
-        <>
-          <div className="flex items-center gap-2 mb-4">
-            <span className="inline-block w-2 h-2 bg-emerald-500" />
-            <p className="text-emerald-600 text-[10px] font-bold tracking-[0.25em] uppercase">
-              You&apos;re In
-            </p>
-          </div>
-          <h2 className="text-neutral-900 text-3xl sm:text-4xl font-black uppercase tracking-tight leading-[0.95] mb-3">
-            Welcome,{" "}
-            <span className="text-amber-600">
-              {user.displayName?.split(" ")[0] || "Champ"}
-            </span>
-            .
-          </h2>
-          <p className="text-neutral-600 text-sm font-medium leading-7 max-w-lg mb-10">
-            Tonight&apos;s prize goes to the top of the board. Start by picking winners
-            on each bout below — every correct call earns Skill Points.
-          </p>
-        </>
-      )}
+      </div>
 
       {/* Sticky status HUD — replaces the old in-flow Standing card so the
           user's points, rank, and pick ratio stay one glance away no matter
@@ -167,9 +175,13 @@ export default function FightNightClient({ fightNight, bouts }: FightNightClient
           The body class set by the page-marketing effect hides the
           page-level flyer aside on lg+, freeing the full max-w-7xl
           width for this grid. */}
+      {/* Two-column game grid at xl+. Below xl, the fixed bottom tab bar swaps
+          which section is visible (one at a time) so the live game is navigable
+          without endless scroll. `hidden xl:block` = mobile-toggled / always-on
+          at xl. */}
       <div className="xl:grid xl:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] xl:gap-10 xl:items-start">
-        {/* Left col: Fight Card */}
-        <div className="mb-12 xl:mb-0">
+        {/* Fights */}
+        <div className={`mb-12 xl:mb-0 ${tab === "fights" ? "" : "hidden xl:block"}`}>
           <div className="flex items-center justify-between mb-5">
             <h3 className="text-neutral-900 text-lg font-bold uppercase tracking-tight">
               Fight Card
@@ -187,15 +199,14 @@ export default function FightNightClient({ fightNight, bouts }: FightNightClient
           <FightCard fightNightId={fightNight.id} initialBouts={bouts} />
         </div>
 
-        {/* Right rail: Leaderboard + Beyond-the-Bouts. Sticks at xl+ so
-            the user can keep scrolling through fights on the left while
-            standings stay visible on the right. */}
+        {/* Right rail: Leaderboard (board tab) + Beyond-the-Bouts (extras tab).
+            Sticks at xl+ so standings stay visible while scrolling fights. */}
         <div
-          className={`space-y-12 xl:sticky xl:self-start ${
+          className={`xl:space-y-12 xl:sticky xl:self-start ${
             hasLiveBout ? "xl:top-[180px]" : "xl:top-[120px]"
           }`}
         >
-          <div>
+          <div className={tab === "board" ? "" : "hidden xl:block"}>
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-neutral-900 text-lg font-bold uppercase tracking-tight">
                 Leaderboard
@@ -213,16 +224,66 @@ export default function FightNightClient({ fightNight, bouts }: FightNightClient
             <LeaderboardLive fightNightId={fightNight.id} />
           </div>
 
-          {(fightNight.propsEnabled || fightNight.pollsEnabled) && (
-            <BeyondTheBouts
-              fightNightId={fightNight.id}
-              propsEnabled={!!fightNight.propsEnabled}
-              pollsEnabled={!!fightNight.pollsEnabled}
-            />
+          {hasExtras && (
+            <div className={tab === "extras" ? "" : "hidden xl:block"}>
+              <BeyondTheBouts
+                fightNightId={fightNight.id}
+                propsEnabled={!!fightNight.propsEnabled}
+                pollsEnabled={!!fightNight.pollsEnabled}
+              />
+            </div>
           )}
         </div>
       </div>
+
+      {/* Mobile section nav — fixed bottom tab bar (app-style). Hidden on xl,
+          where every section shows side-by-side. */}
+      <nav className="xl:hidden fixed inset-x-0 bottom-0 z-30 bg-white/95 backdrop-blur-md border-t border-neutral-200 pb-[env(safe-area-inset-bottom)]">
+        <div className={`grid ${hasExtras ? "grid-cols-3" : "grid-cols-2"}`}>
+          <GameTab label="Fights" active={tab === "fights"} onClick={() => switchTab("fights")}>
+            <Swords className="w-5 h-5" strokeWidth={2} />
+          </GameTab>
+          <GameTab label="Board" active={tab === "board"} onClick={() => switchTab("board")}>
+            <Trophy className="w-5 h-5" strokeWidth={2} />
+          </GameTab>
+          {hasExtras && (
+            <GameTab label={extrasLabel} active={tab === "extras"} onClick={() => switchTab("extras")}>
+              <Zap className="w-5 h-5" strokeWidth={2} />
+            </GameTab>
+          )}
+        </div>
+      </nav>
     </section>
+  )
+}
+
+// One tab in the mobile bottom nav. Amber top bar marks the active section
+// (amber kept strictly as an accent, not a fill).
+function GameTab({
+  label,
+  active,
+  onClick,
+  children,
+}: {
+  label: string
+  active: boolean
+  onClick: () => void
+  children: ReactNode
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`relative flex flex-col items-center gap-1 py-2.5 transition-colors ${
+        active ? "text-neutral-900" : "text-neutral-400 hover:text-neutral-600"
+      }`}
+    >
+      {active && (
+        <span className="absolute top-0 inset-x-5 h-0.5 bg-amber-500 rounded-full" />
+      )}
+      {children}
+      <span className="text-[10px] font-bold tracking-[0.15em] uppercase">{label}</span>
+    </button>
   )
 }
 

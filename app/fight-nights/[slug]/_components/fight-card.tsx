@@ -320,7 +320,7 @@ function BoutCard({
             #{bout.boutNumber}
           </span>
           {bout.isMainEvent && (
-            <span className="text-amber-600 text-[9px] font-bold tracking-wider uppercase px-1.5 py-0.5 rounded-full bg-amber-100 border border-amber-200">
+            <span className="text-white text-[9px] font-bold tracking-wider uppercase px-1.5 py-0.5 rounded-full bg-neutral-900">
               Main Event
             </span>
           )}
@@ -357,7 +357,7 @@ function BoutCard({
             f1Selected && f1Won
               ? "bg-emerald-100"
               : f1Selected
-                ? "bg-amber-100"
+                ? "bg-neutral-100 ring-2 ring-inset ring-neutral-900"
                 : f1Won
                   ? "bg-emerald-50"
                   : isLocked
@@ -389,7 +389,7 @@ function BoutCard({
             f2Selected && f2Won
               ? "bg-emerald-100"
               : f2Selected
-                ? "bg-amber-100"
+                ? "bg-neutral-100 ring-2 ring-inset ring-neutral-900"
                 : f2Won
                   ? "bg-emerald-50"
                   : isLocked

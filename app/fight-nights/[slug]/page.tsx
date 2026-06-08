@@ -124,7 +124,7 @@ export default async function FightNightSlugPage({ params }: PageProps) {
             {/* Action first — the sign-up form / live game sits right under the
                 hero so a visitor (especially at the venue) can act without
                 scrolling past the explainer. */}
-            <FightNightClient fightNight={fightNight} bouts={bouts} />
+            <FightNightClient fightNight={fightNight} bouts={bouts} flyerUrl={flyerUrl} />
 
             {/* How it works moved below the game — reference, not a gate. Still
                 tagged fn-page-marketing so it hides once the user is engaged. */}

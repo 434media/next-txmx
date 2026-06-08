@@ -175,18 +175,18 @@ function Row({
 }) {
   const rankColor =
     position === 1
-      ? "text-amber-500"
+      ? "text-neutral-900"
       : position === 2
-        ? "text-neutral-400"
+        ? "text-neutral-500"
         : position === 3
-          ? "text-amber-700"
+          ? "text-neutral-400"
           : "text-neutral-300"
 
   return (
     <div
       className={`flex items-center gap-3 px-4 sm:px-5 py-3 transition-colors ${
         isMe
-          ? "bg-amber-50 border-l-2 border-amber-500"
+          ? "bg-neutral-100 border-l-2 border-neutral-900"
           : "hover:bg-neutral-50"
       }`}
     >

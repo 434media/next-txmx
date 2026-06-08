@@ -33,19 +33,19 @@ body {
   }
 }
 
-/* When a signed-in user is actively engaged on a fight night (has placed
-   at least one pick), hide the page-level marketing content and the
-   flyer aside on lg+ and let the game grid take the full max-w-7xl
-   width. FightNightClient toggles `body.fn-game-active`. The page-level
-   classes (`fn-page-grid`, `fn-page-marketing`, `fn-flyer-aside`) act as
-   hooks for this. Below lg, layout is unaffected. */
+/* Once a user is signed in on a fight night they're past the marketing, so
+   hide the page-level hero/explainer (`fn-page-marketing`) and the flyer aside
+   (`fn-flyer-aside`) on ALL breakpoints — including mobile — so the game leads.
+   The compact event header inside FightNightClient carries event identity (a
+   small poster + title) in their place. FightNightClient toggles
+   `body.fn-game-active`. */
+body.fn-game-active .fn-flyer-aside,
+body.fn-game-active .fn-page-marketing {
+  display: none;
+}
+/* On lg+, collapse the two-column page grid so the game grid takes the full
+   max-w-7xl width. */
 @media (min-width: 1024px) {
-  body.fn-game-active .fn-flyer-aside {
-    display: none;
-  }
-  body.fn-game-active .fn-page-marketing {
-    display: none;
-  }
   body.fn-game-active .fn-page-grid {
     grid-template-columns: minmax(0, 1fr);
   }
