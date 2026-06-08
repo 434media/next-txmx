@@ -17,6 +17,10 @@ import { useAuth } from "../lib/auth-context"
 import NotificationBell from "./notification-bell"
 import type { FightNight } from "../app/actions/fightnight"
 import type { FightNightStanding } from "../app/actions/fightnight-standings"
+import {
+  getUserSeasonStanding,
+  type SeasonStanding,
+} from "../app/actions/season-standings"
 
 interface NavbarProps {
   onMenuClick: () => void
@@ -47,7 +51,23 @@ export default function Navbar({ onMenuClick, activeFightNight = null }: NavbarP
   const dropdownRef = useRef<HTMLDivElement>(null)
   const userMenuRef = useRef<HTMLDivElement>(null)
   const eventsRef = useRef<HTMLDivElement>(null)
-  const { user, profile, loading, signOut } = useAuth()
+  const { user, loading, signOut } = useAuth()
+  const [season, setSeason] = useState<SeasonStanding | null>(null)
+
+  // Load the signed-in user's all-time season standing when the menu opens, so
+  // the dropdown reflects their fan-game identity even between events.
+  useEffect(() => {
+    if (!isUserMenuOpen || !user) return
+    let active = true
+    getUserSeasonStanding(user.uid)
+      .then((s) => {
+        if (active) setSeason(s)
+      })
+      .catch(() => {})
+    return () => {
+      active = false
+    }
+  }, [isUserMenuOpen, user])
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -208,9 +228,9 @@ export default function Navbar({ onMenuClick, activeFightNight = null }: NavbarP
                         <p className="text-white text-xs font-semibold tracking-wide leading-relaxed truncate">
                           {user.displayName || "Account"}
                         </p>
-                        {profile?.subscriptionStatus === "active" && (
-                          <span className="inline-flex items-center text-amber-400 text-[9px] font-bold tracking-[0.2em] uppercase px-1.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/25 leading-none whitespace-nowrap">
-                            Black Card
+                        {season && season.points > 0 && (
+                          <span className="inline-flex items-center text-amber-400 text-[9px] font-bold tracking-[0.2em] uppercase px-1.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/25 leading-none whitespace-nowrap tabular-nums">
+                            {season.points.toLocaleString()} PTS
                           </span>
                         )}
                       </div>
@@ -227,6 +247,44 @@ export default function Navbar({ onMenuClick, activeFightNight = null }: NavbarP
                         onNavigate={() => setIsUserMenuOpen(false)}
                       />
                     )}
+
+                    {/* Your season — all-time standing, always present so the
+                        fan-game identity shows even between events. */}
+                    <div className="px-4 py-3 border-b border-white/5">
+                      <p className="text-amber-400 text-[9px] font-bold tracking-[0.25em] uppercase mb-1.5">
+                        Your Season
+                      </p>
+                      {season && (season.points > 0 || (season.eventsPlayed || 0) > 0) ? (
+                        <>
+                          <p className="text-white/75 text-[11px] font-medium leading-relaxed mb-2 tabular-nums">
+                            {(season.points || 0).toLocaleString()} pts · {season.eventsPlayed || 0}{" "}
+                            {(season.eventsPlayed || 0) === 1 ? "night" : "nights"} all-time
+                          </p>
+                          <Link
+                            href="/leaderboard"
+                            onClick={() => setIsUserMenuOpen(false)}
+                            className="inline-flex items-center gap-1 text-white/75 text-[11px] font-semibold tracking-wide hover:text-amber-400 transition-colors"
+                          >
+                            View leaderboard
+                            <ArrowUpRight className="w-3 h-3" strokeWidth={2.25} />
+                          </Link>
+                        </>
+                      ) : (
+                        <>
+                          <p className="text-white/55 text-[11px] font-medium leading-relaxed mb-2">
+                            Play a fight night to climb the all-time board.
+                          </p>
+                          <Link
+                            href="/fight-nights"
+                            onClick={() => setIsUserMenuOpen(false)}
+                            className="inline-flex items-center gap-1 text-white/75 text-[11px] font-semibold tracking-wide hover:text-amber-400 transition-colors"
+                          >
+                            Find a fight night
+                            <ArrowUpRight className="w-3 h-3" strokeWidth={2.25} />
+                          </Link>
+                        </>
+                      )}
+                    </div>
 
                     {/* Notifications */}
                     <div className="px-4 py-2.5 border-b border-white/5 flex items-center justify-between">
@@ -357,7 +415,7 @@ function TonightPanel({
       )}
 
       <Link
-        href="/fight-nights"
+        href={`/fight-nights/${fightNight.slug || fightNight.id}`}
         onClick={onNavigate}
         className="inline-flex items-center gap-1 text-white/75 text-[11px] font-semibold tracking-wide hover:text-amber-400 transition-colors"
       >
