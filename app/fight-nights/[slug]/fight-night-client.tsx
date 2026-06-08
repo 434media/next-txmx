@@ -186,11 +186,14 @@ export default function FightNightClient({ fightNight, bouts, flyerUrl }: FightN
         {flyerUrl && (
           <div className="relative w-12 h-16 sm:w-14 sm:h-18 shrink-0 rounded-md overflow-hidden border border-neutral-200 bg-neutral-100">
             {/* eslint-disable-next-line @next/next/no-img-element */}
+            {/* Inline styles beat the global `img { height: auto }` rule so the
+                poster actually fills the thumbnail (same pattern as HeroFeatured). */}
             <img
               src={flyerUrl}
               alt=""
               aria-hidden
-              className="absolute inset-0 w-full h-full object-cover"
+              className="absolute inset-0"
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
             />
           </div>
         )}

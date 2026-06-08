@@ -58,6 +58,21 @@ export interface FightNightBout {
   fighter1Gym: string
   fighter2Name: string
   fighter2Gym: string
+  /** Snapshot of the linked fighter records — set in admin when a fighter is
+   *  picked from the database — so the public card can show portraits + records
+   *  without a per-bout join on the live read path. Empty for free-text bouts. */
+  fighter1Id?: string
+  fighter1Slug?: string
+  fighter1Nickname?: string
+  fighter1PhotoUrl?: string
+  fighter1Record?: string
+  fighter1Kos?: number
+  fighter2Id?: string
+  fighter2Slug?: string
+  fighter2Nickname?: string
+  fighter2PhotoUrl?: string
+  fighter2Record?: string
+  fighter2Kos?: number
   weightClass: string
   /** Whether this bout is the main event */
   isMainEvent: boolean
@@ -359,6 +374,18 @@ function mapBout(doc: FirebaseFirestore.DocumentSnapshot): FightNightBout {
     fighter1Gym: data.fighter1Gym || '',
     fighter2Name: data.fighter2Name || '',
     fighter2Gym: data.fighter2Gym || '',
+    fighter1Id: data.fighter1Id || '',
+    fighter1Slug: data.fighter1Slug || '',
+    fighter1Nickname: data.fighter1Nickname || '',
+    fighter1PhotoUrl: data.fighter1PhotoUrl || '',
+    fighter1Record: data.fighter1Record || '',
+    fighter1Kos: typeof data.fighter1Kos === 'number' ? data.fighter1Kos : 0,
+    fighter2Id: data.fighter2Id || '',
+    fighter2Slug: data.fighter2Slug || '',
+    fighter2Nickname: data.fighter2Nickname || '',
+    fighter2PhotoUrl: data.fighter2PhotoUrl || '',
+    fighter2Record: data.fighter2Record || '',
+    fighter2Kos: typeof data.fighter2Kos === 'number' ? data.fighter2Kos : 0,
     weightClass: data.weightClass || '',
     isMainEvent: data.isMainEvent === true,
     status: (data.status as FightNightBout['status']) || 'scheduled',
@@ -397,6 +424,18 @@ export async function upsertBout(
       fighter1Gym: '',
       fighter2Name: '',
       fighter2Gym: '',
+      fighter1Id: '',
+      fighter1Slug: '',
+      fighter1Nickname: '',
+      fighter1PhotoUrl: '',
+      fighter1Record: '',
+      fighter1Kos: 0,
+      fighter2Id: '',
+      fighter2Slug: '',
+      fighter2Nickname: '',
+      fighter2PhotoUrl: '',
+      fighter2Record: '',
+      fighter2Kos: 0,
       weightClass: '',
       isMainEvent: false,
       status: 'scheduled' as const,

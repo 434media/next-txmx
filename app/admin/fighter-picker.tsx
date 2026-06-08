@@ -8,6 +8,40 @@ import Combobox, { type ComboboxOption } from './combobox'
 export const fighterDisplayName = (f: Fighter) =>
   [f.firstName, f.lastName].filter(Boolean).join(' ').trim()
 
+/** The full snapshot of a picked fighter, written onto the bout so the public
+ *  card can show portraits + records without joining back to the fighter. */
+export interface FighterPick {
+  id: string
+  name: string
+  slug: string
+  nickname: string
+  gym: string
+  weightClass: string
+  photoUrl: string
+  record: string
+  kos: number
+}
+
+function recordString(f: Fighter): string {
+  const r = f.record
+  if (!r) return ''
+  return `${r.wins ?? 0}-${r.losses ?? 0}-${r.draws ?? 0}`
+}
+
+function snapshotOf(f: Fighter): FighterPick {
+  return {
+    id: f.id || '',
+    name: fighterDisplayName(f),
+    slug: f.slug || '',
+    nickname: f.nickname || '',
+    gym: f.gym || '',
+    weightClass: f.weightClass || '',
+    photoUrl: f.profileImageUrl || '',
+    record: recordString(f),
+    kos: f.record?.knockouts || 0,
+  }
+}
+
 const createBtn =
   'px-2.5 py-1 text-[11px] font-semibold text-gray-700 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50'
 
@@ -28,7 +62,7 @@ export default function FighterPicker({
 }: {
   fighters: Fighter[]
   value: string
-  onPick: (info: { name: string; gym: string; weightClass: string }) => void
+  onPick: (info: FighterPick) => void
   defaultGym?: string
   defaultWeightClass?: string
   onFightersChanged: () => void
@@ -45,11 +79,7 @@ export default function FighterPicker({
   function handleSelect(id: string) {
     const f = fighters.find((x) => x.id === id)
     if (!f) return
-    onPick({
-      name: fighterDisplayName(f),
-      gym: f.gym || '',
-      weightClass: f.weightClass || '',
-    })
+    onPick(snapshotOf(f))
   }
 
   async function handleCreate(sex: 'male' | 'female', name: string, close: () => void) {
@@ -63,7 +93,17 @@ export default function FighterPicker({
         gym: defaultGym,
         weightClass: defaultWeightClass,
       })
-      onPick({ name, gym: defaultGym || '', weightClass: defaultWeightClass || '' })
+      onPick({
+        id: '',
+        name,
+        slug: '',
+        nickname: '',
+        gym: defaultGym || '',
+        weightClass: defaultWeightClass || '',
+        photoUrl: '',
+        record: '',
+        kos: 0,
+      })
       onFightersChanged()
       close()
     } finally {

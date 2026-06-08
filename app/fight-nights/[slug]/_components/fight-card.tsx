@@ -202,7 +202,7 @@ export default function FightCard({ fightNightId, initialBouts }: FightCardProps
             <div
               key={bout.boutNumber}
               data-bout-anchor={bout.boutNumber}
-              className="snap-start shrink-0 w-[88vw] sm:w-[380px] scroll-mt-32"
+              className="snap-start shrink-0 w-[88vw] sm:w-[380px] scroll-mt-32 min-h-[60dvh] flex"
             >
               <BoutCard
                 fightNightId={fightNightId}
@@ -303,7 +303,7 @@ function BoutCard({
 
   return (
     <div
-      className={`border rounded-xl overflow-hidden transition-colors ${
+      className={`w-full flex flex-col border rounded-xl overflow-hidden transition-colors ${
         isCompleted && userWon
           ? "border-emerald-200 bg-emerald-50"
           : isCompleted && pick && !userWon
@@ -348,72 +348,44 @@ function BoutCard({
         )}
       </div>
 
-      {/* Fighter buttons */}
-      <div className="grid grid-cols-2 divide-x divide-neutral-200">
-        <button
+      {/* Matchup — portraits + records, whole cell taps to pick. The portrait
+          band grows to fill the taller mobile carousel card (big imagery, no
+          dead space); a min-height keeps it substantial in the desktop grid. */}
+      <div className="relative flex divide-x divide-neutral-200 flex-1">
+        <FighterCell
+          corner="red"
+          name={bout.fighter1Name}
+          nickname={bout.fighter1Nickname}
+          photoUrl={bout.fighter1PhotoUrl}
+          record={bout.fighter1Record}
+          kos={bout.fighter1Kos}
+          gym={bout.fighter1Gym}
+          selected={f1Selected}
+          won={f1Won}
+          dim={isCompleted && !!bout.winnerCorner && bout.winnerCorner !== "fighter1"}
+          locked={isLocked}
+          submitting={submitting === "fighter1"}
           onClick={() => handlePick("fighter1")}
-          disabled={isLocked || !!submitting}
-          className={`text-left px-4 py-4 transition-all relative ${
-            f1Selected && f1Won
-              ? "bg-emerald-100"
-              : f1Selected
-                ? "bg-neutral-100 ring-2 ring-inset ring-neutral-900"
-                : f1Won
-                  ? "bg-emerald-50"
-                  : isLocked
-                    ? "opacity-60"
-                    : "hover:bg-neutral-100 cursor-pointer"
-          } ${submitting === "fighter1" ? "opacity-50" : ""}`}
-        >
-          {f1Selected && (
-            <span className="absolute top-2 right-2 text-amber-600 text-[9px] font-bold tracking-wider uppercase">
-              · Your Pick
-            </span>
-          )}
-          <p className="text-neutral-400 text-[10px] font-bold tracking-wider uppercase mb-1">
-            Red Corner
-          </p>
-          <p className={`text-base font-bold leading-tight ${f1Won ? "text-emerald-600" : "text-neutral-900"} truncate`}>
-            {bout.fighter1Name || "TBA"}
-          </p>
-          {bout.fighter1Gym && (
-            <p className="text-neutral-400 text-xs font-medium leading-5 truncate mt-0.5">
-              {bout.fighter1Gym}
-            </p>
-          )}
-        </button>
-        <button
+        />
+        <FighterCell
+          corner="blue"
+          name={bout.fighter2Name}
+          nickname={bout.fighter2Nickname}
+          photoUrl={bout.fighter2PhotoUrl}
+          record={bout.fighter2Record}
+          kos={bout.fighter2Kos}
+          gym={bout.fighter2Gym}
+          selected={f2Selected}
+          won={f2Won}
+          dim={isCompleted && !!bout.winnerCorner && bout.winnerCorner !== "fighter2"}
+          locked={isLocked}
+          submitting={submitting === "fighter2"}
           onClick={() => handlePick("fighter2")}
-          disabled={isLocked || !!submitting}
-          className={`text-left px-4 py-4 transition-all relative ${
-            f2Selected && f2Won
-              ? "bg-emerald-100"
-              : f2Selected
-                ? "bg-neutral-100 ring-2 ring-inset ring-neutral-900"
-                : f2Won
-                  ? "bg-emerald-50"
-                  : isLocked
-                    ? "opacity-60"
-                    : "hover:bg-neutral-100 cursor-pointer"
-          } ${submitting === "fighter2" ? "opacity-50" : ""}`}
-        >
-          {f2Selected && (
-            <span className="absolute top-2 right-2 text-amber-600 text-[9px] font-bold tracking-wider uppercase">
-              · Your Pick
-            </span>
-          )}
-          <p className="text-neutral-400 text-[10px] font-bold tracking-wider uppercase mb-1">
-            Blue Corner
-          </p>
-          <p className={`text-base font-bold leading-tight ${f2Won ? "text-emerald-600" : "text-neutral-900"} truncate`}>
-            {bout.fighter2Name || "TBA"}
-          </p>
-          {bout.fighter2Gym && (
-            <p className="text-neutral-400 text-xs font-medium leading-5 truncate mt-0.5">
-              {bout.fighter2Gym}
-            </p>
-          )}
-        </button>
+        />
+        {/* Center VS — sits on the divider, in the portrait band. */}
+        <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-neutral-900 text-white border-2 border-white shadow-md flex items-center justify-center text-[11px] font-black tracking-wider pointer-events-none">
+          VS
+        </span>
       </div>
 
       {/* Footer status */}
@@ -452,6 +424,123 @@ function BoutCard({
         </div>
       )}
     </div>
+  )
+}
+
+// One fighter in a bout — a tappable cell with a portrait, name, nickname,
+// record, and gym. The portrait fills the band (object-cover, beating the
+// global `img { height:auto }` rule via inline styles); no photo → a monogram.
+function FighterCell({
+  corner,
+  name,
+  nickname,
+  photoUrl,
+  record,
+  kos,
+  gym,
+  selected,
+  won,
+  dim,
+  locked,
+  submitting,
+  onClick,
+}: {
+  corner: "red" | "blue"
+  name: string
+  nickname?: string
+  photoUrl?: string
+  record?: string
+  kos?: number
+  gym?: string
+  selected: boolean
+  won: boolean
+  dim: boolean
+  locked: boolean
+  submitting: boolean
+  onClick: () => void
+}) {
+  const initial = (name?.trim() || "?")[0].toUpperCase()
+  const cornerDot = corner === "red" ? "bg-red-500" : "bg-blue-500"
+  const cornerLabel = corner === "red" ? "Red Corner" : "Blue Corner"
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={locked || submitting}
+      className={`relative flex-1 min-w-0 flex flex-col text-left transition-all ${
+        selected && won
+          ? "bg-emerald-100"
+          : selected
+            ? "bg-neutral-100 ring-2 ring-inset ring-neutral-900"
+            : won
+              ? "bg-emerald-50"
+              : dim
+                ? "opacity-60"
+                : locked
+                  ? ""
+                  : "hover:bg-neutral-100 cursor-pointer"
+      } ${submitting ? "opacity-50" : ""}`}
+    >
+      {selected && (
+        <span className="absolute top-2 right-2 z-10 text-amber-600 text-[9px] font-bold tracking-wider uppercase">
+          · Your Pick
+        </span>
+      )}
+
+      {/* Portrait */}
+      <div className="relative flex-1 min-h-40 bg-neutral-100 overflow-hidden">
+        {photoUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={photoUrl}
+            alt={name || ""}
+            referrerPolicy="no-referrer"
+            className="absolute inset-0"
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center bg-linear-to-br from-neutral-100 to-neutral-200">
+            <span className="text-neutral-300 text-5xl font-black">{initial}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Info — fixed height so a fighter with more fields (gym, nickname)
+          doesn't shrink its portrait relative to the other corner; both cells
+          then keep equal images and equal content sections. */}
+      <div className="px-3 py-3 h-32 overflow-hidden">
+        <p className="flex items-center gap-1.5 mb-1">
+          <span className={`inline-block w-1.5 h-1.5 rounded-full ${cornerDot}`} />
+          <span className="text-neutral-400 text-[10px] font-bold tracking-wider uppercase">
+            {cornerLabel}
+          </span>
+        </p>
+        <p
+          className={`text-base font-bold leading-tight truncate ${
+            won ? "text-emerald-600" : "text-neutral-900"
+          }`}
+        >
+          {name || "TBA"}
+        </p>
+        {nickname && (
+          <p className="text-neutral-500 text-xs font-medium italic leading-snug truncate">
+            &ldquo;{nickname}&rdquo;
+          </p>
+        )}
+        {record && (
+          <p className="text-neutral-600 text-xs font-semibold tabular-nums mt-1">
+            {record}
+            {kos ? ` · ${kos} KO` : ""}
+          </p>
+        )}
+        {gym && (
+          <p className="text-neutral-400 text-[11px] font-medium leading-5 truncate mt-0.5">
+            {gym}
+          </p>
+        )}
+      </div>
+    </button>
   )
 }
 

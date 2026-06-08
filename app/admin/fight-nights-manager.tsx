@@ -2224,18 +2224,21 @@ function BoutsPanel({ fightNight }: { fightNight: FightNight }) {
     await load()
   }
 
-  // Reorder by swapping the `order` of two adjacent bouts (bouts is already
-  // sorted by order). boutNumber — the picks/props key — never changes.
-  async function handleMove(boutNumber: number, dir: -1 | 1) {
-    const i = bouts.findIndex((b) => b.boutNumber === boutNumber)
-    const j = i + dir
-    if (i < 0 || j < 0 || j >= bouts.length) return
-    const a = bouts[i]
-    const b = bouts[j]
-    await Promise.all([
-      upsertBout(fightNight.id, a.boutNumber, { order: b.order }),
-      upsertBout(fightNight.id, b.boutNumber, { order: a.order }),
-    ])
+  // Drag-to-reorder. boutNumber — the picks/props key — never changes; only the
+  // display `order` is rewritten to the new positions.
+  const [dragIndex, setDragIndex] = useState<number | null>(null)
+  const [overIndex, setOverIndex] = useState<number | null>(null)
+
+  async function handleReorder(from: number, to: number) {
+    if (from === to) return
+    const next = [...bouts]
+    const [moved] = next.splice(from, 1)
+    next.splice(to, 0, moved)
+    const reordered = next.map((b, idx) => ({ ...b, order: idx + 1 }))
+    setBouts(reordered) // optimistic — snap into place immediately
+    await Promise.all(
+      reordered.map((b) => upsertBout(fightNight.id, b.boutNumber, { order: b.order }))
+    )
     await load()
   }
 
@@ -2271,9 +2274,20 @@ function BoutsPanel({ fightNight }: { fightNight: FightNight }) {
               onFightersChanged={loadFighters}
               onGymsChanged={loadGyms}
               defaultEdit={bout.boutNumber === openBout}
-              onMove={handleMove}
-              isFirst={index === 0}
-              isLast={index === bouts.length - 1}
+              index={index}
+              dragging={dragIndex === index}
+              dropTarget={overIndex === index && dragIndex !== null && dragIndex !== index}
+              onDragStart={() => setDragIndex(index)}
+              onDragEnter={() => setOverIndex(index)}
+              onDrop={() => {
+                if (dragIndex !== null) handleReorder(dragIndex, index)
+                setDragIndex(null)
+                setOverIndex(null)
+              }}
+              onDragEnd={() => {
+                setDragIndex(null)
+                setOverIndex(null)
+              }}
               onChange={load}
             />
           ))}
@@ -2291,9 +2305,13 @@ function BoutRow({
   onFightersChanged,
   onGymsChanged,
   defaultEdit = false,
-  onMove,
-  isFirst,
-  isLast,
+  index,
+  dragging,
+  dropTarget,
+  onDragStart,
+  onDragEnter,
+  onDrop,
+  onDragEnd,
   onChange,
 }: {
   fightNightId: string
@@ -2303,17 +2321,33 @@ function BoutRow({
   onFightersChanged: () => void
   onGymsChanged: () => void
   defaultEdit?: boolean
-  onMove: (boutNumber: number, dir: -1 | 1) => void
-  isFirst: boolean
-  isLast: boolean
+  index: number
+  dragging: boolean
+  dropTarget: boolean
+  onDragStart: () => void
+  onDragEnter: () => void
+  onDrop: () => void
+  onDragEnd: () => void
   onChange: () => void
 }) {
   const [edit, setEdit] = useState(defaultEdit)
   const [data, setData] = useState({
     fighter1Name: bout.fighter1Name,
     fighter1Gym: bout.fighter1Gym,
+    fighter1Id: bout.fighter1Id || "",
+    fighter1Slug: bout.fighter1Slug || "",
+    fighter1Nickname: bout.fighter1Nickname || "",
+    fighter1PhotoUrl: bout.fighter1PhotoUrl || "",
+    fighter1Record: bout.fighter1Record || "",
+    fighter1Kos: bout.fighter1Kos || 0,
     fighter2Name: bout.fighter2Name,
     fighter2Gym: bout.fighter2Gym,
+    fighter2Id: bout.fighter2Id || "",
+    fighter2Slug: bout.fighter2Slug || "",
+    fighter2Nickname: bout.fighter2Nickname || "",
+    fighter2PhotoUrl: bout.fighter2PhotoUrl || "",
+    fighter2Record: bout.fighter2Record || "",
+    fighter2Kos: bout.fighter2Kos || 0,
     weightClass: bout.weightClass,
     isMainEvent: bout.isMainEvent,
   })
@@ -2358,8 +2392,45 @@ function BoutRow({
 
   if (!edit) {
     return (
-      <div className="border border-gray-100 rounded-lg px-3 py-2 flex items-center gap-3">
+      <div
+        onDragOver={(e) => e.preventDefault()}
+        onDragEnter={onDragEnter}
+        onDrop={(e) => {
+          e.preventDefault()
+          onDrop()
+        }}
+        className={`rounded-lg px-3 py-2 flex items-center gap-3 transition-all border ${
+          dragging ? "opacity-40" : ""
+        } ${dropTarget ? "border-gray-900 ring-1 ring-gray-900" : "border-gray-100"}`}
+      >
+        <span
+          draggable
+          onDragStart={(e) => {
+            e.dataTransfer.effectAllowed = "move"
+            e.dataTransfer.setData("text/plain", String(index))
+            onDragStart()
+          }}
+          onDragEnd={onDragEnd}
+          aria-label="Drag to reorder"
+          title="Drag to reorder"
+          className="cursor-grab active:cursor-grabbing text-gray-300 hover:text-gray-600 -ml-1 select-none"
+        >
+          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+            <circle cx="9" cy="6" r="1.4" />
+            <circle cx="15" cy="6" r="1.4" />
+            <circle cx="9" cy="12" r="1.4" />
+            <circle cx="15" cy="12" r="1.4" />
+            <circle cx="9" cy="18" r="1.4" />
+            <circle cx="15" cy="18" r="1.4" />
+          </svg>
+        </span>
         <span className="text-[10px] font-mono text-gray-300 w-6">#{bout.boutNumber}</span>
+        {(bout.fighter1Name || bout.fighter2Name) && (
+          <div className="flex -space-x-1.5 shrink-0">
+            <FighterAvatar url={bout.fighter1PhotoUrl} name={bout.fighter1Name} className="w-7 h-7 text-[11px] ring-1 ring-white" rounded="rounded-full" />
+            <FighterAvatar url={bout.fighter2PhotoUrl} name={bout.fighter2Name} className="w-7 h-7 text-[11px] ring-1 ring-white" rounded="rounded-full" />
+          </div>
+        )}
         <div className="flex-1 min-w-0">
           <p className="text-[12px] text-gray-800 truncate">
             <span className="font-semibold">{bout.fighter1Name || "TBA"}</span>
@@ -2384,30 +2455,6 @@ function BoutRow({
         >
           {bout.status}
         </span>
-        <div className="flex flex-col -my-1">
-          <button
-            type="button"
-            onClick={() => onMove(bout.boutNumber, -1)}
-            disabled={isFirst}
-            aria-label="Move up"
-            className="text-gray-300 hover:text-gray-700 disabled:opacity-30 disabled:hover:text-gray-300 leading-none transition-colors"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
-            </svg>
-          </button>
-          <button
-            type="button"
-            onClick={() => onMove(bout.boutNumber, 1)}
-            disabled={isLast}
-            aria-label="Move down"
-            className="text-gray-300 hover:text-gray-700 disabled:opacity-30 disabled:hover:text-gray-300 leading-none transition-colors"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-        </div>
         <button
           onClick={() => setEdit(true)}
           className="text-[10px] text-gray-400 hover:text-gray-900 px-1.5 py-1"
@@ -2435,12 +2482,18 @@ function BoutRow({
           <FighterPicker
             fighters={fighters}
             value={data.fighter1Name}
-            onPick={({ name, gym, weightClass }) =>
+            onPick={(p) =>
               setData((d) => ({
                 ...d,
-                fighter1Name: name,
-                fighter1Gym: gym || d.fighter1Gym,
-                weightClass: weightClass || d.weightClass,
+                fighter1Name: p.name,
+                fighter1Gym: p.gym || d.fighter1Gym,
+                fighter1Id: p.id,
+                fighter1Slug: p.slug,
+                fighter1Nickname: p.nickname,
+                fighter1PhotoUrl: p.photoUrl,
+                fighter1Record: p.record,
+                fighter1Kos: p.kos,
+                weightClass: p.weightClass || d.weightClass,
               }))
             }
             defaultGym={data.fighter1Gym}
@@ -2462,12 +2515,18 @@ function BoutRow({
           <FighterPicker
             fighters={fighters}
             value={data.fighter2Name}
-            onPick={({ name, gym, weightClass }) =>
+            onPick={(p) =>
               setData((d) => ({
                 ...d,
-                fighter2Name: name,
-                fighter2Gym: gym || d.fighter2Gym,
-                weightClass: weightClass || d.weightClass,
+                fighter2Name: p.name,
+                fighter2Gym: p.gym || d.fighter2Gym,
+                fighter2Id: p.id,
+                fighter2Slug: p.slug,
+                fighter2Nickname: p.nickname,
+                fighter2PhotoUrl: p.photoUrl,
+                fighter2Record: p.record,
+                fighter2Kos: p.kos,
+                weightClass: p.weightClass || d.weightClass,
               }))
             }
             defaultGym={data.fighter2Gym}
@@ -2505,6 +2564,35 @@ function BoutRow({
           </label>
         </div>
       </div>
+
+      {/* Card preview — exactly what the fan sees on the slug, so the admin can
+          confirm the linked fighter and spot a fighter that still needs a photo. */}
+      <div className="mb-3">
+        <p className="text-[10px] font-semibold text-gray-400 tracking-[0.15em] mb-1.5">
+          CARD PREVIEW
+        </p>
+        <div className="grid grid-cols-2 gap-2">
+          <FighterMini
+            corner="red"
+            name={data.fighter1Name}
+            nickname={data.fighter1Nickname}
+            photoUrl={data.fighter1PhotoUrl}
+            record={data.fighter1Record}
+            kos={data.fighter1Kos}
+            gym={data.fighter1Gym}
+          />
+          <FighterMini
+            corner="blue"
+            name={data.fighter2Name}
+            nickname={data.fighter2Nickname}
+            photoUrl={data.fighter2PhotoUrl}
+            record={data.fighter2Record}
+            kos={data.fighter2Kos}
+            gym={data.fighter2Gym}
+          />
+        </div>
+      </div>
+
       <div className="flex items-center gap-2">
         <button
           onClick={handleSave}
@@ -2521,6 +2609,94 @@ function BoutRow({
         </button>
         {!canSave && (
           <span className="text-[10px] text-gray-400">Both fighters are required</span>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// Small fighter portrait. Inline styles beat the global `img { height:auto }`
+// rule so it fills; no photo → a monogram. Shared by the bout preview + row.
+function FighterAvatar({
+  url,
+  name,
+  className = "",
+  rounded = "rounded",
+}: {
+  url?: string
+  name: string
+  className?: string
+  rounded?: string
+}) {
+  const initial = (name?.trim() || "?")[0].toUpperCase()
+  return (
+    <div
+      className={`relative shrink-0 overflow-hidden bg-gray-100 border border-gray-200 ${rounded} ${className}`}
+    >
+      {url ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={url}
+          alt=""
+          className="absolute inset-0"
+          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+        />
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center text-gray-300 font-black">
+          {initial}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// Bout-card mini profile shown in the admin BoutRow edit form — mirrors the
+// public FighterCell so the admin sees exactly what the fan will see, and flags
+// a linked fighter that has no image yet ("Needs photo").
+function FighterMini({
+  corner,
+  name,
+  nickname,
+  photoUrl,
+  record,
+  kos,
+  gym,
+}: {
+  corner: "red" | "blue"
+  name: string
+  nickname?: string
+  photoUrl?: string
+  record?: string
+  kos?: number
+  gym?: string
+}) {
+  if (!name?.trim()) {
+    return (
+      <div className="flex items-center justify-center rounded-md border border-dashed border-gray-200 bg-white p-2 text-[11px] text-gray-300 min-h-[64px]">
+        Pick a fighter
+      </div>
+    )
+  }
+  const cornerDot = corner === "red" ? "bg-red-500" : "bg-blue-500"
+  return (
+    <div className="flex items-center gap-2.5 rounded-md border border-gray-200 bg-white p-2">
+      <FighterAvatar url={photoUrl} name={name} className="w-11 h-14 text-lg" />
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-1.5">
+          <span className={`inline-block w-1.5 h-1.5 rounded-full ${cornerDot}`} />
+          <p className="text-[12px] font-semibold text-gray-900 truncate">{name}</p>
+        </div>
+        {nickname && (
+          <p className="text-[11px] text-gray-500 italic truncate">&ldquo;{nickname}&rdquo;</p>
+        )}
+        <p className="text-[11px] text-gray-500 tabular-nums truncate">
+          {record ? `${record}${kos ? ` · ${kos} KO` : ""}` : "No record"}
+          {gym ? ` · ${gym}` : ""}
+        </p>
+        {!photoUrl && (
+          <span className="inline-flex items-center mt-1 text-[9px] font-bold tracking-wider uppercase text-amber-700 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5">
+            Needs photo
+          </span>
         )}
       </div>
     </div>

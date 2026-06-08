@@ -120,11 +120,12 @@ export default function Carousel({
         <ChevronRight className="w-4 h-4" strokeWidth={2.5} />
       </button>
 
-      {/* Right-edge fade — only when more content to the right */}
+      {/* Right-edge fade — desktop only (paired with the arrow buttons). Hidden
+          on mobile, where it read as a blur over the swipeable cards. */}
       {canScrollRight && (
         <div
           aria-hidden
-          className="pointer-events-none absolute right-0 top-0 bottom-4 w-12 bg-linear-to-l from-white to-transparent z-10"
+          className="hidden lg:block pointer-events-none absolute right-0 top-0 bottom-4 w-12 bg-linear-to-l from-white to-transparent z-10"
         />
       )}
 
