@@ -1,8 +1,6 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { useAuth } from "../lib/auth-context"
-import { awardShareCredits } from "../app/actions/sharing"
 
 interface ShareButtonProps {
   url: string
@@ -11,11 +9,14 @@ interface ShareButtonProps {
   variant?: "default" | "compact"
 }
 
+/**
+ * Social-share dropdown (X / Facebook / LinkedIn / copy / native share). Pure
+ * sharing UI — no account/economy coupling.
+ */
 export default function ShareButton({ url, title, text, variant = "default" }: ShareButtonProps) {
   const [open, setOpen] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
   const ref = useRef<HTMLDivElement>(null)
-  const { user } = useAuth()
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -32,23 +33,10 @@ export default function ShareButton({ url, title, text, variant = "default" }: S
     setTimeout(() => setToast(null), 2500)
   }
 
-  const awardTC = async (platform: string) => {
-    if (!user) return
-    try {
-      const result = await awardShareCredits(user.uid, platform, url)
-      if (result.awarded) {
-        showToast(`+20 TC earned for sharing!`)
-      }
-    } catch {
-      // Silently fail — sharing itself is the primary action
-    }
-  }
-
   const handleCopyUrl = async () => {
     try {
       await navigator.clipboard.writeText(url)
       showToast("Link copied!")
-      awardTC("copy")
       setOpen(false)
     } catch {
       showToast("Couldn't copy link")
@@ -70,16 +58,14 @@ export default function ShareButton({ url, title, text, variant = "default" }: S
     }
     if (shareUrl) {
       window.open(shareUrl, "_blank", "width=600,height=400,noopener,noreferrer")
-      awardTC(platform)
       setOpen(false)
     }
   }
 
   const handleNativeShare = async () => {
-    if (!navigator.share) return
+    if (typeof navigator.share !== "function") return
     try {
       await navigator.share({ title, text, url })
-      awardTC("native")
       setOpen(false)
     } catch {
       // User cancelled
@@ -91,7 +77,13 @@ export default function ShareButton({ url, title, text, variant = "default" }: S
   return (
     <div ref={ref} className="relative inline-block">
       <button
-        onClick={() => setOpen(!open)}
+        onClick={() => {
+          if (isCompact && typeof navigator.share === "function") {
+            handleNativeShare()
+          } else {
+            setOpen(!open)
+          }
+        }}
         className={
           isCompact
             ? "flex items-center gap-1.5 text-white/50 hover:text-white/70 transition-colors p-1.5"
@@ -99,7 +91,7 @@ export default function ShareButton({ url, title, text, variant = "default" }: S
         }
         aria-label="Share"
       >
-        <svg className={isCompact ? "w-4 h-4" : "w-4 h-4"} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
         </svg>
         {!isCompact && "Share"}
@@ -128,14 +120,6 @@ export default function ShareButton({ url, title, text, variant = "default" }: S
               Copy Link
             </button>
           </div>
-
-          {user && (
-            <div className="border-t border-white/10 px-3 py-2">
-              <p className="text-emerald-400/70 text-[10px] font-semibold tracking-wider">
-                +20 TC PER SHARE
-              </p>
-            </div>
-          )}
         </div>
       )}
 

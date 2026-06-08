@@ -15,7 +15,6 @@ import { AuthProvider } from "../lib/auth-context"
 import GlobalStyles from "../components/global-styles"
 import "./globals.css"
 import Footer from "../components/footer"
-import DailyLoginReward from "../components/daily-login-reward"
 import { Analytics } from "@vercel/analytics/next"
 import Script from "next/script"
 import type { FightNight } from "./actions/fightnight"
@@ -65,8 +64,6 @@ export default function ClientLayout({
     }
   }, [])
   const isAdmin = pathname?.startsWith('/admin')
-  const isFanos = pathname === '/fanos'
-  const isFightNight = pathname?.startsWith('/fight-nights')
 
   const openModal = () => setIsModalOpen(true)
   const closeModal = () => setIsModalOpen(false)
@@ -144,22 +141,18 @@ export default function ClientLayout({
 
         <AuthProvider>
           <GlobalStyles />
-          {!isFanos && <Navbar onMenuClick={openModal} onAuthClick={() => setIsAuthModalOpen(true)} activeFightNight={activeFightNight} />}
-          {!isFanos && !isAdmin && <LiveRibbon activeFightNight={activeFightNight} />}
-          {!isFanos && !isAdmin && <SettlementToasts activeFightNight={activeFightNight} />}
-          {!isFanos && !isAdmin && <NotificationPrompt activeFightNight={activeFightNight} />}
+          <Navbar onMenuClick={openModal} onAuthClick={() => setIsAuthModalOpen(true)} activeFightNight={activeFightNight} />
+          {!isAdmin && <LiveRibbon activeFightNight={activeFightNight} />}
+          {!isAdmin && <SettlementToasts activeFightNight={activeFightNight} />}
+          {!isAdmin && <NotificationPrompt activeFightNight={activeFightNight} />}
           {children}
-          {!isAdmin && !isFanos && <Footer />}
+          {!isAdmin && <Footer />}
           
           {/* Auth Modal */}
           <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
           
           {/* Universal Slide Out Modal */}
           <SlideOutModal isOpen={isModalOpen} onClose={closeModal} onAuthClick={() => { closeModal(); setIsAuthModalOpen(true) }} activeFightNight={activeFightNight} />
-          
-          {/* Daily Login Reward — suppressed on the fight night page so the
-              toast doesn't compete with the live game UI */}
-          {!isFanos && !isFightNight && <DailyLoginReward />}
         </AuthProvider>
       </body>
     </html>
