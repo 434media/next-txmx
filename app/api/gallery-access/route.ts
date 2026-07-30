@@ -6,7 +6,25 @@ import { firestore } from "../../../lib/firebase-admin"
  * collection (keyed by normalized email) with the RSVP flow: an existing RSVP
  * just gets its 8 Count subscription flag set; otherwise a new record is made.
  */
+
+/**
+ * DISABLED 2026-07-30. The only form capturing data on the public site is the
+ * newsletter (/api/newsletter). The gallery is open to everyone — this capture endpoint is closed.
+ * The handler below is left intact so this can be switched back on by deleting
+ * this guard.
+ */
+const ENDPOINT_DISABLED = true
+
+function disabledResponse() {
+  return NextResponse.json(
+    { error: "This form is no longer accepting submissions" },
+    { status: 410 },
+  )
+}
+
 export async function POST(request: Request) {
+  if (ENDPOINT_DISABLED) return disabledResponse()
+
   try {
     const { firstName, lastName, email, subscribeToNewsletter } = await request.json()
 

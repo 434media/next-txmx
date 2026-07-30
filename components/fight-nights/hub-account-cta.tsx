@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useAuth } from "../../lib/auth-context"
+import { FAN_ACCOUNTS_ENABLED } from "../../lib/feature-flags"
 import {
   getUserSeasonStanding,
   type SeasonStanding,
@@ -32,6 +33,10 @@ interface HubAccountCtaProps {
  * (account creation is event-independent — see SignUpForm). A live "join this
  * event" flow still lives on the per-event slug page; this is purely "get an
  * account so your picks and points follow you everywhere."
+ *
+ * While FAN_ACCOUNTS_ENABLED is false this renders AccountsOff instead — same
+ * band, no form. The `#join` anchor is kept either way so the hub's hero and
+ * FAQ CTAs still land somewhere real.
  */
 export default function HubAccountCta({ featured }: HubAccountCtaProps) {
   const { user, loading } = useAuth()
@@ -41,7 +46,9 @@ export default function HubAccountCta({ featured }: HubAccountCtaProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 overflow-hidden rounded-xl border border-neutral-200 bg-neutral-50 md:min-h-[460px]">
         {/* Content — left */}
         <div className="order-2 md:order-1 p-8 sm:p-10 flex flex-col justify-center">
-          {loading ? (
+          {!FAN_ACCOUNTS_ENABLED ? (
+            <AccountsOff featured={featured} />
+          ) : loading ? (
             <div className="h-[260px] rounded-xl border border-neutral-200 bg-neutral-100 animate-pulse" />
           ) : user ? (
             <SignedIn featured={featured} userId={user.uid} name={user.displayName} />
@@ -63,6 +70,47 @@ export default function HubAccountCta({ featured }: HubAccountCtaProps) {
         </div>
       </div>
     </Section>
+  )
+}
+
+// ── Accounts off: no form, just the card + leaderboard as read-only ──────────
+
+/**
+ * What the band shows while FAN_ACCOUNTS_ENABLED is false. No inputs, nothing
+ * captured — it points at the two things that stay fully public: the featured
+ * card and the all-time leaderboard.
+ */
+function AccountsOff({ featured }: { featured: FeaturedRef | null }) {
+  return (
+    <>
+      <Eyebrow tone="amber" mb="mb-3">
+        Fight Nights
+      </Eyebrow>
+      <h2 className="text-neutral-900 text-3xl sm:text-4xl font-black uppercase tracking-tight leading-[0.95] mb-3">
+        Follow every card.
+      </h2>
+      <p className="text-neutral-600 text-sm font-semibold leading-7 mb-7">
+        Fan sign-ups are closed for now. The full card, live results, and the
+        all-time leaderboard stay open to everyone — no account, nothing to
+        fill out.
+      </p>
+      <div className="flex flex-col sm:flex-row gap-3 self-start">
+        {featured && (
+          <Link
+            href={`/fight-nights/${featured.slug}`}
+            className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-amber-500 text-black text-xs font-bold tracking-[0.2em] uppercase rounded-md hover:bg-amber-400 transition-colors"
+          >
+            See the Card →
+          </Link>
+        )}
+        <Link
+          href="/leaderboard"
+          className="inline-flex items-center justify-center gap-2 px-6 py-3.5 border border-neutral-300 text-neutral-900 text-xs font-bold tracking-[0.2em] uppercase rounded-md hover:bg-neutral-100 transition-colors"
+        >
+          View Leaderboard →
+        </Link>
+      </div>
+    </>
   )
 }
 

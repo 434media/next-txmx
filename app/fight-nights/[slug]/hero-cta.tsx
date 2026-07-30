@@ -1,6 +1,7 @@
 "use client"
 
 import { useAuth } from "../../../lib/auth-context"
+import { FAN_ACCOUNTS_ENABLED } from "../../../lib/feature-flags"
 
 interface HeroCtaProps {
   /** Whether an active fight night exists. When null, no game is wired up yet
@@ -23,6 +24,29 @@ export default function HeroCta({ hasActiveEvent }: HeroCtaProps) {
   if (!hasActiveEvent) {
     return (
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+        <a
+          href="#how-it-works"
+          className="inline-flex items-center justify-center gap-2 px-6 py-3.5 border border-neutral-300 text-neutral-900 text-xs font-bold tracking-[0.2em] uppercase hover:border-neutral-400 hover:bg-neutral-100 transition-all rounded-md group"
+        >
+          How It Works
+          <ChevronIcon />
+        </a>
+      </div>
+    )
+  }
+
+  // Accounts off → there is no "#play" sign-up section to send anyone to, so
+  // the primary CTA points at the read-only card instead.
+  if (!FAN_ACCOUNTS_ENABLED) {
+    return (
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+        <a
+          href="#game"
+          className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-amber-500 text-black text-xs font-bold tracking-[0.2em] uppercase hover:bg-amber-400 transition-colors rounded-md group"
+        >
+          See Tonight's Card
+          <ArrowIcon />
+        </a>
         <a
           href="#how-it-works"
           className="inline-flex items-center justify-center gap-2 px-6 py-3.5 border border-neutral-300 text-neutral-900 text-xs font-bold tracking-[0.2em] uppercase hover:border-neutral-400 hover:bg-neutral-100 transition-all rounded-md group"

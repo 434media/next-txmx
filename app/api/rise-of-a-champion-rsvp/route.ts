@@ -5,7 +5,25 @@ import { firestore } from "../../../lib/firebase-admin"
  * Rise of a Champion RSVP capture → `txmx` Firestore (`iconicSeriesRsvps`,
  * deduped by normalized email — shared with the gallery-access flow).
  */
+
+/**
+ * DISABLED 2026-07-30. The only form capturing data on the public site is the
+ * newsletter (/api/newsletter). The Rise of a Champion RSVP form is retired.
+ * The handler below is left intact so this can be switched back on by deleting
+ * this guard.
+ */
+const ENDPOINT_DISABLED = true
+
+function disabledResponse() {
+  return NextResponse.json(
+    { error: "This form is no longer accepting submissions" },
+    { status: 410 },
+  )
+}
+
 export async function POST(request: Request) {
+  if (ENDPOINT_DISABLED) return disabledResponse()
+
   try {
     const { firstName, lastName, email, phone, invitedBy } = await request.json()
 

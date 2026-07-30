@@ -10,6 +10,7 @@ import {
 } from "@stripe/react-stripe-js"
 import { loadStripe } from "@stripe/stripe-js"
 import { useAuth } from "../../lib/auth-context"
+import { FAN_ACCOUNTS_ENABLED } from "../../lib/feature-flags"
 import { createSubscriptionIntent } from "../actions/stripe-subscribe"
 import AuthModal from "../../components/auth-modal"
 
@@ -86,6 +87,37 @@ function CheckoutForm() {
     },
     [stripe, elements, user, refreshProfile]
   )
+
+  // Checkout requires an account, and fan accounts are off — so there's no way
+  // in. The Stripe wiring below is left untouched; this just closes the door in
+  // place of the sign-in modal, so no card or auth details can be submitted.
+  if (!FAN_ACCOUNTS_ENABLED) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center px-4">
+        <div className="max-w-md w-full text-center space-y-4">
+          <div className="flex items-center justify-center gap-3">
+            <span className="inline-block w-2 h-2 bg-amber-500" />
+            <p className="text-amber-500 text-[10px] font-bold tracking-[0.25em] uppercase">
+              TXMX Boxing
+            </p>
+          </div>
+          <h2 className="text-white text-3xl font-black tracking-tight uppercase">
+            Memberships are closed
+          </h2>
+          <p className="text-white/50 text-sm font-medium leading-relaxed">
+            The Black Card isn&apos;t taking new signups right now. Fight nights,
+            results, and leaderboards are still open to everyone.
+          </p>
+          <a
+            href="/fight-nights"
+            className="inline-block text-black text-sm font-semibold tracking-widest uppercase bg-amber-500 hover:bg-amber-400 px-8 py-3 transition-colors"
+          >
+            See Fight Nights
+          </a>
+        </div>
+      </div>
+    )
+  }
 
   if (!user) {
     return (

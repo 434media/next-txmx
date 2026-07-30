@@ -4,15 +4,12 @@ import {
   getUpcomingFightNights,
   getPastFightNights,
   getLastCompletedFightNight,
-  getBouts,
 } from "../actions/fightnight"
 import { getSeasonStandings } from "../actions/season-standings"
 import { getStandings } from "../actions/fightnight-standings"
 import FightNightCard from "../../components/fight-nights/fight-night-card"
-import HubAccountCta from "../../components/fight-nights/hub-account-cta"
 import HowItWorks from "../../components/fight-nights/how-it-works"
 import IntroHero from "../../components/fight-nights/intro-hero"
-import HeroFeatured from "../../components/fight-nights/hero-featured"
 import RecapSpotlight from "../../components/fight-nights/recap-spotlight"
 import SeasonBoard from "../../components/fight-nights/season-board"
 import HubFaq from "../../components/fight-nights/hub-faq"
@@ -58,12 +55,8 @@ export default async function FightNightsHubPage() {
     ? (await getStandings(lastEvent.id, { limit: 1 }))[0] ?? null
     : null
 
-  // The featured night's card — surfaces the main event + matchups in the
-  // "Happening Next" band so the hub reads as an event page, not just a
-  // fan-game explainer. Empty when nothing is featured.
-  const featuredBouts = featured ? await getBouts(featured.id) : []
-
-  // Don't repeat the featured night in the calendar/archive grids.
+  // `featured` is no longer rendered as its own band — it's only used to keep
+  // the active night from repeating in the calendar/archive grids below.
   const upcoming = upcomingRaw.filter((f) => f.id !== featured?.id)
   const past = pastRaw.filter((f) => f.id !== featured?.id && f.id !== lastEvent?.id)
 
@@ -72,21 +65,18 @@ export default async function FightNightsHubPage() {
       {/* 1 — INTRO HERO: brand intro to the fan game (text left / video right). */}
       <IntroHero />
 
-      {/* 2 — HAPPENING NEXT: the featured event as a full-bleed image band. */}
-      <HeroFeatured featured={featured} bouts={featuredBouts} />
-
-      {/* 3 — HOW IT WORKS + scoring. */}
+      {/* 2 — HOW IT WORKS. */}
       <Section id="how-it-works">
         <HowItWorks variant="hub" />
       </Section>
 
-      {/* 4 — PROOF: last event recap + winner spotlight. */}
+      {/* 3 — PROOF: last event recap + winner spotlight. */}
       <RecapSpotlight event={lastEvent} winner={lastWinner} />
 
-      {/* 5 — COMPETITION: all-time board. */}
+      {/* 4 — COMPETITION: all-time board. */}
       <SeasonBoard leaders={leaders} />
 
-      {/* 6 — BROWSE: upcoming + past. */}
+      {/* 5 — BROWSE: upcoming + past. */}
       {(upcoming.length > 0 || past.length > 0) && (
         <Section className="space-y-14">
           {upcoming.length > 0 && (
@@ -113,16 +103,7 @@ export default async function FightNightsHubPage() {
         </Section>
       )}
 
-      {/* 7 — THE ASK: account on-ramp as a full-bleed band (renders its own section). */}
-      <HubAccountCta
-        featured={
-          featured
-            ? { slug: featured.slug, title: featured.title, status: featured.status }
-            : null
-        }
-      />
-
-      {/* 8 — FAQ: full-bleed band that closes the page + re-CTAs to #join. */}
+      {/* 6 — FAQ: full-bleed band that closes the page. */}
       <HubFaq />
     </main>
   )

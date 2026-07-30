@@ -6,9 +6,12 @@ import Link from "next/link"
 import { GALLERY_IMAGES, type GalleryImage, type GalleryCategory } from "../../../../lib/gallery-images"
 import GalleryUnlockForm from "../../../../components/gallery/gallery-unlock-form"
 import ImageModal from "../../../../components/gallery/image-modal"
+import { GALLERY_EMAIL_GATE_ENABLED } from "../../../../lib/feature-flags"
 
 export default function GalleryClient() {
-  const [isUnlocked, setIsUnlocked] = useState(false)
+  // Gate off → the gallery starts unlocked for everyone and the form below
+  // never renders. See lib/feature-flags.ts.
+  const [isUnlocked, setIsUnlocked] = useState(!GALLERY_EMAIL_GATE_ENABLED)
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState<GalleryCategory>("red-carpet")
@@ -17,26 +20,29 @@ export default function GalleryClient() {
   const [imageLoadingStates, setImageLoadingStates] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
-    // Check localStorage with 90-day expiration
-    const unlockData = localStorage.getItem("galleryUnlocked")
-    if (unlockData) {
-      try {
-        const { unlocked, timestamp } = JSON.parse(unlockData)
-        const now = Date.now()
-        const ninetyDaysInMs = 90 * 24 * 60 * 60 * 1000 // 90 days in milliseconds
-        
-        if (unlocked && timestamp && (now - timestamp < ninetyDaysInMs)) {
-          setIsUnlocked(true)
-        } else {
-          // Expired or invalid - clear localStorage
+    if (GALLERY_EMAIL_GATE_ENABLED) {
+      // Check localStorage with 90-day expiration
+      const unlockData = localStorage.getItem("galleryUnlocked")
+      if (unlockData) {
+        try {
+          const { unlocked, timestamp } = JSON.parse(unlockData)
+          const now = Date.now()
+          const ninetyDaysInMs = 90 * 24 * 60 * 60 * 1000 // 90 days in milliseconds
+
+          if (unlocked && timestamp && (now - timestamp < ninetyDaysInMs)) {
+            setIsUnlocked(true)
+          } else {
+            // Expired or invalid - clear localStorage
+            localStorage.removeItem("galleryUnlocked")
+          }
+        } catch {
+          // Invalid JSON - clear localStorage
           localStorage.removeItem("galleryUnlocked")
         }
-      } catch (err) {
-        // Invalid JSON - clear localStorage
-        localStorage.removeItem("galleryUnlocked")
       }
     }
-    
+
+
     // Fetch images from Google Drive API
     fetch('/api/gallery')
       .then(res => {

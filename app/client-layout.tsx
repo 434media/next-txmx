@@ -9,7 +9,6 @@ import Navbar from "../components/navbar"
 import LiveRibbon from "../components/live-ribbon"
 import SettlementToasts from "../components/settlement-toasts"
 import NotificationPrompt from "../components/notification-prompt"
-import AuthModal from "../components/auth-modal"
 import SlideOutModal from "../components/slide-out-modal"
 import { AuthProvider } from "../lib/auth-context"
 import GlobalStyles from "../components/global-styles"
@@ -54,7 +53,6 @@ export default function ClientLayout({
   activeFightNight = null,
 }: Readonly<ClientLayoutProps>) {
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const pathname = usePathname()
 
   // Register service worker for PWA + push notifications
@@ -135,18 +133,16 @@ export default function ClientLayout({
 
         <AuthProvider>
           <GlobalStyles />
-          <Navbar onMenuClick={openModal} onAuthClick={() => setIsAuthModalOpen(true)} activeFightNight={activeFightNight} />
+          <Navbar onMenuClick={openModal} activeFightNight={activeFightNight} />
           {!isAdmin && <LiveRibbon activeFightNight={activeFightNight} />}
           {!isAdmin && <SettlementToasts activeFightNight={activeFightNight} />}
           {!isAdmin && <NotificationPrompt activeFightNight={activeFightNight} />}
           {children}
           {!isAdmin && <Footer />}
-          
-          {/* Auth Modal */}
-          <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
-          
-          {/* Universal Slide Out Modal */}
-          <SlideOutModal isOpen={isModalOpen} onClose={closeModal} onAuthClick={() => { closeModal(); setIsAuthModalOpen(true) }} activeFightNight={activeFightNight} />
+
+          {/* Universal Slide Out Modal. No AuthModal is mounted — fan accounts
+              are off (lib/feature-flags.ts), so there is no sign-in entry point. */}
+          <SlideOutModal isOpen={isModalOpen} onClose={closeModal} activeFightNight={activeFightNight} />
         </AuthProvider>
       </body>
     </html>

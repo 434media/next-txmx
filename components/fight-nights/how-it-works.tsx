@@ -11,6 +11,7 @@ import {
   DEFAULT_PROP_POINTS,
   UNDERDOG_MULTIPLIER,
 } from "../../lib/scoring"
+import { FAN_ACCOUNTS_ENABLED } from "../../lib/feature-flags"
 import { Eyebrow } from "./section"
 
 type Variant = "hub" | "event"
@@ -58,9 +59,56 @@ const STEPS: Record<Variant, Step[]> = {
   ],
 }
 
+/**
+ * Copy used while FAN_ACCOUNTS_ENABLED is false. Nobody can sign up or make a
+ * pick, so the explainer describes what a visitor can actually do — follow the
+ * card and the board — instead of walking them into a form that isn't there.
+ */
+const STEPS_NO_ACCOUNT: Record<Variant, Step[]> = {
+  hub: [
+    {
+      step: "01",
+      title: "Find the Night",
+      desc: "Every TXMX fight night gets its own page here — the full card, the venue, and first bell. Nothing to sign up for.",
+    },
+    {
+      step: "02",
+      title: "Follow the Card",
+      desc: "Bouts flip to live and settle in real time as the night runs. Winners land on the card the moment they're called.",
+    },
+    {
+      step: "03",
+      title: "Watch the Board",
+      desc: "The all-time leaderboard from past fight nights stays open — see who's on top across every event.",
+    },
+  ],
+  event: [
+    {
+      step: "01",
+      title: "Open the Card",
+      desc: "Every bout on tonight's card is on this page, in order, with fighters and weight classes.",
+    },
+    {
+      step: "02",
+      title: "Follow It Live",
+      desc: "Bouts lock at the bell and settle as results come in. No refresh needed.",
+    },
+    {
+      step: "03",
+      title: "Watch the Board",
+      desc: "Tonight's leaderboard updates alongside the card. Free to follow, nothing to sign up for.",
+    },
+  ],
+}
+
 const INTRO: Record<Variant, string> = {
   hub: "The whole crowd plays in real time — online or in person, same leaderboard. Free to play.",
   event: "The whole crowd plays in real time. Online or in person — same leaderboard.",
+}
+
+const INTRO_NO_ACCOUNT: Record<Variant, string> = {
+  hub: "Fan picks are closed for now — the cards, results, and leaderboards stay open to everyone.",
+  event: "Fan picks are closed for now — follow the card and the board live, no account needed.",
 }
 
 const SCORING = [
@@ -75,26 +123,36 @@ const SCORING = [
 
 export default function HowItWorks({
   variant = "hub",
-  showScoring = variant === "hub",
+  showScoring = variant === "hub" && FAN_ACCOUNTS_ENABLED,
   id,
 }: {
   variant?: Variant
-  /** Show the "How Points Work" scoring strip. Defaults on for the hub. */
+  /** Show the "How Points Work" scoring strip. Defaults on for the hub, and
+   *  off entirely while fan accounts are disabled — nobody can earn points. */
   showScoring?: boolean
   /** Optional id for anchor targeting (e.g. the slug's "#how-it-works" CTA). */
   id?: string
 }) {
-  const steps = STEPS[variant]
+  const steps = FAN_ACCOUNTS_ENABLED ? STEPS[variant] : STEPS_NO_ACCOUNT[variant]
 
   return (
     <section id={id} className="scroll-mt-24">
       <Eyebrow tone="amber">How It Works</Eyebrow>
       <h2 className="text-neutral-900 text-3xl sm:text-4xl font-black uppercase tracking-tight leading-[0.95] mb-3">
-        Three steps to<br />
-        <span className="text-neutral-400">a shot at the prize.</span>
+        {FAN_ACCOUNTS_ENABLED ? (
+          <>
+            Three steps to<br />
+            <span className="text-neutral-400">a shot at the prize.</span>
+          </>
+        ) : (
+          <>
+            Three steps to<br />
+            <span className="text-neutral-400">following the night.</span>
+          </>
+        )}
       </h2>
       <p className="text-neutral-600 text-sm font-semibold leading-7 mb-10 max-w-lg">
-        {INTRO[variant]}
+        {FAN_ACCOUNTS_ENABLED ? INTRO[variant] : INTRO_NO_ACCOUNT[variant]}
       </p>
 
       {/* Steps */}

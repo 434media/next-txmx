@@ -8,13 +8,17 @@ import { ArrowLeftIcon } from "../components/icons/arrow-left-icon"
 import { Newsletter } from "./newsletter"
 import Image from "next/image"
 import { useAuth } from "../lib/auth-context"
+import { FAN_ACCOUNTS_ENABLED } from "../lib/feature-flags"
 import NotificationBell from "./notification-bell"
 import type { FightNight } from "../app/actions/fightnight"
 
 interface SlideOutModalProps {
   isOpen: boolean
   onClose: () => void
-  onAuthClick: () => void
+  /** Opens the sign-in modal. Omitted while fan accounts are off — nothing
+   *  mounts AuthModal, so the menu renders no sign-in button. Pass it again
+   *  (from app/client-layout.tsx) when FAN_ACCOUNTS_ENABLED goes back to true. */
+  onAuthClick?: () => void
   activeFightNight?: FightNight | null
 }
 
@@ -201,8 +205,9 @@ export default function SlideOutModal({ isOpen, onClose, onAuthClick, activeFigh
                 )}
               </div>
 
-              {/* Auth Section */}
-              {user ? (
+              {/* Auth Section. Hidden entirely while fan accounts are off —
+                  no sign-in button, and no account panel for a stale session. */}
+              {!FAN_ACCOUNTS_ENABLED ? null : user ? (
                 <div className="py-4 space-y-4">
                   {/* User info */}
                   <div className="flex items-center justify-between">
@@ -266,14 +271,16 @@ export default function SlideOutModal({ isOpen, onClose, onAuthClick, activeFigh
                   </button>
                 </div>
               ) : (
-                <div className="py-6">
-                  <button
-                    onClick={onAuthClick}
-                    className="w-full text-center text-black text-[11px] font-semibold tracking-widest uppercase bg-amber-500 hover:bg-amber-400 px-5 py-3 transition-colors"
-                  >
-                    SIGN IN
-                  </button>
-                </div>
+                onAuthClick && (
+                  <div className="py-6">
+                    <button
+                      onClick={onAuthClick}
+                      className="w-full text-center text-black text-[11px] font-semibold tracking-widest uppercase bg-amber-500 hover:bg-amber-400 px-5 py-3 transition-colors"
+                    >
+                      SIGN IN
+                    </button>
+                  </div>
+                )
               )}
             </div>
           </div>

@@ -14,6 +14,7 @@ import {
 } from "firebase/firestore"
 import { db } from "../lib/firebase-client"
 import { useAuth } from "../lib/auth-context"
+import { FAN_ACCOUNTS_ENABLED } from "../lib/feature-flags"
 import NotificationBell from "./notification-bell"
 import type { FightNight } from "../app/actions/fightnight"
 import type { FightNightStanding } from "../app/actions/fightnight-standings"
@@ -24,7 +25,6 @@ import {
 
 interface NavbarProps {
   onMenuClick: () => void
-  onAuthClick: () => void
   activeFightNight?: FightNight | null
 }
 
@@ -206,8 +206,10 @@ export default function Navbar({ onMenuClick, activeFightNight = null }: NavbarP
               )}
             </div>
 
-            {/* Auth */}
-            {!loading && user && (
+            {/* Auth. Gated on the flag as well as `user` so a stale persisted
+                Firebase session can't resurrect the account menu while fan
+                accounts are switched off. */}
+            {FAN_ACCOUNTS_ENABLED && !loading && user && (
               <div ref={userMenuRef} className="relative">
                 <button
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}

@@ -18,6 +18,10 @@ import Carousel from "./carousel"
 interface FightCardProps {
   fightNightId: string
   initialBouts: FightNightBout[]
+  /** Render the card as a spectator view: bouts, statuses, results and the
+   *  crowd meter still update live, but no corner is tappable and no pick can
+   *  be submitted. Used while fan accounts are off (lib/feature-flags.ts). */
+  readOnly?: boolean
 }
 
 /**
@@ -46,7 +50,7 @@ interface BoutStake {
   total: number
 }
 
-export default function FightCard({ fightNightId, initialBouts }: FightCardProps) {
+export default function FightCard({ fightNightId, initialBouts, readOnly = false }: FightCardProps) {
   const { user } = useAuth()
   const [bouts, setBouts] = useState<FightNightBout[]>(initialBouts)
   const [picks, setPicks] = useState<Record<number, FightNightPick>>({})
@@ -210,6 +214,7 @@ export default function FightCard({ fightNightId, initialBouts }: FightCardProps
                 pick={picks[bout.boutNumber]}
                 userId={user?.uid || null}
                 stake={stakeByBout[bout.boutNumber] || null}
+                readOnly={readOnly}
               />
             </div>
           ))}
@@ -237,6 +242,7 @@ export default function FightCard({ fightNightId, initialBouts }: FightCardProps
               pick={picks[bout.boutNumber]}
               userId={user?.uid || null}
               stake={stakeByBout[bout.boutNumber] || null}
+              readOnly={readOnly}
             />
           </div>
         ))}
@@ -251,26 +257,30 @@ function BoutCard({
   pick,
   userId,
   stake,
+  readOnly = false,
 }: {
   fightNightId: string
   bout: FightNightBout
   pick: FightNightPick | undefined
   userId: string | null
   stake: BoutStake | null
+  readOnly?: boolean
 }) {
   const [submitting, setSubmitting] = useState<"fighter1" | "fighter2" | null>(null)
   const [error, setError] = useState("")
 
-  const isLocked = bout.status === "live" || bout.status === "completed"
+  // readOnly locks every corner the same way a live bell does, so the cells
+  // render as un-tappable rather than tappable-then-erroring.
+  const isLocked = readOnly || bout.status === "live" || bout.status === "completed"
   const isCompleted = bout.status === "completed"
   const userPicked = pick?.pickedCorner || null
 
   async function handlePick(corner: "fighter1" | "fighter2") {
+    if (readOnly || isLocked) return
     if (!userId) {
       setError("Sign in to make picks")
       return
     }
-    if (isLocked) return
     // Re-tapping the current pick is a no-op (skip network round-trip).
     if (userPicked === corner) return
     setSubmitting(corner)
@@ -399,6 +409,13 @@ function BoutCard({
       {error && (
         <div className="px-4 py-2 border-t border-red-200 bg-red-50">
           <p className="text-red-600 text-xs font-medium">{error}</p>
+        </div>
+      )}
+      {!error && readOnly && !isCompleted && (
+        <div className="px-4 py-2 border-t border-neutral-200">
+          <p className="text-neutral-500 text-[11px] font-medium">
+            Following along — picks are closed.
+          </p>
         </div>
       )}
       {!error && !isCompleted && !isLocked && (

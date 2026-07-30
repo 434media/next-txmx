@@ -5,6 +5,7 @@ import { Swords, Trophy, Zap } from "lucide-react"
 import { collection, doc, onSnapshot, query, where } from "firebase/firestore"
 import { db } from "../../../lib/firebase-client"
 import { useAuth } from "../../../lib/auth-context"
+import { FAN_ACCOUNTS_ENABLED } from "../../../lib/feature-flags"
 import SignUpForm from "../../../components/fight-nights/sign-up-form"
 import StatusStrip from "./_components/status-strip"
 import FightCard from "./_components/fight-card"
@@ -141,6 +142,65 @@ export default function FightNightClient({ fightNight, bouts, flyerUrl }: FightN
           The fight card is being prepped. Come back when doors open and you'll see
           the bouts, polls, and live leaderboard here.
         </p>
+      </section>
+    )
+  }
+
+  // Fan accounts are off (lib/feature-flags.ts) — nobody can play, so the night
+  // renders as a spectator view: the full card and the live board, updating in
+  // real time, with no pick targets and no sign-up. Props/polls are omitted
+  // because submitting either requires an account.
+  if (!FAN_ACCOUNTS_ENABLED) {
+    return (
+      <section id="game" className="scroll-mt-24">
+        <div className="flex items-center gap-2 mb-4">
+          <span className="inline-block w-2 h-2 bg-neutral-300" />
+          <p className="text-neutral-500 text-[10px] font-bold tracking-[0.25em] uppercase">
+            Following Live
+          </p>
+        </div>
+        <h2 className="text-neutral-900 text-3xl sm:text-4xl font-black uppercase tracking-tight leading-[0.95] mb-3">
+          Watch the card move.
+        </h2>
+        <p className="text-neutral-600 text-sm font-semibold leading-7 mb-8 max-w-md">
+          Fan picks are closed for now. The card, the results, and the
+          leaderboard all update live — nothing to sign up for.
+        </p>
+
+        <div className="xl:grid xl:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] xl:gap-10 xl:items-start">
+          <div className="mb-12 xl:mb-0">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-neutral-900 text-lg font-bold uppercase tracking-tight">
+                Fight Card
+              </h3>
+              {hasLiveBout ? (
+                <span className="text-red-600 text-[10px] font-bold tracking-[0.2em] uppercase">
+                  · Live Now
+                </span>
+              ) : (
+                <span className="text-neutral-400 text-xs font-medium tabular-nums">
+                  {bouts.length} bout{bouts.length !== 1 ? "s" : ""}
+                </span>
+              )}
+            </div>
+            <FightCard fightNightId={fightNight.id} initialBouts={bouts} readOnly />
+          </div>
+
+          <div className="xl:sticky xl:self-start xl:top-[120px]">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-neutral-900 text-lg font-bold uppercase tracking-tight">
+                Leaderboard
+              </h3>
+            </div>
+            {fightNight.prizeLabel && (
+              <PrizeChip
+                label={fightNight.prizeLabel}
+                details={fightNight.prizeDetails}
+              />
+            )}
+            <LeaderboardLive fightNightId={fightNight.id} />
+          </div>
+        </div>
       </section>
     )
   }
