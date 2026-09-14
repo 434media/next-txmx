@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { GALLERY_IMAGES, type GalleryImage, type GalleryCategory } from "../../../../lib/gallery-images"
+import { GALLERY_IMAGES, galleryImageSrc, type GalleryImage, type GalleryCategory } from "../../../../lib/gallery-images"
 import GalleryUnlockForm from "../../../../components/gallery/gallery-unlock-form"
 import ImageModal from "../../../../components/gallery/image-modal"
 import { GALLERY_EMAIL_GATE_ENABLED } from "../../../../lib/feature-flags"
@@ -124,7 +124,7 @@ export default function GalleryClient() {
               {images.filter(img => img.category === "red-carpet").slice(0, 20).map((image) => (
                 <div key={image.id} className="aspect-square relative">
                   <Image
-                    src={image.src}
+                    src={galleryImageSrc(image.src, 400)}
                     alt="Preview"
                     fill
                     className="object-cover blur-[2px]"
@@ -370,7 +370,7 @@ export default function GalleryClient() {
                     </div>
                   )}
                   <Image
-                    src={image.src}
+                    src={galleryImageSrc(image.src, 600)}
                     alt={image.alt}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"

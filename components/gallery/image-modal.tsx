@@ -2,7 +2,7 @@
 
 import { useEffect, useCallback, useState } from "react"
 import Image from "next/image"
-import type { GalleryImage } from "../../lib/gallery-images"
+import { galleryDownloadSrc, galleryImageSrc, type GalleryImage } from "../../lib/gallery-images"
 
 interface ImageModalProps {
   image: GalleryImage | null
@@ -23,32 +23,40 @@ export default function ImageModal({ image, onClose, onPrevious, onNext }: Image
     [onClose, onPrevious, onNext],
   )
 
+  // Guarded on `image`: this component stays mounted with image=null whenever
+  // the lightbox is closed, and hooks run before the `return null` below — so
+  // an unguarded effect locks body scroll for the whole gallery page, not just
+  // while the lightbox is open. Restoring to "" drops the inline style instead
+  // of pinning overflow to a value the stylesheet did not ask for.
   useEffect(() => {
+    if (!image) return
+
     document.addEventListener("keydown", handleKeyDown)
+    const previousOverflow = document.body.style.overflow
     document.body.style.overflow = "hidden"
     return () => {
       document.removeEventListener("keydown", handleKeyDown)
-      document.body.style.overflow = "unset"
+      document.body.style.overflow = previousOverflow
     }
-  }, [handleKeyDown])
+  }, [image, handleKeyDown])
 
   if (!image) return null
 
-  const handleDownload = async () => {
-    try {
-      const response = await fetch(image.src)
-      const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement("a")
-      a.href = url
-      a.download = `rise-of-a-champion-${image.id}.jpg`
-      document.body.appendChild(a)
-      a.click()
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
-    } catch (error) {
-      console.error("Download failed:", error)
-    }
+  // Downloads deliberately pull the unsized original — full camera resolution
+  // is the point of the download button, unlike the on-screen render above.
+  //
+  // The link is handed to the browser rather than fetched here: the proxy
+  // replies with Content-Disposition: attachment, so the file streams to disk
+  // through the browser's own download manager. Reading it into a blob first
+  // would hold the whole original (up to 67MB) in page memory, which mobile
+  // browsers frequently kill, and would show no progress while it loaded.
+  const handleDownload = () => {
+    const a = document.createElement("a")
+    a.href = galleryDownloadSrc(image.src)
+    a.rel = "noopener"
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
   }
 
   const handleShare = async () => {
@@ -163,7 +171,7 @@ export default function ImageModal({ image, onClose, onPrevious, onNext }: Image
         onClick={(e) => e.stopPropagation()}
       >
         <Image
-          src={image.src || "/placeholder.svg"}
+          src={galleryImageSrc(image.src, 2048) || "/placeholder.svg"}
           alt={image.alt}
           width={1200}
           height={800}

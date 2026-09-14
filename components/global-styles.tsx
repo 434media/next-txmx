@@ -10,6 +10,7 @@ export default function GlobalStyles() {
         --gray-light: #f5f5f5;
         --gray-medium: #a0a0a0;
         --gray-dark: #404040;
+        --accent-gold: #ffb800;
         --white-rgb: 255, 255, 255;
         --black-rgb: 0, 0, 0;
         --shadow-light: rgba(255, 255, 255, 0.1);
@@ -172,14 +173,21 @@ export default function GlobalStyles() {
         height: auto;
       }
 
-      /* Enhanced selection styles - Monochrome */
+      /* Selection: the brand gold behind black text.
+         The previous rule paired a 20%-opacity white background with pure
+         black text — over the site's black pages that composites to roughly
+         #333, leaving black-on-near-black at about 1.6:1 contrast, so
+         highlighted text all but disappeared. An opaque background is what
+         fixes it: gold against black text clears 12:1, and because it does
+         not rely on what is painted behind it, it stays legible on light
+         sections as well as dark ones. */
       ::selection {
-        background: rgba(var(--white-rgb), 0.2);
+        background: var(--accent-gold);
         color: var(--primary-black);
       }
 
       ::-moz-selection {
-        background: rgba(var(--white-rgb), 0.2);
+        background: var(--accent-gold);
         color: var(--primary-black);
       }
 

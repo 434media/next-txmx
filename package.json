@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
+    "test": "node --test scripts/*.test.mjs",
     "backfill:tdlr": "node scripts/tdlr-backfill-settlement.mjs",
     "backfill:tdlr:write": "node scripts/tdlr-backfill-settlement.mjs --write"
   },

@@ -4,26 +4,32 @@ import type { GalleryImage, GalleryCategory } from './gallery-images'
 const isDev = process.env.NODE_ENV === 'development'
 
 // Shared Google Auth — used by all Drive operations.
-// Preferred: the consolidated GOOGLE_SERVICE_ACCOUNT_KEY (full SA JSON).
-// Fallback (transitional): the legacy GOOGLE_SERVICE_ACCOUNT_EMAIL + GOOGLE_PRIVATE_KEY.
+//
+// Drive access is granted per service account by Shared Drive membership, not
+// by the GCP project the key belongs to. The gallery folder lives in the "434
+// Media Shared Drive", whose only member is GOOGLE_SERVICE_ACCOUNT_EMAIL —
+// the consolidated GOOGLE_SERVICE_ACCOUNT_KEY identity is not a member and
+// gets a bare 404 for the folder. So Drive prefers the dedicated pair and
+// falls back to the consolidated key.
+//
+// To finish consolidating: add the GOOGLE_SERVICE_ACCOUNT_KEY client_email as
+// a member (Viewer) of the Shared Drive, then drop the dedicated pair from the
+// environment — this falls through to the consolidated key automatically.
 export const getAuth = () => {
-  let email: string | undefined
-  let privateKey: string | undefined
-
-  const json = process.env.GOOGLE_SERVICE_ACCOUNT_KEY
-  if (json) {
-    try {
-      const sa = JSON.parse(json)
-      email = sa.client_email
-      privateKey = sa.private_key
-    } catch {
-      // Malformed JSON — fall through to the legacy vars below.
-    }
-  }
+  let email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL
+  let privateKey = process.env.GOOGLE_PRIVATE_KEY
 
   if (!email || !privateKey) {
-    email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL
-    privateKey = process.env.GOOGLE_PRIVATE_KEY
+    const json = process.env.GOOGLE_SERVICE_ACCOUNT_KEY
+    if (json) {
+      try {
+        const sa = JSON.parse(json)
+        email = sa.client_email
+        privateKey = sa.private_key
+      } catch {
+        // Malformed JSON — handled by the guard below.
+      }
+    }
   }
 
   if (!email || !privateKey) {

@@ -1,7 +1,15 @@
 'use client'
 
 import Image from 'next/image'
-import { GALLERY_IMAGES } from '../../../lib/gallery-images'
+
+const AWARDS = [
+  {
+    title: 'Visionary Icon Awards',
+    recipients: ['Selina Barrios', 'Joshua "The Professor" Franco', 'Jesse "Bam" Rodriguez'],
+  },
+  { title: 'Humanitarian Icon Award', recipients: ['Sam Watson'] },
+  { title: 'Icon Award', recipients: ['Jesse James Leija'] },
+]
 
 export default function IconicSeriesClient() {
 
@@ -23,16 +31,17 @@ export default function IconicSeriesClient() {
 
       {/* Content */}
       <div className="relative z-10">
-        {/* Hero Section */}
-        <section className="min-h-screen flex flex-col items-center justify-center px-4 mt-8 md:mt-0 py-12 md:py-16 md:pt-20">
+        {/* Hero Section — artwork only. The story, the honorees and the
+            gallery CTA sit together below so a past event does not open with
+            a full empty viewport before anything actionable. */}
+        <section className="px-4 mt-8 md:mt-0 pt-12 md:pt-20">
           <div className="w-full max-w-7xl mx-auto">
-            {/* Unified Responsive Layout */}
             <div className="flex flex-col items-center justify-center">
               {/* Presenters Text Above Logo */}
               <p className="text-white/50 text-xs md:text-sm tracking-widest mb-2 font-semibold uppercase text-center leading-relaxed">
                 ICONTALKS x TXMX Boxing Present
               </p>
-              
+
               {/* Hero Logo - Responsive */}
               <div className="w-full max-w-xl md:max-w-4xl mb-0 pb-0 -mt-8 md:-mt-24">
                 <Image
@@ -56,132 +65,95 @@ export default function IconicSeriesClient() {
                 />
               </div>
             </div>
-
-            {/* Event Info - Unified Responsive Section */}
-            <div className="text-center -mt-20 md:-mt-32 space-y-6 md:space-y-8">
-              {/* Event Title */}
-              <div className="space-y-2 md:space-y-3">
-                <h1 className="text-2xl md:text-3xl lg:text-5xl xl:text-6xl font-semibold text-white/90 tracking-widest leading-relaxed uppercase">
-                  A HISTORIC CELEBRATION
-                </h1>
-              </div>
-
-              {/* Event Description */}
-              <div className="text-xs md:text-base lg:text-lg text-white/60 max-w-3xl mx-auto leading-relaxed space-y-4 px-2 md:px-4">
-                <p className="leading-relaxed tracking-wide">
-                  This invitation-only experience honored four of the biggest names in the sport — all from San Antonio — as they were celebrated in their hometown and captured live for the nationally distributed series <span className="text-[#FFB800] font-semibold italic">Rise of a Champion</span>, powered by TXMX Boxing and produced by ICON Media x 434 Media.
-                </p>
-                <p className="leading-relaxed tracking-wide">
-                  The event brought together a curated room of athletes, entertainers, and industry leaders to celebrate greatness and build meaningful connections.
-                </p>
-              </div>
-            </div>
           </div>
         </section>
 
-        {/* Honorees Section */}
-        <section className="py-12 md:py-16 px-4 -mt-10 md:-mt-10">
-          <div className="max-w-4xl mx-auto">
-            {/* Invitation Header */}
-            <div className="text-center mb-12 md:mb-16">
-              <p className="text-white/40 text-xs md:text-sm max-w-2xl mx-auto leading-relaxed tracking-widest font-semibold mb-2 uppercase">
-                Celebrating San Antonio's Finest
-              </p>
-              <div className="flex items-center justify-center gap-4 md:gap-6 mb-2">
-                <div className="h-px bg-[#FFB800]/40 w-12 md:w-24"></div>
-                <h2 className="text-sm md:text-lg text-[#FFB800] tracking-widest font-semibold uppercase">
-                  HONOREES
-                </h2>
-                <div className="h-px bg-[#FFB800]/40 w-12 md:w-24"></div>
-              </div>
-              
-            </div>
-
-            {/* Honorees List */}
-            <div className="space-y-10 md:space-y-14">
-              {/* Visionary Icon Awards - First Group */}
-              <div className="text-center border-b border-white/10 pb-10">
-                <h3 className="text-[#FFB800] text-base md:text-2xl tracking-widest mb-4 md:mb-5 italic font-semibold" style={{ fontFamily: '"Lucida Calligraphy", cursive, serif' }}>
-                  Visionary Icon Awards
-                </h3>
-                <div className="space-y-2">
-                  <p className="text-white/80 text-sm md:text-lg font-normal leading-relaxed">
-                    • Selina Barrios
-                  </p>
-                  <p className="text-white/80 text-sm md:text-lg font-normal leading-relaxed">
-                    • Joshua "The Professor" Franco
-                  </p>
-                  <p className="text-white/80 text-sm md:text-lg font-normal leading-relaxed">
-                    • Jesse "Bam" Rodriguez
-                  </p>
-                </div>
-              </div>
-
-              {/* Humanitarian Icon Award */}
-              <div className="text-center border-b border-white/10 pb-10">
-                <h3 className="text-[#FFB800] text-base md:text-2xl tracking-widest mb-4 md:mb-5 italic font-semibold" style={{ fontFamily: '"Lucida Calligraphy", cursive, serif' }}>
-                  Humanitarian Icon Award
-                </h3>
-                <p className="text-white/80 text-sm md:text-lg font-normal leading-relaxed">
-                  • Sam Watson
-                </p>
-              </div>
-
-              {/* Icon Award */}
-              <div className="text-center pb-8">
-                <h3 className="text-[#FFB800] text-base md:text-2xl tracking-widest mb-4 md:mb-5 italic font-semibold" style={{ fontFamily: '"Lucida Calligraphy", cursive, serif' }}>
-                  Icon Award
-                </h3>
-                <p className="text-white/80 text-sm md:text-lg font-normal leading-relaxed">
-                  • Jesse James Leija
-                </p>
-              </div>
-            </div>
-
-            {/* Decorative Bottom Border */}
-            <div className="flex items-center justify-center mt-4 md:mt-2">
-              <div className="h-px bg-linear-to-r from-transparent via-[#FFB800]/30 to-transparent w-full max-w-md"></div>
-            </div>
-          </div>
-        </section>
-
-        {/* Gallery CTA Section */}
-        <section className="py-2 px-4">
+        {/* Celebration + Honorees — side by side from lg up, stacked below it.
+            The negative top margin closes the transparent gap under the
+            champions artwork, as the event copy used to. */}
+        <section className="px-4 -mt-20 md:-mt-32 pb-12 md:pb-16">
           <div className="max-w-7xl mx-auto">
-            <div className="max-w-4xl mx-auto">
-              <div className="relative overflow-hidden bg-white/5 backdrop-blur-sm border border-white/10 p-8 md:p-12 rounded-sm text-center">
-                {/* Background Grid */}
-                <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-                  <div className="absolute inset-0 grid grid-cols-3 md:grid-cols-4 gap-0.5 opacity-20">
-                    {GALLERY_IMAGES.slice(0, 12).map((image) => (
-                      <div key={image.id} className="aspect-square relative">
-                        <Image
-                          src={image.src}
-                          alt=""
-                          fill
-                          className="object-cover blur-[3px]"
-                          sizes="(max-width: 768px) 33vw, 25vw"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                  <div className="absolute inset-0 bg-black/70" />
+            {/* Section intro — full width and centered, so the title heads
+                both columns instead of belonging to the left one. It fits on
+                a single line from lg up, where the tracking also tightens:
+                0.1em suits a small uppercase label but is too airy at 72px. */}
+            <div className="text-center mb-12 md:mb-16">
+              <h1 className="text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white tracking-widest lg:tracking-wider leading-[1.05] uppercase">
+                A Historic Celebration
+              </h1>
+              <div className="flex justify-center mt-6 md:mt-8">
+                <div className="h-px bg-[#FFB800]/50 w-24 md:w-32"></div>
+              </div>
+            </div>
+
+            {/* lg:items-start so both columns begin on the same line — the
+                copy on the left and the HONOREES rule on the right share a
+                top edge. The container caps at max-w-7xl, so a 13" laptop
+                and a large monitor lay out alike; the extra width just
+                becomes margin. */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 lg:items-start">
+              {/* Left — the event copy, and the gallery CTA */}
+              <div className="text-center lg:text-left">
+                <div className="text-sm md:text-base text-white/60 leading-relaxed space-y-4 lg:max-w-xl mx-auto lg:mx-0">
+                  <p className="leading-relaxed tracking-wide">
+                    This invitation-only experience honored four of the biggest names in the sport — all from San Antonio — as they were celebrated in their hometown and captured live for the nationally distributed series <span className="text-[#FFB800] font-semibold italic">Rise of a Champion</span>, powered by TXMX Boxing and produced by ICON Media x 434 Media.
+                  </p>
+                  <p className="leading-relaxed tracking-wide">
+                    The event brought together a curated room of athletes, entertainers, and industry leaders to celebrate greatness and build meaningful connections.
+                  </p>
                 </div>
-                
-                {/* Content */}
-                <div className="relative z-10">
-                  <h3 className="text-sm md:text-lg font-semibold text-[#FFB800] mb-3 tracking-widest uppercase leading-relaxed">
+
+                {/* Gallery CTA — the primary action for a past event. Set in the
+                    same column and on the same left edge as the copy so it
+                    reads as where that messaging leads, not a boxed aside. */}
+                <div className="mt-10 md:mt-12">
+                  <h2 className="text-[#FFB800] text-xs md:text-sm font-semibold tracking-widest uppercase mb-3">
                     Relive the Moments
-                  </h3>
-                  <p className="text-white/60 text-xs md:text-base mb-6 leading-relaxed tracking-wide">
+                  </h2>
+                  <p className="text-sm md:text-base text-white/60 leading-relaxed tracking-wide mb-7 lg:max-w-lg mx-auto lg:mx-0">
                     Browse exclusive photos from the Rise of a Champion celebration, featuring red carpet arrivals, championship moments, live performances, and the unforgettable reception.
                   </p>
-                  <a 
+                  <a
                     href="/icon-talks/rise-of-a-champion/gallery"
-                    className="inline-block bg-[#FFB800] text-black hover:bg-[#FFB800]/90 font-semibold py-3 px-6 rounded-md transition-all text-xs md:text-sm tracking-widest uppercase"
+                    className="inline-block bg-[#FFB800] text-black hover:bg-[#FFB800]/90 font-semibold py-4 px-8 rounded-md transition-all duration-300 text-xs md:text-sm tracking-widest uppercase shadow-lg shadow-[#FFB800]/20 hover:shadow-[#FFB800]/30"
                   >
-                    View Event Gallery →
+                    View Event Gallery
                   </a>
+                </div>
+              </div>
+
+              {/* Right — Honorees, set directly on the page background */}
+              <div>
+                {/* Honorees Header */}
+                <div className="text-center mb-8 md:mb-10">
+                  <div className="flex items-center justify-center gap-4 md:gap-6">
+                    <div className="h-px bg-[#FFB800]/40 w-12 md:w-16"></div>
+                    <h2 className="text-sm md:text-lg text-[#FFB800] tracking-widest font-semibold uppercase">
+                      HONOREES
+                    </h2>
+                    <div className="h-px bg-[#FFB800]/40 w-12 md:w-16"></div>
+                  </div>
+                </div>
+
+                {/* Honorees List */}
+                <div className="divide-y divide-white/10">
+                  {AWARDS.map((award) => (
+                    <div key={award.title} className="py-5 md:py-6 first:pt-0 last:pb-0 text-center">
+                      <h3
+                        className="text-[#FFB800] text-lg md:text-2xl tracking-widest mb-3 italic font-semibold"
+                        style={{ fontFamily: '"Lucida Calligraphy", cursive, serif' }}
+                      >
+                        {award.title}
+                      </h3>
+                      <div className="space-y-1.5">
+                        {award.recipients.map((name) => (
+                          <p key={name} className="text-white/80 text-sm md:text-base font-normal leading-relaxed">
+                            {name}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
