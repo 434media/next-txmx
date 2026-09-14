@@ -69,6 +69,12 @@ export default function ClientLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <head>
+        {/* Every hero image on the site is served from this bucket, so open
+            the connection alongside the HTML instead of paying DNS + TLS
+            once the first <img> is discovered. */}
+        <link rel="preconnect" href="https://storage.googleapis.com" crossOrigin="" />
+        <link rel="dns-prefetch" href="https://storage.googleapis.com" />
+
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />

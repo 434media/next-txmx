@@ -238,12 +238,14 @@ export default function GalleryClient() {
         </>
       ) : (
         /* Unlocked State - Simple grid */
-        <div className="py-20 px-4">
+        /* The photos are the page, so the masthead stays shallow: the outer
+           wrapper already supplies md:pt-16 under the navbar. */
+        <div className="pt-6 pb-20 px-4">
           <div className="max-w-7xl mx-auto">
             {/* Back Link */}
             <Link
               href="/icon-talks/rise-of-a-champion"
-              className="inline-flex items-center gap-2 text-white/60 hover:text-[#FFB800] text-xs font-semibold tracking-widest mb-8 transition-colors leading-relaxed uppercase"
+              className="inline-flex items-center gap-2 text-white/60 hover:text-[#FFB800] text-xs font-semibold tracking-widest mb-6 transition-colors leading-relaxed uppercase"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -251,31 +253,44 @@ export default function GalleryClient() {
               Back to Event
             </Link>
 
-            {/* Success Message */}
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/30 px-4 py-2 rounded-md mb-4">
-                <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span className="text-green-400 text-xs font-semibold tracking-widest uppercase leading-relaxed">Gallery Unlocked</span>
-              </div>
-              
-              {/* Logo */}
-              <div className="-mt-10 flex justify-center">
+            {/* Masthead. The three stacked -mt-10 pulls this replaced were
+                overlapping the wordmark with the badge above and the hint
+                below; normal flow at a legible logo size is all it needs. */}
+            <div className="text-center mb-6">
+              {/* Only meaningful when the email gate is on — with it off
+                  (lib/feature-flags.ts) nobody ever unlocks anything, so
+                  this would announce a state that never happened. */}
+              {GALLERY_EMAIL_GATE_ENABLED && (
+                <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/30 px-4 py-2 rounded-md mb-4">
+                  <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span className="text-green-400 text-xs font-semibold tracking-widest uppercase leading-relaxed">Gallery Unlocked</span>
+                </div>
+              )}
+
+              {/* Sized by the wrapper's width, not an h-* on the image:
+                  global-styles.tsx sets `img, video { height: auto }`, which
+                  overrides height utilities here, so the old h-6 never took
+                  effect and the wordmark rendered at whatever the srcset
+                  picked. Constraining width and letting height follow the
+                  aspect ratio is stable. */}
+              <div className="mx-auto w-44 md:w-56">
                 <Image
                   src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/iconic-series/ROAC.png"
                   alt="Rise of a Champion"
-                  width={200}
-                  height={60}
-                  className="w-auto h-6"
+                  width={400}
+                  height={120}
+                  className="w-full h-auto"
+                  priority
                 />
               </div>
-              
-              <p className="-mt-10 text-white/40 text-xs tracking-wide leading-relaxed">Click any photo to view full size</p>
+
+              <p className="mt-3 text-white/40 text-xs tracking-wide leading-relaxed">Click any photo to view full size</p>
             </div>
 
             {/* Category Filter */}
-            <div className="mb-8">
+            <div className="mb-5">
               <div className="flex flex-wrap justify-center gap-2">
                 {categories.map((cat) => (
                   <button
@@ -345,7 +360,7 @@ export default function GalleryClient() {
 
             {/* Photo Count */}
             {!isLoading && !fetchError && (
-              <div className="text-center mb-6">
+              <div className="text-center mb-4">
                 <p className="text-white/40 text-xs tracking-wide leading-relaxed">
                   Showing {filteredImages.length} {filteredImages.length === 1 ? 'photo' : 'photos'}
                 </p>

@@ -15,16 +15,25 @@ export default function IconicSeriesClient() {
 
   return (
     <div className="min-h-screen bg-black relative">
-      {/* Background Image */}
-      <div 
-        className="fixed inset-0 z-0"
-        style={{
-          backgroundImage: 'url(https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/iconic-series/BG.png)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundAttachment: 'fixed'
-        }}
-      />
+      {/* Background Image.
+          Served through next/image rather than a CSS background: the source
+          is a 5.5MB PNG, and as an inline style on a client component the URL
+          was invisible to the browser's preload scanner, so the largest asset
+          on the page was also the last one discovered. next/image resizes it
+          to the viewport and converts it to WebP/AVIF. The wrapper is already
+          `fixed inset-0`, which gives the same pinned backdrop the old
+          `background-attachment: fixed` did. */}
+      <div className="fixed inset-0 z-0">
+        <Image
+          src="https://storage.googleapis.com/groovy-ego-462522-v2.firebasestorage.app/iconic-series/BG.png"
+          alt=""
+          aria-hidden="true"
+          fill
+          sizes="100vw"
+          className="object-cover object-center"
+          priority
+        />
+      </div>
       
       {/* Dark Overlay */}
       <div className="fixed inset-0 bg-black/60 z-0" />
@@ -50,6 +59,7 @@ export default function IconicSeriesClient() {
                   width={1200}
                   height={400}
                   className="w-full block"
+                  sizes="(max-width: 768px) 100vw, 896px"
                   priority
                 />
               </div>
@@ -62,6 +72,8 @@ export default function IconicSeriesClient() {
                   width={1200}
                   height={600}
                   className="w-full block"
+                  sizes="(max-width: 768px) 100vw, 1024px"
+                  priority
                 />
               </div>
             </div>
@@ -94,6 +106,13 @@ export default function IconicSeriesClient() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 lg:items-start">
               {/* Left — the event copy, and the gallery CTA */}
               <div className="text-center lg:text-left">
+                {/* Column label, sized to match HONOREES opposite it. Both
+                    columns open on a gold label at the same line, which is
+                    what makes their shared top edge read as deliberate. */}
+                <h2 className="text-sm md:text-lg text-[#FFB800] tracking-widest font-semibold uppercase mb-6 md:mb-8">
+                  The Event
+                </h2>
+
                 <div className="text-sm md:text-base text-white/60 leading-relaxed space-y-4 lg:max-w-xl mx-auto lg:mx-0">
                   <p className="leading-relaxed tracking-wide">
                     This invitation-only experience honored four of the biggest names in the sport — all from San Antonio — as they were celebrated in their hometown and captured live for the nationally distributed series <span className="text-[#FFB800] font-semibold italic">Rise of a Champion</span>, powered by TXMX Boxing and produced by ICON Media x 434 Media.
