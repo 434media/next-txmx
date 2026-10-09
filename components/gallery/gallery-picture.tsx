@@ -1,4 +1,6 @@
-import type { CSSProperties } from "react"
+"use client"
+
+import { useEffect, useRef, type CSSProperties } from "react"
 import { gallerySrcSet, galleryImageSrc, type GalleryImage } from "../../lib/gallery-images"
 
 interface GalleryPictureProps {
@@ -21,10 +23,25 @@ interface GalleryPictureProps {
 export default function GalleryPicture({
   image, alt, sizes, fallbackWidth, className, style, loading = "lazy", fetchPriority, onLoad, onError,
 }: GalleryPictureProps) {
+  // A server-rendered image can finish before React attaches onLoad, and then
+  // the load event is never seen — the tile's spinner would stay on a photo that
+  // is already showing. next/image covered this; here it is checked on mount.
+  const ref = useRef<HTMLImageElement>(null)
+  useEffect(() => {
+    const img = ref.current
+    if (img?.complete) {
+      if (img.naturalWidth > 0) onLoad?.()
+      else onError?.()
+    }
+    // Only on mount: later loads arrive through the handlers below.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   return (
     <picture>
       <source type="image/webp" srcSet={gallerySrcSet(image, "webp")} sizes={sizes} />
       <img
+        ref={ref}
         src={galleryImageSrc(image, fallbackWidth)}
         srcSet={gallerySrcSet(image, "jpg")}
         sizes={sizes}
