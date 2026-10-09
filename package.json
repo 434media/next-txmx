@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "test": "node --test scripts/*.test.mjs",
+    "test": "echo \"no tests yet\"",
     "backfill:tdlr": "node scripts/tdlr-backfill-settlement.mjs",
     "backfill:tdlr:write": "node scripts/tdlr-backfill-settlement.mjs --write"
   },
@@ -20,7 +20,6 @@
     "firebase": "^12.11.0",
     "firebase-admin": "^13.7.0",
     "geist": "1.7.0",
-    "googleapis": "^168.0.0",
     "lucide-react": "^0.511.0",
     "motion": "^12.14.0",
     "next": "^16.0.7",

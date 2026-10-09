@@ -1,22 +1,26 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, type CSSProperties } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { GALLERY_IMAGES, galleryImageSrc, type GalleryImage, type GalleryCategory } from "../../../../lib/gallery-images"
+import { GALLERY, type GalleryImage, type GalleryCategory } from "../../../../lib/gallery-images"
 import GalleryUnlockForm from "../../../../components/gallery/gallery-unlock-form"
 import ImageModal from "../../../../components/gallery/image-modal"
+import GalleryPicture from "../../../../components/gallery/gallery-picture"
 import { GALLERY_EMAIL_GATE_ENABLED } from "../../../../lib/feature-flags"
+
+// Fills its square tile. Inline rather than h-full: global-styles.tsx sets
+// `img, video { height: auto }`, which overrides height utilities.
+const FILL: CSSProperties = { position: "absolute", inset: 0, width: "100%", height: "100%" }
 
 export default function GalleryClient() {
   // Gate off → the gallery starts unlocked for everyone and the form below
   // never renders. See lib/feature-flags.ts.
   const [isUnlocked, setIsUnlocked] = useState(!GALLERY_EMAIL_GATE_ENABLED)
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState<GalleryCategory>("red-carpet")
-  const [images, setImages] = useState<GalleryImage[]>([])
-  const [fetchError, setFetchError] = useState<string | null>(null)
+  // Bundled at build time from the generated manifest; nothing is fetched.
+  const images = GALLERY
   const [imageLoadingStates, setImageLoadingStates] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
@@ -40,33 +44,7 @@ export default function GalleryClient() {
           localStorage.removeItem("galleryUnlocked")
         }
       }
-    }
-
-
-    // Fetch images from Google Drive API
-    fetch('/api/gallery')
-      .then(res => {
-        if (!res.ok) {
-          throw new Error(`Failed to fetch images (${res.status})`)
-        }
-        return res.json()
-      })
-      .then(data => {
-        if (data && Array.isArray(data) && data.length > 0) {
-          setImages(data)
-          setFetchError(null)
-        } else {
-          setFetchError('No images found in Google Drive folder')
-        }
-      })
-      .catch(err => {
-        console.error('Error fetching gallery images:', err)
-        setFetchError(err.message || 'Unable to connect to Google Drive')
-      })
-      .finally(() => {
-        setIsLoading(false)
-      })
-  }, [])
+    }  }, [])
 
   const handleUnlock = () => {
     setIsUnlocked(true)
@@ -105,14 +83,6 @@ export default function GalleryClient() {
     { id: "reception" as GalleryCategory, label: "Reception", count: images.filter(img => img.category === "reception").length },
   ]
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#FFB800] border-t-transparent rounded-full animate-spin" />
-      </div>
-    )
-  }
-
   return (
     <div className="bg-black pb-20 md:pt-16 relative min-h-screen">
         {!isUnlocked ? (
@@ -123,12 +93,13 @@ export default function GalleryClient() {
             <div className="absolute inset-0 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-0.5 opacity-30">
               {images.filter(img => img.category === "red-carpet").slice(0, 20).map((image) => (
                 <div key={image.id} className="aspect-square relative">
-                  <Image
-                    src={galleryImageSrc(image.src, 400)}
+                  <GalleryPicture
+                    image={image}
                     alt="Preview"
-                    fill
-                    className="object-cover blur-[2px]"
+                    fallbackWidth={400}
                     sizes="(max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                    className="object-cover blur-[2px]"
+                    style={FILL}
                   />
                 </div>
               ))}
@@ -173,45 +144,9 @@ export default function GalleryClient() {
               Relive the moments from our celebration of San Antonio's boxing legends.
             </p>
             
-            {/* Loading State */}
-            {isLoading && (
-              <div className="bg-[#FFB800]/10 border border-[#FFB800]/30 rounded-lg p-6 mb-10">
-                <div className="flex items-center justify-center gap-3">
-                  <div className="w-5 h-5 border-2 border-[#FFB800] border-t-transparent rounded-full animate-spin"></div>
-                  <p className="text-[#FFB800] font-semibold text-xs tracking-widest leading-relaxed uppercase">Connecting to Google Drive...</p>
-                </div>
-              </div>
-            )}
-
-            {/* Error State */}
-            {fetchError && !isLoading && (
-              <div className="bg-red-500/10 border border-red-500/30 rounded-md p-6 mb-10">
-                <div className="flex items-start gap-3">
-                  <svg className="w-5 h-5 text-red-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <div className="flex-1">
-                    <h3 className="text-red-400 font-semibold text-xs tracking-widest uppercase mb-1 leading-relaxed">Unable to Load Gallery</h3>
-                    <p className="text-red-300/80 text-xs leading-relaxed tracking-wide mb-3">{fetchError}</p>
-                    <p className="text-red-300/50 text-xs leading-relaxed tracking-wide">
-                      The gallery images are stored in Google Drive. Please ensure environment variables are configured in Vercel:
-                      <br />
-                      • GOOGLE_SERVICE_ACCOUNT_EMAIL
-                      <br />
-                      • GOOGLE_PRIVATE_KEY
-                      <br />
-                      • GOOGLE_DRIVE_FOLDER_ID
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {!isLoading && !fetchError && (
-              <p className="text-[#FFB800] text-center mb-10 font-semibold text-xs tracking-widest leading-relaxed uppercase">
-                {images.length} exclusive photos • Free access
-              </p>
-            )}
+            <p className="text-[#FFB800] text-center mb-10 font-semibold text-xs tracking-widest leading-relaxed uppercase">
+              {images.length} exclusive photos • Free access
+            </p>
 
             {/* Unlock Form */}
             <div className="bg-white/5 border border-white/10 rounded-md p-6 md:p-8 mb-12">
@@ -308,67 +243,15 @@ export default function GalleryClient() {
               </div>
             </div>
 
-            {/* Loading State */}
-            {isLoading && (
-              <div className="bg-[#FFB800]/10 border border-[#FFB800]/30 rounded-md p-8 mb-10">
-                <div className="flex flex-col items-center justify-center gap-4">
-                  <div className="w-10 h-10 border-2 border-[#FFB800] border-t-transparent rounded-full animate-spin"></div>
-                  <div className="text-center">
-                    <p className="text-[#FFB800] font-semibold text-xs tracking-widest uppercase mb-1 leading-relaxed">Connecting to Google Drive...</p>
-                    <p className="text-white/40 text-xs leading-relaxed tracking-wide">Loading your exclusive event photos</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Error State */}
-            {fetchError && !isLoading && (
-              <div className="bg-red-500/10 border border-red-500/30 rounded-md p-8 mb-10">
-                <div className="flex flex-col items-start gap-4">
-                  <div className="flex items-start gap-3 w-full">
-                    <svg className="w-6 h-6 text-red-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <div className="flex-1">
-                      <h3 className="text-red-400 font-semibold text-xs tracking-widest uppercase mb-2 leading-relaxed">Unable to Load Gallery Images</h3>
-                      <p className="text-red-300/80 text-xs leading-relaxed tracking-wide mb-3">{fetchError}</p>
-                      <div className="bg-red-500/10 border border-red-500/20 rounded-md p-4 mb-4">
-                        <p className="text-red-300/70 text-xs font-semibold tracking-widest uppercase mb-2 leading-relaxed">Configuration Required:</p>
-                        <p className="text-red-300/50 text-xs leading-relaxed tracking-wide mb-3">
-                          The gallery images are stored in Google Drive. Please configure these environment variables in Vercel:
-                        </p>
-                        <ul className="text-red-300/60 text-xs space-y-1 font-mono leading-relaxed">
-                          <li>• GOOGLE_SERVICE_ACCOUNT_EMAIL</li>
-                          <li>• GOOGLE_PRIVATE_KEY</li>
-                          <li>• GOOGLE_DRIVE_FOLDER_ID</li>
-                        </ul>
-                      </div>
-                      <button
-                        onClick={() => window.location.reload()}
-                        className="inline-flex items-center gap-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300 px-4 py-2 rounded-md text-xs font-semibold tracking-widest uppercase transition-colors leading-relaxed"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                        </svg>
-                        Retry Connection
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
             {/* Photo Count */}
-            {!isLoading && !fetchError && (
-              <div className="text-center mb-4">
-                <p className="text-white/40 text-xs tracking-wide leading-relaxed">
-                  Showing {filteredImages.length} {filteredImages.length === 1 ? 'photo' : 'photos'}
-                </p>
-              </div>
-            )}
+            <div className="text-center mb-4">
+              <p className="text-white/40 text-xs tracking-wide leading-relaxed">
+                Showing {filteredImages.length} {filteredImages.length === 1 ? 'photo' : 'photos'}
+              </p>
+            </div>
 
             {/* Photo Grid */}
-            {!isLoading && !fetchError && images.length > 0 && (
+            {images.length > 0 && (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3 mb-12">
               {filteredImages.map((image, index) => (
                 <button
@@ -384,15 +267,16 @@ export default function GalleryClient() {
                       </div>
                     </div>
                   )}
-                  <Image
-                    src={galleryImageSrc(image.src, 600)}
+                  <GalleryPicture
+                    image={image}
                     alt={image.alt}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    fallbackWidth={600}
                     sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    priority={index < 8}
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    style={FILL}
                     loading={index < 8 ? 'eager' : 'lazy'}
-                    onLoadingComplete={() => {
+                    fetchPriority={index < 8 ? 'high' : undefined}
+                    onLoad={() => {
                       setImageLoadingStates(prev => ({ ...prev, [image.id]: false }))
                     }}
                     onError={() => {

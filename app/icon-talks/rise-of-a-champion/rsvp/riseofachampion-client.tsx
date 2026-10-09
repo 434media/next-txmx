@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { GALLERY_IMAGES } from '../../../../lib/gallery-images'
+import { GALLERY_IMAGES, galleryImageSrc } from '../../../../lib/gallery-images'
 
 export default function RiseOfAChampionClient() {
   return (
@@ -126,7 +126,7 @@ export default function RiseOfAChampionClient() {
                   {GALLERY_IMAGES.slice(0, 12).map((image) => (
                     <div key={image.id} className="aspect-square relative">
                       <Image
-                        src={image.src}
+                        src={galleryImageSrc(image, 400)}
                         alt=""
                         fill
                         className="object-cover blur-[3px]"

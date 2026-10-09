@@ -1,8 +1,8 @@
 "use client"
 
 import { useEffect, useCallback, useState } from "react"
-import Image from "next/image"
-import { galleryDownloadSrc, galleryImageSrc, type GalleryImage } from "../../lib/gallery-images"
+import { galleryDownloadSrc, type GalleryImage } from "../../lib/gallery-images"
+import GalleryPicture from "./gallery-picture"
 
 interface ImageModalProps {
   image: GalleryImage | null
@@ -42,17 +42,16 @@ export default function ImageModal({ image, onClose, onPrevious, onNext }: Image
 
   if (!image) return null
 
-  // Downloads deliberately pull the unsized original — full camera resolution
-  // is the point of the download button, unlike the on-screen render above.
+  // Downloads take the largest delivered JPEG (2048 px, or the photo's own
+  // width when narrower); the originals stay in the private sources bucket.
   //
-  // The link is handed to the browser rather than fetched here: the proxy
-  // replies with Content-Disposition: attachment, so the file streams to disk
-  // through the browser's own download manager. Reading it into a blob first
-  // would hold the whole original (up to 67MB) in page memory, which mobile
-  // browsers frequently kill, and would show no progress while it loaded.
+  // The link is handed to the browser rather than fetched here: the object was
+  // created with Content-Disposition: attachment, so the file streams to disk
+  // through the browser's own download manager. (The `download` attribute is
+  // ignored across origins, which is why the header carries it instead.)
   const handleDownload = () => {
     const a = document.createElement("a")
-    a.href = galleryDownloadSrc(image.src)
+    a.href = galleryDownloadSrc(image)
     a.rel = "noopener"
     document.body.appendChild(a)
     a.click()
@@ -170,13 +169,15 @@ export default function ImageModal({ image, onClose, onPrevious, onNext }: Image
         className="relative max-w-[90vw] max-h-[80vh] flex items-center justify-center"
         onClick={(e) => e.stopPropagation()}
       >
-        <Image
-          src={galleryImageSrc(image.src, 2048) || "/placeholder.svg"}
+        <GalleryPicture
+          key={image.id}
+          image={image}
           alt={image.alt}
-          width={1200}
-          height={800}
+          fallbackWidth={2048}
+          sizes="90vw"
           className="max-w-full max-h-[80vh] object-contain"
-          priority
+          loading="eager"
+          fetchPriority="high"
         />
       </div>
 
