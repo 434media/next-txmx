@@ -344,7 +344,6 @@ export async function placePropPick(
     await incrementPicksMade(fightNightId, userId, {
       displayName: u?.displayName || null,
       photoURL: u?.photoURL || null,
-      email: u?.email || null,
     })
   } catch {
     // Non-critical
@@ -444,7 +443,6 @@ export async function settleProp(
         await incrementStandingPoints(fightNightId, pick.userId, points, {
           displayName: u?.displayName || null,
           photoURL: u?.photoURL || null,
-          email: u?.email || null,
         })
       } catch {
         // Non-critical

@@ -147,7 +147,6 @@ export async function placeFightNightPick(
     await incrementPicksMade(fightNightId, userId, {
       displayName: u?.displayName || null,
       photoURL: u?.photoURL || null,
-      email: u?.email || null,
     })
   } catch {
     // Non-critical
@@ -331,7 +330,6 @@ export async function recordFightNightBoutResult(
         await incrementStandingPoints(fightNightId, pick.userId, pointsAwarded, {
           displayName: u?.displayName || null,
           photoURL: u?.photoURL || null,
-          email: u?.email || null,
         })
       } catch {
         // Non-critical — points will be off, but settlement succeeded

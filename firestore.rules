@@ -36,6 +36,10 @@ service cloud.firestore {
         allow read: if true;
       }
 
+      // Readable by any signed-in fan (live leaderboard). Must hold no
+      // private data: emails are not written here (they live on users/{uid},
+      // owner-only, and are read server-side). Older docs may still carry a
+      // legacy `email` field until the separate cleanup removes it.
       match /standings/{userId} {
         allow read: if request.auth != null;
       }
@@ -60,6 +64,7 @@ service cloud.firestore {
         allow read: if request.auth != null;
       }
 
+      // Same rule as standings: no emails are written here.
       match /prizes/{prizeId} {
         allow read: if request.auth != null;
       }

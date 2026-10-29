@@ -3,6 +3,7 @@
 import { firestore } from "../../lib/firebase-admin"
 import { verifyFanIdToken } from "../../lib/fan-auth"
 import { requireAdmin } from "../../lib/admin-auth"
+import { emailsForUids } from "../../lib/server/fan-emails"
 
 export interface UserRecord {
   uid: string
@@ -218,6 +219,20 @@ export async function getLegacyUsers(): Promise<UserRecord[]> {
     .where("legacyRank", "!=", null)
     .get()
   return snap.docs.map(d => d.data() as UserRecord)
+}
+
+/**
+ * Admin-only: fans' emails by uid, for the participants panel and the player
+ * drawer. Emails are not stored on standings docs (readable by any signed-in
+ * user), so the admin UI asks for them here.
+ */
+export async function getFanEmailsForAdmin(
+  uids: string[]
+): Promise<Record<string, string | null>> {
+  await requireAdmin()
+  if (!Array.isArray(uids)) return {}
+  const map = await emailsForUids(uids.filter((u) => typeof u === "string").slice(0, 1000))
+  return Object.fromEntries(map)
 }
 
 export async function searchUsers(query: string, limit = 20): Promise<UserRecord[]> {
