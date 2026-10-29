@@ -2,6 +2,7 @@
 
 import { firestore } from "../../lib/firebase-admin"
 import { verifyFanIdToken } from "../../lib/fan-auth"
+import { requireAdmin } from "../../lib/admin-auth"
 
 export interface UserRecord {
   uid: string
@@ -121,47 +122,12 @@ export async function getOrCreateUser(
   return user
 }
 
-export async function getUserByUid(
-  uid: string
-): Promise<UserRecord | null> {
-  const snap = await firestore.collection("users").doc(uid).get()
-  if (!snap.exists) return null
-  return snap.data() as UserRecord
-}
-
-export async function getUserByStripeCustomerId(
-  customerId: string
-): Promise<UserRecord | null> {
-  const snap = await firestore
-    .collection("users")
-    .where("stripeCustomerId", "==", customerId)
-    .limit(1)
-    .get()
-
-  if (snap.empty) return null
-  return snap.docs[0].data() as UserRecord
-}
-
-export async function updateUserSubscription(
-  uid: string,
-  data: {
-    subscriptionStatus: UserRecord["subscriptionStatus"]
-    stripeCustomerId?: string
-    stripeSubscriptionId?: string
-  }
-) {
-  const ref = firestore.collection("users").doc(uid)
-  await ref.update({
-    ...data,
-    updatedAt: new Date().toISOString(),
-  })
-}
-
 export async function updateUserPoints(
   uid: string,
   field: "skillPoints" | "txCredits" | "loyaltyPoints",
   delta: number
 ) {
+  await requireAdmin()
   const ref = firestore.collection("users").doc(uid)
 
   await firestore.runTransaction(async (tx) => {
@@ -189,6 +155,7 @@ export async function updateUserPoints(
 }
 
 export async function setGymPledge(uid: string, gymId: string) {
+  await requireAdmin()
   const ref = firestore.collection("users").doc(uid)
   const snap = await ref.get()
 
@@ -218,6 +185,7 @@ export async function setGymPledge(uid: string, gymId: string) {
 // ── Verified Accounts ────────────────────────────────────
 
 export async function setUserVerified(uid: string, verified: boolean): Promise<void> {
+  await requireAdmin()
   const ref = firestore.collection("users").doc(uid)
   const snap = await ref.get()
   if (!snap.exists) throw new Error("User not found")
@@ -230,6 +198,7 @@ export async function setUserLegacyRank(
   uid: string,
   legacyRank: "rookie" | "contender" | "champion" | "hall_of_fame" | null
 ): Promise<void> {
+  await requireAdmin()
   const ref = firestore.collection("users").doc(uid)
   const snap = await ref.get()
   if (!snap.exists) throw new Error("User not found")
@@ -243,6 +212,7 @@ export async function setUserLegacyRank(
 }
 
 export async function getLegacyUsers(): Promise<UserRecord[]> {
+  await requireAdmin()
   const snap = await firestore
     .collection("users")
     .where("legacyRank", "!=", null)
@@ -251,6 +221,7 @@ export async function getLegacyUsers(): Promise<UserRecord[]> {
 }
 
 export async function searchUsers(query: string, limit = 20): Promise<UserRecord[]> {
+  await requireAdmin()
   // Firestore doesn't support full-text search, so fetch recent users and filter client-side
   const snap = await firestore
     .collection("users")
@@ -270,6 +241,7 @@ export async function searchUsers(query: string, limit = 20): Promise<UserRecord
 }
 
 export async function getVerifiedUsers(): Promise<UserRecord[]> {
+  await requireAdmin()
   const snap = await firestore
     .collection("users")
     .where("isVerified", "==", true)
@@ -288,6 +260,7 @@ export interface LeaderboardEntry {
 }
 
 export async function getLeaderboard(limit = 50): Promise<LeaderboardEntry[]> {
+  await requireAdmin()
   const snapshot = await firestore
     .collection("users")
     .orderBy("skillPoints", "desc")
@@ -310,6 +283,7 @@ export async function getLeaderboard(limit = 50): Promise<LeaderboardEntry[]> {
 // ── Profile Photo ────────────────────────────────────────
 
 export async function updateUserPhoto(uid: string, photoURL: string | null): Promise<void> {
+  await requireAdmin()
   const ref = firestore.collection("users").doc(uid)
   const snap = await ref.get()
   if (!snap.exists) throw new Error("User not found")

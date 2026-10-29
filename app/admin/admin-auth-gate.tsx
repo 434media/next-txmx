@@ -1,33 +1,102 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import { onAuthStateChanged, signInWithPopup, signInWithEmailAndPassword, signOut, type User } from 'firebase/auth'
 import { auth, googleProvider } from '../../lib/firebase-client'
 
 interface AdminAuthGateProps {
   children: React.ReactNode
+  /** Email on the verified server-side admin session, or null if none. */
+  sessionEmail: string | null
 }
 
-export default function AdminAuthGate({ children }: AdminAuthGateProps) {
+type Access = 'checking' | 'denied' | 'error'
+
+const SESSION_ENDPOINT = '/api/admin/session'
+
+/** Clear the httpOnly admin session cookie. Best effort. */
+export async function clearAdminSession(): Promise<void> {
+  try {
+    await fetch(SESSION_ENDPOINT, { method: 'DELETE' })
+  } catch {
+    // Network failure — the cookie still expires on its own.
+  }
+}
+
+/**
+ * Client-side sign-in UI for /admin. This is presentation only: the server
+ * decides who is an admin (verified email on ADMIN_EMAILS) when the ID token
+ * is exchanged for a session cookie, and re-checks that cookie on every page
+ * render, admin action and /api/admin request.
+ */
+export default function AdminAuthGate({ children, sessionEmail }: AdminAuthGateProps) {
+  const router = useRouter()
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const [access, setAccess] = useState<Access>('checking')
   const [error, setError] = useState('')
   const [signingIn, setSigningIn] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
+  // Read the latest server session from inside the auth listener without
+  // re-subscribing it on every refresh.
+  const sessionEmailRef = useRef(sessionEmail)
+  useEffect(() => {
+    sessionEmailRef.current = sessionEmail
+  }, [sessionEmail])
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        setUser(firebaseUser)
-        setError('')
-      } else {
-        setUser(null)
-      }
+      setUser(firebaseUser)
+      setError('')
+      setAccess('checking')
       setLoading(false)
+
+      if (!firebaseUser) {
+        // Signed out of Firebase: drop any admin session this browser holds.
+        if (sessionEmailRef.current) {
+          await clearAdminSession()
+          router.refresh()
+        }
+        return
+      }
+
+      const userEmail = firebaseUser.email?.toLowerCase() ?? null
+      if (userEmail && userEmail === sessionEmailRef.current) return
+
+      // No session for this user yet: exchange the ID token for one. The
+      // server answers 403 for anyone not on the allowlist.
+      try {
+        const idToken = await firebaseUser.getIdToken()
+        const res = await fetch(SESSION_ENDPOINT, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${idToken}` },
+        })
+        if (res.ok) {
+          // Re-render the server tree so the page loads its data under the
+          // new session cookie.
+          router.refresh()
+        } else if (res.status === 403) {
+          setAccess('denied')
+        } else {
+          setAccess('error')
+          setError('Could not start an admin session. Please sign in again.')
+        }
+      } catch {
+        setAccess('error')
+        setError('Could not reach the server. Please try again.')
+      }
     })
     return () => unsubscribe()
-  }, [])
+  }, [router])
+
+  const handleSignOut = async () => {
+    await clearAdminSession()
+    await signOut(auth)
+    router.refresh()
+  }
 
   const handleGoogleSignIn = async () => {
     setSigningIn(true)
@@ -175,10 +244,71 @@ export default function AdminAuthGate({ children }: AdminAuthGateProps) {
     )
   }
 
-  return <>{children}</>
+  const authorized =
+    !!sessionEmail && user.email?.toLowerCase() === sessionEmail
+
+  if (authorized) {
+    return <>{children}</>
+  }
+
+  if (access === 'denied' || access === 'error') {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center pt-16 admin-selection-fix">
+        <div className="max-w-sm w-full px-8">
+          <div className="text-center space-y-6">
+            <div>
+              <p className="text-gray-300 text-[10px] font-semibold tracking-[0.3em] mb-2">
+                TXMX BOXING
+              </p>
+              <h1 className="text-gray-900 text-2xl font-bold tracking-[0.15em]">
+                {access === 'denied' ? 'NOT AUTHORIZED' : 'SIGN-IN ERROR'}
+              </h1>
+              <div className="mt-2 h-px w-10 bg-gray-900/60 mx-auto" />
+            </div>
+
+            {access === 'denied' ? (
+              <p className="text-gray-400 text-sm leading-relaxed tracking-tight">
+                {user.email ? (
+                  <>
+                    <span className="text-gray-900">{user.email}</span> does not have
+                    admin access.
+                  </>
+                ) : (
+                  'This account does not have admin access.'
+                )}{' '}
+                Admin accounts must be on the allowlist and have a verified email.
+              </p>
+            ) : (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                <p className="text-red-600 text-xs">{error}</p>
+              </div>
+            )}
+
+            <button
+              onClick={handleSignOut}
+              className="w-full bg-gray-900 text-white font-medium text-sm tracking-wide px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors"
+            >
+              Sign out
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Session exchange or page refresh in flight.
+  return (
+    <div className="min-h-screen bg-white flex items-center justify-center pt-16">
+      <div className="text-center space-y-4">
+        <div className="animate-spin w-8 h-8 border-2 border-gray-900 border-t-transparent rounded-full mx-auto" />
+        <p className="text-gray-400 text-xs tracking-widest">VERIFYING ACCESS</p>
+      </div>
+    </div>
+  )
 }
 
 export function useAdminAuth() {
+  const router = useRouter()
   const [user, setUser] = useState<User | null>(null)
 
   useEffect(() => {
@@ -189,7 +319,9 @@ export function useAdminAuth() {
   }, [])
 
   const handleSignOut = async () => {
+    await clearAdminSession()
     await signOut(auth)
+    router.refresh()
   }
 
   return { user, signOut: handleSignOut }

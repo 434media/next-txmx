@@ -1,6 +1,7 @@
 'use server'
 
 import { firestore } from '../../lib/firebase-admin'
+import { requireAdmin } from '../../lib/admin-auth'
 
 export interface VenueData {
   id: string
@@ -20,6 +21,7 @@ export interface VenueData {
 }
 
 export async function getVenues(): Promise<VenueData[]> {
+  await requireAdmin()
   const snapshot = await firestore
     .collection('venues')
     .orderBy('name', 'asc')
@@ -39,6 +41,7 @@ export async function getVenues(): Promise<VenueData[]> {
 }
 
 export async function updateVenue(id: string, data: Partial<Omit<VenueData, 'id' | 'createdAt'>>) {
+  await requireAdmin()
   await firestore.collection('venues').doc(id).update({
     ...data,
     updatedAt: new Date().toISOString(),
@@ -47,6 +50,7 @@ export async function updateVenue(id: string, data: Partial<Omit<VenueData, 'id'
 }
 
 export async function deleteVenue(id: string) {
+  await requireAdmin()
   await firestore.collection('venues').doc(id).delete()
   return { success: true }
 }

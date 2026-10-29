@@ -2,6 +2,7 @@
 
 import { Resend } from 'resend'
 import { firestore } from '../../lib/firebase-admin'
+import { requireAdmin } from '../../lib/admin-auth'
 import { getFightNight } from './fightnight'
 import { type FightNightStanding } from './fightnight-standings'
 import { getStandingsWithEmails, getPrizesWithEmails } from '../../lib/server/fan-emails'
@@ -33,6 +34,7 @@ export async function sendFightNightRecap(
   fightNightId: string,
   options?: { claimInstructions?: string }
 ): Promise<RecapResult> {
+  await requireAdmin()
   const fightNight = await getFightNight(fightNightId)
   if (!fightNight) {
     return { sent: 0, skipped: 0, errors: 0, firstError: 'Fight night not found' }
@@ -133,6 +135,7 @@ export async function getRecapEmailPreview(
   fightNightId: string,
   options?: { claimInstructions?: string }
 ): Promise<string> {
+  await requireAdmin()
   const fightNight = await getFightNight(fightNightId)
   if (!fightNight) {
     return '<p style="font-family:sans-serif;padding:24px">Fight night not found.</p>'

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { rebuildSeasonStandings } from '../../../actions/season-standings'
+import { rebuildSeasonStandings } from '../../../../lib/server/season-standings'
 
 /**
  * One-off / maintenance backfill for the cross-event season leaderboard.

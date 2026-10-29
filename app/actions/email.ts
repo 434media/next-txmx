@@ -1,4 +1,8 @@
-"use server"
+import 'server-only'
+
+// Server-only module, deliberately NOT "use server": its exports used to be
+// server actions, i.e. public POST endpoints anyone could call. They are only
+// called from server code (the Stripe webhook and notifyFightNightWinners).
 
 import { Resend } from "resend"
 

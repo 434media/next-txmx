@@ -2,10 +2,11 @@
 
 import { firestore } from '../../lib/firebase-admin'
 import { uidFromIdToken } from '../../lib/fan-auth'
+import { requireAdmin } from '../../lib/admin-auth'
 import {
   incrementStandingPoints,
   incrementPicksMade,
-} from './fightnight-standings'
+} from '../../lib/server/fightnight-standings'
 import { DEFAULT_PROP_POINTS, UNDERDOG_MULTIPLIER } from '../../lib/scoring'
 
 // ── Types ────────────────────────────────────────────────
@@ -93,6 +94,7 @@ export async function createProp(
     boutNumber?: number | null
   }
 ): Promise<FightNightProp> {
+  await requireAdmin()
   if (!fightNightId) throw new Error('Missing fightNightId')
   if (!data.title.trim()) throw new Error('Title is required')
   if (!data.options || data.options.length < 2) {
@@ -125,6 +127,7 @@ export async function updatePropStatus(
   propId: string,
   status: PropStatus
 ): Promise<void> {
+  await requireAdmin()
   await propsCol(fightNightId).doc(propId).update({
     status,
     updatedAt: new Date().toISOString(),
@@ -152,6 +155,7 @@ export async function updateProp(
     boutNumber?: number | null
   }
 ): Promise<void> {
+  await requireAdmin()
   if (!fightNightId || !propId) throw new Error('Missing args')
   const ref = propsCol(fightNightId).doc(propId)
   const snap = await ref.get()
@@ -202,6 +206,7 @@ export async function deleteProp(
   fightNightId: string,
   propId: string
 ): Promise<void> {
+  await requireAdmin()
   await propsCol(fightNightId).doc(propId).delete()
 }
 
@@ -228,6 +233,7 @@ export async function lockPropsForBout(
   fightNightId: string,
   boutNumber: number
 ): Promise<{ locked: number }> {
+  await requireAdmin()
   if (!fightNightId || !boutNumber) return { locked: 0 }
   const snap = await propsCol(fightNightId)
     .where('boutNumber', '==', boutNumber)
@@ -255,6 +261,7 @@ export async function unlockPropsForBout(
   fightNightId: string,
   boutNumber: number
 ): Promise<{ unlocked: number }> {
+  await requireAdmin()
   if (!fightNightId || !boutNumber) return { unlocked: 0 }
   const snap = await propsCol(fightNightId)
     .where('boutNumber', '==', boutNumber)
@@ -373,6 +380,7 @@ export async function settleProp(
   winners: number
   error?: string
 }> {
+  await requireAdmin()
   if (!fightNightId || !propId) {
     return { success: false, settled: 0, winners: 0, error: 'Missing args' }
   }
@@ -451,6 +459,7 @@ export async function voidProp(
   fightNightId: string,
   propId: string
 ): Promise<void> {
+  await requireAdmin()
   await propsCol(fightNightId).doc(propId).update({
     status: 'voided' as PropStatus,
     updatedAt: new Date().toISOString(),

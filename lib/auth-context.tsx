@@ -140,6 +140,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const signOut = async () => {
+    // Also drop the /admin session cookie (httpOnly, so only the server can
+    // clear it) — signing out anywhere on the site ends admin access too.
+    try {
+      await fetch('/api/admin/session', { method: 'DELETE' })
+    } catch {
+      // Best effort — the cookie expires on its own.
+    }
     await firebaseSignOut(auth)
     setProfile(null)
   }

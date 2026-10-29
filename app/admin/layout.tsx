@@ -1,9 +1,18 @@
 import AdminAuthGate from './admin-auth-gate'
+import { getAdminSession } from '../../lib/admin-auth'
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  return <AdminAuthGate>{children}</AdminAuthGate>
+  // The gate only decides what the browser shows. Authorization is enforced
+  // server-side: the page, every admin action and /api/admin/* re-check the
+  // session cookie against ADMIN_EMAILS on each request.
+  const session = await getAdminSession()
+  return (
+    <AdminAuthGate sessionEmail={session.ok ? session.admin.email : null}>
+      {children}
+    </AdminAuthGate>
+  )
 }
