@@ -1,6 +1,7 @@
 'use server'
 
 import { firestore } from '../../lib/firebase-admin'
+import { requireAdmin } from '../../lib/admin-auth'
 
 export interface FightNightPollOption {
   label: string
@@ -48,6 +49,7 @@ export async function createPoll(
     boutNumber?: number | null
   }
 ): Promise<FightNightPoll> {
+  await requireAdmin()
   if (!fightNightId) throw new Error('Missing fightNightId')
   if (!data.question.trim()) throw new Error('Question is required')
   if (data.options.length < 2) throw new Error('At least 2 options required')
@@ -67,6 +69,7 @@ export async function createPoll(
 }
 
 export async function closePoll(fightNightId: string, pollId: string): Promise<void> {
+  await requireAdmin()
   await pollsCol(fightNightId).doc(pollId).update({
     status: 'closed',
     closedAt: new Date().toISOString(),
@@ -74,6 +77,7 @@ export async function closePoll(fightNightId: string, pollId: string): Promise<v
 }
 
 export async function reopenPoll(fightNightId: string, pollId: string): Promise<void> {
+  await requireAdmin()
   await pollsCol(fightNightId).doc(pollId).update({
     status: 'open',
     closedAt: null,
@@ -100,6 +104,7 @@ export async function updatePoll(
     boutNumber?: number | null
   }
 ): Promise<void> {
+  await requireAdmin()
   if (!fightNightId || !pollId) throw new Error('Missing args')
   const ref = pollsCol(fightNightId).doc(pollId)
   const snap = await ref.get()
@@ -134,6 +139,7 @@ export async function updatePoll(
 }
 
 export async function deletePoll(fightNightId: string, pollId: string): Promise<void> {
+  await requireAdmin()
   await pollsCol(fightNightId).doc(pollId).delete()
 }
 

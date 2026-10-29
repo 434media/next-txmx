@@ -2,7 +2,7 @@
 
 import { stripe } from "../../lib/stripe"
 import { getAuth } from "firebase-admin/auth"
-import { getUserByUid, updateUserSubscription } from "./users"
+import { getUserByUid, updateUserSubscription } from "../../lib/server/users"
 import "../../lib/firebase-admin"
 
 async function getOrCreateBlackCardProduct(): Promise<string> {

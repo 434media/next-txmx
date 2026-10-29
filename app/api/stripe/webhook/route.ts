@@ -4,7 +4,7 @@ import {
   getUserByStripeCustomerId,
   getUserByUid,
   updateUserSubscription,
-} from "../../../actions/users"
+} from "../../../../lib/server/users"
 import { sendSubscriptionConfirmation } from "../../../actions/email"
 import type Stripe from "stripe"
 

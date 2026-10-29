@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getAuth } from "firebase-admin/auth"
 import { stripe } from "../../../../lib/stripe"
-import { getUserByUid, updateUserSubscription } from "../../../actions/users"
+import { getUserByUid, updateUserSubscription } from "../../../../lib/server/users"
 
 export async function POST(request: NextRequest) {
   const authHeader = request.headers.get("Authorization")

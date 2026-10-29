@@ -4,6 +4,7 @@ import { getVenues } from '../actions/venues'
 import { getEventPromoters, getPromoters, getEvents } from '../actions/events'
 import { getGyms } from '../actions/gyms'
 import AdminClient from './admin-client'
+import { getAdminSession } from '../../lib/admin-auth'
 
 export const metadata: Metadata = {
   title: 'Admin Dashboard',
@@ -16,6 +17,12 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic'
 
 export default async function AdminPage() {
+  // Authorize before fetching anything: non-admins get no admin data rendered
+  // or serialized into the RSC payload. The layout's client gate handles the
+  // sign-in UI and refreshes this page once a session cookie exists.
+  const session = await getAdminSession()
+  if (!session.ok) return null
+
   try {
     const [fighters, venues, eventPromoters, promoterDocs, gyms, events] = await Promise.all([
       getFighters(),

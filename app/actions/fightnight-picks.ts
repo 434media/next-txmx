@@ -1,8 +1,9 @@
 'use server'
 
 import { firestore } from '../../lib/firebase-admin'
+import { requireAdmin } from '../../lib/admin-auth'
 import { getFightNight } from './fightnight'
-import { incrementStandingPoints, incrementPicksMade } from './fightnight-standings'
+import { incrementStandingPoints, incrementPicksMade } from '../../lib/server/fightnight-standings'
 import { lockPropsForBout, unlockPropsForBout } from './fightnight-props'
 import { sendPushToUsers } from './notifications'
 import { MATCH_WIN_POINTS } from '../../lib/scoring'
@@ -157,6 +158,7 @@ export async function getUserPicks(
   fightNightId: string,
   userId: string
 ): Promise<FightNightPick[]> {
+  await requireAdmin()
   if (!fightNightId || !userId) return []
   // Sort client-side rather than on Firestore so we don't need a
   // composite (userId, boutNumber) index. Per-user picks are bounded
@@ -178,6 +180,7 @@ export async function getAllUserPicks(
   userId: string,
   max = 500
 ): Promise<FightNightPick[]> {
+  await requireAdmin()
   if (!userId) return []
   const nights = await firestore
     .collection('fightNights')
@@ -201,6 +204,7 @@ export async function getPicksForBout(
   fightNightId: string,
   boutNumber: number
 ): Promise<FightNightPick[]> {
+  await requireAdmin()
   if (!fightNightId || !boutNumber) return []
   const snap = await picksCol(fightNightId)
     .where('boutNumber', '==', boutNumber)
@@ -214,6 +218,7 @@ export async function getPicksForBout(
  * how many pick docs exist. Drives the Overview engagement metric.
  */
 export async function getPickCount(fightNightId: string): Promise<number> {
+  await requireAdmin()
   if (!fightNightId) return 0
   const agg = await picksCol(fightNightId).count().get()
   return agg.data().count
@@ -237,6 +242,7 @@ export async function recordFightNightBoutResult(
   winners: number
   error?: string
 }> {
+  await requireAdmin()
   if (!fightNightId || !boutNumber) {
     return { success: false, settled: 0, winners: 0, error: 'Missing args' }
   }
@@ -388,6 +394,7 @@ export async function markBoutLive(
   fightNightId: string,
   boutNumber: number
 ): Promise<void> {
+  await requireAdmin()
   const boutRef = firestore
     .collection('fightNights')
     .doc(fightNightId)
@@ -463,6 +470,7 @@ export async function reopenFightNightBout(
   pointsReversed: number
   error?: string
 }> {
+  await requireAdmin()
   if (!fightNightId || !boutNumber) {
     return { success: false, unsettled: 0, pointsReversed: 0, error: 'Missing args' }
   }

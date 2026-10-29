@@ -1,6 +1,7 @@
 'use server'
 
 import { firestore } from '../../lib/firebase-admin'
+import { requireAdmin } from '../../lib/admin-auth'
 
 // ── Types ────────────────────────────────────────────────
 
@@ -164,6 +165,7 @@ async function ensureUniqueSlug(base: string, excludeId?: string): Promise<strin
 export async function createFightNight(
   data: Partial<Omit<FightNight, 'id' | 'createdAt' | 'updatedAt'>>
 ): Promise<FightNight> {
+  await requireAdmin()
   const now = new Date().toISOString()
   const merged = { ...emptyDefaults(), ...data }
   const base = merged.slug ? slugify(merged.slug) : buildSlugBase(merged)
@@ -177,6 +179,7 @@ export async function updateFightNight(
   id: string,
   data: Partial<Omit<FightNight, 'id' | 'createdAt'>>
 ): Promise<void> {
+  await requireAdmin()
   const patch: Record<string, unknown> = {
     ...data,
     updatedAt: new Date().toISOString(),
@@ -192,6 +195,7 @@ export async function updateFightNight(
 }
 
 export async function deleteFightNight(id: string): Promise<void> {
+  await requireAdmin()
   // Note: subcollections are NOT deleted by this — admin should drop manually
   // if a fight night is created in error. For Thursday's event we won't delete.
   await fightNightRef(id).delete()
@@ -281,6 +285,7 @@ export async function getPastFightNights(limit = 12): Promise<FightNight[]> {
  * trigger from an admin button or a one-off server invocation.
  */
 export async function backfillFightNightSlugs(): Promise<{ updated: number }> {
+  await requireAdmin()
   const snap = await firestore.collection('fightNights').get()
   let updated = 0
   for (const doc of snap.docs) {
@@ -408,6 +413,7 @@ export async function upsertBout(
   boutNumber: number,
   data: Partial<Omit<FightNightBout, 'boutNumber' | 'createdAt' | 'updatedAt'>>
 ): Promise<FightNightBout> {
+  await requireAdmin()
   const ref = boutsCol(fightNightId).doc(String(boutNumber))
   const now = new Date().toISOString()
   const existing = await ref.get()
@@ -455,5 +461,6 @@ export async function deleteBout(
   fightNightId: string,
   boutNumber: number
 ): Promise<void> {
+  await requireAdmin()
   await boutsCol(fightNightId).doc(String(boutNumber)).delete()
 }
