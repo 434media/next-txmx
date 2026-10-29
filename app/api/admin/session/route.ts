@@ -7,6 +7,7 @@ import {
   adminFromVerifiedClaims,
   adminSessionCookieOptions,
   checkAdminSessionCookie,
+  issueAdminSessionToken,
 } from '../../../../lib/admin-auth'
 
 export const dynamic = 'force-dynamic'
@@ -28,6 +29,11 @@ async function readIdToken(request: NextRequest): Promise<string | null> {
 
 /**
  * Exchange a Firebase ID token for an httpOnly admin session cookie.
+ *
+ * The ID token is checked by public-key verification only (no checkRevoked):
+ * this project's service account may not call the Firebase Auth admin APIs,
+ * so checkRevoked and Firebase session cookies fail with
+ * auth/insufficient-permission. The session is our own HMAC-signed cookie.
  * 401 — missing or invalid token. 403 — valid Firebase user who is not an
  * admin (not on ADMIN_EMAILS, or email not verified). 200 — cookie set.
  */
@@ -39,7 +45,7 @@ export async function POST(request: NextRequest) {
 
   let claims
   try {
-    claims = await auth.verifyIdToken(idToken, true)
+    claims = await auth.verifyIdToken(idToken)
   } catch (err) {
     console.error('[POST /api/admin/session] verifyIdToken failed:', (err as { code?: string })?.code ?? 'unknown')
     return NextResponse.json({ error: 'Invalid ID token' }, { status: 401 })
@@ -54,14 +60,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Not authorized' }, { status: 403 })
   }
 
-  let sessionCookie: string
-  try {
-    sessionCookie = await auth.createSessionCookie(idToken, {
-      expiresIn: ADMIN_SESSION_MAX_AGE_MS,
-    })
-  } catch (err) {
-    console.error('[POST /api/admin/session] createSessionCookie failed:', (err as { code?: string })?.code ?? 'unknown')
-    return NextResponse.json({ error: 'Could not create session' }, { status: 401 })
+  const sessionCookie = issueAdminSessionToken(admin)
+  if (!sessionCookie) {
+    // Fail closed: ADMIN_SESSION_SECRET unset or shorter than 32 bytes.
+    console.error('[POST /api/admin/session] ADMIN_SESSION_SECRET missing or too short')
+    return NextResponse.json({ error: 'Could not create session' }, { status: 500 })
   }
 
   cookieStore.set(
