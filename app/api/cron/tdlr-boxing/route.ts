@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireCronSecret } from '../../../../lib/cron-auth'
 
 const CSV_URL = 'https://www.tdlr.texas.gov/sports/_events-list.csv'
 const BASE_URL = 'https://www.tdlr.texas.gov'
@@ -31,13 +32,10 @@ function parseCSV(text: string): CSVRow[] {
 }
 
 export async function GET(request: NextRequest) {
-  // Verify cron secret to prevent unauthorized access
-  const authHeader = request.headers.get('authorization')
-  const cronSecret = process.env.CRON_SECRET
-
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  // Vercel Cron sends `Authorization: Bearer $CRON_SECRET`. Fails closed when
+  // CRON_SECRET is unset so the route is never publicly triggerable.
+  const denied = requireCronSecret(request)
+  if (denied) return denied
 
   try {
     // 1. Fetch the TDLR events CSV

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { requireCronSecret } from "../../../../lib/cron-auth"
 import { backfillBoutFighters } from "../../../actions/backfill-bout-fighters"
 
 /**
@@ -19,18 +20,8 @@ import { backfillBoutFighters } from "../../../actions/backfill-bout-fighters"
  *     -H "Authorization: Bearer $CRON_SECRET"
  */
 export async function POST(request: NextRequest) {
-  const secret = process.env.CRON_SECRET
-  if (!secret) {
-    return NextResponse.json(
-      { error: "CRON_SECRET not configured — refusing to run." },
-      { status: 503 }
-    )
-  }
-
-  const authHeader = request.headers.get("authorization")
-  if (authHeader !== `Bearer ${secret}`) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
+  const denied = requireCronSecret(request)
+  if (denied) return denied
 
   const { searchParams } = new URL(request.url)
   const truthy = (v: string | null) => v === "1" || v === "true"
