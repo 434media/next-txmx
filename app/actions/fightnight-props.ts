@@ -1,6 +1,7 @@
 'use server'
 
 import { firestore } from '../../lib/firebase-admin'
+import { uidFromIdToken } from '../../lib/fan-auth'
 import {
   incrementStandingPoints,
   incrementPicksMade,
@@ -276,11 +277,14 @@ export async function unlockPropsForBout(
 
 export async function placePropPick(
   fightNightId: string,
-  userId: string,
+  idToken: string,
   propId: string,
   optionId: string
 ): Promise<{ success: boolean; error?: string }> {
-  if (!fightNightId || !userId || !propId) {
+  // The picker is whoever the verified ID token says — never a client-sent uid.
+  const userId = await uidFromIdToken(idToken)
+  if (!userId) return { success: false, error: 'Not signed in' }
+  if (!fightNightId || !propId) {
     return { success: false, error: 'Missing args' }
   }
 

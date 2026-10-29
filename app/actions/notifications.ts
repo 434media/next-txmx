@@ -1,6 +1,7 @@
 'use server'
 
 import { firestore } from '../../lib/firebase-admin'
+import { uidFromIdToken } from '../../lib/fan-auth'
 import webpush from 'web-push'
 
 interface PushSubscriptionData {
@@ -12,14 +13,26 @@ interface PushSubscriptionData {
 }
 
 export async function savePushSubscription(
-  userId: string,
+  idToken: string,
   subscription: PushSubscriptionData
 ) {
+  // The subscription is stored under the verified caller's uid only.
+  const userId = await uidFromIdToken(idToken)
+  if (!userId) return { success: false, error: 'Not signed in' }
+  if (
+    !subscription ||
+    typeof subscription.endpoint !== 'string' ||
+    typeof subscription.keys?.p256dh !== 'string' ||
+    typeof subscription.keys?.auth !== 'string'
+  ) {
+    return { success: false, error: 'Invalid subscription' }
+  }
   await firestore
     .collection('pushSubscriptions')
     .doc(userId)
     .set({
-      ...subscription,
+      endpoint: subscription.endpoint,
+      keys: { p256dh: subscription.keys.p256dh, auth: subscription.keys.auth },
       userId,
       createdAt: new Date().toISOString(),
     })
@@ -27,7 +40,9 @@ export async function savePushSubscription(
   return { success: true }
 }
 
-export async function removePushSubscription(userId: string) {
+export async function removePushSubscription(idToken: string) {
+  const userId = await uidFromIdToken(idToken)
+  if (!userId) return { success: false, error: 'Not signed in' }
   await firestore.collection('pushSubscriptions').doc(userId).delete()
   return { success: true }
 }

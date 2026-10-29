@@ -8,7 +8,7 @@ import {
   query,
   doc as docFn,
 } from "firebase/firestore"
-import { db } from "../../../../lib/firebase-client"
+import { auth, db } from "../../../../lib/firebase-client"
 import { useAuth } from "../../../../lib/auth-context"
 import { placeFightNightPick } from "../../../actions/fightnight-picks"
 import type { FightNightBout } from "../../../actions/fightnight"
@@ -286,7 +286,13 @@ function BoutCard({
     setSubmitting(corner)
     setError("")
     try {
-      const res = await placeFightNightPick(fightNightId, userId, bout.boutNumber, corner)
+      // The server takes the picker's uid from this verified token.
+      const idToken = await auth.currentUser?.getIdToken()
+      if (!idToken) {
+        setError("Sign in to make picks")
+        return
+      }
+      const res = await placeFightNightPick(fightNightId, idToken, bout.boutNumber, corner)
       if (!res.success) setError(res.error || "Failed to place pick")
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to place pick")

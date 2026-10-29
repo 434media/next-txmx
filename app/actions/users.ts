@@ -1,6 +1,7 @@
 "use server"
 
 import { firestore } from "../../lib/firebase-admin"
+import { verifyFanIdToken } from "../../lib/fan-auth"
 
 export interface UserRecord {
   uid: string
@@ -47,12 +48,30 @@ function computeRank(
   return spRank
 }
 
+/**
+ * Create or backfill the caller's own `users/{uid}` record.
+ *
+ * Identity (uid, email, photo) comes only from the verified ID token — a
+ * server action's arguments can be forged, so a client-sent uid would let
+ * anyone create or read any user's record. The one caller-supplied value is
+ * `displayName`, the name the fan typed at sign-up, applied only to their own
+ * record and only where it is still empty.
+ */
 export async function getOrCreateUser(
-  uid: string,
-  email: string | null,
-  displayName: string | null,
-  photoURL: string | null
+  idToken: string,
+  displayNameHint: string | null = null
 ): Promise<UserRecord> {
+  const decoded = await verifyFanIdToken(idToken)
+  if (!decoded) throw new Error("Not signed in")
+  const uid = decoded.uid
+  const email = decoded.email || null
+  const photoURL = decoded.picture || null
+  // Walk-in guests sign in with a custom token whose claims carry
+  // `displayName`; provider sign-ins carry `name`.
+  const claimName = typeof decoded.displayName === "string" ? decoded.displayName : null
+  const hint = typeof displayNameHint === "string" ? displayNameHint.trim().slice(0, 80) : ""
+  const displayName = hint || decoded.name || claimName || null
+
   const ref = firestore.collection("users").doc(uid)
   const snap = await ref.get()
 

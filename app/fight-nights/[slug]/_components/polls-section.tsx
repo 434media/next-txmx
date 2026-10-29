@@ -60,7 +60,7 @@ export default function PollsSection({
     setSubmitting(pollId)
     setErrorById((m) => ({ ...m, [pollId]: "" }))
     try {
-      const res = await votePoll(fightNightId, user.uid, pollId, optionIndex)
+      const res = await votePoll(fightNightId, await user.getIdToken(), pollId, optionIndex)
       if (res.success) {
         // Optimistic update — flips the card to results immediately
         setUserVotes((m) => ({ ...m, [pollId]: optionIndex }))

@@ -3,8 +3,8 @@
 import { Resend } from 'resend'
 import { firestore } from '../../lib/firebase-admin'
 import { getFightNight } from './fightnight'
-import { getStandings, type FightNightStanding } from './fightnight-standings'
-import { getPrizes } from './fightnight-prizes'
+import { type FightNightStanding } from './fightnight-standings'
+import { getStandingsWithEmails, getPrizesWithEmails } from '../../lib/server/fan-emails'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 const EMAIL_FROM = 'Marcos Resendez <noreply@send.434media.com>'
@@ -38,12 +38,12 @@ export async function sendFightNightRecap(
     return { sent: 0, skipped: 0, errors: 0, firstError: 'Fight night not found' }
   }
 
-  const standings = await getStandings(fightNightId, { limit: 1000 })
+  const standings = await getStandingsWithEmails(fightNightId, { limit: 1000 })
   if (standings.length === 0) {
     return { sent: 0, skipped: 0, errors: 0 }
   }
 
-  const prizes = await getPrizes(fightNightId)
+  const prizes = await getPrizesWithEmails(fightNightId)
   const prizesByUser = new Map(prizes.map((p) => [p.userId, p]))
 
   const top3 = standings.slice(0, 3).map((s, i) => ({
@@ -138,8 +138,8 @@ export async function getRecapEmailPreview(
     return '<p style="font-family:sans-serif;padding:24px">Fight night not found.</p>'
   }
 
-  const standings = await getStandings(fightNightId, { limit: 3 })
-  const prizes = await getPrizes(fightNightId)
+  const standings = await getStandingsWithEmails(fightNightId, { limit: 3 })
+  const prizes = await getPrizesWithEmails(fightNightId)
   const prizesByUser = new Map(prizes.map((p) => [p.userId, p]))
 
   const top3 = standings.length

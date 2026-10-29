@@ -90,7 +90,7 @@ export default function PropsSection({ fightNightId }: PropsSectionProps) {
     setSubmitting(propId)
     setErrorById((m) => ({ ...m, [propId]: "" }))
     try {
-      const res = await placePropPick(fightNightId, user.uid, propId, optionId)
+      const res = await placePropPick(fightNightId, await user.getIdToken(), propId, optionId)
       if (res.success) {
         await refresh()
       } else {

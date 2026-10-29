@@ -10,7 +10,7 @@ import {
   query,
   where,
 } from "firebase/firestore"
-import { db } from "../../lib/firebase-client"
+import { auth, db } from "../../lib/firebase-client"
 import {
   type FightNight,
   type FightNightStatus,
@@ -34,6 +34,7 @@ import {
 import {
   awardTopFinishers,
   getPrizes,
+  getPrizesForAdmin,
   markPrizeClaimed,
   markPrizeForfeited,
   notifyFightNightWinners,
@@ -3347,7 +3348,12 @@ function PrizesPanel({ fightNight }: { fightNight: FightNight }) {
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const data = await getPrizes(fightNight.id)
+      // Winners' emails only come back for an ADMIN_EMAILS admin; otherwise
+      // fall back to the public list (emails blank).
+      const idToken = await auth.currentUser?.getIdToken()
+      const data =
+        (idToken ? await getPrizesForAdmin(fightNight.id, idToken) : null) ??
+        (await getPrizes(fightNight.id))
       setPrizes(data)
     } finally {
       setLoading(false)
