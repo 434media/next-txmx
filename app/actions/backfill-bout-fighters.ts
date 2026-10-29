@@ -1,4 +1,8 @@
-"use server"
+import 'server-only'
+
+// Server-only module, deliberately NOT "use server": its exports used to be
+// server actions, i.e. public POST endpoints anyone could call. They are only
+// called from server code (the CRON_SECRET-gated /api/admin/backfill-bout-fighters route).
 
 import { firestore } from "../../lib/firebase-admin"
 import { getFighters } from "./fighters"

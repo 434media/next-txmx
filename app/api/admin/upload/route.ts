@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getStorage } from 'firebase-admin/storage'
 import { getApps } from 'firebase-admin/app'
 import '../../../../lib/firebase-admin'
+import { getAdminSession } from '../../../../lib/admin-auth'
 
 const ALLOWED_MIME_PREFIXES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif']
 const ALLOWED_EXTENSIONS: Record<string, string> = {
@@ -23,6 +24,12 @@ function resolveContentType(file: File): string | null {
 }
 
 export async function POST(request: NextRequest) {
+  // Admin only: 401 without a valid session, 403 if not on ADMIN_EMAILS.
+  const session = await getAdminSession()
+  if (!session.ok) {
+    return NextResponse.json({ error: session.error }, { status: session.status })
+  }
+
   try {
     const formData = await request.formData()
     const file = formData.get('file') as File | null

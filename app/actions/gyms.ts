@@ -1,6 +1,7 @@
 'use server'
 
 import { firestore } from '../../lib/firebase-admin'
+import { requireAdmin } from '../../lib/admin-auth'
 import type { Fighter } from '../../lib/types/fighter'
 
 export interface GymData {
@@ -41,6 +42,7 @@ export interface GymWithRoster extends GymData {
 }
 
 export async function getGyms(): Promise<GymData[]> {
+  await requireAdmin()
   const snapshot = await firestore
     .collection('gyms')
     .orderBy('name', 'asc')
@@ -66,6 +68,7 @@ export async function getGyms(): Promise<GymData[]> {
 }
 
 export async function addGym(data: Omit<GymData, 'id' | 'createdAt' | 'updatedAt'>) {
+  await requireAdmin()
   const now = new Date().toISOString()
   const docRef = await firestore.collection('gyms').add({
     ...data,
@@ -81,6 +84,7 @@ export async function addGym(data: Omit<GymData, 'id' | 'createdAt' | 'updatedAt
  * (only offered when there's no name match), so no dedupe here.
  */
 export async function quickAddGym(name: string) {
+  await requireAdmin()
   return addGym({
     name,
     address: '',
@@ -99,6 +103,7 @@ export async function quickAddGym(name: string) {
 }
 
 export async function updateGym(id: string, data: Partial<Omit<GymData, 'id' | 'createdAt'>>) {
+  await requireAdmin()
   await firestore.collection('gyms').doc(id).update({
     ...data,
     updatedAt: new Date().toISOString(),
@@ -107,11 +112,13 @@ export async function updateGym(id: string, data: Partial<Omit<GymData, 'id' | '
 }
 
 export async function deleteGym(id: string) {
+  await requireAdmin()
   await firestore.collection('gyms').doc(id).delete()
   return { success: true }
 }
 
 export async function getGymsWithRosters(): Promise<GymWithRoster[]> {
+  await requireAdmin()
   const [gymsSnap, fightersSnap, fansSnap] = await Promise.all([
     firestore.collection('gyms').orderBy('name', 'asc').get(),
     firestore.collection('fighters').get(),

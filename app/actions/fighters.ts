@@ -1,6 +1,7 @@
 'use server'
 
 import { firestore } from '../../lib/firebase-admin'
+import { requireAdmin } from '../../lib/admin-auth'
 import type { Fighter, FightRecord } from '../../lib/types/fighter'
 
 function generateSlug(firstName: string, lastName: string): string {
@@ -12,6 +13,7 @@ function generateSlug(firstName: string, lastName: string): string {
 }
 
 export async function addFighter(data: Omit<Fighter, 'id' | 'slug' | 'createdAt' | 'updatedAt'>) {
+  await requireAdmin()
   const slug = generateSlug(data.firstName, data.lastName)
   const now = new Date().toISOString()
 
@@ -54,6 +56,7 @@ export async function quickAddFighter(input: {
   gym?: string
   weightClass?: string
 }) {
+  await requireAdmin()
   return addFighter({
     firstName: input.firstName,
     lastName: input.lastName,
@@ -67,6 +70,7 @@ export async function quickAddFighter(input: {
 }
 
 export async function updateFighter(id: string, data: Partial<Fighter>) {
+  await requireAdmin()
   const now = new Date().toISOString()
 
   await firestore.collection('fighters').doc(id).update({
@@ -78,6 +82,7 @@ export async function updateFighter(id: string, data: Partial<Fighter>) {
 }
 
 export async function deleteFighter(id: string) {
+  await requireAdmin()
   await firestore.collection('fighters').doc(id).delete()
   return { success: true }
 }

@@ -1,6 +1,7 @@
 'use server'
 
 import { firestore } from '../../lib/firebase-admin'
+import { requireAdmin } from '../../lib/admin-auth'
 import { getFightNight } from './fightnight'
 import { getStandings } from './fightnight-standings'
 import { sendEventWinnerEmailsBatch, type EventEmailContext } from './email'
@@ -39,6 +40,7 @@ export async function awardPrize(input: {
   email: string | null
   pointsEarned: number
 }): Promise<FightNightPrize> {
+  await requireAdmin()
   if (!input.fightNightId || !input.userId) {
     throw new Error('Missing fightNightId or userId')
   }
@@ -85,6 +87,7 @@ export async function awardTopFinishers(
     prizeLabel: string
   }
 ): Promise<FightNightPrize[]> {
+  await requireAdmin()
   if (!fightNightId) return []
 
   const fightNight = await getFightNight(fightNightId)
@@ -123,6 +126,7 @@ export async function markPrizeClaimed(
   adminUid: string,
   notes = ''
 ): Promise<void> {
+  await requireAdmin()
   await prizesCol(fightNightId).doc(prizeId).update({
     status: 'claimed' as PrizeStatus,
     claimedAt: new Date().toISOString(),
@@ -137,6 +141,7 @@ export async function markPrizeForfeited(
   adminUid: string,
   reason = ''
 ): Promise<void> {
+  await requireAdmin()
   await prizesCol(fightNightId).doc(prizeId).update({
     status: 'forfeited' as PrizeStatus,
     claimedAt: null,
@@ -163,6 +168,7 @@ export async function notifyFightNightWinners(
     status: 'sent' | 'skipped' | 'error'
   }>
 }> {
+  await requireAdmin()
   const fightNight = await getFightNight(fightNightId)
   if (!fightNight) return { sent: 0, skipped: 0, errors: 0, results: [] }
 

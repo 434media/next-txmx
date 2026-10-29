@@ -1,6 +1,7 @@
 'use server'
 
 import { firestore } from '../../lib/firebase-admin'
+import { requireAdmin } from '../../lib/admin-auth'
 import webpush from 'web-push'
 
 interface PushSubscriptionData {
@@ -52,6 +53,7 @@ export async function sendPushToUsers(
   url: string = '/',
   tag?: string
 ) {
+  await requireAdmin()
   const vapidPublic = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
   const vapidPrivate = process.env.VAPID_PRIVATE_KEY
   const vapidEmail = process.env.VAPID_EMAIL || 'mailto:guna@434media.com'

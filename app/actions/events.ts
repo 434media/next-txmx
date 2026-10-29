@@ -1,6 +1,7 @@
 'use server'
 
 import { firestore } from '../../lib/firebase-admin'
+import { requireAdmin } from '../../lib/admin-auth'
 
 export type EventMode = 'standard' | 'free-props'
 
@@ -41,6 +42,7 @@ export interface EventBout {
 }
 
 export async function getEvents(): Promise<TXMXEvent[]> {
+  await requireAdmin()
   const snapshot = await firestore
     .collection('events')
     .orderBy('date', 'desc')
@@ -274,6 +276,7 @@ export interface EventPromoter {
 }
 
 export async function getEventPromoters(): Promise<EventPromoter[]> {
+  await requireAdmin()
   const snapshot = await firestore
     .collection('events')
     .get()
@@ -311,6 +314,7 @@ export interface PromoterData {
 }
 
 export async function getPromoters(): Promise<PromoterData[]> {
+  await requireAdmin()
   const snapshot = await firestore
     .collection('promoters')
     .orderBy('name', 'asc')
@@ -333,6 +337,7 @@ export async function getPromoters(): Promise<PromoterData[]> {
 }
 
 export async function upsertPromoter(name: string, data: Partial<Omit<PromoterData, 'id' | 'createdAt'>>) {
+  await requireAdmin()
   // Check if promoter doc already exists by name
   const existing = await firestore
     .collection('promoters')
@@ -366,6 +371,7 @@ export async function upsertPromoter(name: string, data: Partial<Omit<PromoterDa
 }
 
 export async function updatePromoter(id: string, data: Partial<Omit<PromoterData, 'id' | 'createdAt'>>) {
+  await requireAdmin()
   await firestore.collection('promoters').doc(id).update({
     ...data,
     updatedAt: new Date().toISOString(),
@@ -374,11 +380,13 @@ export async function updatePromoter(id: string, data: Partial<Omit<PromoterData
 }
 
 export async function deletePromoter(id: string) {
+  await requireAdmin()
   await firestore.collection('promoters').doc(id).delete()
   return { success: true }
 }
 
 export async function updateEvent(id: string, data: Partial<Omit<TXMXEvent, 'id' | 'createdAt'>>) {
+  await requireAdmin()
   await firestore.collection('events').doc(id).update({
     ...data,
     updatedAt: new Date().toISOString(),
@@ -408,6 +416,7 @@ export async function updateEvent(id: string, data: Partial<Omit<TXMXEvent, 'id'
 export async function addEvent(
   data: Omit<TXMXEvent, 'id' | 'createdAt' | 'source' | 'eventMode'> & { eventMode?: EventMode }
 ): Promise<{ success: true; event: TXMXEvent }> {
+  await requireAdmin()
   const now = new Date().toISOString()
   const eventMode: EventMode = data.eventMode || 'standard'
   const docRef = await firestore.collection('events').add({
@@ -423,6 +432,7 @@ export async function addEvent(
 }
 
 export async function deleteEvent(id: string) {
+  await requireAdmin()
   await firestore.collection('events').doc(id).delete()
   return { success: true }
 }
@@ -445,6 +455,7 @@ export async function updateBout(
     boutNumber?: number
   }
 ) {
+  await requireAdmin()
   // Shared fields go to both docs
   const shared: Record<string, unknown> = {}
   if (data.weightClass !== undefined) shared.weightClass = data.weightClass
@@ -486,6 +497,7 @@ export async function deleteBout(
   fighter2Id: string,
   docId: string
 ) {
+  await requireAdmin()
   const batch = firestore.batch()
   batch.delete(firestore.collection('fighters').doc(fighter1Id).collection('fights').doc(docId))
   batch.delete(firestore.collection('fighters').doc(fighter2Id).collection('fights').doc(docId))
@@ -513,6 +525,7 @@ export async function addBout(
     titleFight?: boolean
   }
 ) {
+  await requireAdmin()
   const boutKey = `${eventNumber}-${String(boutNumber).padStart(2, '0')}`
   const now = new Date().toISOString()
 
@@ -560,6 +573,7 @@ export interface AdminEventBout extends EventBout {
 }
 
 export async function getAdminEventBouts(eventNumber: string): Promise<AdminEventBout[]> {
+  await requireAdmin()
   if (!eventNumber) return []
 
   const snapshot = await firestore
