@@ -136,8 +136,12 @@ export async function getPrizesForAdmin(
   if (!fightNightId || typeof idToken !== 'string' || !idToken) return null
   let claims
   try {
-    claims = await auth.verifyIdToken(idToken, true)
-  } catch {
+    // Public-key verification only: checkRevoked calls the Firebase Auth admin
+    // API, which this project's service account may not use
+    // (auth/insufficient-permission).
+    claims = await auth.verifyIdToken(idToken)
+  } catch (err) {
+    console.error('[getPrizesForAdmin] verifyIdToken failed:', (err as { code?: string })?.code ?? 'unknown')
     return null
   }
   if (!isAllowlistedAdmin(claims, parseAdminEmails(process.env.ADMIN_EMAILS))) return null

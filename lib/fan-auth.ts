@@ -15,8 +15,12 @@ import { auth } from './firebase-admin'
 export async function verifyFanIdToken(idToken: unknown): Promise<DecodedIdToken | null> {
   if (typeof idToken !== 'string' || idToken.length === 0) return null
   try {
+    // No checkRevoked: that calls the Firebase Auth admin API, which this
+    // project's service account may not use (auth/insufficient-permission).
+    // Public-key verification needs no IAM role.
     return await auth.verifyIdToken(idToken)
-  } catch {
+  } catch (err) {
+    console.error('[fan-auth] verifyIdToken failed:', (err as { code?: string })?.code ?? 'unknown')
     return null
   }
 }
