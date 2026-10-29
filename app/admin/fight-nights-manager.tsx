@@ -62,6 +62,7 @@ import {
   deleteProp,
 } from "../actions/fightnight-props"
 import { type FightNightStanding } from "../actions/fightnight-standings"
+import { getFanEmailsForAdmin } from "../actions/users"
 import { useAdminAuth } from "./admin-auth-gate"
 import FlyerUploader from "./flyer-uploader"
 import UserActivityDrawer from "./user-activity-drawer"
@@ -633,7 +634,44 @@ function StandingsPanel({
   fightNight: FightNight
   onDrillDown: (userId: string) => void
 }) {
-  const [participants, setParticipants] = useState<FightNightStanding[]>([])
+  const [rawParticipants, setParticipants] = useState<FightNightStanding[]>([])
+  // Emails come from an admin-gated action, not the standings docs (which any
+  // signed-in fan can read and which no longer store email).
+  const [emailByUid, setEmailByUid] = useState<Record<string, string | null>>({})
+  const participants = rawParticipants.map((p) =>
+    p.userId in emailByUid ? { ...p, email: emailByUid[p.userId] } : p
+  )
+  useEffect(() => {
+    const missing = rawParticipants
+      .map((p) => p.userId)
+      .filter((uid) => uid && !(uid in emailByUid))
+    if (missing.length === 0) return
+    let cancelled = false
+    // Page the lookup at the server action's 1000-uid cap, and record every
+    // requested uid (null when not found or on error) so no uid is
+    // re-requested on each snapshot.
+    const PAGE = 1000
+    const pages: string[][] = []
+    for (let i = 0; i < missing.length; i += PAGE) pages.push(missing.slice(i, i + PAGE))
+    const fetched = (found: Record<string, string | null>) => {
+      const merged: Record<string, string | null> = Object.fromEntries(
+        missing.map((uid) => [uid, null])
+      )
+      Object.assign(merged, found)
+      return merged
+    }
+    Promise.all(pages.map((page) => getFanEmailsForAdmin(page)))
+      .then((results) => {
+        if (!cancelled) setEmailByUid((m) => ({ ...m, ...fetched(Object.assign({}, ...results)) }))
+      })
+      .catch(() => {
+        // Not fatal: the panel shows "—" without emails.
+        if (!cancelled) setEmailByUid((m) => ({ ...m, ...fetched({}) }))
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [rawParticipants, emailByUid])
   const [loading, setLoading] = useState(true)
   const [tick, setTick] = useState(0)
   const [search, setSearch] = useState("")

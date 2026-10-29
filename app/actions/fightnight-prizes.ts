@@ -17,7 +17,12 @@ export interface FightNightPrize {
   position: number
   prizeLabel: string
   displayName: string | null
-  email: string | null
+  /**
+   * LEGACY on stored docs: no longer written, because prizes are readable by
+   * any signed-in user (firestore.rules). Filled in server-side from
+   * users/{uid} by lib/server/fan-emails.ts for admin and email senders.
+   */
+  email?: string | null
   pointsEarned: number
   status: PrizeStatus
   notes: string
@@ -39,7 +44,8 @@ export async function awardPrize(input: {
   position: number
   prizeLabel: string
   displayName: string | null
-  email: string | null
+  /** Ignored: emails are not stored on prize docs. */
+  email?: string | null
   pointsEarned: number
 }): Promise<FightNightPrize> {
   await requireAdmin()
@@ -66,7 +72,6 @@ export async function awardPrize(input: {
     position: input.position,
     prizeLabel: input.prizeLabel,
     displayName: input.displayName,
-    email: input.email,
     pointsEarned: input.pointsEarned,
     status: 'pending',
     notes: '',
@@ -218,7 +223,7 @@ export async function notifyFightNightWinners(
   const winners = pending.map((p) => ({
     userId: p.userId,
     displayName: p.displayName,
-    email: p.email,
+    email: p.email ?? null,
     position: p.position,
     spEarned: p.pointsEarned,
     prizeLabel: p.prizeLabel,

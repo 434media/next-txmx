@@ -28,7 +28,8 @@ export async function incrementStandingPoints(
   meta: {
     displayName: string | null
     photoURL: string | null
-    email: string | null
+    /** Ignored: emails are no longer stored on standings (see lib/server/fan-emails.ts). */
+    email?: string | null
   }
 ): Promise<void> {
   if (!fightNightId || !userId || amount <= 0) return
@@ -49,7 +50,6 @@ export async function incrementStandingPoints(
         // doc can't null out a name we already captured.
         displayName: meta.displayName || current.displayName || null,
         photoURL: meta.photoURL || current.photoURL || null,
-        email: current.email || meta.email,
         updatedAt: now,
       })
     } else {
@@ -58,7 +58,6 @@ export async function incrementStandingPoints(
         userId,
         displayName: meta.displayName,
         photoURL: meta.photoURL,
-        email: meta.email,
         points: amount,
         picksMade: 0,
         picksWon: 1,
@@ -88,7 +87,8 @@ export async function incrementPicksMade(
   meta: {
     displayName: string | null
     photoURL: string | null
-    email: string | null
+    /** Ignored: emails are no longer stored on standings (see lib/server/fan-emails.ts). */
+    email?: string | null
   }
 ): Promise<void> {
   if (!fightNightId || !userId) return
@@ -107,7 +107,6 @@ export async function incrementPicksMade(
         // with null from a stale users-doc read.
         displayName: meta.displayName || current.displayName || null,
         photoURL: meta.photoURL || current.photoURL || null,
-        email: current.email || meta.email,
         updatedAt: now,
       })
     } else {
@@ -116,7 +115,6 @@ export async function incrementPicksMade(
         userId,
         displayName: meta.displayName,
         photoURL: meta.photoURL,
-        email: meta.email,
         points: 0,
         picksMade: 1,
         picksWon: 0,
@@ -146,7 +144,8 @@ export async function ensureStanding(
   meta?: {
     displayName: string | null
     photoURL: string | null
-    email: string | null
+    /** Ignored: emails are no longer stored on standings (see lib/server/fan-emails.ts). */
+    email?: string | null
   }
 ): Promise<void> {
   if (!fightNightId || !userId) return
@@ -161,7 +160,6 @@ export async function ensureStanding(
       userId,
       displayName: meta?.displayName || null,
       photoURL: meta?.photoURL || null,
-      email: meta?.email || null,
       points: 0,
       picksMade: 0,
       picksWon: 0,
@@ -177,7 +175,6 @@ export async function ensureStanding(
       {
         displayName: meta?.displayName || null,
         photoURL: meta?.photoURL || null,
-        email: meta?.email || null,
       }
     )
   }

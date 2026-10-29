@@ -30,7 +30,8 @@ export interface SeasonDelta {
 export interface SeasonMeta {
   displayName: string | null
   photoURL: string | null
-  email: string | null
+  /** Ignored: emails are no longer stored on season standings (see lib/server/fan-emails.ts). */
+  email?: string | null
 }
 
 /**
@@ -65,7 +66,6 @@ export async function bumpSeasonStanding(
         eventsPlayed: Math.max(0, (cur.eventsPlayed || 0) + (delta.eventsPlayed || 0)),
         displayName: meta.displayName || cur.displayName || null,
         photoURL: meta.photoURL || cur.photoURL || null,
-        email: cur.email || meta.email,
         updatedAt: now,
       })
     } else {
@@ -73,7 +73,6 @@ export async function bumpSeasonStanding(
         userId,
         displayName: meta.displayName,
         photoURL: meta.photoURL,
-        email: meta.email,
         points: Math.max(0, delta.points || 0),
         picksMade: Math.max(0, delta.picksMade || 0),
         picksWon: Math.max(0, delta.picksWon || 0),
@@ -123,7 +122,6 @@ export async function rebuildSeasonStandings(): Promise<{
         cur.eventsPlayed += 1
         cur.displayName = s.displayName || cur.displayName || null
         cur.photoURL = s.photoURL || cur.photoURL || null
-        cur.email = cur.email || s.email || null
         if (joinedAt && (!cur.firstSeenAt || joinedAt < cur.firstSeenAt)) {
           cur.firstSeenAt = joinedAt
         }
@@ -133,7 +131,6 @@ export async function rebuildSeasonStandings(): Promise<{
           userId: s.userId,
           displayName: s.displayName || null,
           photoURL: s.photoURL || null,
-          email: s.email || null,
           points: s.points || 0,
           picksMade: s.picksMade || 0,
           picksWon: s.picksWon || 0,
