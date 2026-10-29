@@ -647,12 +647,26 @@ function StandingsPanel({
       .filter((uid) => uid && !(uid in emailByUid))
     if (missing.length === 0) return
     let cancelled = false
-    getFanEmailsForAdmin(missing)
-      .then((found) => {
-        if (!cancelled) setEmailByUid((m) => ({ ...m, ...found }))
+    // Page the lookup at the server action's 1000-uid cap, and record every
+    // requested uid (null when not found or on error) so no uid is
+    // re-requested on each snapshot.
+    const PAGE = 1000
+    const pages: string[][] = []
+    for (let i = 0; i < missing.length; i += PAGE) pages.push(missing.slice(i, i + PAGE))
+    const fetched = (found: Record<string, string | null>) => {
+      const merged: Record<string, string | null> = Object.fromEntries(
+        missing.map((uid) => [uid, null])
+      )
+      Object.assign(merged, found)
+      return merged
+    }
+    Promise.all(pages.map((page) => getFanEmailsForAdmin(page)))
+      .then((results) => {
+        if (!cancelled) setEmailByUid((m) => ({ ...m, ...fetched(Object.assign({}, ...results)) }))
       })
       .catch(() => {
         // Not fatal: the panel shows "—" without emails.
+        if (!cancelled) setEmailByUid((m) => ({ ...m, ...fetched({}) }))
       })
     return () => {
       cancelled = true

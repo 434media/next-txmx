@@ -52,14 +52,19 @@ export default function UserActivityDrawer({
 }: UserActivityDrawerProps) {
   const [standing, setStanding] = useState<FightNightStanding | null>(null)
   // Email via an admin-gated action; standings docs no longer store it.
-  const [email, setEmail] = useState<string | null>(null)
+  // Keyed by uid so switching players resets it at once: until the new
+  // player's lookup returns, the previous player's email is never shown.
+  const [emailFor, setEmailFor] = useState<{ uid: string; email: string | null } | null>(null)
+  const email = emailFor?.uid === userId ? emailFor.email : null
   useEffect(() => {
     let cancelled = false
     getFanEmailsForAdmin([userId])
       .then((m) => {
-        if (!cancelled) setEmail(m[userId] ?? null)
+        if (!cancelled) setEmailFor({ uid: userId, email: m[userId] ?? null })
       })
-      .catch(() => {})
+      .catch(() => {
+        if (!cancelled) setEmailFor({ uid: userId, email: null })
+      })
     return () => {
       cancelled = true
     }
