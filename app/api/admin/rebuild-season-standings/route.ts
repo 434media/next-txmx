@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireCronSecret } from '../../../../lib/cron-auth'
 import { rebuildSeasonStandings } from '../../../../lib/server/season-standings'
 
 /**
@@ -8,26 +9,16 @@ import { rebuildSeasonStandings } from '../../../../lib/server/season-standings'
  * to run repeatedly — it overwrites totals from the source of truth and prunes
  * stale rows, so it doubles as a drift-repair tool.
  *
- * Auth: requires `Authorization: Bearer ${CRON_SECRET}`. Unlike the cron
- * routes, this refuses to run when CRON_SECRET is unset — a rebuild shouldn't be
+ * Auth: requires `Authorization: Bearer ${CRON_SECRET}` (lib/cron-auth.ts).
+ * Refuses to run when CRON_SECRET is unset — a rebuild shouldn't be
  * world-callable even on a misconfigured deploy.
  *
  *   curl -X POST https://<host>/api/admin/rebuild-season-standings \
  *     -H "Authorization: Bearer $CRON_SECRET"
  */
 export async function POST(request: NextRequest) {
-  const secret = process.env.CRON_SECRET
-  if (!secret) {
-    return NextResponse.json(
-      { error: 'CRON_SECRET not configured — refusing to run.' },
-      { status: 503 }
-    )
-  }
-
-  const authHeader = request.headers.get('authorization')
-  if (authHeader !== `Bearer ${secret}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const denied = requireCronSecret(request)
+  if (denied) return denied
 
   try {
     const result = await rebuildSeasonStandings()
