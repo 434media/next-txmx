@@ -40,7 +40,8 @@ export async function POST(request: NextRequest) {
   let claims
   try {
     claims = await auth.verifyIdToken(idToken, true)
-  } catch {
+  } catch (err) {
+    console.error('[POST /api/admin/session] verifyIdToken failed:', (err as { code?: string })?.code ?? 'unknown')
     return NextResponse.json({ error: 'Invalid ID token' }, { status: 401 })
   }
 
@@ -58,7 +59,8 @@ export async function POST(request: NextRequest) {
     sessionCookie = await auth.createSessionCookie(idToken, {
       expiresIn: ADMIN_SESSION_MAX_AGE_MS,
     })
-  } catch {
+  } catch (err) {
+    console.error('[POST /api/admin/session] createSessionCookie failed:', (err as { code?: string })?.code ?? 'unknown')
     return NextResponse.json({ error: 'Could not create session' }, { status: 401 })
   }
 
