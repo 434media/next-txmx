@@ -46,7 +46,8 @@ function seasonRef(userId: string) {
  */
 export async function getSeasonStandings(limit = 100): Promise<SeasonStanding[]> {
   const snap = await seasonCol().orderBy('points', 'desc').limit(limit).get()
-  return snap.docs.map((d) => d.data() as SeasonStanding)
+  // Public action (anonymous callers): never return fans' emails.
+  return snap.docs.map((d) => ({ ...(d.data() as SeasonStanding), email: null }))
 }
 
 export async function getUserSeasonStanding(
@@ -55,6 +56,6 @@ export async function getUserSeasonStanding(
   if (!userId) return null
   const snap = await seasonRef(userId).get()
   if (!snap.exists) return null
-  return snap.data() as SeasonStanding
+  return { ...(snap.data() as SeasonStanding), email: null }
 }
 

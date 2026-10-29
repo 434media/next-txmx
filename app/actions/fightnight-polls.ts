@@ -1,6 +1,7 @@
 'use server'
 
 import { firestore } from '../../lib/firebase-admin'
+import { uidFromIdToken } from '../../lib/fan-auth'
 import { requireAdmin } from '../../lib/admin-auth'
 
 export interface FightNightPollOption {
@@ -160,10 +161,12 @@ export async function getPolls(
 
 export async function votePoll(
   fightNightId: string,
-  userId: string,
+  idToken: string,
   pollId: string,
   optionIndex: number
 ): Promise<{ success: boolean; error?: string }> {
+  // The voter is whoever the verified ID token says — never a client-sent uid.
+  const userId = await uidFromIdToken(idToken)
   if (!userId) return { success: false, error: 'Not signed in' }
   if (!fightNightId || !pollId) return { success: false, error: 'Missing args' }
 

@@ -3,7 +3,9 @@
 import { firestore } from '../../lib/firebase-admin'
 import { requireAdmin } from '../../lib/admin-auth'
 import { getFightNight } from './fightnight'
-import { getStandings } from './fightnight-standings'
+import { getStandingsWithEmails, getPrizesWithEmails } from '../../lib/server/fan-emails'
+import { auth } from '../../lib/firebase-admin'
+import { isAllowlistedAdmin, parseAdminEmails } from '../../lib/admin-allowlist'
 import { sendEventWinnerEmailsBatch, type EventEmailContext } from './email'
 
 export type PrizeStatus = 'pending' | 'claimed' | 'forfeited'
@@ -93,7 +95,7 @@ export async function awardTopFinishers(
   const fightNight = await getFightNight(fightNightId)
   if (!fightNight) return []
 
-  const standings = await getStandings(fightNightId, {
+  const standings = await getStandingsWithEmails(fightNightId, {
     limit: opts.topN,
   })
 
@@ -114,10 +116,36 @@ export async function awardTopFinishers(
   return prizes
 }
 
+/** Public action (anonymous callers on the fight-night page): emails blanked. */
 export async function getPrizes(fightNightId: string): Promise<FightNightPrize[]> {
   if (!fightNightId) return []
   const snap = await prizesCol(fightNightId).orderBy('position', 'asc').get()
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as FightNightPrize)
+  return snap.docs.map((d) => ({ id: d.id, ...d.data(), email: null }) as FightNightPrize)
+}
+
+/**
+ * Prizes with winners' emails, for the admin prize panel. The caller sends its
+ * Firebase ID token; only a verified email on ADMIN_EMAILS gets emails back
+ * (same rule as lib/admin-allowlist.ts). Anyone else gets null, and the panel
+ * falls back to getPrizes (emails blank).
+ */
+export async function getPrizesForAdmin(
+  fightNightId: string,
+  idToken: string
+): Promise<FightNightPrize[] | null> {
+  if (!fightNightId || typeof idToken !== 'string' || !idToken) return null
+  let claims
+  try {
+    // Public-key verification only: checkRevoked calls the Firebase Auth admin
+    // API, which this project's service account may not use
+    // (auth/insufficient-permission).
+    claims = await auth.verifyIdToken(idToken)
+  } catch (err) {
+    console.error('[getPrizesForAdmin] verifyIdToken failed:', (err as { code?: string })?.code ?? 'unknown')
+    return null
+  }
+  if (!isAllowlistedAdmin(claims, parseAdminEmails(process.env.ADMIN_EMAILS))) return null
+  return getPrizesWithEmails(fightNightId)
 }
 
 export async function markPrizeClaimed(
@@ -172,7 +200,7 @@ export async function notifyFightNightWinners(
   const fightNight = await getFightNight(fightNightId)
   if (!fightNight) return { sent: 0, skipped: 0, errors: 0, results: [] }
 
-  const prizes = await getPrizes(fightNightId)
+  const prizes = await getPrizesWithEmails(fightNightId)
   const pending = prizes.filter((p) => p.status === 'pending')
   if (pending.length === 0) return { sent: 0, skipped: 0, errors: 0, results: [] }
 

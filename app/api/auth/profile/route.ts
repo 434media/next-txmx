@@ -20,12 +20,8 @@ export async function GET(request: NextRequest) {
     // backfill on the next getOrCreateUser write).
     const customDisplayName =
       typeof decoded.displayName === "string" ? decoded.displayName : null
-    const user = await getOrCreateUser(
-      decoded.uid,
-      decoded.email || null,
-      decoded.name || customDisplayName || null,
-      decoded.picture || null
-    )
+    // getOrCreateUser re-verifies the token and takes uid/email/photo from it.
+    const user = await getOrCreateUser(token, decoded.name || customDisplayName || null)
 
     return NextResponse.json({
       uid: user.uid,

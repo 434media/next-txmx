@@ -1,6 +1,7 @@
 'use server'
 
 import { firestore } from '../../lib/firebase-admin'
+import { uidFromIdToken } from '../../lib/fan-auth'
 import { requireAdmin } from '../../lib/admin-auth'
 import { getFightNight } from './fightnight'
 import { incrementStandingPoints, incrementPicksMade } from '../../lib/server/fightnight-standings'
@@ -58,12 +59,15 @@ async function fightNightBoutPath(
 
 export async function placeFightNightPick(
   fightNightId: string,
-  userId: string,
+  idToken: string,
   boutNumber: number,
   pickedCorner: PickCorner
 ): Promise<{ success: boolean; error?: string }> {
-  if (!fightNightId || !userId) {
-    return { success: false, error: 'Missing fightNightId or userId' }
+  // The picker is whoever the verified ID token says — never a client-sent uid.
+  const userId = await uidFromIdToken(idToken)
+  if (!userId) return { success: false, error: 'Not signed in' }
+  if (!fightNightId) {
+    return { success: false, error: 'Missing fightNightId' }
   }
   if (!boutNumber || boutNumber < 1) {
     return { success: false, error: 'Invalid bout number' }

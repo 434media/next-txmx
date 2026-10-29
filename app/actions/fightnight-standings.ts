@@ -23,6 +23,10 @@ export interface FightNightStanding {
   recapEmailSentAt?: string
 }
 
+function withoutEmail<T extends { email: string | null }>(row: T): T {
+  return { ...row, email: null }
+}
+
 function standingsCol(fightNightId: string) {
   return firestore.collection('fightNights').doc(fightNightId).collection('standings')
 }
@@ -44,7 +48,9 @@ export async function getStandings(
     .limit(limit)
     .get()
 
-  return snap.docs.map((d) => d.data() as FightNightStanding)
+  // Public action (anonymous callers): never return fans' emails. Server-side
+  // senders use lib/server/fan-emails.ts.
+  return snap.docs.map((d) => withoutEmail(d.data() as FightNightStanding))
 }
 
 export async function getUserStanding(
@@ -54,7 +60,7 @@ export async function getUserStanding(
   if (!fightNightId || !userId) return null
   const snap = await entryRef(fightNightId, userId).get()
   if (!snap.exists) return null
-  return snap.data() as FightNightStanding
+  return withoutEmail(snap.data() as FightNightStanding)
 }
 
 /**

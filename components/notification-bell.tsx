@@ -56,7 +56,7 @@ export default function NotificationBell() {
 
       const json = sub.toJSON()
       if (json.endpoint && json.keys) {
-        await savePushSubscription(user.uid, {
+        await savePushSubscription(await user.getIdToken(), {
           endpoint: json.endpoint,
           keys: {
             p256dh: json.keys.p256dh!,
@@ -79,7 +79,7 @@ export default function NotificationBell() {
       const reg = await navigator.serviceWorker.ready
       const sub = await reg.pushManager.getSubscription()
       if (sub) await sub.unsubscribe()
-      await removePushSubscription(user.uid)
+      await removePushSubscription(await user.getIdToken())
       setSubscribed(false)
     } catch {
       // silent

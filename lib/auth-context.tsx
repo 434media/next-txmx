@@ -136,7 +136,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Seed/backfill the Firestore users record so the name reaches the
     // leaderboard — picks snapshot users/{uid}.displayName, and getOrCreateUser
     // backfills if /api/auth/profile already created the record with a null name.
-    await getOrCreateUser(cred.user.uid, email, name ?? null, null)
+    await getOrCreateUser(await cred.user.getIdToken(), name ?? null)
   }
 
   const signOut = async () => {

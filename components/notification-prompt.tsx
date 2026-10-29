@@ -121,7 +121,7 @@ export default function NotificationPrompt({ activeFightNight }: NotificationPro
       })
       const json = sub.toJSON()
       if (json.endpoint && json.keys) {
-        await savePushSubscription(user.uid, {
+        await savePushSubscription(await user.getIdToken(), {
           endpoint: json.endpoint,
           keys: { p256dh: json.keys.p256dh!, auth: json.keys.auth! },
         })
