@@ -62,6 +62,7 @@ import {
   deleteProp,
 } from "../actions/fightnight-props"
 import { type FightNightStanding } from "../actions/fightnight-standings"
+import { getFanEmailsForAdmin } from "../actions/users"
 import { useAdminAuth } from "./admin-auth-gate"
 import FlyerUploader from "./flyer-uploader"
 import UserActivityDrawer from "./user-activity-drawer"
@@ -633,7 +634,30 @@ function StandingsPanel({
   fightNight: FightNight
   onDrillDown: (userId: string) => void
 }) {
-  const [participants, setParticipants] = useState<FightNightStanding[]>([])
+  const [rawParticipants, setParticipants] = useState<FightNightStanding[]>([])
+  // Emails come from an admin-gated action, not the standings docs (which any
+  // signed-in fan can read and which no longer store email).
+  const [emailByUid, setEmailByUid] = useState<Record<string, string | null>>({})
+  const participants = rawParticipants.map((p) =>
+    p.userId in emailByUid ? { ...p, email: emailByUid[p.userId] } : p
+  )
+  useEffect(() => {
+    const missing = rawParticipants
+      .map((p) => p.userId)
+      .filter((uid) => uid && !(uid in emailByUid))
+    if (missing.length === 0) return
+    let cancelled = false
+    getFanEmailsForAdmin(missing)
+      .then((found) => {
+        if (!cancelled) setEmailByUid((m) => ({ ...m, ...found }))
+      })
+      .catch(() => {
+        // Not fatal: the panel shows "—" without emails.
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [rawParticipants, emailByUid])
   const [loading, setLoading] = useState(true)
   const [tick, setTick] = useState(0)
   const [search, setSearch] = useState("")

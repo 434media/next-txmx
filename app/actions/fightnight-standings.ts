@@ -8,8 +8,13 @@ export interface FightNightStanding {
   userId: string
   displayName: string | null
   photoURL: string | null
-  /** Email snapshotted at first pick — used for winner notification */
-  email: string | null
+  /**
+   * LEGACY: older standings docs still carry the fan's email. New writes no
+   * longer store it, because standings are readable by any signed-in user
+   * (firestore.rules). Server-side senders resolve emails from users/{uid}
+   * via lib/server/fan-emails.ts. Remove once the cleanup has run.
+   */
+  email?: string | null
   /** Total points earned within this fight night */
   points: number
   /** Picks placed for this fight night (match + prop combined) */
@@ -23,7 +28,7 @@ export interface FightNightStanding {
   recapEmailSentAt?: string
 }
 
-function withoutEmail<T extends { email: string | null }>(row: T): T {
+function withoutEmail<T extends { email?: string | null }>(row: T): T {
   return { ...row, email: null }
 }
 
@@ -183,7 +188,6 @@ export async function removeFightNightParticipant(
       {
         displayName: s.displayName || null,
         photoURL: s.photoURL || null,
-        email: s.email || null,
       }
     )
 

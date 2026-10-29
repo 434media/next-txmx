@@ -17,7 +17,8 @@ export interface SeasonStanding {
   userId: string
   displayName: string | null
   photoURL: string | null
-  email: string | null
+  /** LEGACY: older docs still carry it; no longer written (readable by any signed-in fan). */
+  email?: string | null
   /** Lifetime points across every fight night */
   points: number
   /** Lifetime picks placed (match + prop) across every fight night */

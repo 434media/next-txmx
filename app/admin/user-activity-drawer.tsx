@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react"
 import { doc, onSnapshot } from "firebase/firestore"
 import { X, RefreshCw } from "lucide-react"
 import { db } from "../../lib/firebase-client"
+import { getFanEmailsForAdmin } from "../actions/users"
 import { getBouts, type FightNightBout } from "../actions/fightnight"
 import {
   getUserPicks,
@@ -50,6 +51,19 @@ export default function UserActivityDrawer({
   onClose,
 }: UserActivityDrawerProps) {
   const [standing, setStanding] = useState<FightNightStanding | null>(null)
+  // Email via an admin-gated action; standings docs no longer store it.
+  const [email, setEmail] = useState<string | null>(null)
+  useEffect(() => {
+    let cancelled = false
+    getFanEmailsForAdmin([userId])
+      .then((m) => {
+        if (!cancelled) setEmail(m[userId] ?? null)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [userId])
   const [bouts, setBouts] = useState<FightNightBout[]>([])
   const [picks, setPicks] = useState<FightNightPick[]>([])
   const [polls, setPolls] = useState<FightNightPoll[]>([])
@@ -171,7 +185,7 @@ export default function UserActivityDrawer({
                 {standing?.displayName || "Anonymous"}
               </h2>
               <p className="text-[12px] text-gray-500 truncate mt-0.5">
-                {standing?.email || "—"}
+                {email || standing?.email || "—"}
               </p>
             </div>
             <div className="flex items-center gap-1.5 shrink-0">
