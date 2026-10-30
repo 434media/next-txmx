@@ -1,8 +1,6 @@
 "use client"
 
 import { useState, useRef, useCallback } from "react"
-import { ref as storageRef, uploadBytesResumable, getDownloadURL } from "firebase/storage"
-import { storage } from "../../lib/firebase-client"
 
 interface FlyerUploaderProps {
   fightNightId: string
@@ -11,14 +9,71 @@ interface FlyerUploaderProps {
 }
 
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"]
-const MAX_BYTES = 10 * 1024 * 1024 // 10 MB
+const MAX_BYTES = 10 * 1024 * 1024 // 10 MB, what an admin may pick
+// What the server accepts: Vercel refuses a request body over 4.5 MB.
+const UPLOAD_LIMIT = 4 * 1024 * 1024
 
-function extFromMime(mime: string): string {
-  if (mime === "image/jpeg") return "jpg"
-  if (mime === "image/png") return "png"
-  if (mime === "image/webp") return "webp"
-  if (mime === "image/gif") return "gif"
-  return "bin"
+/**
+ * Flyers upload through /api/admin/upload, which checks the admin allowlist and
+ * writes with the server's credentials. They used to go from the browser
+ * straight into Firebase Storage, which needed Storage rules letting any
+ * signed-in user write anywhere in the bucket, on a project with public sign-up.
+ *
+ * An image over the server's limit is downscaled here first: re-encoded as JPEG
+ * (Safari cannot encode WebP from a canvas), at most 3000 px on its long side,
+ * stepping quality and then size down until it fits. A GIF is not, because that
+ * would drop its animation.
+ */
+async function fitForUpload(file: File): Promise<File> {
+  if (file.size <= UPLOAD_LIMIT) return file
+  if (file.type === "image/gif") {
+    throw new Error("GIFs must be under 4 MB. Export a smaller one, or use a JPG or PNG.")
+  }
+  const bitmap = await createImageBitmap(file)
+  let scale = Math.min(1, 3000 / Math.max(bitmap.width, bitmap.height))
+  const canvas = document.createElement("canvas")
+  for (let attempt = 0; attempt < 8; attempt++) {
+    canvas.width = Math.round(bitmap.width * scale)
+    canvas.height = Math.round(bitmap.height * scale)
+    const ctx = canvas.getContext("2d")
+    if (!ctx) break
+    ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height)
+    for (const quality of [0.9, 0.8, 0.7]) {
+      const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", quality))
+      if (blob && blob.size <= UPLOAD_LIMIT) {
+        return new File([blob], file.name.replace(/\.[^.]+$/, "") + ".jpg", { type: "image/jpeg" })
+      }
+    }
+    scale *= 0.8
+  }
+  throw new Error("Couldn't shrink this image under 4 MB. Try a smaller file.")
+}
+
+/** POST to the admin upload route, reporting progress (fetch cannot). */
+function uploadFlyer(file: File, fightNightId: string, onProgress: (pct: number) => void): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const form = new FormData()
+    form.append("file", file)
+    form.append("folder", "fightnights")
+    form.append("fightNightId", fightNightId)
+    const xhr = new XMLHttpRequest()
+    xhr.open("POST", "/api/admin/upload")
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100))
+    }
+    xhr.onload = () => {
+      let data: { url?: string; error?: string } = {}
+      try {
+        data = JSON.parse(xhr.responseText)
+      } catch {
+        // fall through to the status message
+      }
+      if (xhr.status >= 200 && xhr.status < 300 && data.url) resolve(data.url)
+      else reject(new Error(data.error || `Upload failed (${xhr.status})`))
+    }
+    xhr.onerror = () => reject(new Error("Upload failed. Check your connection and try again."))
+    xhr.send(form)
+  })
 }
 
 export default function FlyerUploader({
@@ -48,35 +103,15 @@ export default function FlyerUploader({
       setUploading(true)
       setProgress(0)
 
-      const ext = extFromMime(file.type)
-      const path = `fightnights/${fightNightId}/flyer-${Date.now()}.${ext}`
-      const fileRef = storageRef(storage, path)
-
-      const task = uploadBytesResumable(fileRef, file, {
-        contentType: file.type,
-        cacheControl: "public, max-age=31536000, immutable",
-      })
-
-      task.on(
-        "state_changed",
-        (snap) => {
-          setProgress(Math.round((snap.bytesTransferred / snap.totalBytes) * 100))
-        },
-        (err) => {
-          setError(err.message)
-          setUploading(false)
-        },
-        async () => {
-          try {
-            const url = await getDownloadURL(task.snapshot.ref)
-            onUploaded(url)
-          } catch (err) {
-            setError(err instanceof Error ? err.message : "Failed to read URL")
-          } finally {
-            setUploading(false)
-          }
-        }
-      )
+      try {
+        const ready = await fitForUpload(file)
+        const url = await uploadFlyer(ready, fightNightId, setProgress)
+        onUploaded(url)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Upload failed")
+      } finally {
+        setUploading(false)
+      }
     },
     [fightNightId, onUploaded]
   )

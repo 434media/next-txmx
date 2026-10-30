@@ -4,13 +4,30 @@ import { getApps } from 'firebase-admin/app'
 import '../../../../lib/firebase-admin'
 import { getAdminSession } from '../../../../lib/admin-auth'
 
-const ALLOWED_MIME_PREFIXES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif']
+const ALLOWED_MIME_PREFIXES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/gif']
 const ALLOWED_EXTENSIONS: Record<string, string> = {
   jpg: 'image/jpeg',
   jpeg: 'image/jpeg',
   png: 'image/png',
   webp: 'image/webp',
   avif: 'image/avif',
+  gif: 'image/gif',
+}
+
+// Vercel refuses a function request body over 4.5 MB before this code runs, so
+// the limit sits just under it. The flyer uploader downscales larger images in
+// the browser first.
+const MAX_BYTES = 4 * 1024 * 1024
+
+// A fight night id becomes part of a storage path, so it is held to a strict shape.
+const FIGHT_NIGHT_ID = /^[A-Za-z0-9_-]{1,128}$/
+
+const EXT_FOR_TYPE: Record<string, string> = {
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+  'image/avif': 'avif',
+  'image/gif': 'gif',
 }
 
 function resolveContentType(file: File): string | null {
@@ -47,11 +64,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate file size (5MB max)
-    const maxSize = 5 * 1024 * 1024
-    if (file.size > maxSize) {
+    if (file.size > MAX_BYTES) {
       return NextResponse.json(
-        { error: 'File too large. Maximum size is 5MB' },
+        { error: 'File too large. Maximum size is 4 MB' },
         { status: 400 }
       )
     }
@@ -59,12 +74,27 @@ export async function POST(request: NextRequest) {
     const app = getApps()[0]
     const bucket = getStorage(app).bucket(process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET)
 
-    // Generate a safe filename
-    const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
+    // Generate a safe filename. The extension comes from the validated content
+    // type, never from the uploaded name.
+    const ext = EXT_FOR_TYPE[contentType] || 'jpg'
     const folderParam = formData.get('folder') as string | null
-    const allowedFolders = ['fighters', '8count', 'fan-cards']
+    const allowedFolders = ['fighters', '8count', 'fan-cards', 'fightnights']
     const folder = folderParam && allowedFolders.includes(folderParam) ? folderParam : 'fighters'
-    const safeName = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
+
+    let safeName: string
+    if (folder === 'fightnights') {
+      // Fight night flyers (app/admin/flyer-uploader.tsx). They used to upload
+      // from the browser straight into Storage, which needed Storage rules that
+      // let ANY signed-in user write anywhere in the bucket, on a project with
+      // public sign-up. Through this route only an allowlisted admin can write.
+      const fightNightId = String(formData.get('fightNightId') ?? '')
+      if (!FIGHT_NIGHT_ID.test(fightNightId)) {
+        return NextResponse.json({ error: 'Invalid fight night' }, { status: 400 })
+      }
+      safeName = `fightnights/${fightNightId}/flyer-${Date.now()}.${ext}`
+    } else {
+      safeName = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
+    }
 
     const buffer = Buffer.from(await file.arrayBuffer())
 
@@ -72,7 +102,7 @@ export async function POST(request: NextRequest) {
     await fileRef.save(buffer, {
       metadata: {
         contentType,
-        cacheControl: 'public, max-age=31536000',
+        cacheControl: 'public, max-age=31536000, immutable',
       },
     })
 
