@@ -7,7 +7,8 @@ rules_version = '2';
 // That means client write rules can stay locked down.
 //
 // Authentication: signed-in users (including anonymous walk-ins) can read the
-// public game surfaces — fight night data, bouts, standings, polls, props.
+// public game surfaces — fight night data, polls, props. Bouts and standings
+// are readable by anyone, signed in or not.
 // Per-user records (their own profile, their own pick docs) are gated to the
 // owner.
 
@@ -36,12 +37,15 @@ service cloud.firestore {
         allow read: if true;
       }
 
-      // Readable by any signed-in fan (live leaderboard). Must hold no
-      // private data: emails are not written here (they live on users/{uid},
-      // owner-only, and are read server-side). Older docs may still carry a
-      // legacy `email` field until the separate cleanup removes it.
+      // Public-read: the live leaderboard (leaderboard-live.tsx) is shown to
+      // signed-out visitors, who are everyone while fan accounts are off
+      // (lib/feature-flags.ts). Must hold no private data: the fan's display
+      // name, photo and points only. Emails are not written here (they live on
+      // users/{uid}, owner-only, and are read server-side), and the legacy
+      // `email` field was stripped by ops-runner's txmx-strip-legacy-emails
+      // job before this rule was published.
       match /standings/{userId} {
-        allow read: if request.auth != null;
+        allow read: if true;
       }
 
       match /picks/{pickId} {
