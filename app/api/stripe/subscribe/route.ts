@@ -1,9 +1,17 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getAuth } from "firebase-admin/auth"
-import { stripe } from "../../../../lib/stripe"
+import { getStripe } from "../../../../lib/stripe"
+import { FAN_ACCOUNTS_ENABLED } from "../../../../lib/feature-flags"
 import { getUserByUid, updateUserSubscription } from "../../../../lib/server/users"
 
 export async function POST(request: NextRequest) {
+  // Memberships are closed and Stripe is retired: checkout and the billing
+  // portal are gone, not temporarily failing.
+  const stripe = getStripe()
+  if (!FAN_ACCOUNTS_ENABLED || !stripe) {
+    return NextResponse.json({ error: "Memberships are closed" }, { status: 410 })
+  }
+
   const authHeader = request.headers.get("Authorization")
   if (!authHeader?.startsWith("Bearer ")) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
