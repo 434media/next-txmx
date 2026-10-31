@@ -1,9 +1,15 @@
 'use server'
 
-import { stripe } from '../../lib/stripe'
+import { getStripe } from '../../lib/stripe'
 import { SPONSOR_PACKAGES } from '../../lib/iconic-series-products'
 
 export async function startCheckoutSession(packageId: string) {
+  // Sponsor checkout was a one-time event (Nov 2025) and Stripe is retired.
+  const stripe = getStripe()
+  if (!stripe) {
+    throw new Error('Sponsor checkout is closed')
+  }
+
   const sponsorPackage = SPONSOR_PACKAGES.find(p => p.id === packageId)
   if (!sponsorPackage) {
     throw new Error(`Package with id "${packageId}" not found`)

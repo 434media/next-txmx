@@ -1,11 +1,13 @@
 "use server"
 
-import { stripe } from "../../lib/stripe"
+import type Stripe from "stripe"
+import { getStripe } from "../../lib/stripe"
+import { FAN_ACCOUNTS_ENABLED } from "../../lib/feature-flags"
 import { getAuth } from "firebase-admin/auth"
 import { getUserByUid, updateUserSubscription } from "../../lib/server/users"
 import "../../lib/firebase-admin"
 
-async function getOrCreateBlackCardProduct(): Promise<string> {
+async function getOrCreateBlackCardProduct(stripe: Stripe): Promise<string> {
   const products = await stripe.products.list({ limit: 100 })
   const existing = products.data.find(
     (p) => p.metadata.app === "txmx-black-card" && p.active
@@ -22,6 +24,13 @@ async function getOrCreateBlackCardProduct(): Promise<string> {
 }
 
 export async function createSubscriptionIntent(idToken: string) {
+  // Memberships are closed and Stripe is retired. The checkout form surfaces
+  // this message through its existing error handling.
+  const stripe = getStripe()
+  if (!FAN_ACCOUNTS_ENABLED || !stripe) {
+    throw new Error("Memberships are closed")
+  }
+
   const decoded = await getAuth().verifyIdToken(idToken)
   const user = await getUserByUid(decoded.uid)
 
@@ -48,7 +57,7 @@ export async function createSubscriptionIntent(idToken: string) {
     })
   }
 
-  const productId = await getOrCreateBlackCardProduct()
+  const productId = await getOrCreateBlackCardProduct(stripe)
 
   // Create subscription with incomplete payment to get a PaymentIntent
   const subscription = await stripe.subscriptions.create({

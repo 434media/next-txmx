@@ -11,10 +11,7 @@ let stripePromise: Promise<Stripe | null> | null = null
 const getStripePromise = () => {
   if (!stripePromise) {
     const key = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
-    if (!key) {
-      console.error('NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is not defined')
-      return null
-    }
+    if (!key) return null
     stripePromise = loadStripe(key)
   }
   return stripePromise
@@ -30,7 +27,7 @@ export default function SponsorCheckout({ packageId, onSuccess }: { packageId: s
     if (promise) {
       setStripePromise(promise)
     } else {
-      setError('Stripe is not configured. Please add NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY to your environment variables.')
+      setError('Sponsor checkout is closed.')
     }
   }, [])
 

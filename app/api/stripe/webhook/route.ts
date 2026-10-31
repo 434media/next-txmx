@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { stripe } from "../../../../lib/stripe"
+import { getStripe } from "../../../../lib/stripe"
 import {
   getUserByStripeCustomerId,
   getUserByUid,
@@ -8,9 +8,15 @@ import {
 import { sendSubscriptionConfirmation } from "../../../actions/email"
 import type Stripe from "stripe"
 
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!
-
 export async function POST(request: NextRequest) {
+  // Stripe is retired: with no key or webhook secret there is nothing to
+  // verify against, so the endpoint reports itself gone.
+  const stripe = getStripe()
+  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET
+  if (!stripe || !endpointSecret) {
+    return NextResponse.json({ error: "Stripe is not enabled" }, { status: 410 })
+  }
+
   const body = await request.text()
   const sig = request.headers.get("stripe-signature")
 

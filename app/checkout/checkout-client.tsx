@@ -14,9 +14,10 @@ import { FAN_ACCOUNTS_ENABLED } from "../../lib/feature-flags"
 import { createSubscriptionIntent } from "../actions/stripe-subscribe"
 import AuthModal from "../../components/auth-modal"
 
-const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
-)
+// Stripe is retired: with no publishable key, Elements gets null and Stripe.js
+// is never loaded. The page still renders "Memberships are closed" below.
+const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+const stripePromise = publishableKey ? loadStripe(publishableKey) : null
 
 const cardStyle = {
   style: {
