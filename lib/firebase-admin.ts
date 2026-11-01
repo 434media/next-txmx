@@ -3,6 +3,7 @@ import 'server-only'
 import { initializeApp, getApps, cert, type App } from 'firebase-admin/app'
 import { getFirestore } from 'firebase-admin/firestore'
 import { getAuth } from 'firebase-admin/auth'
+import { isKeyless, keylessCredential, keylessFirestore } from './gcp-keyless'
 
 interface SaCredential {
   projectId: string
@@ -56,6 +57,14 @@ function getApp(): App {
   if (getApps().length > 0) {
     return getApps()[0]
   }
+  // Keyless (Vercel OIDC, see ./gcp-keyless) wins when its variables are set;
+  // Auth only verifies ID tokens, which needs the project id, not a key.
+  if (isKeyless()) {
+    return initializeApp({
+      credential: keylessCredential,
+      projectId: process.env.FIREBASE_PROJECT_ID,
+    })
+  }
   const { projectId, clientEmail, privateKey } = resolveCredential()
   return initializeApp({
     credential: cert({ projectId, clientEmail, privateKey }),
@@ -63,7 +72,7 @@ function getApp(): App {
 }
 
 const app = getApp()
-const firestore = getFirestore(app, 'txmx')
+const firestore = isKeyless() ? keylessFirestore('txmx') : getFirestore(app, 'txmx')
 const auth = getAuth(app)
 
 export { firestore, auth }
