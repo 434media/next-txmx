@@ -17,8 +17,8 @@
     "@vercel/analytics": "^1.5.0",
     "botid": "^1.5.10",
     "clsx": "^2.1.1",
-    "firebase": "^12.11.0",
-    "firebase-admin": "^13.7.0",
+    "firebase": "^12.19.0",
+    "firebase-admin": "^13.10.0",
     "geist": "1.7.0",
     "lucide-react": "^0.511.0",
     "motion": "^12.14.0",
@@ -40,5 +40,10 @@
     "eslint-config-next": "16.4.1",
     "tailwindcss": "^4",
     "typescript": "^5.9.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "@grpc/grpc-js@1": "^1.13.6"
+    }
   }
 }
