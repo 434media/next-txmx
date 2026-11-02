@@ -45,7 +45,8 @@
   },
   "pnpm": {
     "overrides": {
-      "@grpc/grpc-js@1": "^1.13.6"
+      "@grpc/grpc-js@1": "^1.13.6",
+      "zod": ">=4.6.6 <5"
     }
   }
 }
