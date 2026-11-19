@@ -24,7 +24,7 @@
     "google-auth-library": "9.15.1",
     "lucide-react": "^0.511.0",
     "motion": "^12.14.0",
-    "next": "16.4.1",
+    "next": "16.4.5",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
     "resend": "^6.9.4",
