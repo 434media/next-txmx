@@ -1,5 +1,13 @@
+import type { Metadata } from 'next'
 import AdminAuthGate from './admin-auth-gate'
 import { getAdminSession } from '../../lib/admin-auth'
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
+}
 
 export default async function AdminLayout({
   children,

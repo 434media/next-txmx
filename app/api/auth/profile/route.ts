@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getAuth } from "firebase-admin/auth"
 import { getOrCreateUser } from "../../../actions/users"
+import { FAN_ACCOUNTS_ENABLED } from "../../../../lib/feature-flags"
 
 export async function GET(request: NextRequest) {
+  // Fan accounts are closed: don't create or read fan profiles.
+  if (!FAN_ACCOUNTS_ENABLED) {
+    return NextResponse.json({ error: "Fan accounts are closed" }, { status: 410 })
+  }
+
   const authHeader = request.headers.get("Authorization")
   if (!authHeader?.startsWith("Bearer ")) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })

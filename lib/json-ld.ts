@@ -1,5 +1,14 @@
 const SITE_URL = 'https://www.txmxboxing.com'
 
+/**
+ * Serialize JSON-LD for a <script type="application/ld+json"> body. Escapes `<`
+ * so a value containing "</script>" (fighter names, event titles from
+ * Firestore) cannot close the tag and inject markup.
+ */
+export function toJsonLd(data: unknown): string {
+  return JSON.stringify(data).replace(/</g, '\\u003c')
+}
+
 export function generateEventJsonLd() {
   return {
     '@context': 'https://schema.org',

@@ -1,6 +1,7 @@
 'use server'
 
 import { firestore } from '../../lib/firebase-admin'
+import { clampLimit } from '../../lib/utils'
 
 /**
  * Cross-event ("season") aggregate of a fan's fight-night play. This is a
@@ -46,7 +47,7 @@ function seasonRef(userId: string) {
  * Top-N all-time board for the public hub + /leaderboard.
  */
 export async function getSeasonStandings(limit = 100): Promise<SeasonStanding[]> {
-  const snap = await seasonCol().orderBy('points', 'desc').limit(limit).get()
+  const snap = await seasonCol().orderBy('points', 'desc').limit(clampLimit(limit, 100)).get()
   // Public action (anonymous callers): never return fans' emails.
   return snap.docs.map((d) => ({ ...(d.data() as SeasonStanding), email: null }))
 }

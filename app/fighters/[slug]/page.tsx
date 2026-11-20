@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { getFighterBySlug, getFighters, getFighterFights } from "../../actions/fighters"
-import { generateFighterJsonLd } from "../../../lib/json-ld"
+import { generateFighterJsonLd, toJsonLd } from "../../../lib/json-ld"
 import FighterProfileClient from "./fighter-profile-client"
 
 export const dynamic = 'force-dynamic'
@@ -66,7 +66,7 @@ export default async function FighterPage({ params }: FighterPageProps) {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: toJsonLd(personJsonLd) }}
       />
       <FighterProfileClient fighter={fighter} fights={fights} />
     </>

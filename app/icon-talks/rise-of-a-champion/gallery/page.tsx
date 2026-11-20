@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import GalleryClient from "./gallery-client"
-import { generateBreadcrumbJsonLd, generateOrganizationJsonLd } from '../../../../lib/json-ld'
+import { generateBreadcrumbJsonLd, generateOrganizationJsonLd, toJsonLd } from '../../../../lib/json-ld'
 
 export const metadata: Metadata = {
   title: 'Event Gallery - Rise of a Champion',
@@ -60,11 +60,11 @@ export default function GalleryPage() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: toJsonLd(breadcrumbJsonLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: toJsonLd(organizationJsonLd) }}
       />
       <GalleryClient />
     </>

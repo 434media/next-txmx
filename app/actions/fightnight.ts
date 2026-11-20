@@ -2,6 +2,7 @@
 
 import { firestore } from '../../lib/firebase-admin'
 import { requireAdmin } from '../../lib/admin-auth'
+import { clampLimit } from '../../lib/utils'
 
 // ── Types ────────────────────────────────────────────────
 
@@ -276,7 +277,7 @@ export async function getUpcomingFightNights(): Promise<FightNight[]> {
  */
 export async function getPastFightNights(limit = 12): Promise<FightNight[]> {
   const all = await getFightNights()
-  return all.filter((d) => d.status === 'completed').slice(0, limit)
+  return all.filter((d) => d.status === 'completed').slice(0, clampLimit(limit, 12))
 }
 
 /**

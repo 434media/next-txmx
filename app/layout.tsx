@@ -59,9 +59,8 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  alternates: {
-    canonical: 'https://www.txmxboxing.com',
-  },
+  // No root canonical: every public page sets its own alternates.canonical,
+  // and inheriting the homepage URL would mark /admin and 404s as duplicates.
 }
 
 export default async function RootLayout({

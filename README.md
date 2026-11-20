@@ -144,7 +144,7 @@ file is a focused slice of the domain:
 | `props.ts` · `match-picks.ts` | Prop Picks scoring |
 | `polls.ts` | Polls + voting + TX-Credit rewards |
 | `economy.ts` · `credits.ts` · `skill-points.ts` · `loyalty-points.ts` | Economy primitives |
-| `stripe-subscribe.ts` · `iconic-series-stripe.ts` | Stripe checkout |
+| `stripe-subscribe.ts` | Stripe checkout |
 | `daily-login.ts` · `quests.ts` · `rewards-store.ts` | Engagement + rewards |
 | `gyms.ts` · `venues.ts` | Reference data |
 | `community.ts` · `user-blocks.ts` · `abuse-prevention.ts` · `rate-limiter.ts` | Community + safety |
@@ -153,7 +153,7 @@ file is a focused slice of the domain:
 | `seasons.ts` · `fan-card.ts` | Seasons + Fan Card |
 | `notifications.ts` | Web push delivery |
 | `tdlr-import.ts` | TDLR PDF → Firestore |
-| `email.ts` · `contact-form.ts` · `sharing.ts` · `onboarding.ts` · `feature-flags.ts` · `guest-session.ts` · `verified-manager.ts` | Misc. |
+| `email.ts` · `sharing.ts` · `onboarding.ts` · `feature-flags.ts` · `guest-session.ts` · `verified-manager.ts` | Misc. |
 
 ### `app/api/` — Route handlers
 
@@ -167,7 +167,6 @@ file is a focused slice of the domain:
 | `/api/newsletter` | Resend newsletter subscription |
 | `/api/rise-of-a-champion-rsvp` | RSVP intake |
 | `/api/stripe/subscribe` · `/api/stripe/webhook` | Stripe checkout + webhooks |
-| `/api/tdlr-parse` | Calls the Python `tdlr-parse.py` parser |
 
 ### `api/` — Python serverless
 

@@ -11,11 +11,22 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 const EMAIL_FROM = "Marcos Resendez <noreply@send.434media.com>"
 const REPLY_TO = "build@434media.com"
 
+// Names and event fields come from user profiles and admin input; escape them
+// before interpolating into the HTML bodies below.
+function escapeHtml(value: unknown): string {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;")
+}
+
 export async function sendSubscriptionConfirmation(
   email: string,
   displayName: string | null
 ) {
-  const firstName = displayName?.split(" ")[0] || "Champ"
+  const firstName = escapeHtml(displayName?.split(" ")[0] || "Champ")
 
   await resend.emails.send({
     from: EMAIL_FROM,
@@ -125,7 +136,7 @@ export async function sendEventWelcomeEmail(
   displayName: string | null,
   event: EventEmailContext
 ) {
-  const firstName = displayName?.split(" ")[0] || "Champ"
+  const firstName = escapeHtml(displayName?.split(" ")[0] || "Champ")
   const eventUrl = `https://www.txmxboxing.com/${event.urlPath || "events"}/${event.eventId}`
 
   await resend.emails.send({
@@ -157,14 +168,14 @@ export async function sendEventWelcomeEmail(
                 You're in for fight night, ${firstName}.
               </h1>
               <p style="margin:0 0 24px;color:rgba(255,255,255,0.5);font-size:15px;line-height:1.7;">
-                Tonight's card runs at <strong style="color:#fff;">${event.venue}</strong> in ${event.city}. Pick winners, stack Skill Points, and climb the event leaderboard live.
+                Tonight's card runs at <strong style="color:#fff;">${escapeHtml(event.venue)}</strong> in ${escapeHtml(event.city)}. Pick winners, stack Skill Points, and climb the event leaderboard live.
               </p>
 
               <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:32px;border:1px solid rgba(245,158,11,0.2);border-radius:12px;overflow:hidden;">
                 <tr>
                   <td style="padding:20px 24px;background:rgba(245,158,11,0.05);border-bottom:1px solid rgba(245,158,11,0.1);">
-                    <p style="margin:0 0 4px;color:#f59e0b;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;">${event.promoter}</p>
-                    <p style="margin:0;color:#fff;font-size:18px;font-weight:700;">${event.eventName}</p>
+                    <p style="margin:0 0 4px;color:#f59e0b;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;">${escapeHtml(event.promoter)}</p>
+                    <p style="margin:0;color:#fff;font-size:18px;font-weight:700;">${escapeHtml(event.eventName)}</p>
                   </td>
                 </tr>
                 <tr>
@@ -180,7 +191,7 @@ export async function sendEventWelcomeEmail(
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center" style="padding:8px 0;">
-                    <a href="${eventUrl}" style="display:inline-block;background:#f59e0b;color:#000;font-size:14px;font-weight:600;letter-spacing:0.5px;text-decoration:none;padding:14px 32px;border-radius:8px;">
+                    <a href="${escapeHtml(eventUrl)}" style="display:inline-block;background:#f59e0b;color:#000;font-size:14px;font-weight:600;letter-spacing:0.5px;text-decoration:none;padding:14px 32px;border-radius:8px;">
                       Open Fight Card
                     </a>
                   </td>
@@ -192,7 +203,7 @@ export async function sendEventWelcomeEmail(
           <tr>
             <td style="padding-top:32px;border-top:1px solid rgba(255,255,255,0.05);">
               <p style="margin:0 0 8px;color:rgba(255,255,255,0.2);font-size:12px;">
-                ${event.date} &middot; ${event.venue} &middot; ${event.city}
+                ${escapeHtml(event.date)} &middot; ${escapeHtml(event.venue)} &middot; ${escapeHtml(event.city)}
               </p>
               <p style="margin:0;color:rgba(255,255,255,0.15);font-size:11px;">
                 &copy; TXMX Boxing &middot; txmxboxing.com
@@ -223,7 +234,7 @@ export async function sendEventWinnerEmail(
     claimInstructions: string
   }
 ) {
-  const firstName = displayName?.split(" ")[0] || "Champ"
+  const firstName = escapeHtml(displayName?.split(" ")[0] || "Champ")
   const eventUrl = `https://www.txmxboxing.com/${event.urlPath || "events"}/${event.eventId}`
   const positionLabel =
     details.position === 1
@@ -264,16 +275,16 @@ export async function sendEventWinnerEmail(
                 Nice work, ${firstName}.
               </h1>
               <p style="margin:0 0 24px;color:rgba(255,255,255,0.55);font-size:15px;line-height:1.7;">
-                You earned <strong style="color:#fff;">${details.spEarned.toLocaleString()} SP</strong> at ${event.eventName} and finished ${positionLabel} on the event leaderboard.
+                You earned <strong style="color:#fff;">${details.spEarned.toLocaleString()} SP</strong> at ${escapeHtml(event.eventName)} and finished ${positionLabel} on the event leaderboard.
               </p>
 
               <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;border:1px solid rgba(245,158,11,0.3);border-radius:12px;overflow:hidden;background:rgba(245,158,11,0.05);">
                 <tr>
                   <td style="padding:24px;">
                     <p style="margin:0 0 6px;color:#f59e0b;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;">Your Prize</p>
-                    <p style="margin:0 0 12px;color:#fff;font-size:20px;font-weight:700;">${details.prizeLabel}</p>
+                    <p style="margin:0 0 12px;color:#fff;font-size:20px;font-weight:700;">${escapeHtml(details.prizeLabel)}</p>
                     <p style="margin:0;color:rgba(255,255,255,0.65);font-size:14px;line-height:1.6;">
-                      ${details.claimInstructions}
+                      ${escapeHtml(details.claimInstructions)}
                     </p>
                   </td>
                 </tr>
@@ -282,7 +293,7 @@ export async function sendEventWinnerEmail(
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center" style="padding:8px 0;">
-                    <a href="${eventUrl}" style="display:inline-block;background:#f59e0b;color:#000;font-size:14px;font-weight:600;letter-spacing:0.5px;text-decoration:none;padding:14px 32px;border-radius:8px;">
+                    <a href="${escapeHtml(eventUrl)}" style="display:inline-block;background:#f59e0b;color:#000;font-size:14px;font-weight:600;letter-spacing:0.5px;text-decoration:none;padding:14px 32px;border-radius:8px;">
                       View Final Standings
                     </a>
                   </td>
@@ -294,7 +305,7 @@ export async function sendEventWinnerEmail(
           <tr>
             <td style="padding-top:32px;border-top:1px solid rgba(255,255,255,0.05);">
               <p style="margin:0 0 8px;color:rgba(255,255,255,0.2);font-size:12px;">
-                ${event.date} &middot; ${event.venue} &middot; ${event.city}
+                ${escapeHtml(event.date)} &middot; ${escapeHtml(event.venue)} &middot; ${escapeHtml(event.city)}
               </p>
               <p style="margin:0;color:rgba(255,255,255,0.15);font-size:11px;">
                 &copy; TXMX Boxing &middot; txmxboxing.com
