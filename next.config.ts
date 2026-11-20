@@ -26,7 +26,7 @@ const csp = [
   `img-src 'self' data: blob: https://storage.googleapis.com https://firebasestorage.googleapis.com https://images.unsplash.com https://lh3.googleusercontent.com https://picsum.photos https://fastly.picsum.photos https://www.facebook.com https://*.google-analytics.com https://www.googletagmanager.com ${simplifi}` +
     (isPreview ? " https://vercel.live https://vercel.com" : ""),
   "font-src 'self' data:" + (isPreview ? " https://vercel.live" : ""),
-  "media-src 'self' https://storage.googleapis.com https://commondatastorage.googleapis.com",
+  "media-src 'self' https://storage.googleapis.com https://firebasestorage.googleapis.com https://commondatastorage.googleapis.com",
   `connect-src 'self' https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.facebook.com https://connect.facebook.net ${simplifi}` +
     (isPreview ? " https://vercel.live wss://ws-us3.pusher.com" : ""),
   `frame-src ${firebaseAuthOrigin} https://www.facebook.com ${simplifi}${toolbar}`,
