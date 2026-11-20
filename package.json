@@ -1,6 +1,7 @@
 {
   "name": "next-txmx",
   "version": "0.1.0",
+  "packageManager": "pnpm@10.34.9",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
