@@ -88,8 +88,22 @@ export async function GET(request: NextRequest) {
     }
 
     for (const event of newEvents) {
-      const pdfUrl = BASE_URL + event.results
       const filename = event.results.split('/').pop() || 'unknown.pdf'
+
+      // Resolve against the TDLR origin and refuse anything that lands on
+      // another host (the scraped link is untrusted input).
+      let pdfUrl: string
+      try {
+        const resolved = new URL(event.results, BASE_URL)
+        if (resolved.hostname !== new URL(BASE_URL).hostname) {
+          results.errors.push(`${filename}: off-site results link skipped`)
+          continue
+        }
+        pdfUrl = resolved.toString()
+      } catch {
+        results.errors.push(`${filename}: invalid results link skipped`)
+        continue
+      }
 
       try {
         // Download the PDF

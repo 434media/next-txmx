@@ -8,7 +8,7 @@ import {
 } from "../../actions/fightnight"
 import { getStandings } from "../../actions/fightnight-standings"
 import { getPrizes } from "../../actions/fightnight-prizes"
-import { generateFightNightJsonLd } from "../../../lib/json-ld"
+import { generateFightNightJsonLd, toJsonLd } from "../../../lib/json-ld"
 import FightNightClient from "./fight-night-client"
 import HeroCta from "./hero-cta"
 import RecapView from "./recap-view"
@@ -82,7 +82,7 @@ export default async function FightNightSlugPage({ params }: PageProps) {
   const jsonLdScript = (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      dangerouslySetInnerHTML={{ __html: toJsonLd(jsonLd) }}
     />
   )
 

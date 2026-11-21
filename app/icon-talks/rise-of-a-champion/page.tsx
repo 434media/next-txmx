@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import IconicSeriesClient from './iconic-series-client'
-import { generateEventJsonLd, generateBreadcrumbJsonLd, generateOrganizationJsonLd } from '../../../lib/json-ld'
+import { generateEventJsonLd, generateBreadcrumbJsonLd, generateOrganizationJsonLd, toJsonLd } from '../../../lib/json-ld'
 
 export const metadata: Metadata = {
   title: 'Rise of a Champion - Iconic Series',
@@ -64,15 +64,15 @@ export default function IconicSeriesPage() {
       {/* JSON-LD Structured Data */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(eventJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: toJsonLd(eventJsonLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: toJsonLd(breadcrumbJsonLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: toJsonLd(organizationJsonLd) }}
       />
       <IconicSeriesClient />
     </>

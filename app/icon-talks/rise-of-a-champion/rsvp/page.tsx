@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import RiseOfAChampionClient from './riseofachampion-client'
-import { generateEventJsonLd, generateBreadcrumbJsonLd, generateOrganizationJsonLd } from '../../../../lib/json-ld'
+import { generateEventJsonLd, generateBreadcrumbJsonLd, generateOrganizationJsonLd, toJsonLd } from '../../../../lib/json-ld'
 
 export const metadata: Metadata = {
   title: 'RSVP - Rise of a Champion',
@@ -64,15 +64,15 @@ export default function RiseOfAChampionPage() {
       {/* JSON-LD Structured Data */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(eventJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: toJsonLd(eventJsonLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: toJsonLd(breadcrumbJsonLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: toJsonLd(organizationJsonLd) }}
       />
       <RiseOfAChampionClient />
     </>

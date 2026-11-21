@@ -2,6 +2,7 @@
 
 import { firestore } from '../../lib/firebase-admin'
 import { requireAdmin } from '../../lib/admin-auth'
+import { clampLimit } from '../../lib/utils'
 
 export type EventMode = 'standard' | 'free-props'
 
@@ -247,7 +248,7 @@ export async function getUpcomingEvents(limit = 10): Promise<TXMXEvent[]> {
     .collection('events')
     .where('date', '>=', today)
     .orderBy('date', 'asc')
-    .limit(limit)
+    .limit(clampLimit(limit, 10))
     .get()
 
   return snapshot.docs.map((doc) => {

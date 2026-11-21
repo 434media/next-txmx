@@ -2,6 +2,7 @@
 
 import { firestore } from '../../lib/firebase-admin'
 import { requireAdmin } from '../../lib/admin-auth'
+import { clampLimit } from '../../lib/utils'
 import { bumpSeasonStanding } from '../../lib/server/season-standings'
 
 export interface FightNightStanding {
@@ -45,7 +46,7 @@ export async function getStandings(
   opts: { limit?: number } = {}
 ): Promise<FightNightStanding[]> {
   if (!fightNightId) return []
-  const limit = opts.limit ?? 100
+  const limit = clampLimit(opts?.limit, 100)
 
   // Single-field order by `points` desc — avoids needing a composite index.
   const snap = await standingsCol(fightNightId)

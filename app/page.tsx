@@ -4,6 +4,7 @@ import {
   generateOrganizationJsonLd,
   generateSiteNavigationJsonLd,
   generateWebSiteJsonLd,
+  toJsonLd,
 } from "../lib/json-ld"
 
 export const metadata: Metadata = {
@@ -37,7 +38,7 @@ export default function TXMXLanding() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }}
+        dangerouslySetInnerHTML={{ __html: toJsonLd(graph) }}
       />
       <main className="relative min-h-screen bg-black overflow-hidden font-sans">
         <HeroSection />
