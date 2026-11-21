@@ -13,6 +13,7 @@ import { useAuth } from "../../lib/auth-context"
 import { FAN_ACCOUNTS_ENABLED } from "../../lib/feature-flags"
 import { createSubscriptionIntent } from "../actions/stripe-subscribe"
 import AuthModal from "../../components/auth-modal"
+import { track } from "../../lib/analytics"
 
 // Stripe is retired: with no publishable key, Elements gets null and Stripe.js
 // is never loaded. The page still renders "Memberships are closed" below.
@@ -53,6 +54,7 @@ function CheckoutForm() {
 
       setLoading(true)
       setError(null)
+      track("begin_checkout", { item_id: "txmx-black-card", currency: "USD" })
 
       try {
         const idToken = await user.getIdToken()
@@ -78,6 +80,7 @@ function CheckoutForm() {
           setError(confirmError.message || "Payment failed")
         } else {
           setComplete(true)
+          track("purchase", { item_id: "txmx-black-card", currency: "USD" })
           await refreshProfile()
         }
       } catch (err) {

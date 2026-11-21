@@ -14,6 +14,7 @@ import { placeFightNightPick } from "../../../actions/fightnight-picks"
 import type { FightNightBout } from "../../../actions/fightnight"
 import type { FightNightPick } from "../../../actions/fightnight-picks"
 import Carousel from "./carousel"
+import { track } from "../../../../lib/analytics"
 
 interface FightCardProps {
   fightNightId: string
@@ -294,6 +295,7 @@ function BoutCard({
       }
       const res = await placeFightNightPick(fightNightId, idToken, bout.boutNumber, corner)
       if (!res.success) setError(res.error || "Failed to place pick")
+      else track("pick_made", { fight_night_id: fightNightId, bout_number: bout.boutNumber })
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to place pick")
     } finally {

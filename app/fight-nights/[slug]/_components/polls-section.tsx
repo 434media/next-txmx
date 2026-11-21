@@ -9,6 +9,7 @@ import {
   getUserVotesForFightNight,
 } from "../../../actions/fightnight-polls"
 import Carousel from "./carousel"
+import { track } from "../../../../lib/analytics"
 
 interface PollsSectionProps {
   fightNightId: string
@@ -62,6 +63,7 @@ export default function PollsSection({
     try {
       const res = await votePoll(fightNightId, await user.getIdToken(), pollId, optionIndex)
       if (res.success) {
+        track("poll_vote", { fight_night_id: fightNightId, poll_id: pollId })
         // Optimistic update — flips the card to results immediately
         setUserVotes((m) => ({ ...m, [pollId]: optionIndex }))
         // Silent background refresh — pulls fresh tallies without
