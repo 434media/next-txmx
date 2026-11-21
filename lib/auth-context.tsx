@@ -15,9 +15,11 @@ import {
   updateProfile,
   signOut as firebaseSignOut,
   GoogleAuthProvider,
+  getAdditionalUserInfo,
   type User,
 } from "firebase/auth"
 import { auth } from "./firebase-client"
+import { track } from "./analytics"
 import { getOrCreateUser } from "../app/actions/users"
 
 export interface UserProfile {
@@ -116,11 +118,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider()
-    await signInWithPopup(auth, provider)
+    const cred = await signInWithPopup(auth, provider)
+    // A first Google sign-in creates the account.
+    track(getAdditionalUserInfo(cred)?.isNewUser ? "sign_up" : "login", { method: "google" })
   }
 
   const signInWithEmail = async (email: string, password: string) => {
     await signInWithEmailAndPassword(auth, email, password)
+    track("login", { method: "password" })
   }
 
   const signUpWithEmail = async (
@@ -129,6 +134,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     displayName?: string
   ) => {
     const cred = await createUserWithEmailAndPassword(auth, email, password)
+    track("sign_up", { method: "password" })
     const name = displayName?.trim()
     if (name) {
       await updateProfile(cred.user, { displayName: name })

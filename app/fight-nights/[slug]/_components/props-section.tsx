@@ -12,6 +12,7 @@ import {
   placePropPick,
 } from "../../../actions/fightnight-props"
 import Carousel from "./carousel"
+import { track } from "../../../../lib/analytics"
 
 interface PropsSectionProps {
   fightNightId: string
@@ -92,6 +93,7 @@ export default function PropsSection({ fightNightId }: PropsSectionProps) {
     try {
       const res = await placePropPick(fightNightId, await user.getIdToken(), propId, optionId)
       if (res.success) {
+        track("prop_pick", { fight_night_id: fightNightId, prop_id: propId })
         await refresh()
       } else {
         setErrorById((m) => ({ ...m, [propId]: res.error || "Failed" }))
