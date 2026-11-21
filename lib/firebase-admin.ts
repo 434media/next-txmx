@@ -54,8 +54,9 @@ function resolveCredential(): SaCredential {
 }
 
 function getApp(): App {
-  if (getApps().length > 0) {
-    return getApps()[0]
+  const existing = getApps().find((a) => a.name === '[DEFAULT]')
+  if (existing) {
+    return existing
   }
   // Keyless (Vercel OIDC, see ./gcp-keyless) wins when its variables are set;
   // Auth only verifies ID tokens, which needs the project id, not a key.
@@ -75,4 +76,21 @@ const app = getApp()
 const firestore = isKeyless() ? keylessFirestore('txmx') : getFirestore(app, 'txmx')
 const auth = getAuth(app)
 
-export { firestore, auth }
+/**
+ * Staff (admin) ID tokens are verified against 434's staff project, not the
+ * fan project (Security Policy 7.4): a fan account under an admin's address
+ * gets nothing. Verification is by public key only, so this app needs no
+ * credential of its own beyond the main app's. Until STAFF_FIREBASE_PROJECT_ID
+ * is set, staff tokens are checked against the main project, as before.
+ */
+function getStaffApp(): App {
+  const staffProjectId = process.env.STAFF_FIREBASE_PROJECT_ID
+  if (!staffProjectId || staffProjectId === process.env.FIREBASE_PROJECT_ID) return app
+  return (
+    getApps().find((a) => a.name === 'staff') ??
+    initializeApp({ credential: app.options.credential, projectId: staffProjectId }, 'staff')
+  )
+}
+const staffAuth = getAuth(getStaffApp())
+
+export { firestore, auth, staffAuth }

@@ -4,7 +4,7 @@ import { firestore } from '../../lib/firebase-admin'
 import { requireAdmin } from '../../lib/admin-auth'
 import { getFightNight } from './fightnight'
 import { getStandingsWithEmails, getPrizesWithEmails } from '../../lib/server/fan-emails'
-import { auth } from '../../lib/firebase-admin'
+import { staffAuth } from '../../lib/firebase-admin'
 import { isAllowlistedAdmin, parseAdminEmails } from '../../lib/admin-allowlist'
 import { sendEventWinnerEmailsBatch, type EventEmailContext } from './email'
 
@@ -144,7 +144,8 @@ export async function getPrizesForAdmin(
     // Public-key verification only: checkRevoked calls the Firebase Auth admin
     // API, which this project's service account may not use
     // (auth/insufficient-permission).
-    claims = await auth.verifyIdToken(idToken)
+    // Admin tokens come from the staff sign-in (lib/firebase-admin.ts).
+    claims = await staffAuth.verifyIdToken(idToken)
   } catch (err) {
     console.error('[getPrizesForAdmin] verifyIdToken failed:', (err as { code?: string })?.code ?? 'unknown')
     return null
