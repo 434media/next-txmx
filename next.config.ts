@@ -15,6 +15,10 @@ const isDev = process.env.NODE_ENV === "development";
 const toolbar = isPreview ? " https://vercel.live" : "";
 // Firebase Auth's sign-in helper iframe is served from the auth domain.
 const firebaseAuthOrigin = `https://${process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "groovy-ego-462522-v2.firebaseapp.com"}`;
+// The staff sign-in for /admin (lib/firebase-client.ts) has its own auth domain.
+const staffAuthOrigin = process.env.NEXT_PUBLIC_STAFF_FIREBASE_AUTH_DOMAIN
+  ? ` https://${process.env.NEXT_PUBLIC_STAFF_FIREBASE_AUTH_DOMAIN}`
+  : "";
 // Simpli.fi's tag chains further scripts, pixels and sync frames across its
 // own subdomains; allow all of *.simpli.fi rather than chase individual hosts.
 const simplifi = "https://*.simpli.fi";
@@ -29,7 +33,7 @@ const csp = [
   "media-src 'self' https://storage.googleapis.com https://firebasestorage.googleapis.com https://commondatastorage.googleapis.com",
   `connect-src 'self' https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.facebook.com https://connect.facebook.net ${simplifi}` +
     (isPreview ? " https://vercel.live wss://ws-us3.pusher.com" : ""),
-  `frame-src ${firebaseAuthOrigin} https://www.facebook.com ${simplifi}${toolbar}`,
+  `frame-src ${firebaseAuthOrigin}${staffAuthOrigin} https://www.facebook.com ${simplifi}${toolbar}`,
   "worker-src 'self'",
   "manifest-src 'self'",
   "object-src 'none'",

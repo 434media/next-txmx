@@ -20,7 +20,13 @@
  * The admin portal has its own gate (app/admin/admin-auth-gate.tsx) and is
  * unaffected by this flag.
  */
-export const FAN_ACCOUNTS_ENABLED: boolean = false
+export const FAN_ACCOUNTS_ENABLED: boolean =
+  // Off in code. A Preview deployment may turn it on for a test with
+  // NEXT_PUBLIC_FAN_ACCOUNTS_PREVIEW=true (branch-scoped in Vercel). Production
+  // ignores that variable: turning fan accounts on for the live site stays a
+  // code change.
+  process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview' &&
+  process.env.NEXT_PUBLIC_FAN_ACCOUNTS_PREVIEW === 'true'
 
 /**
  * Name + email gate in front of the Rise of a Champion photo gallery.
