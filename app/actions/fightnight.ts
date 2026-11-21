@@ -3,6 +3,7 @@
 import { firestore } from '../../lib/firebase-admin'
 import { requireAdmin } from '../../lib/admin-auth'
 import { clampLimit } from '../../lib/utils'
+import { httpsImageUrl } from '../../lib/safe-image-url'
 
 // ── Types ────────────────────────────────────────────────
 
@@ -169,6 +170,7 @@ export async function createFightNight(
   await requireAdmin()
   const now = new Date().toISOString()
   const merged = { ...emptyDefaults(), ...data }
+  if (typeof merged.flyerUrl === 'string') merged.flyerUrl = httpsImageUrl(merged.flyerUrl)
   const base = merged.slug ? slugify(merged.slug) : buildSlugBase(merged)
   merged.slug = await ensureUniqueSlug(base)
   const payload = { ...merged, createdAt: now, updatedAt: now }
@@ -185,6 +187,8 @@ export async function updateFightNight(
     ...data,
     updatedAt: new Date().toISOString(),
   }
+  // A flyer URL is shown on the public page: keep only an absolute https URL.
+  if (typeof data.flyerUrl === 'string') patch.flyerUrl = httpsImageUrl(data.flyerUrl)
   // When the slug is part of the patch, sanitize it and guarantee it stays
   // unique (excluding this doc). An empty/blank slug regenerates from the
   // night's identity fields so the public URL is never broken.
