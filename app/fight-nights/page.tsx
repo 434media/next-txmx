@@ -8,12 +8,14 @@ import {
 import { getSeasonStandings } from "../actions/season-standings"
 import { getStandings } from "../actions/fightnight-standings"
 import FightNightCard from "../../components/fight-nights/fight-night-card"
+import HubAccountCta from "../../components/fight-nights/hub-account-cta"
 import HowItWorks from "../../components/fight-nights/how-it-works"
 import IntroHero from "../../components/fight-nights/intro-hero"
 import RecapSpotlight from "../../components/fight-nights/recap-spotlight"
 import SeasonBoard from "../../components/fight-nights/season-board"
 import HubFaq from "../../components/fight-nights/hub-faq"
 import { Section, Eyebrow } from "../../components/fight-nights/section"
+import { FAN_ACCOUNTS_ENABLED } from "../../lib/feature-flags"
 
 export const metadata: Metadata = {
   title: "Fight Nights | TXMX Boxing",
@@ -103,7 +105,19 @@ export default async function FightNightsHubPage() {
         </Section>
       )}
 
-      {/* 6 — FAQ: full-bleed band that closes the page. */}
+      {/* 6 — THE ASK: account on-ramp (#join), only while fan accounts are on.
+          Off, there is no form to send anyone to, so the band isn't mounted. */}
+      {FAN_ACCOUNTS_ENABLED && (
+        <HubAccountCta
+          featured={
+            featured
+              ? { slug: featured.slug, title: featured.title, status: featured.status }
+              : null
+          }
+        />
+      )}
+
+      {/* 7 — FAQ: full-bleed band that closes the page. */}
       <HubFaq />
     </main>
   )
