@@ -21,12 +21,10 @@
  * unaffected by this flag.
  */
 export const FAN_ACCOUNTS_ENABLED: boolean =
-  // Off in code. A Preview deployment may turn it on for a test with
-  // NEXT_PUBLIC_FAN_ACCOUNTS_PREVIEW=true (branch-scoped in Vercel). Production
-  // ignores that variable: turning fan accounts on for the live site stays a
-  // code change.
-  process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview' &&
-  process.env.NEXT_PUBLIC_FAN_ACCOUNTS_PREVIEW === 'true'
+  // On since the c434-txmx move (FB-1): fans sign up and sign in on TXMX's own
+  // Firebase project, apart from staff. Turning fan accounts off again is this
+  // one line.
+  true
 
 /**
  * Name + email gate in front of the Rise of a Champion photo gallery.
