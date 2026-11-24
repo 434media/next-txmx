@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { onAuthStateChanged, signInWithPopup, signInWithEmailAndPassword, signOut, type User } from 'firebase/auth'
-import { auth, googleProvider } from '../../lib/firebase-client'
+// Staff sign-in, kept apart from fans: see lib/firebase-client.ts.
+import { staffAuth as auth, staffGoogleProvider as googleProvider } from '../../lib/firebase-client'
 
 interface AdminAuthGateProps {
   children: React.ReactNode

@@ -10,6 +10,8 @@ import LiveRibbon from "../components/live-ribbon"
 import SettlementToasts from "../components/settlement-toasts"
 import NotificationPrompt from "../components/notification-prompt"
 import SlideOutModal from "../components/slide-out-modal"
+import AuthModal from "../components/auth-modal"
+import { FAN_ACCOUNTS_ENABLED } from "../lib/feature-flags"
 import { AuthProvider } from "../lib/auth-context"
 import GlobalStyles from "../components/global-styles"
 import "./globals.css"
@@ -53,6 +55,7 @@ export default function ClientLayout({
   activeFightNight = null,
 }: Readonly<ClientLayoutProps>) {
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const pathname = usePathname()
 
   // Register service worker for PWA + push notifications
@@ -146,9 +149,27 @@ export default function ClientLayout({
           {children}
           {!isAdmin && <Footer />}
 
-          {/* Universal Slide Out Modal. No AuthModal is mounted — fan accounts
-              are off (lib/feature-flags.ts), so there is no sign-in entry point. */}
-          <SlideOutModal isOpen={isModalOpen} onClose={closeModal} activeFightNight={activeFightNight} />
+          {/* Fan sign-in modal, mounted only while fan accounts are on
+              (lib/feature-flags.ts). Off, there is no sign-in entry point. */}
+          {FAN_ACCOUNTS_ENABLED && (
+            <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+          )}
+
+          {/* Universal Slide Out Modal. Its sign-in button renders only when
+              onAuthClick is passed, i.e. while fan accounts are on. */}
+          <SlideOutModal
+            isOpen={isModalOpen}
+            onClose={closeModal}
+            onAuthClick={
+              FAN_ACCOUNTS_ENABLED
+                ? () => {
+                    closeModal()
+                    setIsAuthModalOpen(true)
+                  }
+                : undefined
+            }
+            activeFightNight={activeFightNight}
+          />
         </AuthProvider>
       </body>
     </html>

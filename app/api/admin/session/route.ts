@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { auth } from '../../../../lib/firebase-admin'
+import { staffAuth } from '../../../../lib/firebase-admin'
 import {
   ADMIN_SESSION_COOKIE,
   ADMIN_SESSION_MAX_AGE_MS,
@@ -45,7 +45,8 @@ export async function POST(request: NextRequest) {
 
   let claims
   try {
-    claims = await auth.verifyIdToken(idToken)
+    // Staff project only: a token from the fan project is refused here.
+    claims = await staffAuth.verifyIdToken(idToken)
   } catch (err) {
     console.error('[POST /api/admin/session] verifyIdToken failed:', (err as { code?: string })?.code ?? 'unknown')
     return NextResponse.json({ error: 'Invalid ID token' }, { status: 401 })
