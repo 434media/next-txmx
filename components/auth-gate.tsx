@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { onAuthStateChanged, signInWithPopup, signInWithEmailAndPassword, type User } from 'firebase/auth'
+import { onAuthStateChanged, signInWithPopup, signInWithEmailAndPassword, getAdditionalUserInfo, type User } from 'firebase/auth'
+import { track } from '../lib/analytics'
 import { auth, googleProvider } from '../lib/firebase-client'
 
 interface AuthGateProps {
@@ -35,7 +36,8 @@ export default function AuthGate({ children, title = 'SCORECARD', subtitle = 'Si
     setSigningIn(true)
     setError('')
     try {
-      await signInWithPopup(auth, googleProvider)
+      const cred = await signInWithPopup(auth, googleProvider)
+      track(getAdditionalUserInfo(cred)?.isNewUser ? 'sign_up' : 'login', { method: 'google' })
     } catch (err) {
       if (err instanceof Error && !err.message.includes('popup-closed')) {
         setError('Sign-in failed. Please try again.')
@@ -51,6 +53,7 @@ export default function AuthGate({ children, title = 'SCORECARD', subtitle = 'Si
     setError('')
     try {
       await signInWithEmailAndPassword(auth, email, password)
+      track('login', { method: 'password' })
     } catch {
       setError('Invalid email or password.')
     } finally {
