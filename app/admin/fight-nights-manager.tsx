@@ -8,9 +8,10 @@ import {
   onSnapshot,
   orderBy,
   query,
-  where,
 } from "firebase/firestore"
-import { auth, db } from "../../lib/firebase-client"
+// `auth` is the staff sign-in (lib/firebase-client.ts); `db` is used only for
+// public reads (bouts, standings), which need no fan sign-in.
+import { staffAuth as auth, db } from "../../lib/firebase-client"
 import {
   type FightNight,
   type FightNightStatus,
@@ -2773,34 +2774,30 @@ function LivePanel({ fightNight }: { fightNight: FightNight }) {
   // Pick data per bout — drives the "X picked Gomez / Y picked Paez" stakes
   // meter on every card (live AND settled).
   //
-  // - Scheduled / live bouts: real-time onSnapshot so the meter updates as
-  //   fans place picks.
-  // - Completed bouts: one-shot fetch. Settled picks are frozen, so a
-  //   subscription would waste a listener for data that never changes.
+  // Read through the admin-gated server action, not a browser listener:
+  // picks are readable in the browser only with a fan sign-in, and the admin
+  // signs in to the staff project (lib/firebase-client.ts).
+  // - Scheduled / live bouts: re-read every 10 seconds so the meter follows
+  //   fans' picks.
+  // - Completed bouts: one read. Settled picks are frozen.
   useEffect(() => {
-    const unsubs: (() => void)[] = []
     let cancelled = false
-    for (const bout of bouts) {
-      if (bout.status === "completed") {
-        getPicksForBout(fightNight.id, bout.boutNumber).then((picks) => {
-          if (cancelled) return
-          setPicksByBout((prev) => ({ ...prev, [bout.boutNumber]: picks }))
-        })
-        continue
-      }
-      const q = query(
-        collection(db, "fightNights", fightNight.id, "picks"),
-        where("boutNumber", "==", bout.boutNumber)
-      )
-      const unsub = onSnapshot(q, (snap) => {
-        const picks = snap.docs.map((d) => d.data() as FightNightPick)
-        setPicksByBout((prev) => ({ ...prev, [bout.boutNumber]: picks }))
+    const load = (boutNumber: number) =>
+      getPicksForBout(fightNight.id, boutNumber).then((picks) => {
+        if (cancelled) return
+        setPicksByBout((prev) => ({ ...prev, [boutNumber]: picks }))
       })
-      unsubs.push(unsub)
+    const live: number[] = []
+    for (const bout of bouts) {
+      load(bout.boutNumber)
+      if (bout.status !== "completed") live.push(bout.boutNumber)
     }
+    const timer = live.length
+      ? setInterval(() => live.forEach((n) => load(n)), 10_000)
+      : undefined
     return () => {
       cancelled = true
-      unsubs.forEach((u) => u())
+      if (timer) clearInterval(timer)
     }
   }, [fightNight.id, bouts])
 

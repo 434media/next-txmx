@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef, useCallback } from "react"
+import { httpsImageUrl } from "@/lib/safe-image-url"
 
 interface FlyerUploaderProps {
   fightNightId: string
@@ -127,7 +128,7 @@ export default function FlyerUploader({
         <div className="relative border border-gray-200 rounded-lg overflow-hidden bg-gray-50 mb-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={currentUrl}
+            src={httpsImageUrl(currentUrl) || undefined}
             alt="Flyer preview"
             className="w-full max-h-72 object-contain bg-white"
           />
@@ -238,7 +239,12 @@ export default function FlyerUploader({
             type="button"
             disabled={!manualUrl.trim()}
             onClick={() => {
-              onUploaded(manualUrl.trim())
+              const url = httpsImageUrl(manualUrl)
+              if (!url) {
+                setError("Paste a full https:// image URL.")
+                return
+              }
+              onUploaded(url)
               setManualUrl("")
             }}
             className="px-3 py-2 bg-gray-900 text-white text-[11px] font-semibold rounded-md hover:bg-gray-800 transition-colors disabled:opacity-30"

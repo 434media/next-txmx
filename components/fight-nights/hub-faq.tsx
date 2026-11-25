@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Section } from "./section"
+import { FAN_ACCOUNTS_ENABLED } from "../../lib/feature-flags"
 
 // Real TXMX fight-night photography for the background.
 const FAQ_IMAGE =
@@ -10,12 +11,15 @@ const FAQ_IMAGE =
  * an image-as-background card: the photo fills the card, a left-weighted scrim
  * keeps the overlaid questions legible (so this card is a dark treatment — white
  * text over the darkened image). Uses native <details>/<summary> so it works
- * without client JS. Ends with a re-CTA back to the account form.
+ * without client JS. Ends with a re-CTA: the account form while fan accounts
+ * are on, otherwise the explainer.
  */
 const FAQS = [
   {
     q: "Is it free to play?",
-    a: "Yes — completely free, and there's nothing to sign up for. Fan picks are closed for now; the cards, results, and leaderboards stay open to everyone.",
+    a: FAN_ACCOUNTS_ENABLED
+      ? "Yes — completely free. Create an account, make your picks, and you're in. No purchase, no catch."
+      : "Yes — completely free, and there's nothing to sign up for. Fan picks are closed for now; the cards, results, and leaderboards stay open to everyone.",
   },
   {
     q: "Do I have to be at the venue?",
@@ -84,13 +88,13 @@ export default function HubFaq() {
               ))}
             </div>
 
-            {/* Closing re-CTA. The old "#join" account band is gone, so this
-                points back up at the explainer. */}
+            {/* Closing re-CTA: the account band (#join) while fan accounts are
+                on, otherwise back up at the explainer. */}
             <Link
-              href="#how-it-works"
+              href={FAN_ACCOUNTS_ENABLED ? "#join" : "#how-it-works"}
               className="mt-8 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-white hover:text-amber-400 transition-colors"
             >
-              New here? See how it works
+              {FAN_ACCOUNTS_ENABLED ? "Ready? Create your free account" : "New here? See how it works"}
               <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24" aria-hidden>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
               </svg>

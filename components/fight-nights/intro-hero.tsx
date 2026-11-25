@@ -1,6 +1,7 @@
 "use client"
 
 import { useRef, useState } from "react"
+import { FAN_ACCOUNTS_ENABLED } from "../../lib/feature-flags"
 
 // Real TXMX brand assets (same footage used by the retired Scorecard hero).
 const VIDEO_SRC =
@@ -53,6 +54,14 @@ export default function IntroHero() {
             Free to play · No experience needed
           </p>
           <div className="flex flex-col sm:flex-row items-start gap-3">
+            {FAN_ACCOUNTS_ENABLED && (
+              <a
+                href="#join"
+                className="inline-flex items-center px-6 py-3 bg-amber-500 text-black text-xs font-bold tracking-[0.2em] uppercase rounded-md hover:bg-amber-400 transition-colors"
+              >
+                Create Free Account
+              </a>
+            )}
             <a
               href="#how-it-works"
               className="inline-flex items-center px-6 py-3 border border-white/30 text-white text-xs font-bold tracking-[0.2em] uppercase rounded-md hover:border-white/60 hover:bg-white/5 transition-all"

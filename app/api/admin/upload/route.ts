@@ -71,8 +71,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const app = getApps()[0]
-    const bucket = getStorage(app).bucket(process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET)
+    // The default app: lib/firebase-admin.ts may also create a 'staff' app.
+    const app = getApps().find((a) => a.name === '[DEFAULT]')
+    // TXMX_MEDIA_BUCKET keeps uploads in the bucket the site's images already
+    // live in (groovy-ego's, public read) when the fan project moves; it falls
+    // back to the Firebase project's own bucket.
+    const bucket = getStorage(app).bucket(
+      process.env.TXMX_MEDIA_BUCKET || process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    )
 
     // Generate a safe filename. The extension comes from the validated content
     // type, never from the uploaded name.

@@ -20,7 +20,11 @@
  * The admin portal has its own gate (app/admin/admin-auth-gate.tsx) and is
  * unaffected by this flag.
  */
-export const FAN_ACCOUNTS_ENABLED: boolean = false
+export const FAN_ACCOUNTS_ENABLED: boolean =
+  // On since the c434-txmx move (FB-1): fans sign up and sign in on TXMX's own
+  // Firebase project, apart from staff. Turning fan accounts off again is this
+  // one line.
+  true
 
 /**
  * Name + email gate in front of the Rise of a Champion photo gallery.
